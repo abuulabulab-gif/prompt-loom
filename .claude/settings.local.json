@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Start-Sleep -Seconds 3; try { Invoke-WebRequest -Uri \"http://localhost:5173\" -TimeoutSec 5 -UseBasicParsing | Select-Object StatusCode } catch { \"Error: $_\" })",
+      "PowerShell(npm run *)",
+      "PowerShell(Start-Sleep -Seconds 3; try { $r = Invoke-WebRequest -Uri \"http://localhost:5173\" -TimeoutSec 5 -UseBasicParsing; $r.StatusCode } catch { \"Error: $_\" })",
+      "PowerShell(Get-Process *)"
+    ]
+  }
+}

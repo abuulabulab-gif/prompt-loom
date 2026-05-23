@@ -1,0 +1,8 @@
+export const TOOLS = [
+  { id:'general', name:'汎用',           icon:'🌐', suffix:'',               note:'どのAIでも使用可',         noteEn:'Universal',                sep:', ' },
+  { id:'mj',      name:'Midjourney',     icon:'🟦', suffix:'--ar 3:2 --v 8', note:'--ar で比率変更可',        noteEn:'Change ratio with --ar',   sep:' ' },
+  { id:'nai',     name:'NovelAI',        icon:'📘', suffix:'',               note:'重みを{}形式に変換',       noteEn:'Converts weights to {}',   sep:', ' },
+  { id:'sd',      name:'SD/WebUI',       icon:'🖼️', suffix:'',               note:'Forge/ComfyUI対応',        noteEn:'Forge/ComfyUI',            sep:', ' },
+  { id:'flux',    name:'Flux2',          icon:'⚡', suffix:'',               note:'重み構文を自動除去',       noteEn:'Auto-strips weights',      sep:', ', stripWeights:true },
+  { id:'dalle',   name:'DALL-E/Copilot', icon:'🎨', suffix:'',               note:'自然文タブへ自動切替',    noteEn:'Auto-switches to natural', sep:', ' },
+];

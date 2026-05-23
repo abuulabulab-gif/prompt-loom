@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ──────────────────────────────────────────────────────────────
+   LOOM design tokens. Switch on [data-theme="light"] on <html>.
+   Values are space-separated RGB triplets so Tailwind's
+   rgb(var(--x) / <alpha-value>) works (e.g. bg-surface/50).
+   ────────────────────────────────────────────────────────────── */
+:root {
+  --bg: 8 9 15;
+  --surface: 14 16 23;
+  --surface-alt: 19 22 31;
+  --border: 28 32 51;
+  --border-bright: 52 60 90;
+  --text: 225 232 255;
+  --muted: 128 142 175;
+  --dim: 88 98 130;
+  --panel: 12 15 26;
+  --input-bg: 8 9 15;
+  --output-border: 50 68 130;
+  --tint-accent: 30 42 74;
+  --tint-warn: 46 30 13;
+  --tint-warn-tag: 58 40 16;
+  --tint-danger: 58 21 32;
+  --warn-text: 251 191 36;
+  --prompt-text: 127 168 255;
+  --good-text: 79 255 176;
+  /* theme-adaptive accent colours */
+  --c-blue:   108 143 255;
+  --c-blue-s: 160 192 255;
+  --c-green:   52 211 153;
+  --c-purple: 192 132 252;
+  --c-red:    248 113 113;
+  --c-teal:    34 197  94;
+}
+
+[data-theme="light"] {
+  --bg: 244 245 250;
+  --surface: 255 255 255;
+  --surface-alt: 238 240 247;
+  --border: 210 215 232;
+  --border-bright: 182 188 212;
+  --text: 22 25 42;
+  --muted: 100 110 145;
+  --dim: 148 156 185;
+  --panel: 238 240 247;
+  --input-bg: 255 255 255;
+  --output-border: 165 185 235;
+  --tint-accent: 219 229 252;
+  --tint-warn: 254 243 199;
+  --tint-warn-tag: 253 230 138;
+  --tint-danger: 254 226 226;
+  --warn-text: 130 55 10;
+  --prompt-text: 30 86 220;
+  --good-text: 5 120 85;
+  /* theme-adaptive accent colours — darker for white bg */
+  --c-blue:    41  82 196;
+  --c-blue-s:  41  82 196;
+  --c-green:   22 163  74;
+  --c-purple: 124  58 237;
+  --c-red:    185  28  28;
+  --c-teal:    21 128  61;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+  background: rgb(var(--bg));
+}
+
+body {
+  font-family: "Segoe UI", "Noto Sans JP", -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  color: rgb(var(--text));
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgb(var(--border-bright)); border-radius: 4px; }
+
+input, textarea, button { font-family: inherit; }

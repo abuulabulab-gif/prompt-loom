@@ -1,0 +1,201 @@
+import { useState } from "react";
+
+const SCENE_POSITIONS = [
+  { id: 'left',   ja: '左',   en: 'on the left'        },
+  { id: 'center', ja: '中央', en: 'in the center'       },
+  { id: 'right',  ja: '右',   en: 'on the right'        },
+  { id: 'back',   ja: '後ろ', en: 'in the background'   },
+];
+const SCENE_RELATIONS = [
+  { ja: '見つめ合う',     en: 'looking at each other'    },
+  { ja: '手をつなぐ',     en: 'holding hands'             },
+  { ja: '背中合わせ',     en: 'back to back'              },
+  { ja: '抱き合う',       en: 'hugging'                   },
+  { ja: '並んで立つ',     en: 'standing side by side'     },
+  { ja: '対決',           en: 'facing each other'         },
+  { ja: '寄り添う',       en: 'leaning on each other'     },
+  { ja: '指定なし',       en: ''                          },
+];
+
+const charBodyText = char => {
+  const ids = ['attribute', 'face', 'body', 'outfit', 'feature', 'effect'];
+  return char.blocks.filter(b => b.enabled !== false && ids.includes(b.id) && b.text?.trim()).map(b => b.text.trim()).join(', ');
+};
+
+export default function SceneComposeModal({ characters, lang, theme, onClose }) {
+  const [selected, setSelected] = useState([]);
+  const [relation, setRelation] = useState(SCENE_RELATIONS[0]);
+  const [globalQuality, setGlobalQuality] = useState('masterpiece, best quality, ultra-detailed');
+  const [useBreak, setUseBreak] = useState(true);
+  const [copied, setCopied] = useState(false);
+
+  const toggleChar = charId => {
+    setSelected(prev => {
+      if (prev.find(s => s.charId === charId)) return prev.filter(s => s.charId !== charId);
+      if (prev.length >= 3) return prev;
+      const posUsed = prev.map(s => s.position);
+      const nextPos = SCENE_POSITIONS.find(p => !posUsed.includes(p.id))?.id || 'center';
+      return [...prev, { charId, position: nextPos }];
+    });
+  };
+  const setPos = (charId, position) => setSelected(prev => prev.map(s => s.charId === charId ? { ...s, position } : s));
+
+  const countTag = (() => {
+    const girls = selected.length;
+    if (girls === 2) return '2girls'; if (girls === 3) return '3girls'; return '1girl';
+  })();
+
+  const sep = useBreak ? ' BREAK ' : ', ';
+  const charParts = selected.map(s => {
+    const char = characters.find(c => c.id === s.charId);
+    const pos = SCENE_POSITIONS.find(p => p.id === s.position);
+    const body = charBodyText(char);
+    return [body, pos?.en].filter(Boolean).join(', ');
+  }).filter(Boolean);
+
+  const relEn = relation.en;
+  const built = (() => {
+    if (selected.length <= 1) return [globalQuality.trim(), countTag, relEn, ...charParts].filter(Boolean).join(', ');
+    const head = [globalQuality.trim(), countTag, relEn].filter(Boolean).join(', ');
+    return [head, ...charParts].filter(Boolean).join(sep);
+  })();
+
+  const doCopy = () => {
+    if (!built) return;
+    navigator.clipboard.writeText(built).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); });
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/[0.82] z-[300] flex items-center justify-center p-4" onClick={onClose}>
+      <div onClick={e => e.stopPropagation()}
+        className="bg-surface border border-linebright rounded-[14px] w-full max-w-[620px] max-h-[90vh] overflow-y-auto p-[18px]">
+
+        <div className="flex items-center justify-between mb-[6px]">
+          <span className="text-fg text-[15px] font-extrabold">🎬 {lang === 'ja' ? 'シーン合成' : 'Scene Compose'}</span>
+          <button onClick={onClose} className="bg-transparent border border-dim rounded-[6px] px-[10px] py-1 text-muted cursor-pointer text-[12px]">
+            {lang === 'ja' ? '閉じる' : 'Close'}
+          </button>
+        </div>
+        <div className="text-muted text-[11px] mb-[14px]">
+          {lang === 'ja' ? '保存済みキャラを2〜3人選んで1枚の画像用プロンプトに合成します' : 'Combine 2-3 saved characters into one image prompt'}
+        </div>
+
+        {/* Step 1: select chars */}
+        <div className="text-muted text-[10px] font-mono mb-[6px] tracking-[0.07em]">
+          {lang === 'ja' ? `① キャラを選ぶ（${selected.length}/3）` : `① Select characters (${selected.length}/3)`}
+        </div>
+        <div className="flex flex-wrap gap-[6px] mb-[14px]">
+          {characters.map(c => {
+            const sel = selected.find(s => s.charId === c.id);
+            return (
+              <div key={c.id} onClick={() => toggleChar(c.id)}
+                style={{
+                  background: sel ? c.color + '22' : 'rgb(var(--surface-alt))',
+                  border: `1px solid ${sel ? c.color : 'rgb(var(--border))'}`,
+                }}
+                className="flex items-center gap-[6px] rounded-[9px] px-[11px] py-[7px] cursor-pointer transition-all duration-[120ms]">
+                <span className="text-[15px]">{c.emoji}</span>
+                <span style={{ color: sel ? c.color : 'rgb(var(--text))' }} className="text-[12px] font-semibold">{c.name}</span>
+                {sel && <span style={{ color: c.color }} className="text-[10px] font-mono">✓</span>}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Step 2: positions */}
+        {selected.length > 0 && (
+          <>
+            <div className="text-muted text-[10px] font-mono mb-[6px] tracking-[0.07em]">{lang === 'ja' ? '② 配置を決める' : '② Positions'}</div>
+            <div className="mb-[14px]">
+              {selected.map(s => {
+                const c = characters.find(ch => ch.id === s.charId);
+                return (
+                  <div key={s.charId} className="flex items-center gap-2 mb-[6px]">
+                    <span className="text-[14px]">{c.emoji}</span>
+                    <span style={{ color: c.color }} className="text-[12px] font-semibold min-w-[70px]">{c.name}</span>
+                    <div className="flex gap-1">
+                      {SCENE_POSITIONS.map(p => (
+                        <button key={p.id} onClick={() => setPos(s.charId, p.id)}
+                          style={{
+                            background: s.position === p.id ? c.color + '22' : 'rgb(var(--surface-alt))',
+                            border: `1px solid ${s.position === p.id ? c.color : 'rgb(var(--border))'}`,
+                            color: s.position === p.id ? c.color : 'rgb(var(--muted))',
+                          }}
+                          className="rounded-[5px] px-[9px] py-[3px] text-[10px] cursor-pointer font-mono">
+                          {lang === 'ja' ? p.ja : p.en}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+
+        {/* Step 3: relation */}
+        {selected.length > 1 && (
+          <>
+            <div className="text-muted text-[10px] font-mono mb-[6px] tracking-[0.07em]">{lang === 'ja' ? '③ 関係性' : '③ Relationship'}</div>
+            <div className="flex flex-wrap gap-[5px] mb-[14px]">
+              {SCENE_RELATIONS.map(r => (
+                <button key={r.ja} onClick={() => setRelation(r)}
+                  className={`rounded-[6px] px-[10px] py-1 text-[11px] cursor-pointer font-mono ${relation.ja === r.ja ? 'bg-[#6c8fff22] border border-accent text-accent' : 'bg-surfalt border border-line text-fg'}`}>
+                  {lang === 'ja' ? r.ja : (r.en || 'none')}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* BREAK option */}
+        {selected.length > 1 && (
+          <div className="flex items-center gap-[10px] mb-[14px] flex-wrap">
+            <label className="flex items-center gap-[6px] cursor-pointer text-fg text-[11px]">
+              <input type="checkbox" checked={useBreak} onChange={e => setUseBreak(e.target.checked)} style={{ accentColor: '#6c8fff' }} />
+              {lang === 'ja' ? 'BREAK で区切る（色移り対策・NovelAI/SD推奨）' : 'Separate with BREAK'}
+            </label>
+          </div>
+        )}
+
+        {/* Global quality */}
+        <div className="text-muted text-[10px] font-mono mb-[6px] tracking-[0.07em]">{lang === 'ja' ? '共通品質タグ' : 'Global quality'}</div>
+        <input
+          value={globalQuality}
+          onChange={e => setGlobalQuality(e.target.value)}
+          className="w-full bg-inputbg border border-line rounded-[7px] text-fg text-[11px] px-[10px] py-[7px] outline-none font-mono box-border mb-[14px]"
+        />
+
+        {/* Output */}
+        <div className="text-muted text-[10px] font-mono mb-[6px] tracking-[0.07em]">{lang === 'ja' ? '合成プロンプト' : 'Combined prompt'}</div>
+        <div
+          className={`bg-inputbg border border-output-border rounded-[8px] px-3 py-[10px] text-[12px] font-mono min-h-[60px] max-h-[140px] overflow-y-auto leading-[1.6] break-all mb-3 select-all ${built ? 'text-prompt' : 'text-muted'}`}
+        >
+          {built || (lang === 'ja' ? 'キャラを選ぶと合成プロンプトが表示されます' : 'Select characters to build')}
+        </div>
+
+        <button
+          onClick={doCopy}
+          disabled={!built}
+          style={(() => {
+            const goodColor = theme === 'dark' ? '#4fffb0' : '#059655';
+            return {
+              background: copied ? goodColor + '20' : built ? 'linear-gradient(135deg,#4a6fff,#8a4fff)' : 'rgb(var(--dim))',
+              border: `1px solid ${copied ? goodColor + '60' : 'transparent'}`,
+              color: copied ? goodColor : built ? 'white' : 'rgb(var(--muted))',
+            };
+          })()}
+          className="w-full rounded-[9px] py-[11px] text-[13px] font-bold cursor-pointer disabled:cursor-default tracking-[0.03em]"
+        >
+          {copied ? '✓ Copied!' : '📋 ' + (lang === 'ja' ? '合成プロンプトをコピー' : 'Copy combined prompt')}
+        </button>
+
+        {selected.length > 1 && !useBreak && (
+          <div className="text-warn text-[10px] font-mono text-center mt-2">
+            ⚠️ {lang === 'ja' ? 'BREAK無しは色移りが起きやすいです' : 'Without BREAK, color bleeding is likely'}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
