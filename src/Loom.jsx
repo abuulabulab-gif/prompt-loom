@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 const DONATE_URL = 'https://buymeacoffee.com/prompt_loom';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
@@ -30,6 +30,9 @@ import CommandPalette from "./components/CommandPalette.jsx";
 import GlobalTagSearch from "./components/GlobalTagSearch.jsx";
 import { toNaturalJa, toNaturalEn } from "./utils/naturalLanguage.js";
 import CharacterNote from "./CharacterNote/index.jsx";
+import { useAuth } from "./hooks/useAuth.js";
+import { pushToCloud, pullFromCloud, mergeCharacters } from "./sync/firestore.js";
+import AuthButton from "./components/AuthButton.jsx";
 
 // Merge saved blocks with current BLOCKS_DEF so newly added/removed tags
 // are always reflected in existing characters without wiping user data.
@@ -105,6 +108,12 @@ export default function Loom() {
   const [focusBlockId, setFocusBlockId] = useState(null);
   const [showWelcome, setShowWelcome] = useState(false);
   const [vw, setVw] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+
+  // ── Auth & cloud sync ──
+  const { user, signInWithGoogle, signOut } = useAuth();
+  const [syncStatus, setSyncStatus] = useState(''); // '' | 'syncing' | 'synced' | 'error'
+  const cloudPushTimer = useRef(null);
+  const isSyncingFromCloud = useRef(false);
 
   useEffect(() => {
     const onResize = () => setVw(window.innerWidth);
@@ -217,6 +226,45 @@ export default function Loom() {
     }, 800);
   }, [characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight, loaded]);
 
+  // ── Cloud sync: pull on login ──
+  useEffect(() => {
+    if (!user || !loaded) return;
+    (async () => {
+      isSyncingFromCloud.current = true;
+      setSyncStatus('syncing');
+      try {
+        const remote = await pullFromCloud(user.uid);
+        setCharacters(prev => {
+          const merged = mergeCharacters(prev, remote);
+          return merged;
+        });
+        setSyncStatus('synced');
+      } catch {
+        setSyncStatus('error');
+      } finally {
+        isSyncingFromCloud.current = false;
+      }
+    })();
+  }, [user?.uid, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Cloud sync: debounced push on change ──
+  useEffect(() => {
+    if (!user || !loaded || isSyncingFromCloud.current) return;
+    if (cloudPushTimer.current) clearTimeout(cloudPushTimer.current);
+    cloudPushTimer.current = setTimeout(async () => {
+      if (!user) return;
+      setSyncStatus('syncing');
+      const ok = await pushToCloud(user.uid, characters);
+      setSyncStatus(ok ? 'synced' : 'error');
+    }, 3000);
+  }, [characters, user, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Cloud sync: sign-in handler ──
+  const handleSignIn = async () => {
+    try { await signInWithGoogle(); }
+    catch (e) { if (e.code !== 'auth/popup-closed-by-user') console.error(e); }
+  };
+
   // ── Color picker apply ──
   const TARGET_TO_BLOCK = { hair: 'face', eyes: 'face', skin: 'body', dress: 'outfit', shirt: 'outfit', skirt: 'outfit', jacket: 'outfit', ribbon: 'outfit', shoes: 'outfit', theme: 'artstyle' };
   const applyColorTag = (shadeEn, colorEn, targetEn, targetId) => {
@@ -304,7 +352,7 @@ export default function Loom() {
   const copyPresetToChar = (presetKey, preset, targetCharId) => setCharacters(prev => prev.map(c => c.id === targetCharId ? { ...c, [presetKey]: [...(c[presetKey] || []), { ...preset, id: uid() }] } : c));
 
   // ── Character helpers ──
-  const updateChar = (id, upd) => setCharacters(prev => prev.map(c => c.id === id ? { ...c, ...upd } : c));
+  const updateChar = (id, upd) => setCharacters(prev => prev.map(c => c.id === id ? { ...c, ...upd, lastModified: Date.now() } : c));
   const dismissWelcome = async () => {
     setShowWelcome(false);
     try { await db.kv.put({ key: 'welcomeSeen', value: true }); } catch {}
@@ -889,6 +937,15 @@ export default function Loom() {
             )}
           </div>
         )}
+        {/* 🔐 Auth */}
+        <AuthButton
+          user={user}
+          loading={user === undefined}
+          onSignIn={handleSignIn}
+          onSignOut={signOut}
+          syncStatus={syncStatus}
+          lang={lang}
+        />
         {/* ⚙️ 設定 */}
         <button onClick={() => setSettingsOpen(true)} title={lang === 'ja' ? 'テーマ・言語・表示モード・ショートカット (?)' : 'Theme / Language / View mode / Shortcuts (?)'}
           className="bg-transparent border border-dim rounded-[6px] px-[9px] py-1 text-muted cursor-pointer text-[10px] font-mono whitespace-nowrap">

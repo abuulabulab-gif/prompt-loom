@@ -96,6 +96,7 @@ export const makeCharacter = (name = '新キャラ', color = CHAR_COLORS[0], emo
   id: uid(), name, color, emoji, memo: '',
   folder: '', archived: false,
   loras: [], versions: [], costumePresets: [], shotPresets: [],
+  lastModified: Date.now(),
   blocks: deep(BLOCKS_DEF),
   profile: {
     basic: { age: '', species: '', personality: '' },
