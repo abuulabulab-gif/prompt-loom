@@ -6,7 +6,8 @@ import CharVersions from "./components/CharVersions.jsx";
 import { useOutputDrag } from "./hooks/useOutputDrag.js";
 import { useVariations } from "./hooks/useVariations.js";
 import { SortableContext, arrayMove, rectSortingStrategy } from "@dnd-kit/sortable";
-import { loadState, saveState, saveCharImages, loadCharImages, deleteCharImages } from "./storage.js";
+import db, { loadState, saveState, saveCharImages, loadCharImages, deleteCharImages } from "./storage.js";
+import WelcomeHint from "./components/WelcomeHint.jsx";
 import LibraryModal from "./components/modals/LibraryModal.jsx";
 import {
   CHAR_COLORS, CHAR_EMOJIS, WARN_LEN, LIMIT_LEN,
@@ -101,6 +102,7 @@ export default function Loom() {
   const [thumbs, setThumbs] = useState({});
   const [layout, setLayout] = useState('1col');
   const [focusBlockId, setFocusBlockId] = useState(null);
+  const [showWelcome, setShowWelcome] = useState(false);
   const [vw, setVw] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
 
   useEffect(() => {
@@ -171,6 +173,11 @@ export default function Loom() {
           if (d.viewMode) setViewMode(d.viewMode);
           if (d.outputHeight) setOutputHeight(d.outputHeight);
         }
+      } catch {}
+      // First-visit welcome hint
+      try {
+        const seen = await db.kv.get('welcomeSeen');
+        if (!seen) setShowWelcome(true);
       } catch {}
       // Check for ?share= URL param
       try {
@@ -296,6 +303,11 @@ export default function Loom() {
 
   // ── Character helpers ──
   const updateChar = (id, upd) => setCharacters(prev => prev.map(c => c.id === id ? { ...c, ...upd } : c));
+  const dismissWelcome = async () => {
+    setShowWelcome(false);
+    try { await db.kv.put({ key: 'welcomeSeen', value: true }); } catch {}
+  };
+
   const addCharacter = () => { const ci = characters.length % CHAR_COLORS.length; const ei = characters.length % CHAR_EMOJIS.length; const c = makeCharacter(`キャラ ${characters.length + 1}`, CHAR_COLORS[ci], CHAR_EMOJIS[ei]); setCharacters(prev => [...prev, c]); setActiveCharId(c.id); setCharPanelOpen(true); };
   const duplicateCharacter = (id) => { const src = characters.find(c => c.id === id); if (!src) return; const copy = { ...deep(src), id: uid(), name: src.name + ' (コピー)' }; setCharacters(prev => { const i = prev.findIndex(c => c.id === id); const next = [...prev]; next.splice(i + 1, 0, copy); return next; }); setActiveCharId(copy.id); };
   const deleteCharacter = async (id) => {
@@ -1767,6 +1779,7 @@ export default function Loom() {
         viewMode={viewMode} onSetViewMode={setViewMode}
         onToggleLang={() => setLang(l => l === 'ja' ? 'en' : 'ja')} />}
       {paletteOpen && <CommandPalette commands={paletteCommands} lang={lang} onClose={() => setPaletteOpen(false)} />}
+      {showWelcome && loaded && <WelcomeHint lang={lang} onDismiss={dismissWelcome} />}
       <GlobalTagSearch
         open={globalSearchOpen}
         onClose={() => setGlobalSearchOpen(false)}
