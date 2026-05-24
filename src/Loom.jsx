@@ -126,8 +126,16 @@ export default function Loom() {
   // ── Auth & cloud sync ──
   const { user, signInWithGoogle, signOut } = useAuth();
   const [syncStatus, setSyncStatus] = useState(''); // '' | 'syncing' | 'synced' | 'error'
+  const [syncErrToast, setSyncErrToast] = useState(false);
   const cloudPushTimer = useRef(null);
   const isSyncingFromCloud = useRef(false);
+
+  useEffect(() => {
+    if (syncStatus !== 'error') return;
+    setSyncErrToast(true);
+    const t = setTimeout(() => setSyncErrToast(false), 7000);
+    return () => clearTimeout(t);
+  }, [syncStatus]);
 
   useEffect(() => {
     const onResize = () => setVw(window.innerWidth);
@@ -569,7 +577,8 @@ export default function Loom() {
   // ── Share URL ──
   const copyShareUrl = () => {
     try {
-      const payload = { name: activeChar.name, emoji: activeChar.emoji, color: activeChar.color, blocks: activeChar.blocks.map(b => ({ id: b.id, text: b.text, enabled: b.enabled })) };
+      // Only include non-empty enabled blocks to keep URL short
+      const payload = { name: activeChar.name, emoji: activeChar.emoji, color: activeChar.color, blocks: activeChar.blocks.filter(b => b.enabled !== false && b.text?.trim()).map(b => ({ id: b.id, text: b.text })) };
       const bytes = new TextEncoder().encode(JSON.stringify(payload));
       const encoded = btoa(Array.from(bytes, b => String.fromCharCode(b)).join(''));
       const url = `${window.location.origin}${window.location.pathname}?share=${encoded}`;
@@ -841,9 +850,30 @@ export default function Loom() {
 
   const restoreFromHistory = (entry) => { setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, blocks: deep(entry.blocks) } : c)); setHistoryOpen(false); };
 
-  // ── Export/Import ──
-  const handleExport = () => downloadJSON({ version: 'loom-v4', characters }, `loom-${Date.now()}.loom`);
-  const handleImport = (e) => { const file = e.target.files[0]; if (!file) return; if (file.size > 5_000_000) { alert(lang === 'ja' ? 'ファイルが大きすぎます（最大5MB）' : 'File too large (max 5 MB)'); e.target.value = ''; return; } const r = new FileReader(); r.onload = (ev) => { try { const d = JSON.parse(ev.target.result); if (d.characters) { setCharacters(d.characters.map(c => ({ ...c, blocks: mergeCharacterBlocks(c.blocks) }))); setActiveCharId(d.characters[0]?.id); } } catch { alert(lang === 'ja' ? '読み込みに失敗しました' : 'Failed to import file'); } }; r.readAsText(file); e.target.value = ''; };
+  // ── Export/Import (1 character) ──
+  const handleExport = () => downloadJSON(
+    { version: 'loom-v4', character: activeChar },
+    `loom-${activeChar.name}-${Date.now()}.loom`
+  );
+  const handleImport = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 5_000_000) { alert(lang === 'ja' ? 'ファイルが大きすぎます（最大5MB）' : 'File too large (max 5 MB)'); e.target.value = ''; return; }
+    const r = new FileReader();
+    r.onload = (ev) => {
+      try {
+        const d = JSON.parse(ev.target.result);
+        // Support new single-char format and old multi-char format
+        const src = d.character ?? d.characters?.[0];
+        if (!src) throw new Error('no data');
+        const imported = { ...src, id: uid(), blocks: mergeCharacterBlocks(src.blocks) };
+        setCharacters(prev => [...prev, imported]);
+        setActiveCharId(imported.id);
+      } catch { alert(lang === 'ja' ? '読み込みに失敗しました' : 'Failed to import file'); }
+    };
+    r.readAsText(file);
+    e.target.value = '';
+  };
 
   // ── Preset export / import (costume & shot presets only) ──
   const handlePresetExport = () => {
@@ -927,10 +957,10 @@ export default function Loom() {
     { id: 'tab-pos', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: '✦', label: 'Switch to Positive tab', labelJa: 'Positive タブへ切替', shortcut: 'P', action: () => setOutputTab('positive') },
     { id: 'tab-neg', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: '✕', label: 'Switch to Negative tab', labelJa: 'Negative タブへ切替', shortcut: 'N', action: () => setOutputTab('negative') },
     { id: 'view-mode', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: viewMode === 'simple' ? '📋' : viewMode === 'expert' ? '🔧' : '🗂️', label: `View mode: ${viewMode} → cycle`, labelJa: `表示モード切替 (現在: ${viewMode === 'simple' ? 'シンプル' : viewMode === 'expert' ? 'エキスパート' : '通常'})`, action: cycleViewMode },
-    { id: 'share-url', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: '🔗', label: 'Share character URL', labelJa: 'キャラをURLで共有', action: copyShareUrl },
+    { id: 'share-url', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: '🔗', label: 'Share prompt', labelJa: 'プロンプトをシェア', action: copyShareUrl },
     { id: 'toggle-theme', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: theme === 'dark' ? '☀️' : '🌙', label: 'Toggle theme', labelJa: 'テーマを切替', action: () => setTheme(t => t === 'dark' ? 'light' : 'dark') },
     { id: 'toggle-lang', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: '🌐', label: 'Toggle language JA/EN', labelJa: '言語を切替 JA/EN', action: () => setLang(l => l === 'ja' ? 'en' : 'ja') },
-    { id: 'export', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: '💾', label: 'Export JSON', labelJa: 'JSONで書き出し', action: handleExport },
+    { id: 'export', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: '💾', label: 'Backup character', labelJa: 'キャラをバックアップ', action: handleExport },
     // Characters
     ...characters.map(c => ({ id: `char-${c.id}`, group: lang === 'ja' ? 'キャラクター' : 'Characters', icon: c.emoji, label: c.name, labelJa: c.name, description: `${c.blocks?.filter(b => b.enabled !== false && b.text?.trim()).length || 0} active blocks`, action: () => { setActiveCharId(c.id); setCharPanelOpen(true); } })),
     // Blocks
@@ -1039,42 +1069,42 @@ export default function Loom() {
         {/* 🔍 検索 / ⌘K (PC only) */}
         {!isMobile && <button onClick={() => setGlobalSearchOpen(true)} title={lang === 'ja' ? 'タグ全体検索 (G / Ctrl+F)' : 'Global tag search (G / Ctrl+F)'} className="bg-transparent border border-dim rounded-[6px] px-[9px] py-1 text-muted cursor-pointer text-[10px] font-mono whitespace-nowrap">🔍 {lang === 'ja' ? '検索' : 'Search'}</button>}
         {!isMobile && <button onClick={() => setPaletteOpen(true)} title={lang === 'ja' ? 'コマンドパレット (Ctrl+K)' : 'Command Palette (Ctrl+K)'} className="bg-transparent border border-dim rounded-[6px] px-[9px] py-1 text-muted cursor-pointer text-[10px] font-mono">⌘K</button>}
-        {/* 💾 データ (PC only) */}
-        {!isMobile && (
-          <div className="relative flex-shrink-0 flex items-center">
-            <button onClick={() => setDataMenuOpen(p => !p)}
-              title={lang === 'ja' ? 'データの書き出し・読み込み' : 'Export / Import data'}
-              className={`bg-transparent border rounded-[6px] px-[9px] py-1 text-muted cursor-pointer text-[10px] font-mono whitespace-nowrap ${dataMenuOpen ? 'border-accent/50 text-accent' : 'border-dim'}`}>
-              💾 {lang === 'ja' ? 'データ' : 'Data'} ▾
-            </button>
-            {dataMenuOpen && (
-              <>
-                <div className="fixed inset-0 z-[199]" onClick={() => setDataMenuOpen(false)} />
-                <div className="absolute right-0 top-full mt-[4px] z-[200] bg-surface border border-line rounded-[9px] shadow-xl py-[4px] min-w-[200px]">
-                  <div className="px-[10px] py-[4px] text-[9px] font-mono text-dim uppercase tracking-wider">{lang === 'ja' ? 'キャラクター' : 'Characters'}</div>
-                  <button onClick={() => { handleExport(); setDataMenuOpen(false); }}
-                    className="w-full text-left px-[12px] py-[6px] text-[11px] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
-                    <span className="text-dim">↓</span>{lang === 'ja' ? '全キャラを書き出し' : 'Export all characters'}
-                  </button>
-                  <button onClick={() => { fileRef.current?.click(); setDataMenuOpen(false); }}
-                    className="w-full text-left px-[12px] py-[6px] text-[11px] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
-                    <span className="text-dim">↑</span>{lang === 'ja' ? '全キャラを読み込み' : 'Import characters (replace all)'}
-                  </button>
-                  <div className="border-t border-line mx-2 my-[4px]" />
-                  <div className="px-[10px] py-[4px] text-[9px] font-mono text-dim uppercase tracking-wider">{lang === 'ja' ? 'プリセット' : 'Presets'}</div>
-                  <button onClick={() => { handlePresetExport(); setDataMenuOpen(false); }}
-                    className="w-full text-left px-[12px] py-[6px] text-[11px] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
-                    <span className="text-dim">↓</span>{lang === 'ja' ? '衣装・構図プリセット書き出し' : 'Export costume & shot presets'}
-                  </button>
-                  <button onClick={() => { presetFileRef.current?.click(); setDataMenuOpen(false); }}
-                    className="w-full text-left px-[12px] py-[6px] text-[11px] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
-                    <span className="text-dim">↑</span>{lang === 'ja' ? 'プリセット読み込み（マージ）' : 'Import & merge presets'}
-                  </button>
+        {/* 💾 データ */}
+        <div className="relative flex-shrink-0 flex items-center">
+          <button onClick={() => setDataMenuOpen(p => !p)}
+            title={lang === 'ja' ? 'キャラのバックアップ・復元' : 'Backup / Restore character'}
+            className={`bg-transparent border rounded-[6px] px-[9px] py-1 text-muted cursor-pointer text-[10px] font-mono whitespace-nowrap ${dataMenuOpen ? 'border-accent/50 text-accent' : 'border-dim'}`}>
+            💾{!isMobile && ` ${lang === 'ja' ? 'バックアップ' : 'Backup'}`} ▾
+          </button>
+          {dataMenuOpen && (
+            <>
+              <div className="fixed inset-0 z-[199]" onClick={() => setDataMenuOpen(false)} />
+              <div className="absolute right-0 top-full mt-[4px] z-[200] bg-surface border border-line rounded-[9px] shadow-xl py-[4px] min-w-[210px]">
+                <div className="px-[10px] py-[4px] text-[9px] font-mono text-dim uppercase tracking-wider">
+                  {lang === 'ja' ? `選択中: ${activeChar?.name}` : `Selected: ${activeChar?.name}`}
                 </div>
-              </>
-            )}
-          </div>
-        )}
+                <button onClick={() => { handleExport(); setDataMenuOpen(false); }}
+                  className="w-full text-left px-[12px] py-[6px] text-[11px] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
+                  <span className="text-dim">↓</span>{lang === 'ja' ? 'キャラをバックアップ' : 'Backup character'}
+                </button>
+                <button onClick={() => { fileRef.current?.click(); setDataMenuOpen(false); }}
+                  className="w-full text-left px-[12px] py-[6px] text-[11px] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
+                  <span className="text-dim">↑</span>{lang === 'ja' ? 'バックアップから復元' : 'Restore from backup'}
+                </button>
+                <div className="border-t border-line mx-2 my-[4px]" />
+                <div className="px-[10px] py-[4px] text-[9px] font-mono text-dim uppercase tracking-wider">{lang === 'ja' ? 'プリセット' : 'Presets'}</div>
+                <button onClick={() => { handlePresetExport(); setDataMenuOpen(false); }}
+                  className="w-full text-left px-[12px] py-[6px] text-[11px] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
+                  <span className="text-dim">↓</span>{lang === 'ja' ? '衣装・構図プリセット書き出し' : 'Export costume & shot presets'}
+                </button>
+                <button onClick={() => { presetFileRef.current?.click(); setDataMenuOpen(false); }}
+                  className="w-full text-left px-[12px] py-[6px] text-[11px] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
+                  <span className="text-dim">↑</span>{lang === 'ja' ? 'プリセットを追加読み込み' : 'Add presets from file'}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
         {/* 🔐 Auth */}
         <AuthButton
           user={user}
@@ -1242,28 +1272,13 @@ export default function Loom() {
               }
             </div>
             <CharVersions activeChar={activeChar} lang={lang} onSave={saveVersion} onRestore={restoreVersion} onDelete={deleteVersion} color={activeChar.color} />
-            {/* Data export / import */}
-            <div className="flex gap-[6px] mb-[9px]">
-              <button onClick={handleExport}
-                className="flex-1 border border-dim rounded-[6px] py-[5px] text-[10px] font-mono text-muted cursor-pointer bg-transparent flex items-center justify-center gap-[4px]">
-                <span className="text-dim">↓</span>{lang === 'ja' ? '.loom 書き出し' : 'Export .loom'}
-              </button>
-              <button onClick={() => fileRef.current?.click()}
-                className="flex-1 border border-dim rounded-[6px] py-[5px] text-[10px] font-mono text-muted cursor-pointer bg-transparent flex items-center justify-center gap-[4px]">
-                <span className="text-dim">↑</span>{lang === 'ja' ? '.loom 読み込み' : 'Import .loom'}
-              </button>
-              <button onClick={() => presetFileRef.current?.click()}
-                className="flex-1 border border-dashed border-dim rounded-[6px] py-[5px] text-[10px] font-mono text-dim cursor-pointer bg-transparent flex items-center justify-center gap-[4px]">
-                <span>↑</span>{lang === 'ja' ? 'プリセット' : 'Presets'}
-              </button>
-            </div>
             <div>
               <div className="flex items-center justify-between mb-[6px]">
                 <span className="text-muted text-[10px] font-mono">🖼 {lang === 'ja' ? `サムネイル (${(thumbs[activeCharId] || []).length}/4)` : `Images (${(thumbs[activeCharId] || []).length}/4)`}</span>
                 <button onClick={copyShareUrl}
                   style={shared ? { borderColor: goodColor + '60', color: goodColor } : undefined}
                   className="border border-dim rounded-[5px] px-[7px] py-[2px] text-dim text-[10px] cursor-pointer font-mono">
-                  {shared ? `✓ ${lang === 'ja' ? 'コピー済み' : 'Copied!'}` : `🔗 ${lang === 'ja' ? 'URLで共有' : 'Share URL'}`}
+                  {shared ? `✓ ${lang === 'ja' ? 'コピー済み' : 'Copied!'}` : `🔗 ${lang === 'ja' ? 'プロンプトをシェア' : 'Share prompt'}`}
                 </button>
               </div>
               <div className="flex items-center gap-[6px] flex-wrap">
@@ -1389,7 +1404,7 @@ export default function Loom() {
                       <button onClick={copyShareUrl}
                         style={shared ? { borderColor: goodColor + '60', color: goodColor } : undefined}
                         className="border border-dim rounded-[5px] px-[7px] py-[2px] text-dim text-[10px] cursor-pointer font-mono">
-                        {shared ? `✓ ${lang === 'ja' ? 'コピー済み' : 'Copied!'}` : `🔗 ${lang === 'ja' ? 'URLシェア' : 'Share'}`}
+                        {shared ? `✓ ${lang === 'ja' ? 'コピー済み' : 'Copied!'}` : `🔗 ${lang === 'ja' ? 'プロンプトをシェア' : 'Share prompt'}`}
                       </button>
                     </div>
                     <div className="flex items-center gap-[5px] flex-wrap">
@@ -2143,6 +2158,29 @@ export default function Loom() {
             }}>
             {saveStatus === 'saved' ? `💾 ${lang === 'ja' ? '保存済み' : 'Saved'}` : '⚠️ save err'}
           </div>
+        </div>
+      )}
+
+      {/* ── Sync error toast ── */}
+      {syncErrToast && user && (
+        <div
+          className="fixed z-[500] right-4 bg-surface border border-red-400/50 rounded-[10px] shadow-xl px-4 py-3 text-[11px] font-mono max-w-[240px]"
+          style={{ bottom: (outputExpanded ? outputHeight : 80) + 12 }}
+        >
+          <div className="font-bold mb-1" style={{ color: 'rgb(var(--c-red))' }}>
+            ⚠ {lang === 'ja' ? '同期に失敗しました' : 'Sync failed'}
+          </div>
+          <div className="text-muted leading-[1.55]">
+            {lang === 'ja'
+              ? 'ネットワークを確認してください。データはこの端末に保存されています。'
+              : 'Check your network. Data is saved locally on this device.'}
+          </div>
+          <button
+            onClick={() => setSyncErrToast(false)}
+            className="mt-2 text-dim cursor-pointer bg-transparent border-none text-[10px] p-0"
+          >
+            {lang === 'ja' ? '閉じる' : 'Dismiss'}
+          </button>
         </div>
       )}
 

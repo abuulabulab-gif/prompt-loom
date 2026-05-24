@@ -9,7 +9,7 @@ import {
 } from 'firebase/auth';
 import { fbAuth } from '../firebase';
 
-const isMobile = () => /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+const isAndroid = () => /Android/i.test(navigator.userAgent);
 
 export function useAuth() {
   const [user, setUser] = useState(undefined); // undefined = still loading
@@ -24,10 +24,11 @@ export function useAuth() {
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    if (isMobile()) {
-      // Mobile: use redirect to avoid Google's WebView popup policy violation
+    if (isAndroid()) {
+      // Android: redirect to avoid Google's WebView popup policy violation
       await signInWithRedirect(fbAuth, provider);
     } else {
+      // Desktop + iOS Safari: popup works fine
       await signInWithPopup(fbAuth, provider);
     }
   };

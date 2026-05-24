@@ -142,7 +142,7 @@ const GUIDE = (lang) => [
       { icon: 'NAI {}', text: lang === 'ja' ? '【NovelAI選択時のみ】重みの構文が (tag:1.2)→{tag:1.2} 形式に自動変換される。他ツールでは通常の () 形式のまま' : '[NovelAI only] Weight syntax auto-converts from (tag:1.2) to {tag:1.2}. Other tools keep standard () format' },
       { icon: '🔗 LoRA', text: lang === 'ja' ? '【SD/NAI選択時のみ】LoRAをキャラ詳細パネルで設定すると出力に自動付与される。MJ・Flux・DALL-E時は付与されない' : '[SD/NAI only] LoRA set in the character panel auto-appends to output. Not appended for MJ, Flux, or DALL-E' },
       { icon: '👤', text: lang === 'ja' ? 'キャラを複数登録して⊕複製。🆚比較はキャラが2体以上のときキャラバーのエディタボタン左に表示。🎬シーン合成は✦ツールメニューから' : 'Multiple characters: ⊕ to duplicate. 🆚 compare appears left of the editor tab when 2+ characters exist. 🎬 Scene compose is in ✦ Tools' },
-      { icon: '🕐', text: lang === 'ja' ? '🕐ボタンで自動履歴（コピー時に保存、最大20件）。📸スナップショットで任意のタイミングで手動保存・ロールバック' : '🕐 auto-saves on copy (up to 20). 📸 snapshot manually saves any state for later rollback' },
+      { icon: '🕐', text: lang === 'ja' ? '🕐ボタンで自動履歴（コピー時に保存、最大20件）。📸スナップショットで任意のタイミングで手動保存し、その時点の状態に戻せる' : '🕐 auto-saves on copy (up to 20). 📸 snapshot manually saves any state so you can restore it later' },
       { icon: '⚠️', text: lang === 'ja' ? '出力バーのコンフリクト検出で矛盾タグを⚠️警告。バランスメーターでブロック別の配分を可視化' : 'Output bar shows conflict warnings (⚠️) for contradictory tags and a tag distribution balance meter' },
     ],
   },
@@ -163,7 +163,7 @@ const GUIDE = (lang) => [
       { icon: '⌘K', text: lang === 'ja' ? 'Ctrl+K コマンドパレットで全機能にキーボードからアクセス。「おまかせ」もここから実行可' : 'Ctrl+K command palette gives keyboard access to all features including Random generation' },
       { icon: '▦ Col', text: lang === 'ja' ? '【PC限定】列数切替（▢/▥/▦）でブロックを1/2/3列表示。ヘッダー右側に表示される' : '[PC only] Column toggle (▢/▥/▦) for 1/2/3-column block layout. Appears in the top-right header' },
       { icon: '↺ Reset', text: lang === 'ja' ? '✦ ツールメニューの「↺ブロック順リセット」でブロックの並び順をデフォルトに戻す。カスタムブロックは末尾に残る' : '"↺ Reset block order" in ✦ Tools restores the default arrangement. Custom blocks stay at end' },
-      { icon: '💾 JSON', text: lang === 'ja' ? 'JSON書き出し/読み込みでデータを外部バックアップ。🔗URLシェアでキャラ設定をBase64エンコードして共有' : 'JSON export/import for external backup. 🔗 URL share encodes character settings in Base64 for sharing' },
+      { icon: '💾 Backup', text: lang === 'ja' ? '💾バックアップでキャラデータをファイルに保存・別端末に移せる。🔗プロンプトをシェアでタグをURLに変換、リンクを開くだけで相手のLOOMに読み込まれる' : '💾 Backup saves character data to a file for transfer or safekeeping. 🔗 Share prompt encodes tags into a URL — opening the link loads it directly into LOOM' },
     ],
   },
   {
@@ -537,6 +537,40 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                   ? 'APIキーを設定すると3つのAI機能が有効になります。①自然文タブでAIが散文を整形、②✦ツールの「自然文からタグ生成」でキャラ説明をタグに変換、③出力バーの🤖提案で改善タグを提案。キーはこの端末のみに保存されます。'
                   : 'Setting an API key enables 3 AI features: ① AI polish in the Natural Text tab, ② "Text to Tags" in ✦ Tools to convert character descriptions to tags, ③ 🤖 Suggest in the output bar for tag recommendations. Keys are stored on this device only.'}
               </p>
+
+              {/* API key acquisition links */}
+              <div className="rounded-[8px] border border-line bg-surfalt px-[14px] py-[11px] space-y-[8px]">
+                <div className="text-dim text-[10px] font-mono font-bold tracking-widest uppercase mb-[4px]">
+                  {lang === 'ja' ? 'APIキーの取得先' : 'Where to get API keys'}
+                </div>
+                <div className="flex items-center gap-[10px]">
+                  <span className="text-[11px] font-mono text-fg min-w-[110px]">OpenAI (GPT-4o mini)</span>
+                  <a
+                    href="https://platform.openai.com/api-keys"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent text-[11px] font-mono underline underline-offset-2 hover:opacity-80 transition-opacity"
+                  >
+                    platform.openai.com/api-keys →
+                  </a>
+                </div>
+                <div className="flex items-center gap-[10px]">
+                  <span className="text-[11px] font-mono text-fg min-w-[110px]">Claude (Haiku)</span>
+                  <a
+                    href="https://console.anthropic.com/settings/keys"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent text-[11px] font-mono underline underline-offset-2 hover:opacity-80 transition-opacity"
+                  >
+                    console.anthropic.com →
+                  </a>
+                </div>
+                <p className="text-dim text-[10px] font-mono leading-[1.6] pt-[2px]">
+                  {lang === 'ja'
+                    ? '無料枠あり。どちらも登録後すぐにキーを発行できます。利用料金はご自身のアカウントで発生します。'
+                    : 'Both have free tiers. Keys can be issued immediately after registration. Usage fees apply to your own account.'}
+                </p>
+              </div>
 
               {/* Provider */}
               <div className="space-y-[8px]">
