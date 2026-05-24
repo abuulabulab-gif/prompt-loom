@@ -2,8 +2,8 @@ import { uid, tt, deep, CHAR_COLORS, CHAR_EMOJIS } from './constants.js';
 
 export const BLOCKS_DEF = [
   {id:'quality',name:'ベース・品質',nameEn:'Base Quality',icon:'⭐',color:'#fbbf24',collapsed:false,strength:'1.0',text:'masterpiece, best quality',customTags:[],favTags:[],locked:false,cats:[
-    {n:'品質',nEn:'Quality',t:[tt('masterpiece','傑作'),tt('best quality','最高品質'),tt('ultra-detailed','超精細'),tt('highres','高解像度'),tt('absurdres','超高解像度'),tt('8k wallpaper','8K壁紙'),tt('incredibly detailed CG','超精細CG'),tt('official art','公式アート')]},
-    {n:'仕上がり',nEn:'Finish',t:[tt('sharp focus','シャープ'),tt('intricate details','精緻な描写'),tt('HDR','HDR'),tt('ray tracing','レイトレ'),tt('cinematic','シネマ風'),tt('professional artwork','プロ作品'),tt('trending on pixiv','pixiv人気'),tt('detailed background','背景も精細')]},
+    {n:'品質',nEn:'Quality',t:[tt('masterpiece','傑作'),tt('best quality','最高品質'),tt('ultra-detailed','超精細'),tt('highres','高解像度'),tt('absurdres','超高解像度'),tt('official art','公式アート')]},
+    {n:'仕上がり',nEn:'Finish',t:[tt('sharp focus','シャープ'),tt('intricate details','精緻な描写')]},
     {n:'顔の精細化',nEn:'Detailed Face',t:[tt('detailed face','精細な顔'),tt('beautiful detailed eyes','精細な瞳'),tt('detailed skin','精細な肌'),tt('symmetrical eyes','左右対称の目'),tt('perfect face','整った顔')]},
     {n:'セーフティ',nEn:'Safety',t:[tt('SFW','セーフモード（nsfwを自動OFF）'),tt('rating:safe','レーティング:セーフ')]},
   ]},
