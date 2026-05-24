@@ -131,13 +131,73 @@ export const CONFLICT_RULES = [
   { tags:['pixel art','3D rendering'],    ja:'ピクセルアートと3Dレンダリングが矛盾', en:'pixel art + 3D rendering' },
   { tags:['manga style','3D rendering'],  ja:'マンガと3Dレンダリングが矛盾',  en:'manga style + 3D rendering' },
 
-  // ── 種族×衣装 ────────────────────────────────────────────────
-  { tags:['mermaid','thighhighs'],       ja:'人魚とニーハイが矛盾（脚がない）', en:'mermaid + thighhighs' },
-  { tags:['mermaid','shorts'],           ja:'人魚とショーツが矛盾（脚がない）', en:'mermaid + shorts' },
-  { tags:['mermaid','skirt'],            ja:'人魚とスカートが矛盾（脚がない）', en:'mermaid + skirt' },
-  { tags:['mermaid','pants'],            ja:'人魚とパンツが矛盾（脚がない）',   en:'mermaid + pants' },
-  { tags:['mermaid','barefoot'],         ja:'人魚と裸足が矛盾（脚がない）',     en:'mermaid + barefoot' },
-  { tags:['mermaid','leggings'],         ja:'人魚とレギンスが矛盾（脚がない）', en:'mermaid + leggings' },
+  // ── 種族×衣装（人魚） ─────────────────────────────────────────
+  { tags:['mermaid','thighhighs'],        ja:'人魚とニーハイが矛盾（脚がない）',            en:'mermaid + thighhighs' },
+  { tags:['mermaid','shorts'],            ja:'人魚とショーツが矛盾（脚がない）',            en:'mermaid + shorts' },
+  { tags:['mermaid','skirt'],             ja:'人魚とスカートが矛盾（脚がない）',            en:'mermaid + skirt' },
+  { tags:['mermaid','pants'],             ja:'人魚とパンツが矛盾（脚がない）',              en:'mermaid + pants' },
+  { tags:['mermaid','barefoot'],          ja:'人魚と裸足が矛盾（脚がない）',               en:'mermaid + barefoot' },
+  { tags:['mermaid','leggings'],          ja:'人魚とレギンスが矛盾（脚がない）',            en:'mermaid + leggings' },
+  { tags:['mermaid','high heels'],        ja:'人魚とハイヒールが矛盾（脚がない）',          en:'mermaid + high heels' },
+  { tags:['mermaid','pumps'],             ja:'人魚とパンプスが矛盾（脚がない）',            en:'mermaid + pumps' },
+  { tags:['mermaid','platform shoes'],    ja:'人魚と厚底が矛盾（脚がない）',               en:'mermaid + platform shoes' },
+  { tags:['mermaid','boots'],             ja:'人魚とブーツが矛盾（脚がない）',              en:'mermaid + boots' },
+  { tags:['mermaid','knee-high boots'],   ja:'人魚とニーハイブーツが矛盾（脚がない）',      en:'mermaid + knee-high boots' },
+  { tags:['mermaid','thigh-high boots'],  ja:'人魚とサイハイブーツが矛盾（脚がない）',      en:'mermaid + thigh-high boots' },
+  { tags:['mermaid','ankle boots'],       ja:'人魚とアンクルブーツが矛盾（脚がない）',      en:'mermaid + ankle boots' },
+  { tags:['mermaid','sneakers'],          ja:'人魚とスニーカーが矛盾（脚がない）',          en:'mermaid + sneakers' },
+  { tags:['mermaid','loafers'],           ja:'人魚とローファーが矛盾（脚がない）',          en:'mermaid + loafers' },
+  { tags:['mermaid','mary janes'],        ja:'人魚とメアリージェーンが矛盾（脚がない）',    en:'mermaid + mary janes' },
+  { tags:['mermaid','sandals'],           ja:'人魚とサンダルが矛盾（脚がない）',            en:'mermaid + sandals' },
+  { tags:['mermaid','slippers'],          ja:'人魚とスリッパが矛盾（脚がない）',            en:'mermaid + slippers' },
+  { tags:['mermaid','socks'],             ja:'人魚と靴下が矛盾（脚がない）',               en:'mermaid + socks' },
+  { tags:['mermaid','ankle socks'],       ja:'人魚とアンクルソックスが矛盾（脚がない）',    en:'mermaid + ankle socks' },
+  { tags:['mermaid','knee-high socks'],   ja:'人魚とニーハイソックスが矛盾（脚がない）',    en:'mermaid + knee-high socks' },
+
+  // ── 種族×衣装（ラミア）─────────────────────────────────────────
+  { tags:['lamia','thighhighs'],          ja:'ラミアとニーハイが矛盾（蛇の下半身）',        en:'lamia + thighhighs' },
+  { tags:['lamia','shorts'],              ja:'ラミアとショーツが矛盾（蛇の下半身）',        en:'lamia + shorts' },
+  { tags:['lamia','skirt'],               ja:'ラミアとスカートが矛盾（蛇の下半身）',        en:'lamia + skirt' },
+  { tags:['lamia','pants'],               ja:'ラミアとパンツが矛盾（蛇の下半身）',          en:'lamia + pants' },
+  { tags:['lamia','leggings'],            ja:'ラミアとレギンスが矛盾（蛇の下半身）',        en:'lamia + leggings' },
+  { tags:['lamia','barefoot'],            ja:'ラミアと裸足が矛盾（蛇の下半身）',            en:'lamia + barefoot' },
+  { tags:['lamia','high heels'],          ja:'ラミアとハイヒールが矛盾（蛇の下半身）',      en:'lamia + high heels' },
+  { tags:['lamia','pumps'],               ja:'ラミアとパンプスが矛盾（蛇の下半身）',        en:'lamia + pumps' },
+  { tags:['lamia','platform shoes'],      ja:'ラミアと厚底が矛盾（蛇の下半身）',            en:'lamia + platform shoes' },
+  { tags:['lamia','boots'],               ja:'ラミアとブーツが矛盾（蛇の下半身）',          en:'lamia + boots' },
+  { tags:['lamia','knee-high boots'],     ja:'ラミアとニーハイブーツが矛盾（蛇の下半身）',  en:'lamia + knee-high boots' },
+  { tags:['lamia','thigh-high boots'],    ja:'ラミアとサイハイブーツが矛盾（蛇の下半身）',  en:'lamia + thigh-high boots' },
+  { tags:['lamia','ankle boots'],         ja:'ラミアとアンクルブーツが矛盾（蛇の下半身）',  en:'lamia + ankle boots' },
+  { tags:['lamia','sneakers'],            ja:'ラミアとスニーカーが矛盾（蛇の下半身）',      en:'lamia + sneakers' },
+  { tags:['lamia','loafers'],             ja:'ラミアとローファーが矛盾（蛇の下半身）',      en:'lamia + loafers' },
+  { tags:['lamia','mary janes'],          ja:'ラミアとメアリージェーンが矛盾（蛇の下半身）',en:'lamia + mary janes' },
+  { tags:['lamia','sandals'],             ja:'ラミアとサンダルが矛盾（蛇の下半身）',        en:'lamia + sandals' },
+  { tags:['lamia','socks'],               ja:'ラミアと靴下が矛盾（蛇の下半身）',            en:'lamia + socks' },
+  { tags:['lamia','knee-high socks'],     ja:'ラミアとニーハイソックスが矛盾（蛇の下半身）',en:'lamia + knee-high socks' },
+
+  // ── 髪型 × 髪の長さ ───────────────────────────────────────────
+  { tags:['drill hair','short hair'],     ja:'ドリルヘアとショートが矛盾（長さが必要）',    en:'drill hair + short hair' },
+  { tags:['drill hair','very short hair'],ja:'ドリルヘアと超ショートが矛盾',               en:'drill hair + very short hair' },
+  { tags:['hime cut','very short hair'],  ja:'姫カットと超ショートが矛盾（長さが必要）',    en:'hime cut + very short hair' },
+  { tags:['wolf cut','very short hair'],  ja:'ウルフカットと超ショートが矛盾',              en:'wolf cut + very short hair' },
+
+  // ── アートスタイル（新追加）────────────────────────────────────
+  { tags:['chibi','realistic'],           ja:'SD（ちび）とリアルが矛盾',                   en:'chibi + realistic' },
+  { tags:['chibi','3D rendering'],        ja:'SDと3Dレンダリングが矛盾',                   en:'chibi + 3D rendering' },
+  { tags:['flat design','realistic'],     ja:'フラットデザインとリアルが矛盾',              en:'flat design + realistic' },
+  { tags:['flat design','3D rendering'],  ja:'フラットデザインと3Dが矛盾',                 en:'flat design + 3D rendering' },
+  { tags:['flat design','painterly'],     ja:'フラットデザインとペインタリーが矛盾',        en:'flat design + painterly' },
+  { tags:['flat design','watercolor'],    ja:'フラットデザインと水彩が矛盾',               en:'flat design + watercolor' },
+  { tags:['soft shading','cel shading'],  ja:'ソフトシェーディングとセルシェードが矛盾',    en:'soft shading + cel shading' },
+
+  // ── 天候 ──────────────────────────────────────────────────────
+  { tags:['lightning','clear sky'],       ja:'雷と晴れが矛盾',                             en:'lightning + clear sky' },
+
+  // ── 宇宙 × 屋内 ────────────────────────────────────────────────
+  { tags:['outer space','indoors'],       ja:'宇宙空間と屋内が矛盾',                       en:'outer space + indoors' },
+  { tags:['outer space','bedroom'],       ja:'宇宙空間と寝室背景が矛盾',                   en:'outer space + bedroom' },
+  { tags:['outer space','classroom'],     ja:'宇宙空間と教室背景が矛盾',                   en:'outer space + classroom' },
+  { tags:['outer space','cafe'],          ja:'宇宙空間とカフェ背景が矛盾',                 en:'outer space + cafe' },
 ];
 
 export const detectConflicts = text => {

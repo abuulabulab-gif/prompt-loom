@@ -14,7 +14,19 @@ import {
   uid, appendTag, countTags, toggleTag, hasTag, removeTag,
   deep, downloadJSON, stripWeights, toNaiWeights, OPTIONAL_CAT_NAMES, BLOCK_RANDOM_RULES, SPECIES_PARTS_MAP, RANDOM_EXCLUDE_TAGS,
 } from "./data/constants.js";
-import { detectConflicts } from "./data/conflicts.js";
+import { detectConflicts, CONFLICT_RULES } from "./data/conflicts.js";
+
+// Pre-built reverse lookup for conflict-aware random generation
+const CONFLICT_MAP = new Map();
+for (const r of CONFLICT_RULES) {
+  for (let i = 0; i < r.tags.length; i++) {
+    const key = r.tags[i].toLowerCase();
+    if (!CONFLICT_MAP.has(key)) CONFLICT_MAP.set(key, new Set());
+    for (let j = 0; j < r.tags.length; j++) {
+      if (i !== j) CONFLICT_MAP.get(key).add(r.tags[j].toLowerCase());
+    }
+  }
+}
 import { TOOLS } from "./data/tools.js";
 import { buildColorTag } from "./data/colors.js";
 import { makeCharacter, makeCustomBlock, BLOCKS_DEF } from "./data/blocks.js";
@@ -195,7 +207,9 @@ export default function Loom() {
         const sp = new URLSearchParams(window.location.search);
         const shareParam = sp.get('share');
         if (shareParam) {
-          const payload = JSON.parse(decodeURIComponent(escape(atob(shareParam))));
+          if (shareParam.length > 30000) return;
+          const binStr = atob(shareParam);
+          const payload = JSON.parse(new TextDecoder().decode(Uint8Array.from(binStr, c => c.charCodeAt(0))));
           if (payload?.blocks) {
             const imported = makeCharacter(payload.name || 'Shared', payload.color || CHAR_COLORS[0], payload.emoji || CHAR_EMOJIS[0]);
             imported.blocks = imported.blocks.map(b => {
@@ -445,7 +459,9 @@ export default function Loom() {
     const file = e.target.files[0];
     if (!file) return;
     const ext = file.name.split('.').pop().toLowerCase();
-    if (!['jpg', 'jpeg', 'png'].includes(ext)) {
+    const mimeOk = ['image/jpeg', 'image/png'].includes(file.type);
+    const extOk  = ['jpg', 'jpeg', 'png'].includes(ext);
+    if (!mimeOk || !extOk) {
       alert(lang === 'ja' ? '対応フォーマットは JPG / PNG のみです' : 'Only JPG/PNG files are supported');
       e.target.value = '';
       return;
@@ -477,7 +493,8 @@ export default function Loom() {
   const copyShareUrl = () => {
     try {
       const payload = { name: activeChar.name, emoji: activeChar.emoji, color: activeChar.color, blocks: activeChar.blocks.map(b => ({ id: b.id, text: b.text, enabled: b.enabled })) };
-      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+      const bytes = new TextEncoder().encode(JSON.stringify(payload));
+      const encoded = btoa(Array.from(bytes, b => String.fromCharCode(b)).join(''));
       const url = `${window.location.origin}${window.location.pathname}?share=${encoded}`;
       navigator.clipboard.writeText(url).then(() => { setShared(true); setTimeout(() => setShared(false), 2000); });
     } catch {}
@@ -673,11 +690,14 @@ export default function Loom() {
     )) return;
     setCharacters(prev => prev.map(c => {
       if (c.id !== activeCharId) return c;
+
+      // Shared across all blocks so cross-block conflicts (e.g. mermaid→footwear) are respected
+      const conflictExcluded = new Set();
+
       const newBlocks = c.blocks.map(block => {
         if (block.locked || block.id === 'negative') return block;
         const rules = BLOCK_RANDOM_RULES[block.id] || {};
 
-        // Resolve mutually exclusive category groups: pick at most one winner per group
         const disabledCats = new Set();
         for (const group of (rules.exclusiveGroups || [])) {
           const present = group.filter(n => block.cats.some(c => c.n === n));
@@ -692,26 +712,29 @@ export default function Loom() {
         const picks = [];
         const skippedCats = new Set(disabledCats);
 
-        for (const cat of coreCats) {
-          if (picks.length >= maxPicks || skippedCats.has(cat.n)) continue;
-          const validT = cat.t.filter(t => !RANDOM_EXCLUDE_TAGS.has(t.en));
-          if (validT.length > 0) {
-            picks.push(validT[Math.floor(Math.random() * validT.length)]);
-            (rules.skipIfPicked?.[cat.n] || []).forEach(n => skippedCats.add(n));
-          }
-        }
+        const doPick = (cat) => {
+          if (picks.length >= maxPicks || skippedCats.has(cat.n)) return;
+          const validT = cat.t.filter(t =>
+            !RANDOM_EXCLUDE_TAGS.has(t.en) &&
+            !conflictExcluded.has(t.en.toLowerCase())
+          );
+          if (validT.length === 0) return;
+          const pick = validT[Math.floor(Math.random() * validT.length)];
+          picks.push(pick);
+          for (const ct of (CONFLICT_MAP.get(pick.en.toLowerCase()) || [])) conflictExcluded.add(ct);
+          (rules.skipIfPicked?.[cat.n] || []).forEach(n => skippedCats.add(n));
+        };
+
+        for (const cat of coreCats) doPick(cat);
+
         const shuffledOpt = [...optCats].sort(() => Math.random() - 0.5);
         for (const cat of shuffledOpt) {
-          if (picks.length >= maxPicks || skippedCats.has(cat.n)) continue;
-          const validT = cat.t.filter(t => !RANDOM_EXCLUDE_TAGS.has(t.en));
-          if (Math.random() < 0.4 && validT.length > 0) {
-            picks.push(validT[Math.floor(Math.random() * validT.length)]);
-            (rules.skipIfPicked?.[cat.n] || []).forEach(n => skippedCats.add(n));
-          }
+          if (picks.length >= maxPicks) break;
+          if (!skippedCats.has(cat.n) && Math.random() < 0.4) doPick(cat);
         }
+
         let text = '';
         for (const t of picks) text = appendTag(text, t.en, block.strength);
-        // Auto-add special parts for any species tag picked in the attribute block
         if (block.id === 'attribute') {
           const speciesCat = block.cats.find(c => c.n === '種族');
           for (const pick of picks) {
@@ -732,7 +755,7 @@ export default function Loom() {
 
   // ── Export/Import ──
   const handleExport = () => downloadJSON({ version: 'loom-v4', characters }, `loom-${Date.now()}.loom`);
-  const handleImport = (e) => { const file = e.target.files[0]; if (!file) return; const r = new FileReader(); r.onload = (ev) => { try { const d = JSON.parse(ev.target.result); if (d.characters) { setCharacters(d.characters.map(c => ({ ...c, blocks: mergeCharacterBlocks(c.blocks) }))); setActiveCharId(d.characters[0]?.id); } } catch { alert(lang === 'ja' ? '読み込みに失敗しました' : 'Failed to import file'); } }; r.readAsText(file); e.target.value = ''; };
+  const handleImport = (e) => { const file = e.target.files[0]; if (!file) return; if (file.size > 5_000_000) { alert(lang === 'ja' ? 'ファイルが大きすぎます（最大5MB）' : 'File too large (max 5 MB)'); e.target.value = ''; return; } const r = new FileReader(); r.onload = (ev) => { try { const d = JSON.parse(ev.target.result); if (d.characters) { setCharacters(d.characters.map(c => ({ ...c, blocks: mergeCharacterBlocks(c.blocks) }))); setActiveCharId(d.characters[0]?.id); } } catch { alert(lang === 'ja' ? '読み込みに失敗しました' : 'Failed to import file'); } }; r.readAsText(file); e.target.value = ''; };
 
   // ── Preset export / import (costume & shot presets only) ──
   const handlePresetExport = () => {
@@ -741,6 +764,7 @@ export default function Loom() {
   };
   const handlePresetImport = (e) => {
     const file = e.target.files[0]; if (!file) return;
+    if (file.size > 1_000_000) { alert(lang === 'ja' ? 'ファイルが大きすぎます（最大1MB）' : 'File too large (max 1 MB)'); e.target.value = ''; return; }
     const r = new FileReader();
     r.onload = (ev) => {
       try {
@@ -836,7 +860,11 @@ export default function Loom() {
             title={isMobile ? (lang === 'ja' ? 'ブロック一覧を開く' : 'Open block list') : undefined}
             className={`w-[30px] h-[30px] rounded-[8px] flex items-center justify-center flex-shrink-0 bg-[linear-gradient(135deg,#5a7fff,#b06fff)]${isMobile ? ' cursor-pointer active:opacity-70 select-none' : ''}`}
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M4 6h16M4 12h16M4 18h10" /><circle cx="20" cy="18" r="2" /></svg>
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="white">
+              <circle cx="2.5" cy="2.5" r="1.5"/><circle cx="7.5" cy="2.5" r="1.5"/><circle cx="12.5" cy="2.5" r="1.5"/>
+              <circle cx="2.5" cy="7.5" r="1.5"/><circle cx="7.5" cy="7.5" r="1.5"/><circle cx="12.5" cy="7.5" r="1.5"/>
+              <circle cx="2.5" cy="12.5" r="1.5"/><circle cx="7.5" cy="12.5" r="1.5"/><circle cx="12.5" cy="12.5" r="1.5"/>
+            </svg>
           </div>
           <div>
             <div className="text-[20px] font-black tracking-[0.22em] leading-none" style={{ fontFamily: "'Century Gothic', 'AppleGothic', 'Gill Sans', sans-serif" }}>LOOM</div>
