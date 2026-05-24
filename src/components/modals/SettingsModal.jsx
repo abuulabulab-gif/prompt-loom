@@ -184,7 +184,7 @@ const GUIDE = (lang) => [
     label: lang === 'ja' ? 'その他の機能一覧' : 'More Features',
     color: '#94a3b8',
     items: [
-      { icon: '🎬 Scene', text: lang === 'ja' ? '【キャラ2体以上で有効】シーン合成（✦ツール→🎬）：2〜4キャラのプロンプトを1つに合成。BREAKタグ区切り・比重調整に対応' : '[2+ characters required] Scene Compose (✦ Tools → 🎬): merge 2–4 character prompts. Supports BREAK separators and weight ratios' },
+      { icon: '🎬 Scene', text: lang === 'ja' ? '【キャラ2体以上で有効】シーン合成（✦ツール→🎬）：2〜3キャラのプロンプトを1つに合成。BREAKタグ区切り・比重調整に対応' : '[2+ characters required] Scene Compose (✦ Tools → 🎬): merge 2–3 character prompts. Supports BREAK separators and weight ratios' },
       { icon: '🆚 Diff', text: lang === 'ja' ? '【キャラ2体以上で有効】比較パネル（🆚）：キャラバーのエディタボタン左に現れるボタンから起動。2キャラのブロック設定を横並びで差分確認できる' : '[2+ characters required] Compare Panel (🆚): launched from the button left of the editor tab in the character bar. View two characters side-by-side' },
       { icon: 'A 解析', text: lang === 'ja' ? 'プロンプト逆解析（Aキー）：既存プロンプトを貼り付けてブロックに自動振り分け。他ツールからの移行に便利' : 'Analyze Prompt (A key): paste any existing prompt to auto-distribute tags into blocks. Great for migrating from other tools' },
       { icon: '⚠️ Check', text: lang === 'ja' ? 'コンフリクト検出：矛盾する組み合わせ（例: 水着×コート）に⚠️を表示。タグ編集の破綻チェックに活用' : 'Conflict detection: flags contradictory tag pairs (e.g. swimsuit + winter coat) with a ⚠️ warning' },
@@ -197,8 +197,8 @@ const GUIDE = (lang) => [
   },
 ];
 
-export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds = new Set(), allBlocks = [], onRestoreBlock, onRestoreAllBlocks, theme, onToggleTheme, viewMode, onSetViewMode, onToggleLang }) {
-  const [tab, setTab] = useState('shortcuts');
+export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds = new Set(), allBlocks = [], onRestoreBlock, onRestoreAllBlocks, theme, onToggleTheme, viewMode, onSetViewMode, onToggleLang, defaultTab }) {
+  const [tab, setTab] = useState(defaultTab || 'shortcuts');
   const [openSections, setOpenSections] = useState(new Set(['🌱']));
 
   const toggleSection = (icon) => setOpenSections(prev => {

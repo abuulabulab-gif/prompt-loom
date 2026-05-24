@@ -129,6 +129,7 @@ export default function Loom() {
   const statusTimer = useRef(null);
   const fileRef = useRef(null);
   const presetFileRef = useRef(null);
+  const settingsTabRef = useRef('shortcuts');
 
   // ── Feature states ──
   const [libraryOpen, setLibraryOpen] = useState(false);
@@ -1771,7 +1772,7 @@ export default function Loom() {
       {templateOpen && <TemplateModal lang={lang} onApply={applyTemplate} onClose={() => setTemplateOpen(false)} />}
       {colorPickerOpen && <ColorPickerModal lang={lang} onApply={applyColorTag} onClose={() => setColorPickerOpen(false)} />}
       {sceneOpen && <SceneComposeModal characters={characters} lang={lang} activeTool={activeTool} theme={theme} onClose={() => setSceneOpen(false)} />}
-      {settingsOpen && <SettingsModal lang={lang} isMobile={isMobile} onClose={() => setSettingsOpen(false)}
+      {settingsOpen && <SettingsModal lang={lang} isMobile={isMobile} defaultTab={settingsTabRef.current} onClose={() => { setSettingsOpen(false); settingsTabRef.current = 'shortcuts'; }}
         hiddenBlockIds={hiddenBlockIds} allBlocks={blocks}
         onRestoreBlock={blockId => toggleHideBlock(blockId)}
         onRestoreAllBlocks={() => updateChar(activeCharId, { hiddenBlocks: [] })}
@@ -1779,7 +1780,16 @@ export default function Loom() {
         viewMode={viewMode} onSetViewMode={setViewMode}
         onToggleLang={() => setLang(l => l === 'ja' ? 'en' : 'ja')} />}
       {paletteOpen && <CommandPalette commands={paletteCommands} lang={lang} onClose={() => setPaletteOpen(false)} />}
-      {showWelcome && loaded && <WelcomeHint lang={lang} onDismiss={dismissWelcome} />}
+      {showWelcome && loaded && (
+        <WelcomeHint
+          lang={lang}
+          theme={theme}
+          onSetLang={setLang}
+          onSetTheme={setTheme}
+          onDismiss={dismissWelcome}
+          onOpenGuide={() => { settingsTabRef.current = 'guide'; dismissWelcome(); setSettingsOpen(true); }}
+        />
+      )}
       <GlobalTagSearch
         open={globalSearchOpen}
         onClose={() => setGlobalSearchOpen(false)}
