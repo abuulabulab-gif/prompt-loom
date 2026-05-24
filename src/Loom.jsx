@@ -363,7 +363,7 @@ export default function Loom() {
     setShowWelcome(true);
   };
 
-  const addCharacter = () => { const ci = characters.length % CHAR_COLORS.length; const ei = characters.length % CHAR_EMOJIS.length; const c = makeCharacter(`キャラ ${characters.length + 1}`, CHAR_COLORS[ci], CHAR_EMOJIS[ei]); setCharacters(prev => [...prev, c]); setActiveCharId(c.id); setCharPanelOpen(true); };
+  const addCharacter = () => { const ci = characters.length % CHAR_COLORS.length; const ei = characters.length % CHAR_EMOJIS.length; const c = makeCharacter(`${lang === 'ja' ? 'キャラ' : 'Character'} ${characters.length + 1}`, CHAR_COLORS[ci], CHAR_EMOJIS[ei]); setCharacters(prev => [...prev, c]); setActiveCharId(c.id); setCharPanelOpen(true); };
   const duplicateCharacter = (id) => { const src = characters.find(c => c.id === id); if (!src) return; const copy = { ...deep(src), id: uid(), name: src.name + ' (コピー)' }; setCharacters(prev => { const i = prev.findIndex(c => c.id === id); const next = [...prev]; next.splice(i + 1, 0, copy); return next; }); setActiveCharId(copy.id); };
   const deleteCharacter = async (id) => {
     if (characters.length <= 1) return;
@@ -716,13 +716,13 @@ export default function Loom() {
   const restoreFromHistory = (entry) => { setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, blocks: deep(entry.blocks) } : c)); setHistoryOpen(false); };
 
   // ── Export/Import ──
-  const handleExport = () => downloadJSON({ version: 'loom-v4', characters }, `loom-${Date.now()}.json`);
-  const handleImport = (e) => { const file = e.target.files[0]; if (!file) return; const r = new FileReader(); r.onload = (ev) => { try { const d = JSON.parse(ev.target.result); if (d.characters) { setCharacters(d.characters.map(c => ({ ...c, blocks: mergeCharacterBlocks(c.blocks) }))); setActiveCharId(d.characters[0]?.id); } } catch { alert('読み込みに失敗しました'); } }; r.readAsText(file); e.target.value = ''; };
+  const handleExport = () => downloadJSON({ version: 'loom-v4', characters }, `loom-${Date.now()}.loom`);
+  const handleImport = (e) => { const file = e.target.files[0]; if (!file) return; const r = new FileReader(); r.onload = (ev) => { try { const d = JSON.parse(ev.target.result); if (d.characters) { setCharacters(d.characters.map(c => ({ ...c, blocks: mergeCharacterBlocks(c.blocks) }))); setActiveCharId(d.characters[0]?.id); } } catch { alert(lang === 'ja' ? '読み込みに失敗しました' : 'Failed to import file'); } }; r.readAsText(file); e.target.value = ''; };
 
   // ── Preset export / import (costume & shot presets only) ──
   const handlePresetExport = () => {
     const { costumePresets = [], shotPresets = [] } = activeChar;
-    downloadJSON({ version: 'loom-presets-v1', costumePresets, shotPresets }, `loom-presets-${Date.now()}.json`);
+    downloadJSON({ version: 'loom-presets-v1', costumePresets, shotPresets }, `loom-presets-${Date.now()}.loom`);
   };
   const handlePresetImport = (e) => {
     const file = e.target.files[0]; if (!file) return;
@@ -739,7 +739,7 @@ export default function Loom() {
           costumePresets: merge(c.costumePresets, d.costumePresets),
           shotPresets:    merge(c.shotPresets,    d.shotPresets),
         } : c));
-      } catch { alert('プリセットの読み込みに失敗しました'); }
+      } catch { alert(lang === 'ja' ? 'プリセットの読み込みに失敗しました' : 'Failed to import presets'); }
     };
     r.readAsText(file); e.target.value = '';
   };
@@ -883,7 +883,7 @@ export default function Loom() {
             title={lang === 'ja' ? '列数切替 (1→2→3)' : 'Cycle columns (1→2→3)'}
             className={`rounded-[5px] px-[9px] py-1 cursor-pointer text-[10px] font-mono flex-shrink-0 ${layout !== '1col' ? 'border' : 'bg-transparent border border-dim text-muted'}`}
             style={layout !== '1col' ? { background: 'rgb(var(--c-green) / 0.13)', borderColor: 'rgb(var(--c-green) / 0.38)', color: 'rgb(var(--c-green))' } : undefined}>
-            {layout === '3col' ? '▦ 3列' : layout === '2col' ? '▥ 2列' : '▢ 1列'}
+            {layout === '3col' ? `▦ ${lang === 'ja' ? '3列' : '3col'}` : layout === '2col' ? `▥ ${lang === 'ja' ? '2列' : '2col'}` : `▢ ${lang === 'ja' ? '1列' : '1col'}`}
           </button>
         )}
         {isWide && focusBlockId && (
@@ -951,8 +951,8 @@ export default function Loom() {
           className="bg-transparent border border-dim rounded-[6px] px-[9px] py-1 text-muted cursor-pointer text-[10px] font-mono whitespace-nowrap">
           ⚙️{!isMobile && ` ${lang === 'ja' ? '設定' : 'Settings'}`}
         </button>
-        <input ref={fileRef} type="file" accept=".json" onChange={handleImport} className="hidden" />
-        <input ref={presetFileRef} type="file" accept=".json" onChange={handlePresetImport} className="hidden" />
+        <input ref={fileRef} type="file" accept=".json,.loom" onChange={handleImport} className="hidden" />
+        <input ref={presetFileRef} type="file" accept=".json,.loom" onChange={handlePresetImport} className="hidden" />
       </div>
 
       {/* ── CHARACTER BAR ── */}
@@ -1110,6 +1110,21 @@ export default function Loom() {
               }
             </div>
             <CharVersions activeChar={activeChar} lang={lang} onSave={saveVersion} onRestore={restoreVersion} onDelete={deleteVersion} color={activeChar.color} />
+            {/* Data export / import */}
+            <div className="flex gap-[6px] mb-[9px]">
+              <button onClick={handleExport}
+                className="flex-1 border border-dim rounded-[6px] py-[5px] text-[10px] font-mono text-muted cursor-pointer bg-transparent flex items-center justify-center gap-[4px]">
+                <span className="text-dim">↓</span>{lang === 'ja' ? '.loom 書き出し' : 'Export .loom'}
+              </button>
+              <button onClick={() => fileRef.current?.click()}
+                className="flex-1 border border-dim rounded-[6px] py-[5px] text-[10px] font-mono text-muted cursor-pointer bg-transparent flex items-center justify-center gap-[4px]">
+                <span className="text-dim">↑</span>{lang === 'ja' ? '.loom 読み込み' : 'Import .loom'}
+              </button>
+              <button onClick={() => presetFileRef.current?.click()}
+                className="flex-1 border border-dashed border-dim rounded-[6px] py-[5px] text-[10px] font-mono text-dim cursor-pointer bg-transparent flex items-center justify-center gap-[4px]">
+                <span>↑</span>{lang === 'ja' ? 'プリセット' : 'Presets'}
+              </button>
+            </div>
             <div>
               <div className="flex items-center justify-between mb-[6px]">
                 <span className="text-muted text-[10px] font-mono">🖼 {lang === 'ja' ? `サムネイル (${(thumbs[activeCharId] || []).length}/4)` : `Images (${(thumbs[activeCharId] || []).length}/4)`}</span>

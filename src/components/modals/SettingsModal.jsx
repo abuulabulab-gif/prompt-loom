@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const APP_VERSION = 'v1.1';
+const APP_VERSION = 'v1.2';
 const APP_YEAR = '2026';
 
 const SHORTCUTS = (lang) => [
@@ -491,6 +491,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                 </div>
                 <div className="space-y-[5px]">
                   {[
+                    { v: 'v1.2', note: lang === 'ja' ? 'Googleログイン＆Firestoreクラウド同期・.loom独自拡張子・スマホデータ入出力・ウェルカムヒントライトモード視認性改善・英語ローカライズ修正' : 'Google login & Firestore cloud sync, .loom file format, mobile export/import, welcome hint light-mode contrast fix, EN localization fixes' },
                     { v: 'v1.1', note: lang === 'ja' ? 'ボーダー描画バグ修正・フォーカスモードタグサイズ修正・スマホキャラパネルUI改善・ウェルカムヒント再表示ボタン・トースト再設計・Vercel Analytics導入' : 'Border rendering bug fixes, focus mode tag size fix, mobile char panel improvements, welcome hint re-show, toast redesign, Vercel Analytics' },
                     { v: 'v1.0', note: lang === 'ja' ? 'NAI重み{}変換・DALL-E自動自然文切替・バリエーション別自然文トグル・キャラパネルコンパクト化・ツール出力差別化・The Prompt Weaving Studio公開' : 'NAI {} weight conversion, DALL-E auto natural text, per-variation natural text toggle, compact character panel, tool output differentiation, public launch as The Prompt Weaving Studio' },
                     { v: 'v0.9', note: lang === 'ja' ? 'UI統一・全カラーCSS変数化・スマホMJ ARチップ・ブロック順リセット・✦ツールメニュー刷新・COPYボタン拡大・バリエーション3パターン化' : 'UI unification, full CSS-var colors, mobile MJ AR chips, block order reset, ✦ Tools menu overhaul, larger COPY, 3-variation output' },

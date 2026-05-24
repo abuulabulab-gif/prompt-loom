@@ -54,7 +54,7 @@ export default function WelcomeHint({ lang, theme, onSetLang, onSetTheme, onDism
                 <button
                   key={v}
                   onClick={() => onSetLang(v)}
-                  className={`flex-1 px-[10px] py-[5px] cursor-pointer transition-colors duration-100 ${L === v ? 'text-black font-bold' : 'bg-surfalt text-muted'} ${i === 0 ? '' : 'border-l border-line'}`}
+                  className={`flex-1 px-[10px] py-[5px] cursor-pointer transition-colors duration-100 ${L === v ? 'text-white font-bold' : 'bg-surfalt text-muted'} ${i === 0 ? '' : 'border-l border-line'}`}
                   style={L === v ? { background: 'rgb(var(--c-blue))' } : undefined}
                 >
                   {label}
@@ -67,7 +67,7 @@ export default function WelcomeHint({ lang, theme, onSetLang, onSetTheme, onDism
                 <button
                   key={v}
                   onClick={() => onSetTheme(v)}
-                  className={`flex-1 px-[9px] py-[5px] cursor-pointer transition-colors duration-100 ${T === v ? 'text-black font-bold' : 'bg-surfalt text-muted'} ${i === 0 ? '' : 'border-l border-line'}`}
+                  className={`flex-1 px-[9px] py-[5px] cursor-pointer transition-colors duration-100 ${T === v ? 'text-white font-bold' : 'bg-surfalt text-muted'} ${i === 0 ? '' : 'border-l border-line'}`}
                   style={T === v ? { background: 'rgb(var(--c-blue))' } : undefined}
                 >
                   {icon} {L === 'ja' ? ja : en}
@@ -109,7 +109,7 @@ export default function WelcomeHint({ lang, theme, onSetLang, onSetTheme, onDism
         {/* ── Main CTA ── */}
         <button
           onClick={onDismiss}
-          className="w-full rounded-[9px] py-[10px] text-[13px] font-bold cursor-pointer border-none text-black"
+          className="w-full rounded-[9px] py-[10px] text-[13px] font-bold cursor-pointer border-none text-white"
           style={{ background: 'rgb(var(--c-blue))' }}
         >
           {L === 'ja' ? 'わかった！始める →' : "Got it, let's go →"}
