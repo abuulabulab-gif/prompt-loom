@@ -41,6 +41,7 @@ import SettingsModal from "./components/modals/SettingsModal.jsx";
 import CommandPalette from "./components/CommandPalette.jsx";
 import GlobalTagSearch from "./components/GlobalTagSearch.jsx";
 import { toNaturalJa, toNaturalEn } from "./utils/naturalLanguage.js";
+import { callAI } from "./utils/aiApi.js";
 import CharacterNote from "./CharacterNote/index.jsx";
 import { useAuth } from "./hooks/useAuth.js";
 import { pushToCloud, pullFromCloud, mergeCharacters } from "./sync/firestore.js";
@@ -161,6 +162,10 @@ export default function Loom() {
   const [dataMenuOpen, setDataMenuOpen] = useState(false);
   const [toolPickerOpen, setToolPickerOpen] = useState(false);
   const [naturalLang, setNaturalLang] = useState('ja');
+  const [apiConfig, setApiConfig] = useState({ provider: 'openai', apiKey: '' });
+  const [aiResult, setAiResult] = useState('');
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiError, setAiError] = useState('');
   const [jumpOpen, setJumpOpen] = useState(false);
   const sidebarLastTapRef = useRef({});
 
@@ -201,6 +206,11 @@ export default function Loom() {
       try {
         const seen = await db.kv.get('welcomeSeen');
         if (!seen) setShowWelcome(true);
+      } catch {}
+      // API config
+      try {
+        const ac = await db.kv.get('apiConfig');
+        if (ac?.value) setApiConfig(ac.value);
       } catch {}
       // Check for ?share= URL param
       try {
@@ -402,6 +412,26 @@ export default function Loom() {
     setShowWelcome(true);
   };
 
+  const saveApiConfig = async (cfg) => {
+    setApiConfig(cfg);
+    setAiResult('');
+    try { await db.kv.put({ key: 'apiConfig', value: cfg }); } catch {}
+  };
+
+  const handleAiPolish = async () => {
+    if (!naturalText || !apiConfig.apiKey) return;
+    setAiBusy(true);
+    setAiError('');
+    try {
+      const result = await callAI({ provider: apiConfig.provider, apiKey: apiConfig.apiKey, text: naturalText, naturalLang });
+      setAiResult(result);
+    } catch (e) {
+      setAiError(e.message);
+    } finally {
+      setAiBusy(false);
+    }
+  };
+
   const addCharacter = () => { const ci = characters.length % CHAR_COLORS.length; const ei = characters.length % CHAR_EMOJIS.length; const c = makeCharacter(`${lang === 'ja' ? 'キャラ' : 'Character'} ${characters.length + 1}`, CHAR_COLORS[ci], CHAR_EMOJIS[ei]); setCharacters(prev => [...prev, c]); setActiveCharId(c.id); setCharPanelOpen(true); };
   const duplicateCharacter = (id) => { const src = characters.find(c => c.id === id); if (!src) return; const copy = { ...deep(src), id: uid(), name: src.name + ' (コピー)' }; setCharacters(prev => { const i = prev.findIndex(c => c.id === id); const next = [...prev]; next.splice(i + 1, 0, copy); return next; }); setActiveCharId(copy.id); };
   const deleteCharacter = async (id) => {
@@ -536,7 +566,18 @@ export default function Loom() {
   if (suffix) finalPosText = finalPosText + (finalPosText ? (tool.sep || ', ') : '') + suffix;
 
   const naturalText = naturalLang === 'ja' ? toNaturalJa(blocks) : toNaturalEn(blocks);
-  const currentText = outputTab === 'positive' ? finalPosText : outputTab === 'natural' ? naturalText : negText;
+  // Reset AI result when source text or language changes
+  useEffect(() => { setAiResult(''); setAiError(''); }, [naturalText, naturalLang]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Auto-call AI when switching TO natural tab (not on every tag change)
+  const prevOutputTabRef = useRef('positive');
+  useEffect(() => {
+    if (outputTab === 'natural' && prevOutputTabRef.current !== 'natural' && apiConfig.apiKey && naturalText) {
+      handleAiPolish();
+    }
+    prevOutputTabRef.current = outputTab;
+  }, [outputTab]); // eslint-disable-line react-hooks/exhaustive-deps
+  const displayNaturalText = aiResult || naturalText;
+  const currentText = outputTab === 'positive' ? finalPosText : outputTab === 'natural' ? displayNaturalText : negText;
   const textToCopy = outputEditMode ? outputEditText : currentText;
   const goodColor = theme === 'dark' ? '#4fffb0' : '#059655';
   const warnColor = theme === 'dark' ? '#fbbf24' : '#b45309';
@@ -1595,11 +1636,26 @@ export default function Loom() {
                   </button>
                 ))}
                 {outputTab === 'natural' && (
-                  <button onClick={() => setNaturalLang(l => l === 'ja' ? 'en' : 'ja')}
-                    className="rounded-[6px] px-[6px] py-[3px] text-[10px] font-mono cursor-pointer flex-shrink-0"
-                    style={{ background: 'rgb(var(--c-green) / 0.1)', border: '1px solid rgb(var(--c-green) / 0.35)', color: 'rgb(var(--c-green))' }}>
-                    {naturalLang === 'ja' ? 'JA' : 'EN'}
-                  </button>
+                  <>
+                    <button onClick={() => setNaturalLang(l => l === 'ja' ? 'en' : 'ja')}
+                      className="rounded-[6px] px-[6px] py-[3px] text-[10px] font-mono cursor-pointer flex-shrink-0"
+                      style={{ background: 'rgb(var(--c-green) / 0.1)', border: '1px solid rgb(var(--c-green) / 0.35)', color: 'rgb(var(--c-green))' }}>
+                      {naturalLang === 'ja' ? 'JA' : 'EN'}
+                    </button>
+                    {apiConfig.apiKey && (
+                      aiBusy
+                        ? <span className="text-[10px] font-mono text-muted flex-shrink-0">✨...</span>
+                        : <button onClick={handleAiPolish} disabled={!naturalText}
+                            className="rounded-[6px] px-[7px] py-[3px] text-[10px] font-mono cursor-pointer flex-shrink-0 disabled:opacity-40"
+                            style={{ background: 'rgb(var(--c-purple) / 0.1)', border: '1px solid rgb(var(--c-purple) / 0.4)', color: 'rgb(var(--c-purple))' }}
+                            title={lang === 'ja' ? '再生成' : 'Regenerate'}>🔄</button>
+                    )}
+                    {aiResult && (
+                      <button onClick={() => setAiResult('')}
+                        className="rounded-[6px] px-[6px] py-[3px] text-[10px] font-mono cursor-pointer flex-shrink-0 text-muted border border-dim bg-transparent"
+                        title={lang === 'ja' ? 'AIテキストをクリア' : 'Clear AI text'}>✕</button>
+                    )}
+                  </>
                 )}
               </div>
               {/* Mobile Row 2: Action buttons — PC order: ▼ 📸 🗑 ✏️ | flex-1 | token | COPY */}
@@ -1695,12 +1751,27 @@ export default function Loom() {
                   </button>
                 ))}
                 {outputTab === 'natural' && (
-                  <button onClick={() => setNaturalLang(l => l === 'ja' ? 'en' : 'ja')}
-                    title={lang === 'ja' ? '日本語/英語を切替' : 'Toggle Japanese / English'}
-                    className="rounded-[6px] px-[8px] py-1 text-[10px] font-mono cursor-pointer flex-shrink-0"
-                    style={{ background: 'rgb(var(--c-green) / 0.1)', border: '1px solid rgb(var(--c-green) / 0.35)', color: 'rgb(var(--c-green))' }}>
-                    {naturalLang === 'ja' ? '日本語' : 'EN'}
-                  </button>
+                  <>
+                    <button onClick={() => setNaturalLang(l => l === 'ja' ? 'en' : 'ja')}
+                      title={lang === 'ja' ? '日本語/英語を切替' : 'Toggle Japanese / English'}
+                      className="rounded-[6px] px-[8px] py-1 text-[10px] font-mono cursor-pointer flex-shrink-0"
+                      style={{ background: 'rgb(var(--c-green) / 0.1)', border: '1px solid rgb(var(--c-green) / 0.35)', color: 'rgb(var(--c-green))' }}>
+                      {naturalLang === 'ja' ? '日本語' : 'EN'}
+                    </button>
+                    {apiConfig.apiKey && (
+                      aiBusy
+                        ? <span className="text-[10px] font-mono text-muted flex-shrink-0">✨...</span>
+                        : <button onClick={handleAiPolish} disabled={!naturalText}
+                            className="rounded-[6px] px-[8px] py-1 text-[10px] font-mono cursor-pointer flex-shrink-0 disabled:opacity-40"
+                            style={{ background: 'rgb(var(--c-purple) / 0.1)', border: '1px solid rgb(var(--c-purple) / 0.4)', color: 'rgb(var(--c-purple))' }}
+                            title={lang === 'ja' ? '再生成' : 'Regenerate'}>🔄</button>
+                    )}
+                    {aiResult && (
+                      <button onClick={() => setAiResult('')}
+                        className="rounded-[6px] px-[7px] py-1 text-[10px] font-mono cursor-pointer flex-shrink-0 text-muted border border-dim bg-transparent"
+                        title={lang === 'ja' ? 'AIテキストをクリア' : 'Clear AI text'}>✕</button>
+                    )}
+                  </>
                 )}
                 <span className="text-dim flex-shrink-0 select-none text-[11px] mx-[2px]">│</span>
                 {/* バリエ + 解析 */}
@@ -1932,7 +2003,8 @@ export default function Loom() {
         theme={theme} onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
         viewMode={viewMode} onSetViewMode={setViewMode}
         onToggleLang={() => setLang(l => l === 'ja' ? 'en' : 'ja')}
-        onShowWelcome={reshowWelcome} />}
+        onShowWelcome={reshowWelcome}
+        apiConfig={apiConfig} onSaveApiConfig={saveApiConfig} />}
       {paletteOpen && <CommandPalette commands={paletteCommands} lang={lang} onClose={() => setPaletteOpen(false)} />}
 
       {/* ── THUMBNAIL PREVIEW MODAL ── */}

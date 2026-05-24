@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const APP_VERSION = 'v1.4';
 const APP_YEAR = '2026';
@@ -232,8 +232,17 @@ const PLATFORM_DIFF = (lang) => [
   },
 ];
 
-export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds = new Set(), allBlocks = [], onRestoreBlock, onRestoreAllBlocks, theme, onToggleTheme, viewMode, onSetViewMode, onToggleLang, onShowWelcome, defaultTab }) {
+export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds = new Set(), allBlocks = [], onRestoreBlock, onRestoreAllBlocks, theme, onToggleTheme, viewMode, onSetViewMode, onToggleLang, onShowWelcome, defaultTab, apiConfig, onSaveApiConfig }) {
   const [tab, setTab] = useState(defaultTab || 'shortcuts');
+  const [apiProvider, setApiProvider] = useState(apiConfig?.provider ?? 'openai');
+  const [apiKey, setApiKey]           = useState(apiConfig?.apiKey ?? '');
+  const [apiKeyVisible, setApiKeyVisible] = useState(false);
+  const [apiSaved, setApiSaved]       = useState(false);
+
+  useEffect(() => {
+    setApiProvider(apiConfig?.provider ?? 'openai');
+    setApiKey(apiConfig?.apiKey ?? '');
+  }, [apiConfig]);
   const [openSections, setOpenSections] = useState(new Set(['🌱']));
 
   const toggleSection = (icon) => setOpenSections(prev => {
@@ -245,9 +254,10 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
   const hiddenBlocks = allBlocks.filter(b => hiddenBlockIds.has(b.id));
 
   const TABS = [
-    { id: 'shortcuts', label: isMobile ? (lang === 'ja' ? '📱 使い方Tips' : '📱 Tips') : (lang === 'ja' ? '⌨️ ショートカット' : '⌨️ Shortcuts') },
-    { id: 'guide',     label: lang === 'ja' ? '📘 使い方ガイド' : '📘 Guide' },
+    { id: 'shortcuts', label: isMobile ? (lang === 'ja' ? '📱 Tips' : '📱 Tips') : (lang === 'ja' ? '⌨️ ショートカット' : '⌨️ Shortcuts') },
+    { id: 'guide',     label: lang === 'ja' ? '📘 ガイド' : '📘 Guide' },
     { id: 'platform',  label: lang === 'ja' ? '📱/💻 版の違い' : '📱/💻 Platforms' },
+    { id: 'api',       label: lang === 'ja' ? '🤖 API' : '🤖 API' },
     { id: 'about',     label: lang === 'ja' ? 'ℹ️ About' : 'ℹ️ About' },
   ];
 
@@ -515,6 +525,74 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
               <p className="text-dim text-[10px] font-mono text-center pt-[2px]">
                 {lang === 'ja' ? '画面幅 600px 以上で PC版レイアウトに切替わります' : 'PC layout activates at viewport width ≥ 600 px'}
               </p>
+            </div>
+          )}
+
+          {/* ── API tab ── */}
+          {tab === 'api' && (
+            <div className="px-[18px] py-[18px] space-y-[20px]">
+              <p className="text-muted text-[11px] font-mono bg-surfalt rounded-[7px] px-3 py-2 leading-[1.7]">
+                {lang === 'ja'
+                  ? '自然文タブの「✨ AIで整える」機能で使用します。APIキーはこの端末のみに保存され、外部には送信されません。'
+                  : 'Used by the "✨ Polish with AI" button in the Natural Text tab. Your API key is stored locally on this device only.'}
+              </p>
+
+              {/* Provider */}
+              <div className="space-y-[8px]">
+                <div className="text-dim text-[10px] font-mono font-bold tracking-widest uppercase">
+                  {lang === 'ja' ? 'AIプロバイダー' : 'AI Provider'}
+                </div>
+                <div className="flex rounded-[7px] overflow-hidden border border-line text-[11px] font-mono">
+                  {[{ v: 'openai', label: 'OpenAI (GPT-4o mini)' }, { v: 'claude', label: 'Claude (Haiku)' }].map(({ v, label }, i) => (
+                    <button key={v} onClick={() => setApiProvider(v)}
+                      className={`flex-1 py-[8px] cursor-pointer transition-colors duration-100 ${i > 0 ? 'border-l border-line' : ''}`}
+                      style={apiProvider === v
+                        ? { background: 'rgb(var(--c-blue) / 0.12)', color: 'rgb(var(--c-blue))', fontWeight: 700 }
+                        : { background: 'transparent', color: 'rgb(var(--muted))' }}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* API Key */}
+              <div className="space-y-[8px]">
+                <div className="text-dim text-[10px] font-mono font-bold tracking-widest uppercase">
+                  {lang === 'ja' ? 'APIキー' : 'API Key'}
+                </div>
+                <div className="flex gap-[6px]">
+                  <input
+                    type={apiKeyVisible ? 'text' : 'password'}
+                    value={apiKey}
+                    onChange={e => setApiKey(e.target.value)}
+                    placeholder={apiProvider === 'openai' ? 'sk-...' : 'sk-ant-...'}
+                    className="flex-1 rounded-[7px] px-[10px] py-[7px] text-[12px] font-mono outline-none border border-line bg-bg text-fg"
+                    spellCheck={false}
+                  />
+                  <button onClick={() => setApiKeyVisible(v => !v)}
+                    className="rounded-[7px] px-[10px] py-[7px] text-[11px] border border-line bg-surfalt text-muted cursor-pointer">
+                    {apiKeyVisible ? '🙈' : '👁'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Save */}
+              <button
+                onClick={() => { onSaveApiConfig?.({ provider: apiProvider, apiKey }); setApiSaved(true); setTimeout(() => setApiSaved(false), 2000); }}
+                disabled={!apiKey.trim()}
+                className="w-full rounded-[8px] py-[9px] text-[12px] font-bold cursor-pointer border-none text-white transition-all duration-150 disabled:opacity-40 disabled:cursor-default"
+                style={{ background: apiSaved ? 'rgb(var(--c-green))' : 'rgb(var(--c-blue))' }}>
+                {apiSaved
+                  ? (lang === 'ja' ? '✓ 保存しました' : '✓ Saved')
+                  : (lang === 'ja' ? '保存' : 'Save')}
+              </button>
+
+              {apiKey.trim() && (
+                <button onClick={() => { setApiKey(''); onSaveApiConfig?.({ provider: apiProvider, apiKey: '' }); }}
+                  className="w-full rounded-[8px] py-[7px] text-[11px] font-mono cursor-pointer bg-transparent border border-dim text-muted">
+                  {lang === 'ja' ? 'APIキーを削除' : 'Remove API key'}
+                </button>
+              )}
             </div>
           )}
 
