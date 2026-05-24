@@ -1400,6 +1400,7 @@ export default function Loom() {
             onMouseDown={startOutputDrag}
             onTouchStart={startOutputDrag}
             className="flex-shrink-0 h-[14px] flex items-center justify-center cursor-ns-resize group select-none"
+            style={{ touchAction: 'none' }}
             title={lang === 'ja' ? 'ドラッグで高さ調整' : 'Drag to resize'}
           >
             <div className="w-10 h-[3px] rounded-full bg-dim group-hover:bg-muted transition-colors duration-150" />
