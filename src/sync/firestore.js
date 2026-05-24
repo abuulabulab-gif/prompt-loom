@@ -10,18 +10,25 @@ const toCloudChars = (chars) =>
 export async function pushToCloud(uid, characters, orderUpdatedAt, settings, settingsUpdatedAt) {
   try {
     const ref = doc(fstore, 'users', uid, 'data', 'state');
-    await setDoc(ref, {
+    const payload = {
       characters: toCloudChars(characters),
       characterOrder: characters.map(c => c.id),
       orderUpdatedAt: orderUpdatedAt ?? Date.now(),
       settings: settings ?? null,
       settingsUpdatedAt: settingsUpdatedAt ?? 0,
       updatedAt: serverTimestamp(),
-    });
-    return true;
+    };
+    // Warn before Firestore's 1 MiB document limit
+    const sizeBytes = new Blob([JSON.stringify(payload)]).size;
+    if (sizeBytes > 900_000) {
+      console.warn('pushToCloud: payload too large', sizeBytes);
+      return { ok: false, tooBig: true };
+    }
+    await setDoc(ref, payload);
+    return { ok: true };
   } catch (e) {
     console.error('pushToCloud failed', e);
-    return false;
+    return { ok: false };
   }
 }
 

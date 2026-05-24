@@ -178,6 +178,7 @@ export default function Loom() {
   const [naturalToTagsOpen, setNaturalToTagsOpen] = useState(false);
   const [naturalToTagsTab, setNaturalToTagsTab] = useState('text'); // 'text' | 'image'
   const [importToast, setImportToast] = useState(null); // null | { name: string }
+  const [dataSizeToast, setDataSizeToast] = useState(false);
   const [orderUpdatedAt, setOrderUpdatedAt] = useState(0);
   const [settingsUpdatedAt, setSettingsUpdatedAt] = useState(0);
   const isApplyingRemoteSettings = useRef(false);
@@ -320,12 +321,13 @@ export default function Loom() {
     cloudPushTimer.current = setTimeout(async () => {
       if (!user) return;
       setSyncStatus('syncing');
-      const ok = await pushToCloud(
+      const result = await pushToCloud(
         user.uid, characters, orderUpdatedAt,
         { theme, lang, viewMode, activeTool, toolSuffixes, history },
         settingsUpdatedAt,
       );
-      setSyncStatus(ok ? 'synced' : 'error');
+      setSyncStatus(result.ok ? 'synced' : 'error');
+      if (!result.ok && result.tooBig) { setDataSizeToast(true); setTimeout(() => setDataSizeToast(false), 6000); }
     }, 3000);
   }, [characters, orderUpdatedAt, settingsUpdatedAt, user, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -441,7 +443,10 @@ export default function Loom() {
       return { ...c, blocks: sorted };
     }));
   };
-  const savePreset = (blockId, presetKey, name, text) => setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, [presetKey]: [...(c[presetKey] || []), { id: uid(), name, text }] } : c));
+  const savePreset = (blockId, presetKey, name, text) => {
+    if ((activeChar[presetKey] || []).length >= 50) { alert(lang === 'ja' ? 'プリセットは最大50件まで保存できます' : 'Preset limit: 50'); return; }
+    setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, [presetKey]: [...(c[presetKey] || []), { id: uid(), name, text }] } : c));
+  };
   const loadPreset = (blockId, text) => updateBlock(blockId, { text });
   const deletePreset = (presetKey, presetId) => setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, [presetKey]: (c[presetKey] || []).filter(p => p.id !== presetId) } : c));
   const copyPresetToChar = (presetKey, preset, targetCharId) => setCharacters(prev => prev.map(c => c.id === targetCharId ? { ...c, [presetKey]: [...(c[presetKey] || []), { ...preset, id: uid() }] } : c));
@@ -507,7 +512,10 @@ export default function Loom() {
     }
   };
 
-  const addCharacter = () => { const ci = characters.length % CHAR_COLORS.length; const ei = characters.length % CHAR_EMOJIS.length; const c = makeCharacter(`${lang === 'ja' ? 'キャラ' : 'Character'} ${characters.length + 1}`, CHAR_COLORS[ci], CHAR_EMOJIS[ei]); setCharacters(prev => [...prev, c]); setActiveCharId(c.id); setCharPanelOpen(true); setOrderUpdatedAt(Date.now()); };
+  const addCharacter = () => {
+    if (characters.length >= 30) { alert(lang === 'ja' ? 'キャラクターは最大30体まで登録できます' : 'Character limit: 30'); return; }
+    const ci = characters.length % CHAR_COLORS.length; const ei = characters.length % CHAR_EMOJIS.length; const c = makeCharacter(`${lang === 'ja' ? 'キャラ' : 'Character'} ${characters.length + 1}`, CHAR_COLORS[ci], CHAR_EMOJIS[ei]); setCharacters(prev => [...prev, c]); setActiveCharId(c.id); setCharPanelOpen(true); setOrderUpdatedAt(Date.now());
+  };
   const duplicateCharacter = (id) => { const src = characters.find(c => c.id === id); if (!src) return; const copy = { ...deep(src), id: uid(), name: src.name + ' (コピー)' }; setCharacters(prev => { const i = prev.findIndex(c => c.id === id); const next = [...prev]; next.splice(i + 1, 0, copy); return next; }); setActiveCharId(copy.id); setOrderUpdatedAt(Date.now()); };
   const deleteCharacter = async (id) => {
     if (characters.length <= 1) return;
@@ -531,7 +539,10 @@ export default function Loom() {
   const setCharFolder = (id, folder) => updateChar(id, { folder });
 
   // ── LoRA helpers ──
-  const addLora = () => updateChar(activeCharId, { loras: [...(activeChar.loras || []), { id: uid(), name: '', weight: '0.8' }] });
+  const addLora = () => {
+    if ((activeChar.loras || []).length >= 30) { alert(lang === 'ja' ? 'LoRAは最大30件まで登録できます' : 'LoRA limit: 30'); return; }
+    updateChar(activeCharId, { loras: [...(activeChar.loras || []), { id: uid(), name: '', weight: '0.8' }] });
+  };
   const updateLora = (lid, upd) => updateChar(activeCharId, { loras: (activeChar.loras || []).map(l => l.id === lid ? { ...l, ...upd } : l) });
   const deleteLora = (lid) => updateChar(activeCharId, { loras: (activeChar.loras || []).filter(l => l.id !== lid) });
   const loraString = (loras, tool) => {
@@ -780,7 +791,7 @@ export default function Loom() {
   const startOutputDrag = useOutputDrag(outputHeight, setOutputHeight);
 
   const addToPromptLog = (entry) =>
-    setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, promptLog: [entry, ...(c.promptLog || [])] } : c));
+    setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, promptLog: [entry, ...(c.promptLog || [])].slice(0, 100) } : c));
 
   const handleCopy = () => {
     if (!textToCopy) return;
@@ -2200,6 +2211,23 @@ export default function Loom() {
               backdropFilter: 'blur(8px)',
             }}>
             {saveStatus === 'saved' ? `💾 ${lang === 'ja' ? '保存済み' : 'Saved'}` : '⚠️ save err'}
+          </div>
+        </div>
+      )}
+
+      {/* ── Data size warning toast ── */}
+      {dataSizeToast && (
+        <div
+          className="fixed z-[500] right-4 bg-surface border rounded-[10px] shadow-xl px-4 py-3 text-[11px] font-mono max-w-[280px]"
+          style={{ bottom: (outputExpanded ? outputHeight : 80) + 12, borderColor: 'rgb(var(--c-orange, var(--c-warn)) / 0.5)' }}
+        >
+          <div className="font-bold mb-1" style={{ color: 'rgb(var(--warn-text, var(--c-orange)))' }}>
+            ⚠ {lang === 'ja' ? 'データが大きすぎます' : 'Data too large'}
+          </div>
+          <div className="text-muted leading-[1.55]">
+            {lang === 'ja'
+              ? 'クラウド同期できませんでした。プロンプトログを削除してデータを減らしてください。'
+              : 'Cloud sync failed. Delete some prompt log entries to reduce data size.'}
           </div>
         </div>
       )}

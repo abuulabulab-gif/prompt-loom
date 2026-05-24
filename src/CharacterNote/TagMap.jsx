@@ -27,6 +27,7 @@ export default function TagMap({ char, lang, onUpdate }) {
 
   const addRow = () => {
     if (!newLabel.trim()) return;
+    if (tagMap.length >= 200) { alert(lang === 'ja' ? 'タグ対応表は最大200件まで登録できます' : 'Tag Map limit: 200 rows'); return; }
     onUpdate({ tagMap: [...tagMap, { id: uid(), label: newLabel.trim(), promptTags: newPrompt.trim(), targetBlock: newBlock, notes: newNotes.trim(), pinned: false }] });
     setNewLabel(''); setNewPrompt(''); setNewNotes('');
     setAdding(false);

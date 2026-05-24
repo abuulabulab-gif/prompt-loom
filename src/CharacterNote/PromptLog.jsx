@@ -11,7 +11,10 @@ export default function PromptLog({ char, lang, activeTool, posText, negText, on
 
   const log = char.promptLog || [];
 
-  const addEntry = entry => onUpdate({ promptLog: [entry, ...log] });
+  const addEntry = entry => {
+    if (log.length >= 100) { alert(lang === 'ja' ? 'プロンプトログは最大100件まで保存できます。古い記録を削除してください。' : 'Prompt Log limit: 100 entries. Delete older records first.'); return; }
+    onUpdate({ promptLog: [entry, ...log] });
+  };
   const deleteEntry = id => onUpdate({ promptLog: log.filter(e => e.id !== id) });
   const editEntry = updated => onUpdate({ promptLog: log.map(e => e.id === updated.id ? updated : e) });
 
