@@ -37,7 +37,7 @@ const CATS_CLOSED = new Set([
 
 const SCENE_MANAGED_TAGS = new Set(['2girls', '2boys', 'multiple girls', 'multiple boys', '1other']);
 
-export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isFirst, isLast, onSavePreset, onFocus, focused, otherChars, onTransfer, conflictTags, onRemove, onHide, isMobile, isCompact, sceneActive, analyzeText }) {
+export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isFirst, isLast, onSavePreset, onFocus, focused, otherChars, onTransfer, conflictTags, onRemove, onHide, isMobile, isCompact, focusMode, sceneActive, analyzeText }) {
   const [search, setSearch] = useState('');
   const [saving, setSaving] = useState(false);
   const [pName, setPName] = useState('');
@@ -204,7 +204,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             <span
               onClick={() => { setNameInput(block.name); setEditingName(true); }}
               title={lang === 'ja' ? 'クリックで名前を変更' : 'Click to rename'}
-              className={`text-[13px] font-bold flex-1 min-w-0 truncate cursor-text group ${isLocked ? 'text-muted' : 'text-fg'}`}
+              className={`${focusMode ? 'text-[16px]' : 'text-[13px]'} font-bold flex-1 min-w-0 truncate cursor-text group ${isLocked ? 'text-muted' : 'text-fg'}`}
             >
               {lang === 'ja' ? block.name : block.nameEn}
               <span className="ml-[4px] text-[10px] text-dim opacity-0 group-hover:opacity-100 transition-opacity">✎</span>
@@ -212,7 +212,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           )
         ) : (
           <span
-            className={`text-[13px] font-bold flex-1 min-w-0 truncate ${isLocked ? 'text-muted' : 'text-fg'}${onHide ? ' cursor-pointer select-none' : ''}`}
+            className={`${focusMode ? 'text-[16px]' : 'text-[13px]'} font-bold flex-1 min-w-0 truncate ${isLocked ? 'text-muted' : 'text-fg'}${onHide ? ' cursor-pointer select-none' : ''}`}
             onDoubleClick={onHide ? hideConfirm : undefined}
             onTouchStart={onHide ? handleDoubleTap : undefined}
             title={onHide ? (lang === 'ja' ? 'ダブルタップで非表示' : 'Double-tap to hide') : undefined}
@@ -450,7 +450,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               ? (lang === 'ja' ? '🔒 ロック中' : '🔒 Locked')
               : (lang === 'ja' ? `${block.name}のプロンプト` : `${block.nameEn} prompt`)}
             style={{ color: block.text ? 'rgb(var(--prompt-text))' : undefined }}
-            className={`w-full min-h-[54px] max-h-[120px] rounded-[7px] text-[12px] px-[11px] py-[9px] font-mono resize-y box-border outline-none leading-[1.65] bg-bg ${block.text ? '' : 'text-muted'} ${isLocked ? 'border border-dim opacity-50' : 'border border-linebright'}`}
+            className={`w-full ${focusMode ? 'min-h-[80px] max-h-[160px] text-[14px]' : 'min-h-[54px] max-h-[120px] text-[12px]'} rounded-[7px] px-[11px] py-[9px] font-mono resize-y box-border outline-none leading-[1.65] bg-bg ${block.text ? '' : 'text-muted'} ${isLocked ? 'border border-dim opacity-50' : 'border border-linebright'}`}
             onFocus={e => { if (!isLocked) e.target.style.borderColor = block.color + '80'; }}
             onBlur={e => { e.target.style.borderColor = ''; }}
           />
@@ -625,7 +625,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                     <TagBtn key={en} tag={tag} color={block.color} lang={lang} isFav disabled={isLocked}
                       active={hasTag(block.text, en)} selectMode={selectMode} selected={selectedTags.includes(en)}
                       conflict={conflictTags?.has(en.toLowerCase()) && hasTag(block.text, en)}
-                      desc={TAG_DICT[en]}
+                      desc={TAG_DICT[en]} large={focusMode}
                       onInsert={() => onTagClick(en)} onToggleFav={() => toggleFav(en)} />
                   );
                 })}
@@ -648,7 +648,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                       analyzed={!!analyzeText && hasTag(analyzeText, tag.en) && !hasTag(block.text, tag.en)}
                       selectMode={selectMode} selected={selectedTags.includes(tag.en)}
                       conflict={conflictTags?.has(tag.en.toLowerCase()) && hasTag(block.text, tag.en)}
-                      desc={TAG_DICT[tag.en]}
+                      desc={TAG_DICT[tag.en]} large={focusMode}
                       onInsert={() => onTagClick(tag.en)} onToggleFav={() => toggleFav(tag.en)} />
                   ))}
                 </div>
@@ -672,7 +672,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   <span style={isOpen ? { color: block.color } : undefined} className={`text-[10px] flex-shrink-0 font-bold${isOpen ? '' : ' text-muted'}`}>
                     {isOpen ? '▼' : '▶'}
                   </span>
-                  <span className={`text-[11px] font-mono font-medium ${isOpen ? 'text-fg' : 'text-muted'}`}>
+                  <span className={`${focusMode ? 'text-[13px]' : 'text-[11px]'} font-mono font-medium ${isOpen ? 'text-fg' : 'text-muted'}`}>
                     {lang === 'ja' ? cat.n : cat.nEn}
                   </span>
                   <span className="text-[10px] font-mono text-muted">({[...new Map(cat.t.map(t => [t.en, t])).values()].length})</span>
@@ -691,7 +691,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                         analyzed={!!analyzeText && hasTag(analyzeText, tag.en) && !hasTag(block.text, tag.en)}
                         selectMode={selectMode} selected={selectedTags.includes(tag.en)}
                         conflict={conflictTags?.has(tag.en.toLowerCase()) && hasTag(block.text, tag.en)}
-                        desc={TAG_DICT[tag.en]}
+                        desc={TAG_DICT[tag.en]} large={focusMode}
                         onInsert={() => onTagClick(tag.en)} onToggleFav={() => toggleFav(tag.en)} />
                     ))}
                     {sceneActive && cat.n === '性別・人数' && (
@@ -734,7 +734,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                       }}
                       onMouseOver={e => e.target.style.color = '#f87171'}
                       onMouseOut={e => e.target.style.color = ''}
-                      className="bg-transparent border-none border-l border-line text-dim px-[5px] py-[3px] cursor-pointer text-[9px]"
+                      className="bg-transparent border-l border-line text-dim px-[5px] py-[3px] cursor-pointer text-[9px]"
                     >✕</button>
                   </div>
                 ))}

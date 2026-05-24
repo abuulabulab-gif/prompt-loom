@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const APP_VERSION = 'v1.0';
+const APP_VERSION = 'v1.1';
 const APP_YEAR = '2026';
 
 const SHORTCUTS = (lang) => [
@@ -197,7 +197,7 @@ const GUIDE = (lang) => [
   },
 ];
 
-export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds = new Set(), allBlocks = [], onRestoreBlock, onRestoreAllBlocks, theme, onToggleTheme, viewMode, onSetViewMode, onToggleLang, defaultTab }) {
+export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds = new Set(), allBlocks = [], onRestoreBlock, onRestoreAllBlocks, theme, onToggleTheme, viewMode, onSetViewMode, onToggleLang, onShowWelcome, defaultTab }) {
   const [tab, setTab] = useState(defaultTab || 'shortcuts');
   const [openSections, setOpenSections] = useState(new Set(['🌱']));
 
@@ -267,13 +267,24 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
               ))}
             </div>
           </div>
+          {/* Re-show welcome hint */}
+          {onShowWelcome && (
+            <button
+              onClick={onShowWelcome}
+              className="flex items-center gap-[5px] rounded-[5px] px-[9px] py-[4px] text-[11px] font-mono cursor-pointer border bg-surfalt border-line text-muted transition-colors duration-150"
+              onMouseOver={e => { e.currentTarget.style.borderColor = 'rgb(var(--c-blue) / 0.5)'; e.currentTarget.style.color = 'rgb(var(--c-blue))'; }}
+              onMouseOut={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.color = ''; }}
+            >
+              🧵 {lang === 'ja' ? '利用ヒントを再表示' : 'Show welcome hint'}
+            </button>
+          )}
         </div>
 
         {/* Tabs */}
         <div className="flex border-b border-line flex-shrink-0">
           {TABS.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex-1 py-[9px] text-[10px] font-mono font-semibold cursor-pointer border-none transition-colors duration-150 ${
+              className={`flex-1 py-[9px] text-[10px] font-mono font-semibold cursor-pointer transition-colors duration-150 ${
                 tab === t.id
                   ? 'bg-tint-accent text-accent border-b-2 border-accent'
                   : 'bg-transparent text-muted'
@@ -480,6 +491,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                 </div>
                 <div className="space-y-[5px]">
                   {[
+                    { v: 'v1.1', note: lang === 'ja' ? 'ボーダー描画バグ修正・フォーカスモードタグサイズ修正・スマホキャラパネルUI改善・ウェルカムヒント再表示ボタン・トースト再設計・Vercel Analytics導入' : 'Border rendering bug fixes, focus mode tag size fix, mobile char panel improvements, welcome hint re-show, toast redesign, Vercel Analytics' },
                     { v: 'v1.0', note: lang === 'ja' ? 'NAI重み{}変換・DALL-E自動自然文切替・バリエーション別自然文トグル・キャラパネルコンパクト化・ツール出力差別化・The Prompt Weaving Studio公開' : 'NAI {} weight conversion, DALL-E auto natural text, per-variation natural text toggle, compact character panel, tool output differentiation, public launch as The Prompt Weaving Studio' },
                     { v: 'v0.9', note: lang === 'ja' ? 'UI統一・全カラーCSS変数化・スマホMJ ARチップ・ブロック順リセット・✦ツールメニュー刷新・COPYボタン拡大・バリエーション3パターン化' : 'UI unification, full CSS-var colors, mobile MJ AR chips, block order reset, ✦ Tools menu overhaul, larger COPY, 3-variation output' },
                     { v: 'v0.8', note: lang === 'ja' ? '自然文生成・PC/スマホUI全面刷新・ブロックジャンプサイドバー・ダブルタップ非表示・出力バー再設計' : 'Natural text output, full PC/mobile UI overhaul, block jump sidebar, double-tap hide, output bar redesign' },

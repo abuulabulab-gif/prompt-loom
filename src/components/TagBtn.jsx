@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 
-export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disabled, selectMode, selected, conflict, desc, onInsert, onToggleFav }) {
+export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disabled, selectMode, selected, conflict, desc, large, onInsert, onToggleFav }) {
   const [h, setH] = useState(false);
   const [tipPos, setTipPos] = useState(null);
   const wrapRef = useRef(null);
@@ -80,16 +80,16 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
         onClick={onInsert}
         title={conflict ? (lang === 'ja' ? `⚠ 競合タグ: ${tag.en}` : `⚠ Conflicting tag: ${tag.en}`) : (lang === 'ja' ? tag.en : tag.ja)}
         style={{ color: fg }}
-        className={`bg-transparent border-none px-[6px] py-[3px] text-[11px] cursor-pointer font-mono tracking-tight ${(active || selected) ? 'font-bold' : 'font-normal'}`}
+        className={`bg-transparent border-none px-[7px] py-[3px] ${large ? 'text-[13px]' : 'text-[12px]'} cursor-pointer font-mono tracking-tight ${(active || selected) ? 'font-bold' : 'font-normal'}`}
       >
         {conflict ? '⚠ ' : (active && !selectMode) ? '✓ ' : (analyzed && !active && !selectMode) ? '◎ ' : ''}
         {selectMode && selected ? '☑ ' : selectMode ? '☐ ' : ''}
         {lang === 'ja' ? tag.ja : tag.en}
       </button>
-      {onToggleFav && !selectMode && (h || isFav) && (
+      {onToggleFav && !selectMode && ((active && h) || isFav) && (
         <button
           onClick={e => { e.stopPropagation(); onToggleFav(); }}
-          className={`bg-transparent border-none border-l border-dim px-[5px] py-[3px] cursor-pointer text-[10px] leading-none ${isFav ? 'text-warn' : 'text-muted'}`}
+          className={`bg-transparent border-l border-dim px-[5px] py-[3px] cursor-pointer text-[10px] leading-none ${isFav ? 'text-warn' : 'text-muted'}`}
         >★</button>
       )}
     </div>

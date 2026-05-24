@@ -100,6 +100,7 @@ export default function Loom() {
   const cycleViewMode = () => setViewMode(m => m === 'normal' ? 'simple' : m === 'simple' ? 'expert' : 'normal');
   const [mainTab, setMainTab] = useState('editor');
   const [thumbs, setThumbs] = useState({});
+  const [thumbPreview, setThumbPreview] = useState(null);
   const [layout, setLayout] = useState('1col');
   const [focusBlockId, setFocusBlockId] = useState(null);
   const [showWelcome, setShowWelcome] = useState(false);
@@ -211,7 +212,7 @@ export default function Loom() {
         await saveState({ characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight });
         setSaveStatus('saved');
         if (statusTimer.current) clearTimeout(statusTimer.current);
-        statusTimer.current = setTimeout(() => setSaveStatus(''), 2000);
+        statusTimer.current = setTimeout(() => setSaveStatus(''), 2600);
       } catch { setSaveStatus('err'); }
     }, 800);
   }, [characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight, loaded]);
@@ -308,6 +309,11 @@ export default function Loom() {
     setShowWelcome(false);
     try { await db.kv.put({ key: 'welcomeSeen', value: true }); } catch {}
   };
+  const reshowWelcome = async () => {
+    setSettingsOpen(false);
+    try { await db.kv.delete('welcomeSeen'); } catch {}
+    setShowWelcome(true);
+  };
 
   const addCharacter = () => { const ci = characters.length % CHAR_COLORS.length; const ei = characters.length % CHAR_EMOJIS.length; const c = makeCharacter(`キャラ ${characters.length + 1}`, CHAR_COLORS[ci], CHAR_EMOJIS[ei]); setCharacters(prev => [...prev, c]); setActiveCharId(c.id); setCharPanelOpen(true); };
   const duplicateCharacter = (id) => { const src = characters.find(c => c.id === id); if (!src) return; const copy = { ...deep(src), id: uid(), name: src.name + ' (コピー)' }; setCharacters(prev => { const i = prev.findIndex(c => c.id === id); const next = [...prev]; next.splice(i + 1, 0, copy); return next; }); setActiveCharId(copy.id); };
@@ -377,6 +383,12 @@ export default function Loom() {
   const handleThumbUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!['jpg', 'jpeg', 'png'].includes(ext)) {
+      alert(lang === 'ja' ? '対応フォーマットは JPG / PNG のみです' : 'Only JPG/PNG files are supported');
+      e.target.value = '';
+      return;
+    }
     const current = thumbs[activeCharId] || [];
     if (current.length >= 4) return;
     const dataUrl = await compressImage(file);
@@ -767,8 +779,6 @@ export default function Loom() {
             <div className="text-[20px] font-black tracking-[0.22em] leading-none" style={{ fontFamily: "'Century Gothic', 'AppleGothic', 'Gill Sans', sans-serif" }}>LOOM</div>
             <div className="text-[9px] text-muted tracking-[0.08em]">The Prompt Weaving Studio</div>
           </div>
-          {saveStatus === 'saved' && <span style={{ color: goodColor, background: goodColor + '15', border: `1px solid ${goodColor}30` }} className="text-[10px] font-mono px-[6px] py-[2px] rounded-[4px]">💾 {lang === 'ja' ? '保存済み' : 'Saved'}</span>}
-          {saveStatus === 'err' && <span className="text-danger text-[10px] font-mono">⚠️ save err</span>}
         </div>
         <div className="flex-1" />
         {/* ☕ Donate */}
@@ -882,7 +892,7 @@ export default function Loom() {
         {/* ⚙️ 設定 */}
         <button onClick={() => setSettingsOpen(true)} title={lang === 'ja' ? 'テーマ・言語・表示モード・ショートカット (?)' : 'Theme / Language / View mode / Shortcuts (?)'}
           className="bg-transparent border border-dim rounded-[6px] px-[9px] py-1 text-muted cursor-pointer text-[10px] font-mono whitespace-nowrap">
-          ⚙️ {lang === 'ja' ? '設定' : 'Settings'}
+          ⚙️{!isMobile && ` ${lang === 'ja' ? '設定' : 'Settings'}`}
         </button>
         <input ref={fileRef} type="file" accept=".json" onChange={handleImport} className="hidden" />
         <input ref={presetFileRef} type="file" accept=".json" onChange={handlePresetImport} className="hidden" />
@@ -892,18 +902,28 @@ export default function Loom() {
       <div className="bg-surface border-b border-line px-[14px] py-[7px] flex items-center gap-[5px] overflow-x-auto">
         {characters.filter(c => !c.archived || c.id === activeCharId).map(c => (
           <div key={c.id} className="relative flex-shrink-0">
-            <div onClick={() => { setActiveCharId(c.id); setCharPanelOpen(true); setCompareCharId(null); }}
-              style={{ background: activeCharId === c.id ? c.color + '22' : 'rgb(var(--surface-alt))', border: `1px solid ${activeCharId === c.id ? c.color + '70' : 'rgb(var(--border))'}` }}
-              className="flex items-center gap-1 rounded-[20px] px-[9px] py-1 cursor-pointer transition-all duration-150">
-              <span className="text-[12px]">{c.emoji}</span>
-              <span style={{ color: activeCharId === c.id ? c.color : 'rgb(var(--text))' }} className="text-[12px] font-semibold whitespace-nowrap">{c.name}</span>
-              <span onClick={e => { e.stopPropagation(); duplicateCharacter(c.id); }} title={lang === 'ja' ? '複製' : 'Dup'}
-                className="text-dim text-[10px] cursor-pointer px-px leading-none"
-                onMouseOver={e => e.target.style.color = c.color} onMouseOut={e => e.target.style.color = 'rgb(var(--dim))'}>⊕</span>
-              {characters.length > 1 && <span onClick={e => { e.stopPropagation(); deleteCharacter(c.id); }}
-                className="text-dim text-[10px] cursor-pointer px-px leading-none"
-                onMouseOver={e => e.target.style.color = '#f87171'} onMouseOut={e => e.target.style.color = 'rgb(var(--dim))'}>✕</span>}
-            </div>
+            {isMobile ? (
+              <div
+                onClick={() => { setActiveCharId(c.id); setCharPanelOpen(true); setCompareCharId(null); }}
+                title={c.name}
+                style={{ background: c.color, outline: activeCharId === c.id ? `2px solid white` : `2px solid transparent`, outlineOffset: '2px' }}
+                className="w-[22px] h-[22px] rounded-full cursor-pointer transition-all duration-150 flex-shrink-0"
+              />
+            ) : (
+              <div onClick={() => { setActiveCharId(c.id); setCharPanelOpen(true); setCompareCharId(null); }}
+                style={{ background: activeCharId === c.id ? c.color + '22' : 'rgb(var(--surface-alt))', border: `1px solid ${activeCharId === c.id ? c.color + '70' : 'rgb(var(--border))'}` }}
+                className="flex items-center gap-1 rounded-[20px] px-[9px] py-1 cursor-pointer transition-all duration-150">
+                <span style={{ background: c.color }} className="w-[7px] h-[7px] rounded-full flex-shrink-0" />
+                <span className="text-[12px]">{c.emoji}</span>
+                <span style={{ color: activeCharId === c.id ? c.color : 'rgb(var(--text))' }} className="text-[12px] font-semibold whitespace-nowrap">{c.name}</span>
+                <span onClick={e => { e.stopPropagation(); duplicateCharacter(c.id); }} title={lang === 'ja' ? '複製' : 'Dup'}
+                  className="text-dim text-[10px] cursor-pointer px-px leading-none"
+                  onMouseOver={e => e.target.style.color = c.color} onMouseOut={e => e.target.style.color = 'rgb(var(--dim))'}>⊕</span>
+                {characters.length > 1 && <span onClick={e => { e.stopPropagation(); deleteCharacter(c.id); }}
+                  className="text-dim text-[10px] cursor-pointer px-px leading-none"
+                  onMouseOver={e => e.target.style.color = '#f87171'} onMouseOut={e => e.target.style.color = 'rgb(var(--dim))'}>✕</span>}
+              </div>
+            )}
           </div>
         ))}
         <button onClick={addCharacter} className="bg-transparent border border-dashed border-muted/60 rounded-[20px] px-[11px] py-1 text-fg/65 cursor-pointer text-[11px] flex-shrink-0 whitespace-nowrap">+ {lang === 'ja' ? '新キャラ' : 'New'}</button>
@@ -944,9 +964,19 @@ export default function Loom() {
         <div className="bg-panel border-b border-line px-[14px] py-[11px]">
           <div style={{ maxWidth: contentMax }} className="mx-auto">
             <div className="flex flex-col gap-[6px] mb-[9px]">
-              <input value={activeChar.name} onChange={e => updateChar(activeChar.id, { name: e.target.value })}
-                style={{ background: 'rgb(var(--bg))', border: `1px solid ${activeChar.color}60`, color: 'rgb(var(--text))' }}
-                className="rounded-[7px] text-[13px] font-bold px-[10px] py-[5px] outline-none w-full" />
+              <div className="flex items-center gap-[6px]">
+                <input value={activeChar.name} onChange={e => updateChar(activeChar.id, { name: e.target.value })}
+                  style={{ background: 'rgb(var(--bg))', border: `1px solid ${activeChar.color}60`, color: 'rgb(var(--text))' }}
+                  className="rounded-[7px] text-[13px] font-bold px-[10px] py-[5px] outline-none flex-1 min-w-0" />
+                <button onClick={() => duplicateCharacter(activeChar.id)}
+                  title={lang === 'ja' ? '複製' : 'Duplicate'}
+                  className="flex-shrink-0 rounded-[6px] px-[9px] py-[5px] text-[11px] cursor-pointer font-mono border border-dim text-muted bg-transparent">⊕</button>
+                {characters.length > 1 && (
+                  <button onClick={() => deleteCharacter(activeChar.id)}
+                    title={lang === 'ja' ? '削除' : 'Delete'}
+                    className="flex-shrink-0 rounded-[6px] px-[9px] py-[5px] text-[11px] cursor-pointer font-mono border border-dim text-muted bg-transparent">✕</button>
+                )}
+              </div>
               <div className="flex items-center gap-[6px]">
                 <div className="flex gap-[3px] items-center flex-shrink-0">
                   {CHAR_COLORS.map(col => <div key={col} onClick={() => updateChar(activeChar.id, { color: col })}
@@ -1035,7 +1065,7 @@ export default function Loom() {
               <div className="flex items-center gap-[6px] flex-wrap">
                 {(thumbs[activeCharId] || []).map((img, i) => (
                   <div key={i} className="relative flex-shrink-0">
-                    <img src={img} alt={`thumb-${i}`} className="w-[52px] h-[52px] rounded-[6px] object-cover border border-line" />
+                    <img src={img} alt={`thumb-${i}`} onClick={() => setThumbPreview(img)} className="w-[52px] h-[52px] rounded-[6px] object-cover border border-line cursor-pointer hover:opacity-85 transition-opacity" />
                     <button onClick={() => removeThumbAt(i)}
                       className="absolute -top-[5px] -right-[5px] bg-surface border border-dim rounded-full w-[15px] h-[15px] text-[8px] flex items-center justify-center cursor-pointer text-muted leading-none">✕</button>
                   </div>
@@ -1044,7 +1074,7 @@ export default function Loom() {
                   <label style={{ borderColor: activeChar.color + '50', color: activeChar.color }}
                     className="w-[52px] h-[52px] border border-dashed rounded-[6px] flex items-center justify-center text-[18px] cursor-pointer flex-shrink-0">
                     +
-                    <input type="file" accept="image/*" onChange={handleThumbUpload} className="hidden" />
+                    <input type="file" accept=".jpg,.jpeg,.png" onChange={handleThumbUpload} className="hidden" />
                   </label>
                 )}
               </div>
@@ -1161,7 +1191,7 @@ export default function Loom() {
                     <div className="flex items-center gap-[5px] flex-wrap">
                       {(thumbs[activeCharId] || []).map((img, i) => (
                         <div key={i} className="relative flex-shrink-0">
-                          <img src={img} alt={`thumb-${i}`} className="w-[48px] h-[48px] rounded-[6px] object-cover border border-line" />
+                          <img src={img} alt={`thumb-${i}`} onClick={() => setThumbPreview(img)} className="w-[48px] h-[48px] rounded-[6px] object-cover border border-line cursor-pointer hover:opacity-85 transition-opacity" />
                           <button onClick={() => removeThumbAt(i)}
                             className="absolute -top-[5px] -right-[5px] bg-surface border border-dim rounded-full w-[15px] h-[15px] text-[8px] flex items-center justify-center cursor-pointer text-muted leading-none">✕</button>
                         </div>
@@ -1170,7 +1200,7 @@ export default function Loom() {
                         <label style={{ borderColor: activeChar.color + '50', color: activeChar.color }}
                           className="w-[48px] h-[48px] border border-dashed rounded-[6px] flex items-center justify-center text-[18px] cursor-pointer flex-shrink-0">
                           +
-                          <input type="file" accept="image/*" onChange={handleThumbUpload} className="hidden" />
+                          <input type="file" accept=".jpg,.jpeg,.png" onChange={handleThumbUpload} className="hidden" />
                         </label>
                       )}
                     </div>
@@ -1202,7 +1232,7 @@ export default function Loom() {
             {(() => {
               const focusBlock = focusBlockId ? visibleBlocks.find(b => b.id === focusBlockId) : null;
               const otherChars = characters.filter(c => c.id !== activeCharId);
-              const renderCard = (block, idx) => (
+              const renderCard = (block, idx, isFocusMode = false) => (
                 <BlockCard key={block.id} block={block} lang={lang} orderNum={idx + 1}
                   onUpdate={upd => handleBlockUpdate(block.id, upd)}
                   onMove={dir => moveBlock(block.id, dir)}
@@ -1216,6 +1246,7 @@ export default function Loom() {
                   onRemove={block.isCustomBlock ? () => removeBlock(block.id) : undefined}
                   onHide={expertMode ? () => toggleHideBlock(block.id) : undefined}
                   isMobile={isMobile}
+                  focusMode={isFocusMode}
                   isCompact={effLayout === '3col' && !focusBlockId}
                   sceneActive={sceneOpen}
                   analyzeText={analyzeText} />
@@ -1224,25 +1255,25 @@ export default function Loom() {
               if (isWide && focusBlock) {
                 const focusIdx = visibleBlocks.findIndex(b => b.id === focusBlockId);
                 return (
-                  <div className="max-w-[1200px] mx-auto px-[14px] py-[13px] flex gap-[14px] items-start">
-                    <div className="flex-[1_1_60%] min-w-0">
-                      <div className="text-muted text-[10px] font-mono mb-2 tracking-[0.07em]">🔍 {lang === 'ja' ? '集中編集モード' : 'FOCUS MODE'}</div>
-                      {renderCard(focusBlock, focusIdx)}
+                  <div className="max-w-[1400px] mx-auto px-[14px] py-[13px] flex gap-[12px] items-start">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-muted text-[11px] font-mono mb-3 tracking-[0.07em] font-semibold">🔍 {lang === 'ja' ? '集中編集モード' : 'FOCUS MODE'}</div>
+                      {renderCard(focusBlock, focusIdx, true)}
                     </div>
-                    <div className="flex-[1_1_40%] min-w-0">
-                      <div className="text-muted text-[10px] font-mono mb-2 tracking-[0.07em]">{lang === 'ja' ? '他のブロック（クリックで集中）' : 'Other blocks (click to focus)'}</div>
+                    <div className="w-[180px] flex-shrink-0">
+                      <div className="text-muted text-[9px] font-mono mb-2 tracking-[0.06em]">{lang === 'ja' ? '他のブロック' : 'Other blocks'}</div>
                       {visibleBlocks.filter(b => b.id !== focusBlockId).map(b => {
                         const num = visibleBlocks.findIndex(x => x.id === b.id) + 1;
                         return (
                           <div key={b.id} onClick={() => setFocusBlockId(b.id)}
                             style={{ borderLeft: `3px solid ${b.enabled !== false ? b.color : 'rgb(var(--dim))'}`, opacity: b.enabled === false ? 0.5 : 1 }}
-                            className="bg-surface border border-line flex items-center gap-2 rounded-[8px] px-[11px] py-2 mb-[5px] cursor-pointer transition-all duration-[120ms]"
+                            className="bg-surface border border-line flex items-center gap-[6px] rounded-[6px] px-[7px] py-[5px] mb-[4px] cursor-pointer transition-all duration-[120ms]"
                             onMouseOver={e => e.currentTarget.style.background = 'rgb(var(--surface-alt))'}
                             onMouseOut={e => e.currentTarget.style.background = 'rgb(var(--surface))'}>
-                            <span style={{ background: b.color + '22', border: `1px solid ${b.color}60`, color: b.color }} className="min-w-[18px] h-[18px] rounded-full text-[10px] font-bold flex items-center justify-center font-mono flex-shrink-0">{num}</span>
-                            <span className="text-[14px]">{b.icon}</span>
-                            <span className="text-fg text-[12px] font-semibold flex-1">{lang === 'ja' ? b.name : b.nameEn}</span>
-                            {b.text && <span style={{ color: b.color + '99' }} className="text-[10px] font-mono">{countTags(b.text)}{lang === 'ja' ? 'タグ' : 't'}</span>}
+                            <span style={{ background: b.color + '22', border: `1px solid ${b.color}60`, color: b.color }} className="min-w-[16px] h-[16px] rounded-full text-[9px] font-bold flex items-center justify-center font-mono flex-shrink-0">{num}</span>
+                            <span className="text-[11px]">{b.icon}</span>
+                            <span className="text-fg text-[10px] font-semibold truncate flex-1">{lang === 'ja' ? b.name : b.nameEn}</span>
+                            {b.text && <span style={{ color: b.color + '99' }} className="text-[9px] font-mono flex-shrink-0">{countTags(b.text)}</span>}
                           </div>
                         );
                       })}
@@ -1328,7 +1359,7 @@ export default function Loom() {
                     <button
                       key={b.id}
                       onClick={handleCustomTap}
-                      className="w-full flex items-center gap-[8px] px-3 py-[10px] text-left cursor-pointer bg-transparent border-none border-b border-line last:border-b-0"
+                      className="w-full flex items-center gap-[8px] px-3 py-[10px] text-left cursor-pointer bg-transparent border-b border-line last:border-b-0"
                       style={{ borderLeftWidth: '3px', borderLeftStyle: 'solid', borderLeftColor: b.enabled !== false ? b.color : 'rgb(var(--dim))' }}
                     >
                       <span className="text-[14px] flex-shrink-0">{b.icon}</span>
@@ -1356,7 +1387,7 @@ export default function Loom() {
                       document.getElementById(`block-${b.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                       setJumpOpen(false);
                     }}
-                    className="w-full flex items-center gap-[8px] px-3 py-[10px] text-left cursor-pointer bg-transparent border-none border-b border-line last:border-b-0"
+                    className="w-full flex items-center gap-[8px] px-3 py-[10px] text-left cursor-pointer bg-transparent border-b border-line last:border-b-0"
                     style={{ borderLeftWidth: '3px', borderLeftStyle: 'solid', borderLeftColor: b.enabled !== false ? b.color : 'rgb(var(--dim))' }}
                   >
                     <span className="text-[14px] flex-shrink-0">{b.icon}</span>
@@ -1456,7 +1487,7 @@ export default function Loom() {
                   className="bg-transparent border border-dim rounded-[6px] text-muted cursor-pointer text-[11px] px-[7px] py-[5px]">{outputExpanded ? '▼' : '▲'}</button>
                 <button onClick={handleSnapshot} disabled={!posText} title={lang === 'ja' ? 'スナップショット（履歴に手動保存）' : 'Snapshot'}
                   style={{ background: snapped ? '#fbbf2415' : 'none', border: `1px solid ${snapped ? '#fbbf2460' : 'rgb(var(--dim))'}` }}
-                  className={`rounded-[6px] px-[9px] py-[5px] text-[12px] transition-all duration-200 ${snapped ? 'text-warn' : 'text-muted'} ${posText ? 'cursor-pointer' : 'cursor-default'}`}>📸</button>
+                  className={`rounded-[6px] px-[9px] py-[5px] text-[12px] inline-flex items-center justify-center leading-none transition-all duration-200 ${snapped ? 'text-warn' : 'text-muted'} ${posText ? 'cursor-pointer' : 'cursor-default'}`}>📸</button>
                 <button onClick={handleResetAll} title={lang === 'ja' ? 'プロンプトをすべてリセット' : 'Reset all'}
                   className="rounded-[6px] px-[9px] py-[5px] text-[11px] cursor-pointer font-mono border border-dim text-muted"
                   onMouseOver={e => { e.currentTarget.style.borderColor = dangerColor + '80'; e.currentTarget.style.color = dangerColor; }}
@@ -1480,7 +1511,7 @@ export default function Loom() {
                     <div className="flex flex-shrink-0 rounded-[6px] overflow-hidden border border-dim">
                       {['1:1', '3:2', '16:9', '9:16'].map(r => (
                         <button key={r} onClick={() => applyAr(r)}
-                          className="bg-transparent border-none border-r border-dim last:border-r-0 px-[6px] py-[3px] text-[9px] font-mono cursor-pointer whitespace-nowrap transition-colors duration-100"
+                          className="bg-transparent border-r border-dim last:border-r-0 px-[6px] py-[3px] text-[9px] font-mono cursor-pointer whitespace-nowrap transition-colors duration-100"
                           style={{ background: currentAr === r ? 'rgb(var(--c-blue) / 0.15)' : 'transparent', color: currentAr === r ? 'rgb(var(--c-blue))' : 'rgb(var(--muted))' }}>
                           {r}
                         </button>
@@ -1572,7 +1603,7 @@ export default function Loom() {
                   className="bg-transparent border border-dim rounded-[6px] text-muted cursor-pointer text-[11px] px-[7px] py-[4px] flex-shrink-0">{outputExpanded ? '▼' : '▲'}</button>
                 <button onClick={handleSnapshot} disabled={!posText} title={lang === 'ja' ? 'スナップショット（履歴に手動保存）' : 'Snapshot'}
                   style={{ background: snapped ? '#fbbf2415' : 'none', border: `1px solid ${snapped ? '#fbbf2460' : 'rgb(var(--dim))'}` }}
-                  className={`rounded-[6px] px-[9px] py-[4px] text-[12px] transition-all duration-200 flex-shrink-0 ${snapped ? 'text-warn' : 'text-muted'} ${posText ? 'cursor-pointer' : 'cursor-default'}`}>📸</button>
+                  className={`rounded-[6px] px-[9px] py-[4px] text-[12px] inline-flex items-center justify-center leading-none transition-all duration-200 flex-shrink-0 ${snapped ? 'text-warn' : 'text-muted'} ${posText ? 'cursor-pointer' : 'cursor-default'}`}>📸</button>
                 <button onClick={handleResetAll} title={lang === 'ja' ? 'プロンプトをすべてリセット' : 'Reset all prompts'}
                   className="rounded-[6px] px-[9px] py-[4px] text-[11px] cursor-pointer font-mono border border-dim text-muted transition-all duration-200 flex-shrink-0"
                   onMouseOver={e => { e.currentTarget.style.borderColor = dangerColor + '80'; e.currentTarget.style.color = dangerColor; }}
@@ -1618,7 +1649,7 @@ export default function Loom() {
                         <div className="flex flex-shrink-0 rounded-[6px] overflow-hidden border border-dim">
                           {['1:1', '3:2', '16:9', '9:16'].map(r => (
                             <button key={r} onClick={() => applyAr(r)}
-                              className="bg-transparent border-none border-r border-dim last:border-r-0 px-[6px] py-[3px] text-[9px] font-mono cursor-pointer whitespace-nowrap transition-colors duration-100"
+                              className="bg-transparent border-r border-dim last:border-r-0 px-[6px] py-[3px] text-[9px] font-mono cursor-pointer whitespace-nowrap transition-colors duration-100"
                               style={{ background: currentAr === r ? 'rgb(var(--c-blue) / 0.15)' : 'transparent', color: currentAr === r ? 'rgb(var(--c-blue))' : 'rgb(var(--muted))' }}>
                               {r}
                             </button>
@@ -1779,8 +1810,45 @@ export default function Loom() {
         onRestoreAllBlocks={() => updateChar(activeCharId, { hiddenBlocks: [] })}
         theme={theme} onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
         viewMode={viewMode} onSetViewMode={setViewMode}
-        onToggleLang={() => setLang(l => l === 'ja' ? 'en' : 'ja')} />}
+        onToggleLang={() => setLang(l => l === 'ja' ? 'en' : 'ja')}
+        onShowWelcome={reshowWelcome} />}
       {paletteOpen && <CommandPalette commands={paletteCommands} lang={lang} onClose={() => setPaletteOpen(false)} />}
+
+      {/* ── THUMBNAIL PREVIEW MODAL ── */}
+      {thumbPreview && (
+        <div
+          className="fixed inset-0 z-[600] flex items-center justify-center"
+          style={{ background: 'rgba(0,0,0,0.85)' }}
+          onClick={() => setThumbPreview(null)}
+        >
+          <img
+            src={thumbPreview}
+            alt="preview"
+            className="max-w-[90vw] max-h-[88vh] rounded-[12px] shadow-2xl object-contain"
+          />
+          <button
+            onClick={() => setThumbPreview(null)}
+            className="absolute top-[16px] right-[16px] bg-surface border border-dim rounded-full w-[32px] h-[32px] flex items-center justify-center text-muted cursor-pointer text-[14px] leading-none"
+          >✕</button>
+        </div>
+      )}
+
+      {/* ── SAVE TOAST ── */}
+      {(saveStatus === 'saved' || saveStatus === 'err') && (
+        <div className="fixed top-[68px] left-0 right-0 flex justify-center z-[500] pointer-events-none">
+          <div className="flex items-center gap-[6px] px-[14px] py-[7px] rounded-[20px] text-[12px] font-mono font-semibold shadow-lg"
+            style={{
+              animation: 'loom-toast-full 2.6s ease-out forwards',
+              background: saveStatus === 'saved' ? goodColor + '20' : 'rgb(var(--c-red) / 0.15)',
+              border: `1px solid ${saveStatus === 'saved' ? goodColor + '50' : 'rgb(var(--c-red) / 0.4)'}`,
+              color: saveStatus === 'saved' ? goodColor : 'rgb(var(--c-red))',
+              backdropFilter: 'blur(8px)',
+            }}>
+            {saveStatus === 'saved' ? `💾 ${lang === 'ja' ? '保存済み' : 'Saved'}` : '⚠️ save err'}
+          </div>
+        </div>
+      )}
+
       {showWelcome && loaded && (
         <WelcomeHint
           lang={lang}

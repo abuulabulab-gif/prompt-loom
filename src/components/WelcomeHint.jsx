@@ -48,24 +48,26 @@ export default function WelcomeHint({ lang, theme, onSetLang, onSetTheme, onDism
 
           {/* Lang + Theme toggles */}
           <div className="flex flex-col gap-[6px] flex-shrink-0">
-            <div className="flex rounded-[6px] overflow-hidden border border-line text-[10px] font-mono">
-              {['ja', 'en'].map(l => (
+            {/* Language */}
+            <div className="flex rounded-[6px] border border-line text-[10px] font-mono overflow-hidden">
+              {[{ v: 'ja', label: '日本語' }, { v: 'en', label: 'English' }].map(({ v, label }, i) => (
                 <button
-                  key={l}
-                  onClick={() => onSetLang(l)}
-                  className={`px-[10px] py-[5px] cursor-pointer border-none transition-colors duration-100 ${L === l ? 'text-black font-bold' : 'bg-surfalt text-muted'}`}
-                  style={L === l ? { background: 'rgb(var(--c-blue))' } : undefined}
+                  key={v}
+                  onClick={() => onSetLang(v)}
+                  className={`flex-1 px-[10px] py-[5px] cursor-pointer transition-colors duration-100 ${L === v ? 'text-black font-bold' : 'bg-surfalt text-muted'} ${i === 0 ? '' : 'border-l border-line'}`}
+                  style={L === v ? { background: 'rgb(var(--c-blue))' } : undefined}
                 >
-                  {l === 'ja' ? '日本語' : 'EN'}
+                  {label}
                 </button>
               ))}
             </div>
-            <div className="flex rounded-[6px] overflow-hidden border border-line text-[10px] font-mono">
-              {[{ v: 'dark', icon: '🌙', ja: 'ダーク', en: 'Dark' }, { v: 'light', icon: '☀️', ja: 'ライト', en: 'Light' }].map(({ v, icon, ja, en }) => (
+            {/* Theme */}
+            <div className="flex rounded-[6px] border border-line text-[10px] font-mono overflow-hidden">
+              {[{ v: 'dark', icon: '🌙', ja: 'ダーク', en: 'Dark' }, { v: 'light', icon: '☀️', ja: 'ライト', en: 'Light' }].map(({ v, icon, ja, en }, i) => (
                 <button
                   key={v}
                   onClick={() => onSetTheme(v)}
-                  className={`px-[9px] py-[5px] cursor-pointer border-none transition-colors duration-100 ${T === v ? 'text-black font-bold' : 'bg-surfalt text-muted'}`}
+                  className={`flex-1 px-[9px] py-[5px] cursor-pointer transition-colors duration-100 ${T === v ? 'text-black font-bold' : 'bg-surfalt text-muted'} ${i === 0 ? '' : 'border-l border-line'}`}
                   style={T === v ? { background: 'rgb(var(--c-blue))' } : undefined}
                 >
                   {icon} {L === 'ja' ? ja : en}

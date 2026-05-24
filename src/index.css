@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prevent accidental text selection everywhere; allow it only in editable fields */
+* { -webkit-user-select: none; user-select: none; }
+input, textarea, [contenteditable] { -webkit-user-select: text; user-select: text; }
+
 /* ──────────────────────────────────────────────────────────────
    LOOM design tokens. Switch on [data-theme="light"] on <html>.
    Values are space-separated RGB triplets so Tailwind's
@@ -87,4 +91,16 @@ input, textarea, button { font-family: inherit; }
 input::placeholder, textarea::placeholder {
   color: rgb(var(--text) / 0.55);
   opacity: 1;
+}
+
+@keyframes loom-toast-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes loom-toast-full {
+  0%   { opacity: 0; transform: translateY(-10px) scale(0.92); }
+  10%  { opacity: 1; transform: translateY(0) scale(1); }
+  70%  { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-6px) scale(0.97); }
 }
