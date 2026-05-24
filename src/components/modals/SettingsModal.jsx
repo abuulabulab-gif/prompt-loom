@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const APP_VERSION = 'v1.4';
+const APP_VERSION = 'v1.5';
 const APP_YEAR = '2026';
 
 const SHORTCUTS = (lang) => [
@@ -124,6 +124,7 @@ const GUIDE = (lang) => [
       { icon: '⚙️', text: lang === 'ja' ? 'テーマ（ダーク/ライト）・言語（JA/EN）・表示モードは ⚙️ 設定の上部から変更できる' : 'Theme, language, and view mode are changed at the top of the ⚙️ Settings panel' },
       { icon: '✦ Tool', text: lang === 'ja' ? 'ヘッダーの「✦ ツール」からテンプレート・カラーピッカー・シーン合成・URLシェアへアクセス' : '"✦ Tools" in the header opens Template, Color Picker, Scene Compose, and URL Share' },
       { icon: '🗣️', text: lang === 'ja' ? '自然文タブで選択中のタグを日本語・英語の読みやすい散文で出力。DALL-E選択時は自動で切替' : 'Natural Text tab outputs active tags as readable prose in JA or EN. Auto-activates with DALL-E' },
+      { icon: '🤖 AI', text: lang === 'ja' ? 'APIキーを設定（⚙️ 設定 → API）すると3つのAI機能が使えます：①自然文タブでAIが散文を洗練、②✦ツール→「自然文からタグ生成」で説明文をタグに変換、③出力バーの🤖提案でプロンプト改善タグを提案' : 'Set an API key (⚙️ Settings → API) to unlock 3 AI features: ① Natural Text tab AI polish, ② ✦ Tools → "Text to Tags" converts descriptions into tags, ③ 🤖 Suggest in the output bar recommends new tags' },
     ],
   },
   {
@@ -533,8 +534,8 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
             <div className="px-[18px] py-[18px] space-y-[20px]">
               <p className="text-muted text-[11px] font-mono bg-surfalt rounded-[7px] px-3 py-2 leading-[1.7]">
                 {lang === 'ja'
-                  ? '自然文タブの「✨ AIで整える」機能で使用します。APIキーはこの端末のみに保存され、外部には送信されません。'
-                  : 'Used by the "✨ Polish with AI" button in the Natural Text tab. Your API key is stored locally on this device only.'}
+                  ? 'APIキーを設定すると3つのAI機能が有効になります。①自然文タブでAIが散文を整形、②✦ツールの「自然文からタグ生成」でキャラ説明をタグに変換、③出力バーの🤖提案で改善タグを提案。キーはこの端末のみに保存されます。'
+                  : 'Setting an API key enables 3 AI features: ① AI polish in the Natural Text tab, ② "Text to Tags" in ✦ Tools to convert character descriptions to tags, ③ 🤖 Suggest in the output bar for tag recommendations. Keys are stored on this device only.'}
               </p>
 
               {/* Provider */}
@@ -655,6 +656,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                 </div>
                 <div className="space-y-[5px]">
                   {[
+                    { v: 'v1.5', note: lang === 'ja' ? 'AI機能追加：自然文タブのAI文章整形・✦ツールに自然文→タグ変換・出力バーにAIタグ提案（OpenAI/Claude対応）。PWAアイコン修正。ユーザーAPIキー方式を採用' : 'AI features: AI polish in Natural Text tab, Text→Tags in ✦ Tools, AI tag suggestions in output bar (OpenAI & Claude). PWA icon fix. User-provided API key approach.' },
                     { v: 'v1.4', note: lang === 'ja' ? '絵文字を種族・職業系21種に刷新・セキュリティ強化・破綻タグの検出と生成防止拡充・ヘッダーグリッドアイコン・タグ辞書追加・設定にスマホ/PC差異タブ追加' : 'Emoji overhaul (21 species/archetype), security hardening, expanded conflict detection + generation prevention, grid header icon, tag dictionary additions, Mobile vs PC comparison tab in Settings' },
                     { v: 'v1.3', note: lang === 'ja' ? 'SFWタグ自動連携（ネガティブにnsfw自動追加/削除）・タグ大幅拡充（衣装・髪型・フットウェアほか）・単一キャラ生成保証・バリエーション同キャラ維持強化' : 'SFW auto-link (auto-add/remove nsfw in negative), major tag additions (outfits, hairstyles, footwear, etc.), single-character generation guaranteed, improved variations for same-character looks' },
                     { v: 'v1.2', note: lang === 'ja' ? 'Googleログイン＆Firestoreクラウド同期・.loom独自拡張子・スマホデータ入出力・ウェルカムヒントライトモード視認性改善・英語ローカライズ修正' : 'Google login & Firestore cloud sync, .loom file format, mobile export/import, welcome hint light-mode contrast fix, EN localization fixes' },

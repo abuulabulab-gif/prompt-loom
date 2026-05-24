@@ -2063,6 +2063,11 @@ export default function Loom() {
             </div>
           )}
 
+          {outputExpanded && aiError && outputTab === 'natural' && (
+            <div className="flex-shrink-0 mb-[5px] px-[10px] py-[6px] rounded-[7px] text-[11px] font-mono text-red-400 bg-red-400/10 border border-red-400/30">
+              ⚠ {aiError}
+            </div>
+          )}
           {outputExpanded && (outputEditMode && outputTab !== 'natural' ? (
             <textarea
               value={outputEditText}
