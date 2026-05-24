@@ -147,4 +147,66 @@ export const TAG_DICT = {
   'bokeh background':      { ja: '背景がボケた丸い光の玉が散らばる。ポートレート写真的', en: 'Blurred circular light orbs in background — portrait photography look' },
   'rooftop':               { ja: 'ビルや建物の屋上。青空・夜景・街並みと合わせやすい', en: 'Rooftop of a building — pairs well with city skyline or night view' },
   'dungeon':               { ja: '石造りの地下迷宮・牢獄。RPGファンタジー系の背景', en: 'Stone underground labyrinth or prison — fantasy RPG setting' },
+  'alley':                 { ja: '建物の間の薄暗い路地裏。都市的・ノワール系の雰囲気', en: 'Narrow urban alleyway — moody city or noir atmosphere' },
+  'ruins':                 { ja: '崩れた古代遺跡や廃墟。ファンタジー・ポストアポカリプス系に', en: 'Crumbled ancient structures or abandoned buildings — fantasy or post-apocalyptic' },
+  'castle':                { ja: '西洋式の城。塔・城壁・石造りの雄大な建築', en: 'Western-style medieval stone castle with towers and battlements' },
+  'outer space':           { ja: '宇宙空間。星や惑星・銀河を背景にしたSF・ファンタジー系', en: 'Space setting with stars, planets, or galaxies — sci-fi or cosmic feel' },
+  'underwater':            { ja: '水中・海中シーン。光の揺らめきや泡・サンゴなどの演出に', en: 'Submerged underwater scene with light rays, bubbles, and marine elements' },
+  'throne room':           { ja: '玉座と豪華な内装の王室の間。権威・ファンタジー系に映える', en: 'Royal throne hall with ornate decor — regal or fantasy setting' },
+
+  // ── 品質・安全 ────────────────────────────────────────────────
+  'SFW':                   { ja: 'Safe For Work。職場・公共でも見られるよう露出・過激表現を除外し、ネガティブにnsfwを自動追加する', en: 'Safe For Work — keeps content appropriate for public use; auto-adds nsfw to negative prompt' },
+  'rating:safe':           { ja: 'Danbooruの安全評価タグ。露出なし・暴力なしの最高クリーン度を指定', en: 'Danbooru safety rating tag — no nudity or violence, highest clean rating' },
+  'official art':          { ja: 'アニメ・ゲームの公式ビジュアル風の丁寧な仕上がりに誘導する', en: 'Steers output toward polished anime/game official illustration style' },
+  'detailed background':   { ja: '背景を省略せず細部まで丁寧に描くよう誘導する', en: 'Prompts the AI to render a fully detailed, non-lazy background' },
+  'chibi':                 { ja: '頭身が低い2〜3頭身のデフォルメキャラ。SD（スーパーデフォルメ）とも', en: 'Super-deformed 2–3 head-height exaggerated style (also called SD)' },
+  'flat design':           { ja: 'シャドウなし・グラデなしのシンプルなフラットカラー。アイコン・ポスター風', en: 'Minimal vector-like design with no shadows or gradients — icon or poster look' },
+  'soft shading':          { ja: '影の境界がなだらかなやわらかいグラデーションシェーディング', en: 'Gentle, diffuse shading with soft transitions between light and shadow' },
+
+  // ── 髪型 ──────────────────────────────────────────────────────
+  'wolf cut':              { ja: 'ウルフカット。段差を付けてランダムに切り込んだワイルドな外ハネスタイル', en: 'Layered shaggy haircut with wispy ends — edgy, wild texture' },
+  'hime cut':              { ja: '姫カット。眉ラインで水平に揃えた前髪＋サイドを直線に切り揃えたお姫様風', en: 'Princess cut: straight-across bangs with straight side curtains framing the face' },
+  'drill hair':            { ja: 'ドリルヘア（縦ロール）。コルクスクリュー状に巻いた螺旋ツインテール。お嬢様系キャラに多い', en: 'Tight corkscrew spiral curls, usually in twintails — classic ojou-sama/princess style' },
+  'swept back hair':       { ja: '前髪をかき上げて後ろに流したスッキリしたスタイル。知的・クール系に', en: 'Hair brushed back from the forehead — clean, cool, or intellectual look' },
+  'layered hair':          { ja: 'レイヤーカット。段差を付けて動きと軽さを出したスタイル', en: 'Layered cut with varying lengths for volume and movement' },
+  'spiky hair':            { ja: '先端が尖って立ちあがるとがり毛。少年マンガのバトル系キャラに多い', en: 'Sharp upward-pointing spikes — common in shonen battle-anime characters' },
+
+  // ── メイク ────────────────────────────────────────────────────
+  'blush stickers':        { ja: '頬に貼られたシール状のデコ頬紅。可愛い・あどけない印象を加える', en: 'Decorative sticker-style blush marks on cheeks — cute, innocent look' },
+  'mole under eye':        { ja: '目の下の涙ぼくろ。色気・ミステリアスな印象を加える定番ポイント', en: 'Beauty mark / tear mole below the eye — adds allure or a mysterious quality' },
+
+  // ── 種族・特殊 ────────────────────────────────────────────────
+  'succubus':              { ja: 'サキュバス。悪魔の種族で男性を誘惑する魔物。羽・角・尻尾が特徴的', en: 'Succubus — seductive demon with wings, horns, and a spaded tail' },
+  'lamia':                 { ja: 'ラミア。上半身が人間・下半身が蛇の半妖怪。スケールのあるシルエットが特徴', en: 'Half-human half-snake mythological creature with a serpentine lower body' },
+  'tanuki':                { ja: 'タヌキ（狸）。日本の妖怪・信仰の動物。大きな耳・尻尾・腹太鼓が特徴', en: 'Japanese raccoon dog spirit with magical shapeshifting powers' },
+  'paw pads':              { ja: '肉球。動物系キャラの手・足裏にある柔らかいクッション状のパーツ', en: 'Soft cushioned paw pads on the palms or feet of animal-type characters' },
+  'fluffy tail':           { ja: 'もふもふした大きくて丸みのある動物の尻尾。キツネ・オオカミ系に多い', en: 'Large, soft, and fluffy animal tail — common on fox or wolf characters' },
+  'multiple tails':        { ja: '複数本の尻尾。九尾のキツネなど多尾の妖怪・伝説キャラに', en: 'Multiple tails — as on nine-tailed fox spirits or legendary multi-tail creatures' },
+
+  // ── 衣装 ──────────────────────────────────────────────────────
+  'cheongsam':             { ja: 'チャイナドレス（旗袍 / qipao）。高いスリット＋立て衿が特徴の中国伝統衣装', en: 'Traditional Chinese qipao dress with high slit and mandarin collar' },
+  'hanfu':                 { ja: '漢服。古代中国の伝統衣装。広い袖・流れるような布地が特徴', en: 'Traditional Han Chinese clothing with flowing wide sleeves — ancient Chinese aesthetic' },
+  'bunny suit':            { ja: 'バニーガールスーツ。ウサギ耳・カフス・コルセット型の肌出しコスチューム', en: 'Playboy Bunny-style costume with rabbit ears, cuffs, and a corseted body' },
+  'leotard':               { ja: 'レオタード。体にぴったりした一体型の水着に似た衣装。体操・ダンス系に', en: 'Tight one-piece body-hugging garment — like a swimsuit; worn in gymnastics/dance' },
+  'race queen':            { ja: 'レースクイーン。日本のモータースポーツイベントのキャンペーンガール衣装。ミニ丈＋ハイヒールが定番', en: 'Japanese motorsport promo-girl outfit — usually a mini dress or tight uniform with heels' },
+  'bikini armor':          { ja: 'ビキニアーマー。ビキニ型の防具。ファンタジーRPGのセクシー戦士の定番衣装', en: 'Fantasy battle outfit — armor styled as a bikini; iconic skimpy warrior costume' },
+  'magical girl':          { ja: '魔法少女衣装。セーラー服やふわふわドレスにステッキ・リボンを組み合わせた変身ヒロイン風', en: 'Magical girl transformation outfit — frilly dress with ribbon and wand, mahou shoujo style' },
+  'micro bikini':          { ja: 'マイクロビキニ。布地が極端に小さく肌の露出が非常に多い水着', en: 'Extremely minimal bikini with tiny triangles of fabric — very high skin exposure' },
+  'school swimsuit':       { ja: 'スクール水着。日本の学校で使われる紺色のワンピース競泳水着', en: 'Japanese school competition swimsuit — navy blue one-piece with name label' },
+  'halter top':            { ja: 'ホルタートップ。首の後ろで紐を結ぶ形で背中が開いたトップス', en: 'Top that ties behind the neck, leaving the back and shoulders bare' },
+  'sports bra':            { ja: 'スポーツブラ。運動用のサポートブラ。ミドリフ見せスタイルに多用', en: 'Athletic supportive bra top — pairs with bare midriff activewear look' },
+  'sweater vest':          { ja: 'セーターベスト（袖なしニット）。カジュアル知的系のアカデミックファッションに', en: 'Sleeveless knit vest — academic or preppy style' },
+  'cloak':                 { ja: 'クローク。肩から羽織る袖なしのマント状の外套。ファンタジー系に', en: 'Sleeveless outer robe draped over the shoulders — fantasy or medieval style' },
+
+  // ── フットウェア ─────────────────────────────────────────────
+  'pumps':                 { ja: 'パンプス。ヒールがあり甲部分を覆う最もオーソドックスな女性用ドレスシューズ', en: 'Classic women\'s heeled dress shoes with a closed toe and no straps' },
+  'platform shoes':        { ja: '厚底シューズ。靴底全体が分厚く高さのある靴。原宿系・ゴスロリ系に人気', en: 'Shoes with an extra-thick platform sole — Harajuku or gothic lolita style' },
+  'mary janes':            { ja: 'メアリージェーン。甲に横ベルトのある丸つま先のシンプルなフラット靴。幼い印象に', en: 'Round-toe flat shoes with a strap across the instep — girlish, classic schoolgirl look' },
+  'loafers':               { ja: 'ローファー。紐なしのスリップオン式の革靴。制服・学生スタイルに', en: 'Slip-on leather shoes with no laces — school uniform or smart-casual style' },
+  'thigh-high boots':      { ja: '太ももまで覆うロングブーツ。絶対領域との組み合わせが定番', en: 'Boots that reach all the way up to the thigh — often paired with miniskirts' },
+  'knee-high boots':       { ja: 'ニーハイブーツ。膝まで覆うロングブーツ', en: 'Boots reaching up to the knee' },
+
+  // ── 持ち物・武器 ─────────────────────────────────────────────
+  'holding fan':           { ja: '扇子（または団扇）を手に持つポーズ。和風・中華風・貴族系に映える', en: 'Holding a folding or flat fan — Japanese, Chinese, or aristocratic aesthetic' },
+  'holding lantern':       { ja: '提灯やオイルランタンを手に持つ。和風・中世・ゴシック系の雰囲気に', en: 'Holding a paper lantern or oil lantern — historical, gothic, or Japanese ambiance' },
 };

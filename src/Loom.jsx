@@ -265,6 +265,19 @@ export default function Loom() {
     catch (e) { if (e.code !== 'auth/popup-closed-by-user') console.error(e); }
   };
 
+  // ── SFW ↔ nsfw (negative) auto-linkage ──
+  useEffect(() => {
+    if (!loaded) return;
+    const qualBlock = blocks.find(b => b.id === 'quality');
+    const negBlock  = blocks.find(b => b.id === 'negative');
+    if (!qualBlock || !negBlock) return;
+    const sfwOn    = hasTag(qualBlock.text, 'SFW');
+    const nsfwInNeg = hasTag(negBlock.text, 'nsfw');
+    if (sfwOn === nsfwInNeg) return; // already in sync
+    if (sfwOn)  updateBlock('negative', { text: appendTag(negBlock.text, 'nsfw', '1.0') });
+    else        updateBlock('negative', { text: removeTag(negBlock.text, 'nsfw') });
+  }, [blocks, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Color picker apply ──
   const TARGET_TO_BLOCK = { hair: 'face', eyes: 'face', skin: 'body', dress: 'outfit', shirt: 'outfit', skirt: 'outfit', jacket: 'outfit', ribbon: 'outfit', shoes: 'outfit', theme: 'artstyle' };
   const applyColorTag = (shadeEn, colorEn, targetEn, targetId) => {

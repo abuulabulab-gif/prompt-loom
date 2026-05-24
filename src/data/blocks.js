@@ -5,6 +5,7 @@ export const BLOCKS_DEF = [
     {n:'品質',nEn:'Quality',t:[tt('masterpiece','傑作'),tt('best quality','最高品質'),tt('ultra-detailed','超精細'),tt('highres','高解像度'),tt('absurdres','超高解像度'),tt('8k wallpaper','8K壁紙'),tt('incredibly detailed CG','超精細CG'),tt('official art','公式アート')]},
     {n:'仕上がり',nEn:'Finish',t:[tt('sharp focus','シャープ'),tt('intricate details','精緻な描写'),tt('HDR','HDR'),tt('ray tracing','レイトレ'),tt('cinematic','シネマ風'),tt('professional artwork','プロ作品'),tt('trending on pixiv','pixiv人気'),tt('detailed background','背景も精細')]},
     {n:'顔の精細化',nEn:'Detailed Face',t:[tt('detailed face','精細な顔'),tt('beautiful detailed eyes','精細な瞳'),tt('detailed skin','精細な肌'),tt('symmetrical eyes','左右対称の目'),tt('perfect face','整った顔')]},
+    {n:'セーフティ',nEn:'Safety',t:[tt('SFW','セーフモード（nsfwを自動OFF）'),tt('rating:safe','レーティング:セーフ')]},
   ]},
   {id:'artstyle',name:'アートスタイル',nameEn:'Art Style',icon:'🎨',color:'#c084fc',collapsed:false,strength:'1.0',text:'',customTags:[],favTags:[],locked:false,cats:[
     {n:'スタイル',nEn:'Style',t:[tt('anime','アニメ'),tt('manga style','マンガ'),tt('illustration','イラスト'),tt('realistic','リアル'),tt('semi-realistic','セミリアル'),tt('concept art','コンセプトアート'),tt('digital art','デジタルアート'),tt('watercolor','水彩'),tt('oil painting','油彩'),tt('sketch','スケッチ'),tt('pixel art','ピクセルアート'),tt('3D rendering','3Dレンダリング'),tt('impasto','厚塗り'),tt('lineart','線画'),tt('chibi','ちび・デフォルメ'),tt('flat design','フラットデザイン')]},
@@ -79,7 +80,7 @@ export const BLOCKS_DEF = [
   {id:'negative',name:'ネガティブ',nameEn:'Negative Prompt',icon:'🚫',color:'#f87171',collapsed:true,strength:'1.0',text:'lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry',customTags:[],favTags:[],locked:false,cats:[
     {n:'品質NG',nEn:'Quality NG',t:[tt('lowres','低解像度'),tt('worst quality','最低品質'),tt('low quality','低品質'),tt('jpeg artifacts','JPEGノイズ'),tt('blurry','ボケ'),tt('noise','ノイズ'),tt('pixelated','ピクセル化')]},
     {n:'身体NG',nEn:'Body NG',t:[tt('bad anatomy','体型崩れ'),tt('bad hands','手の崩れ'),tt('extra limbs','余分な手足'),tt('missing fingers','指の欠損'),tt('extra digit','余分な指'),tt('deformed','歪み'),tt('mutated','変異'),tt('bad proportions','不自然な体型'),tt('fused fingers','指合体'),tt('malformed hands','奇形の手'),tt('bad face','顔崩れ'),tt('bad feet','足の崩れ'),tt('poorly drawn feet','描写不足の足'),tt('extra toes','余分な足の指')]},
-    {n:'その他NG',nEn:'Other NG',t:[tt('text','テキスト'),tt('watermark','透かし'),tt('signature','署名'),tt('logo','ロゴ'),tt('username','ユーザー名'),tt('cropped','トリミング'),tt('out of frame','画面外'),tt('duplicate','重複'),tt('censored','検閲')]},
+    {n:'その他NG',nEn:'Other NG',t:[tt('nsfw','NSFW（SFWと連動）'),tt('text','テキスト'),tt('watermark','透かし'),tt('signature','署名'),tt('logo','ロゴ'),tt('username','ユーザー名'),tt('cropped','トリミング'),tt('out of frame','画面外'),tt('duplicate','重複'),tt('censored','検閲')]},
   ]},
 ];
 
