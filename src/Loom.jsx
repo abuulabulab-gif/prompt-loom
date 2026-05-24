@@ -41,7 +41,8 @@ import SettingsModal from "./components/modals/SettingsModal.jsx";
 import CommandPalette from "./components/CommandPalette.jsx";
 import GlobalTagSearch from "./components/GlobalTagSearch.jsx";
 import { toNaturalJa, toNaturalEn } from "./utils/naturalLanguage.js";
-import { callAI } from "./utils/aiApi.js";
+import { callAI, callNaturalToTags, callTagSuggest } from "./utils/aiApi.js";
+import NaturalToTagsModal from "./components/modals/NaturalToTagsModal.jsx";
 import CharacterNote from "./CharacterNote/index.jsx";
 import { useAuth } from "./hooks/useAuth.js";
 import { pushToCloud, pullFromCloud, mergeCharacters } from "./sync/firestore.js";
@@ -166,6 +167,11 @@ export default function Loom() {
   const [aiResult, setAiResult] = useState('');
   const [aiBusy, setAiBusy] = useState(false);
   const [aiError, setAiError] = useState('');
+  const [naturalToTagsOpen, setNaturalToTagsOpen] = useState(false);
+  const [tagSuggestOpen, setTagSuggestOpen] = useState(false);
+  const [tagSuggestions, setTagSuggestions] = useState([]);
+  const [tagSuggestBusy, setTagSuggestBusy] = useState(false);
+  const [tagSuggestError, setTagSuggestError] = useState('');
   const [jumpOpen, setJumpOpen] = useState(false);
   const sidebarLastTapRef = useRef({});
 
@@ -416,6 +422,35 @@ export default function Loom() {
     setApiConfig(cfg);
     setAiResult('');
     try { await db.kv.put({ key: 'apiConfig', value: cfg }); } catch {}
+  };
+
+  const handleAddTagsFromNatural = (tagsByBlock) => {
+    setCharacters(prev => prev.map(c => {
+      if (c.id !== activeCharId) return c;
+      const newBlocks = c.blocks.map(b => {
+        const tags = tagsByBlock[b.id];
+        if (!tags?.length) return b;
+        let text = b.text;
+        tags.forEach(t => { text = appendTag(text, t, '1.0'); });
+        return { ...b, text, enabled: true };
+      });
+      return { ...c, blocks: newBlocks };
+    }));
+  };
+
+  const handleTagSuggest = async () => {
+    if (!apiConfig.apiKey || !posText) return;
+    setTagSuggestBusy(true); setTagSuggestError(''); setTagSuggestions([]);
+    try {
+      const res = await callTagSuggest({ provider: apiConfig.provider, apiKey: apiConfig.apiKey, currentTags: posText, lang });
+      setTagSuggestions(res);
+      setTagSuggestOpen(true);
+    } catch (e) {
+      setTagSuggestError(e.message);
+      setTagSuggestOpen(true);
+    } finally {
+      setTagSuggestBusy(false);
+    }
   };
 
   const handleAiPolish = async () => {
@@ -945,6 +980,13 @@ export default function Loom() {
                   className="w-full text-left px-[12px] py-[7px] text-[11px] font-mono cursor-pointer hover:bg-surfalt text-accent flex items-center gap-2">
                   ✦ {lang === 'ja' ? 'テンプレート' : 'Template'}
                 </button>
+                {apiConfig.apiKey && (
+                  <button onClick={() => { setNaturalToTagsOpen(true); setQuickOpen(false); }}
+                    className="w-full text-left px-[12px] py-[7px] text-[11px] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
+                    style={{ color: 'rgb(var(--c-blue))' }}>
+                    ✍️ {lang === 'ja' ? '自然文からタグ生成' : 'Text to Tags'}
+                  </button>
+                )}
                 <button onClick={() => { setColorPickerOpen(true); setQuickOpen(false); }}
                   className="w-full text-left px-[12px] py-[7px] text-[11px] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
                   style={{ color: 'rgb(var(--c-purple))' }}>
@@ -1806,6 +1848,15 @@ export default function Loom() {
                     style={{ background: outputEditMode ? '#fbbf2422' : 'none', border: `1px solid ${outputEditMode ? '#fbbf2460' : 'rgb(var(--dim))'}`, color: outputEditMode ? '#fbbf24' : 'rgb(var(--muted))' }}
                     className="rounded-[6px] px-[9px] py-[4px] text-[11px] transition-all duration-200 cursor-pointer disabled:cursor-default font-mono flex-shrink-0">✏️</button>
                 )}
+                {apiConfig.apiKey && outputTab === 'positive' && (
+                  <button onClick={() => { if (tagSuggestOpen) { setTagSuggestOpen(false); } else { handleTagSuggest(); setOutputExpanded(true); } }}
+                    disabled={tagSuggestBusy || !posText}
+                    title={lang === 'ja' ? 'AIタグ提案' : 'AI tag suggestions'}
+                    style={{ background: tagSuggestOpen ? 'rgb(var(--c-green) / 0.13)' : 'none', border: `1px solid ${tagSuggestOpen ? 'rgb(var(--c-green) / 0.5)' : 'rgb(var(--dim))'}`, color: tagSuggestOpen ? 'rgb(var(--c-green))' : 'rgb(var(--muted))' }}
+                    className="rounded-[6px] px-[9px] py-[4px] text-[11px] cursor-pointer disabled:opacity-40 disabled:cursor-default font-mono flex-shrink-0 transition-all duration-150">
+                    {tagSuggestBusy ? '🤖...' : `🤖 ${lang === 'ja' ? '提案' : 'Suggest'}`}
+                  </button>
+                )}
                 {/* Suffix editor + AR chips */}
                 {activeTool !== 'general' && (() => {
                   const sfxVal = toolSuffixes[activeTool] || '';
@@ -1864,6 +1915,53 @@ export default function Loom() {
                   className="rounded-[8px] px-[20px] py-[6px] text-[13px] font-bold transition-all duration-200 min-w-[90px] flex-shrink-0">
                   {copied ? '✓ Copied!' : '📋 COPY'}
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* Tag suggest panel */}
+          {outputExpanded && tagSuggestOpen && (
+            <div className="flex-shrink-0 mb-[6px] p-[10px] rounded-[8px]"
+              style={{ background: 'rgb(var(--c-green) / 0.04)', border: '1px solid rgb(var(--c-green) / 0.2)' }}>
+              <div className="flex items-center justify-between mb-[8px]">
+                <span className="text-[10px] font-mono font-bold" style={{ color: 'rgb(var(--c-green))' }}>
+                  🤖 {lang === 'ja' ? 'AIタグ提案' : 'AI Tag Suggestions'}
+                </span>
+                <button onClick={() => setTagSuggestOpen(false)}
+                  className="text-[10px] font-mono text-muted cursor-pointer bg-transparent border-none">✕</button>
+              </div>
+              {tagSuggestError && (
+                <div className="text-[11px] font-mono text-red-400 mb-[6px]">{tagSuggestError}</div>
+              )}
+              <div className="flex flex-col gap-[5px]">
+                {tagSuggestions.map((s, i) => {
+                  const block = blocks.find(b => b.id === s.block);
+                  return (
+                    <div key={i} className="flex items-center gap-[8px] bg-surface rounded-[6px] px-[10px] py-[7px]">
+                      <div className="flex-1 min-w-0">
+                        <span className="text-[11px] font-mono text-fg font-bold">{s.tag}</span>
+                        <span className="text-[10px] font-mono text-dim ml-[7px]">→ {block?.name ?? s.block}</span>
+                        <div className="text-[10px] font-mono text-muted mt-[1px]">{s.reason}</div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          if (!block) return;
+                          updateBlock(block.id, { text: appendTag(block.text, s.tag, '1.0'), enabled: true });
+                          setTagSuggestions(prev => prev.filter((_, j) => j !== i));
+                        }}
+                        disabled={!block}
+                        className="rounded-[5px] px-[9px] py-[4px] text-[10px] font-mono cursor-pointer disabled:opacity-40 flex-shrink-0 border-none text-white"
+                        style={{ background: 'rgb(var(--c-green) / 0.8)' }}>
+                        + {lang === 'ja' ? '追加' : 'Add'}
+                      </button>
+                    </div>
+                  );
+                })}
+                {tagSuggestions.length === 0 && !tagSuggestError && (
+                  <div className="text-[11px] font-mono text-muted text-center py-[4px]">
+                    {lang === 'ja' ? 'すべて追加しました' : 'All suggestions added'}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -1993,6 +2091,7 @@ export default function Loom() {
         onDelete={deleteCharacter}
         onSetFolder={setCharFolder} />}
       {historyOpen && <HistoryModal history={history} lang={lang} onClose={() => setHistoryOpen(false)} onRestore={restoreFromHistory} onDelete={id => setHistory(prev => prev.filter(h => h.id !== id))} />}
+      {naturalToTagsOpen && <NaturalToTagsModal lang={lang} apiConfig={apiConfig} blocks={blocks} onAddTags={handleAddTagsFromNatural} onClose={() => setNaturalToTagsOpen(false)} />}
       {templateOpen && <TemplateModal lang={lang} onApply={applyTemplate} onClose={() => setTemplateOpen(false)} />}
       {colorPickerOpen && <ColorPickerModal lang={lang} onApply={applyColorTag} onClose={() => setColorPickerOpen(false)} />}
       {sceneOpen && <SceneComposeModal characters={characters} lang={lang} activeTool={activeTool} theme={theme} onClose={() => setSceneOpen(false)} />}
