@@ -179,6 +179,8 @@ export default function Loom() {
   const [naturalToTagsTab, setNaturalToTagsTab] = useState('text'); // 'text' | 'image'
   const [importToast, setImportToast] = useState(null); // null | { name: string }
   const [orderUpdatedAt, setOrderUpdatedAt] = useState(0);
+  const [settingsUpdatedAt, setSettingsUpdatedAt] = useState(0);
+  const isApplyingRemoteSettings = useRef(false);
   const [tagSuggestOpen, setTagSuggestOpen] = useState(false);
   const [tagSuggestions, setTagSuggestions] = useState([]);
   const [tagSuggestBusy, setTagSuggestBusy] = useState(false);
@@ -210,6 +212,7 @@ export default function Loom() {
             }
             setThumbs(tmap);
           }
+          isApplyingRemoteSettings.current = true;
           if (d.history) setHistory(d.history);
           if (d.lang) setLang(d.lang);
           if (d.activeTool) setActiveTool(d.activeTool);
@@ -218,6 +221,7 @@ export default function Loom() {
           if (d.viewMode) setViewMode(d.viewMode);
           if (d.outputHeight) setOutputHeight(d.outputHeight);
           if (d.orderUpdatedAt) setOrderUpdatedAt(d.orderUpdatedAt);
+          if (d.settingsUpdatedAt) setSettingsUpdatedAt(d.settingsUpdatedAt);
         }
       } catch {}
       // First-visit welcome hint
@@ -260,13 +264,20 @@ export default function Loom() {
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(async () => {
       try {
-        await saveState({ characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight, orderUpdatedAt });
+        await saveState({ characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight, orderUpdatedAt, settingsUpdatedAt });
         setSaveStatus('saved');
         if (statusTimer.current) clearTimeout(statusTimer.current);
         statusTimer.current = setTimeout(() => setSaveStatus(''), 2600);
       } catch { setSaveStatus('err'); }
     }, 800);
-  }, [characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight, orderUpdatedAt, loaded]);
+  }, [characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight, orderUpdatedAt, settingsUpdatedAt, loaded]);
+
+  // ── Settings change watcher: bump settingsUpdatedAt on user-driven changes ──
+  useEffect(() => {
+    if (!loaded) return;
+    if (isApplyingRemoteSettings.current) { isApplyingRemoteSettings.current = false; return; }
+    setSettingsUpdatedAt(Date.now());
+  }, [theme, lang, viewMode, activeTool, toolSuffixes, history, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Cloud sync: pull on login ──
   useEffect(() => {
@@ -280,6 +291,17 @@ export default function Loom() {
           setCharacters(prev => mergeCharacters(prev, remote.characters, remote.characterOrder, orderUpdatedAt, remote.orderUpdatedAt));
           if ((remote.orderUpdatedAt ?? 0) > orderUpdatedAt) {
             setOrderUpdatedAt(remote.orderUpdatedAt);
+          }
+          if (remote.settings && (remote.settingsUpdatedAt ?? 0) > settingsUpdatedAt) {
+            isApplyingRemoteSettings.current = true;
+            const s = remote.settings;
+            if (s.theme) setTheme(s.theme);
+            if (s.lang) setLang(s.lang);
+            if (s.viewMode) setViewMode(s.viewMode);
+            if (s.activeTool) setActiveTool(s.activeTool);
+            if (s.toolSuffixes) setToolSuffixes(s.toolSuffixes);
+            if (s.history) setHistory(s.history);
+            setSettingsUpdatedAt(remote.settingsUpdatedAt);
           }
         }
         setSyncStatus('synced');
@@ -298,10 +320,14 @@ export default function Loom() {
     cloudPushTimer.current = setTimeout(async () => {
       if (!user) return;
       setSyncStatus('syncing');
-      const ok = await pushToCloud(user.uid, characters, orderUpdatedAt);
+      const ok = await pushToCloud(
+        user.uid, characters, orderUpdatedAt,
+        { theme, lang, viewMode, activeTool, toolSuffixes, history },
+        settingsUpdatedAt,
+      );
       setSyncStatus(ok ? 'synced' : 'error');
     }, 3000);
-  }, [characters, orderUpdatedAt, user, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [characters, orderUpdatedAt, settingsUpdatedAt, user, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Cloud sync: sign-in handler ──
   const handleSignIn = async () => {

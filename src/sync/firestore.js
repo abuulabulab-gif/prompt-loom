@@ -7,13 +7,15 @@ const toCloudChars = (chars) =>
     return rest;
   });
 
-export async function pushToCloud(uid, characters, orderUpdatedAt) {
+export async function pushToCloud(uid, characters, orderUpdatedAt, settings, settingsUpdatedAt) {
   try {
     const ref = doc(fstore, 'users', uid, 'data', 'state');
     await setDoc(ref, {
       characters: toCloudChars(characters),
       characterOrder: characters.map(c => c.id),
       orderUpdatedAt: orderUpdatedAt ?? Date.now(),
+      settings: settings ?? null,
+      settingsUpdatedAt: settingsUpdatedAt ?? 0,
       updatedAt: serverTimestamp(),
     });
     return true;
@@ -33,6 +35,8 @@ export async function pullFromCloud(uid) {
       characters: data.characters ?? [],
       characterOrder: data.characterOrder ?? null,
       orderUpdatedAt: data.orderUpdatedAt ?? 0,
+      settings: data.settings ?? null,
+      settingsUpdatedAt: data.settingsUpdatedAt ?? 0,
     };
   } catch (e) {
     console.error('pullFromCloud failed', e);
@@ -47,7 +51,6 @@ export function mergeCharacters(local, remote, remoteOrder, localOrderAt, remote
   if (!remote || remote.length === 0) return local;
   if (!local || local.length === 0) return remote;
 
-  // Merge individual character data by lastModified
   const map = new Map();
   for (const c of local) map.set(c.id, c);
   for (const rc of remote) {
@@ -62,13 +65,11 @@ export function mergeCharacters(local, remote, remoteOrder, localOrderAt, remote
   const useRemoteOrder = remoteOrder && (remoteOrderAt ?? 0) > (localOrderAt ?? 0);
 
   if (useRemoteOrder) {
-    // Apply remote order, then append IDs not covered by remote order
     const remoteSet = new Set(remoteOrder);
     const extraIds = [...map.keys()].filter(id => !remoteSet.has(id));
     const orderedIds = [...remoteOrder.filter(id => map.has(id)), ...extraIds];
     return orderedIds.map(id => map.get(id));
   } else {
-    // Preserve local order, append cloud-only chars
     const localIds = new Set(local.map(c => c.id));
     const cloudOnly = [...map.values()].filter(c => !localIds.has(c.id));
     return [...local.map(c => map.get(c.id)), ...cloudOnly];
