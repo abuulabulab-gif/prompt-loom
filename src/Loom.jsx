@@ -1083,12 +1083,6 @@ export default function Loom() {
                     style={{ background: col, border: `2px solid ${activeChar.color === col ? 'white' : 'rgba(0,0,0,0.18)'}` }}
                     className="w-[15px] h-[15px] rounded-full cursor-pointer box-border transition-all duration-[120ms]" />)}
                 </div>
-                <div className="w-px h-[12px] bg-dim flex-shrink-0" />
-                <div className="flex gap-[2px] overflow-x-auto flex-1" style={{ scrollbarWidth: 'none' }}>
-                  {CHAR_EMOJIS.map(em => <span key={em} onClick={() => updateChar(activeChar.id, { emoji: em })}
-                    style={{ background: activeChar.emoji === em ? activeChar.color + '30' : 'transparent' }}
-                    className="text-[13px] cursor-pointer p-[2px] leading-none rounded-[4px] flex-shrink-0">{em}</span>)}
-                </div>
               </div>
             </div>
             <div className="mb-[9px]">

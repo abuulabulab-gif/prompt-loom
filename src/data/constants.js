@@ -1,6 +1,8 @@
 // ── Character palette ────────────────────────────────────────
 export const CHAR_COLORS = ['#f472b6','#c084fc','#60a5fa','#34d399','#fbbf24','#fb923c','#f87171','#22d3ee','#a78bfa','#86efac'];
-export const CHAR_EMOJIS = ['✨','🌸','⭐','🔥','🌙','💫','🎀','🌊','🦋','🌺','🎭','👑','🐱','🦊','🐰','🐺','🐉','🌟'];
+// Species: cat/rabbit/dog/deer/horse/fox/wolf/snake/dragon/fairy/mermaid/elf/vampire/angel/demon/android/ghost
+// Archetypes: royalty/idol/knight/mage
+export const CHAR_EMOJIS = ['🐱','🐰','🐶','🦌','🐴','🦊','🐺','🐍','🐉','🧚','🧜','🧝','🧛','👼','😈','🤖','👻','👑','🎭','⚔️','🧙'];
 
 // ── Theme color objects (used by inline styles during migration) ──
 export const THEMES = {
