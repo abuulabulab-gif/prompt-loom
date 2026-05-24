@@ -4,6 +4,9 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 // LOOM production build config (target: prompt-loom.com)
 export default defineConfig({
+  build: {
+    chunkSizeWarningLimit: 1200,
+  },
   plugins: [
     react(),
     VitePWA({

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const DONATE_URL = 'https://buymeacoffee.com/prompt_loom';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
@@ -151,7 +151,7 @@ export default function Loom() {
   const statusTimer = useRef(null);
   const fileRef = useRef(null);
   const presetFileRef = useRef(null);
-  const settingsTabRef = useRef('shortcuts');
+  const [settingsTab, setSettingsTab] = useState('shortcuts');
 
   // ── Feature states ──
   const [libraryOpen, setLibraryOpen] = useState(false);
@@ -279,19 +279,6 @@ export default function Loom() {
     catch (e) { if (e.code !== 'auth/popup-closed-by-user') console.error(e); }
   };
 
-  // ── SFW ↔ nsfw (negative) auto-linkage ──
-  useEffect(() => {
-    if (!loaded) return;
-    const qualBlock = blocks.find(b => b.id === 'quality');
-    const negBlock  = blocks.find(b => b.id === 'negative');
-    if (!qualBlock || !negBlock) return;
-    const sfwOn    = hasTag(qualBlock.text, 'SFW');
-    const nsfwInNeg = hasTag(negBlock.text, 'nsfw');
-    if (sfwOn === nsfwInNeg) return; // already in sync
-    if (sfwOn)  updateBlock('negative', { text: appendTag(negBlock.text, 'nsfw', '1.0') });
-    else        updateBlock('negative', { text: removeTag(negBlock.text, 'nsfw') });
-  }, [blocks, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
-
   // ── Color picker apply ──
   const TARGET_TO_BLOCK = { hair: 'face', eyes: 'face', skin: 'body', dress: 'outfit', shirt: 'outfit', skirt: 'outfit', jacket: 'outfit', ribbon: 'outfit', shoes: 'outfit', theme: 'artstyle' };
   const applyColorTag = (shadeEn, colorEn, targetEn, targetId) => {
@@ -316,6 +303,31 @@ export default function Loom() {
 
   // ── Block helpers ──
   const updateBlock = (blockId, upd) => setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, blocks: c.blocks.map(b => b.id === blockId ? { ...b, ...upd } : b) } : c));
+
+  // ── Auto-rename default character names on language switch ──
+  useEffect(() => {
+    if (!loaded) return;
+    setCharacters(prev => prev.map(c => {
+      const jaMatch = c.name.match(/^キャラ (\d+)$/);
+      const enMatch = c.name.match(/^Character (\d+)$/);
+      if (lang === 'en' && jaMatch) return { ...c, name: `Character ${jaMatch[1]}` };
+      if (lang === 'ja' && enMatch) return { ...c, name: `キャラ ${enMatch[1]}` };
+      return c;
+    }));
+  }, [lang]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── SFW ↔ nsfw (negative) auto-linkage ──
+  useEffect(() => {
+    if (!loaded) return;
+    const qualBlock = blocks.find(b => b.id === 'quality');
+    const negBlock  = blocks.find(b => b.id === 'negative');
+    if (!qualBlock || !negBlock) return;
+    const sfwOn     = hasTag(qualBlock.text, 'SFW');
+    const nsfwInNeg = hasTag(negBlock.text, 'nsfw');
+    if (sfwOn === nsfwInNeg) return;
+    if (sfwOn) updateBlock('negative', { text: appendTag(negBlock.text, 'nsfw', '1.0') });
+    else       updateBlock('negative', { text: removeTag(negBlock.text, 'nsfw') });
+  }, [blocks, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Wraps updateBlock; auto-links species → special parts for the attribute block
   const handleBlockUpdate = (blockId, upd) => {
@@ -1207,10 +1219,10 @@ export default function Loom() {
                   className="w-[14px] h-[14px] rounded-full cursor-pointer box-border transition-all duration-[120ms]" />)}
               </div>
               <div className="w-px h-[12px] bg-dim flex-shrink-0" />
-              <div className="flex gap-[2px] overflow-x-auto flex-shrink-0 max-w-[210px]" style={{ scrollbarWidth: 'none' }}>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(11, auto)', gap:'2px' }}>
                 {CHAR_EMOJIS.map(em => <span key={em} onClick={() => updateChar(activeChar.id, { emoji: em })}
                   style={{ background: activeChar.emoji === em ? activeChar.color + '30' : 'transparent' }}
-                  className="text-[13px] cursor-pointer p-[2px] leading-none rounded-[4px] flex-shrink-0">{em}</span>)}
+                  className="text-[12px] cursor-pointer p-[1px] leading-none rounded-[3px] text-center">{em}</span>)}
               </div>
               <div className="flex-1" />
               <button onClick={generateRandomChar} title={lang === 'ja' ? '全ブロックをランダム生成（おまかせ）' : 'Generate a random character'}
@@ -1913,7 +1925,7 @@ export default function Loom() {
       {templateOpen && <TemplateModal lang={lang} onApply={applyTemplate} onClose={() => setTemplateOpen(false)} />}
       {colorPickerOpen && <ColorPickerModal lang={lang} onApply={applyColorTag} onClose={() => setColorPickerOpen(false)} />}
       {sceneOpen && <SceneComposeModal characters={characters} lang={lang} activeTool={activeTool} theme={theme} onClose={() => setSceneOpen(false)} />}
-      {settingsOpen && <SettingsModal lang={lang} isMobile={isMobile} defaultTab={settingsTabRef.current} onClose={() => { setSettingsOpen(false); settingsTabRef.current = 'shortcuts'; }}
+      {settingsOpen && <SettingsModal lang={lang} isMobile={isMobile} defaultTab={settingsTab} onClose={() => { setSettingsOpen(false); setSettingsTab('shortcuts'); }}
         hiddenBlockIds={hiddenBlockIds} allBlocks={blocks}
         onRestoreBlock={blockId => toggleHideBlock(blockId)}
         onRestoreAllBlocks={() => updateChar(activeCharId, { hiddenBlocks: [] })}
@@ -1965,7 +1977,7 @@ export default function Loom() {
           onSetLang={setLang}
           onSetTheme={setTheme}
           onDismiss={dismissWelcome}
-          onOpenGuide={() => { settingsTabRef.current = 'guide'; dismissWelcome(); setSettingsOpen(true); }}
+          onOpenGuide={() => { setSettingsTab('guide'); dismissWelcome(); setSettingsOpen(true); }}
         />
       )}
       <GlobalTagSearch
