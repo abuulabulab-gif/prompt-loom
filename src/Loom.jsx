@@ -178,6 +178,7 @@ export default function Loom() {
   const [naturalToTagsOpen, setNaturalToTagsOpen] = useState(false);
   const [naturalToTagsTab, setNaturalToTagsTab] = useState('text'); // 'text' | 'image'
   const [importToast, setImportToast] = useState(null); // null | { name: string }
+  const [orderUpdatedAt, setOrderUpdatedAt] = useState(0);
   const [tagSuggestOpen, setTagSuggestOpen] = useState(false);
   const [tagSuggestions, setTagSuggestions] = useState([]);
   const [tagSuggestBusy, setTagSuggestBusy] = useState(false);
@@ -216,6 +217,7 @@ export default function Loom() {
           if (d.theme) setTheme(d.theme);
           if (d.viewMode) setViewMode(d.viewMode);
           if (d.outputHeight) setOutputHeight(d.outputHeight);
+          if (d.orderUpdatedAt) setOrderUpdatedAt(d.orderUpdatedAt);
         }
       } catch {}
       // First-visit welcome hint
@@ -258,13 +260,13 @@ export default function Loom() {
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(async () => {
       try {
-        await saveState({ characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight });
+        await saveState({ characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight, orderUpdatedAt });
         setSaveStatus('saved');
         if (statusTimer.current) clearTimeout(statusTimer.current);
         statusTimer.current = setTimeout(() => setSaveStatus(''), 2600);
       } catch { setSaveStatus('err'); }
     }, 800);
-  }, [characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight, loaded]);
+  }, [characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight, orderUpdatedAt, loaded]);
 
   // ── Cloud sync: pull on login ──
   useEffect(() => {
@@ -274,10 +276,12 @@ export default function Loom() {
       setSyncStatus('syncing');
       try {
         const remote = await pullFromCloud(user.uid);
-        setCharacters(prev => {
-          const merged = mergeCharacters(prev, remote);
-          return merged;
-        });
+        if (remote) {
+          setCharacters(prev => mergeCharacters(prev, remote.characters, remote.characterOrder, orderUpdatedAt, remote.orderUpdatedAt));
+          if ((remote.orderUpdatedAt ?? 0) > orderUpdatedAt) {
+            setOrderUpdatedAt(remote.orderUpdatedAt);
+          }
+        }
         setSyncStatus('synced');
       } catch {
         setSyncStatus('error');
@@ -294,10 +298,10 @@ export default function Loom() {
     cloudPushTimer.current = setTimeout(async () => {
       if (!user) return;
       setSyncStatus('syncing');
-      const ok = await pushToCloud(user.uid, characters);
+      const ok = await pushToCloud(user.uid, characters, orderUpdatedAt);
       setSyncStatus(ok ? 'synced' : 'error');
     }, 3000);
-  }, [characters, user, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [characters, orderUpdatedAt, user, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Cloud sync: sign-in handler ──
   const handleSignIn = async () => {
@@ -477,14 +481,15 @@ export default function Loom() {
     }
   };
 
-  const addCharacter = () => { const ci = characters.length % CHAR_COLORS.length; const ei = characters.length % CHAR_EMOJIS.length; const c = makeCharacter(`${lang === 'ja' ? 'キャラ' : 'Character'} ${characters.length + 1}`, CHAR_COLORS[ci], CHAR_EMOJIS[ei]); setCharacters(prev => [...prev, c]); setActiveCharId(c.id); setCharPanelOpen(true); };
-  const duplicateCharacter = (id) => { const src = characters.find(c => c.id === id); if (!src) return; const copy = { ...deep(src), id: uid(), name: src.name + ' (コピー)' }; setCharacters(prev => { const i = prev.findIndex(c => c.id === id); const next = [...prev]; next.splice(i + 1, 0, copy); return next; }); setActiveCharId(copy.id); };
+  const addCharacter = () => { const ci = characters.length % CHAR_COLORS.length; const ei = characters.length % CHAR_EMOJIS.length; const c = makeCharacter(`${lang === 'ja' ? 'キャラ' : 'Character'} ${characters.length + 1}`, CHAR_COLORS[ci], CHAR_EMOJIS[ei]); setCharacters(prev => [...prev, c]); setActiveCharId(c.id); setCharPanelOpen(true); setOrderUpdatedAt(Date.now()); };
+  const duplicateCharacter = (id) => { const src = characters.find(c => c.id === id); if (!src) return; const copy = { ...deep(src), id: uid(), name: src.name + ' (コピー)' }; setCharacters(prev => { const i = prev.findIndex(c => c.id === id); const next = [...prev]; next.splice(i + 1, 0, copy); return next; }); setActiveCharId(copy.id); setOrderUpdatedAt(Date.now()); };
   const deleteCharacter = async (id) => {
     if (characters.length <= 1) return;
     await deleteCharImages(id);
     setThumbs(prev => { const n = { ...prev }; delete n[id]; return n; });
     const r = characters.filter(c => c.id !== id);
     setCharacters(r);
+    setOrderUpdatedAt(Date.now());
     if (activeCharId === id) setActiveCharId(r.find(c => !c.archived)?.id || r[0].id);
   };
   const archiveCharacter = (id, archive) => {
@@ -871,6 +876,7 @@ export default function Loom() {
         const imported = { ...src, id: uid(), blocks: mergeCharacterBlocks(src.blocks) };
         setCharacters(prev => [...prev, imported]);
         setActiveCharId(imported.id);
+        setOrderUpdatedAt(Date.now());
         setImportToast({ name: imported.name });
         setTimeout(() => setImportToast(null), 3500);
       } catch { alert(lang === 'ja' ? '読み込みに失敗しました' : 'Failed to import file'); }
