@@ -176,6 +176,8 @@ export default function Loom() {
   const [aiBusy, setAiBusy] = useState(false);
   const [aiError, setAiError] = useState('');
   const [naturalToTagsOpen, setNaturalToTagsOpen] = useState(false);
+  const [naturalToTagsTab, setNaturalToTagsTab] = useState('text'); // 'text' | 'image'
+  const [importToast, setImportToast] = useState(null); // null | { name: string }
   const [tagSuggestOpen, setTagSuggestOpen] = useState(false);
   const [tagSuggestions, setTagSuggestions] = useState([]);
   const [tagSuggestBusy, setTagSuggestBusy] = useState(false);
@@ -869,6 +871,8 @@ export default function Loom() {
         const imported = { ...src, id: uid(), blocks: mergeCharacterBlocks(src.blocks) };
         setCharacters(prev => [...prev, imported]);
         setActiveCharId(imported.id);
+        setImportToast({ name: imported.name });
+        setTimeout(() => setImportToast(null), 3500);
       } catch { alert(lang === 'ja' ? '読み込みに失敗しました' : 'Failed to import file'); }
     };
     r.readAsText(file);
@@ -1011,10 +1015,17 @@ export default function Loom() {
                   ✦ {lang === 'ja' ? 'テンプレート' : 'Template'}
                 </button>
                 {apiConfig.apiKey && (
-                  <button onClick={() => { setNaturalToTagsOpen(true); setQuickOpen(false); }}
+                  <button onClick={() => { setNaturalToTagsTab('text'); setNaturalToTagsOpen(true); setQuickOpen(false); }}
                     className="w-full text-left px-[12px] py-[7px] text-[11px] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
                     style={{ color: 'rgb(var(--c-blue))' }}>
                     ✍️ {lang === 'ja' ? '自然文からタグ生成' : 'Text to Tags'}
+                  </button>
+                )}
+                {apiConfig.apiKey && (
+                  <button onClick={() => { setNaturalToTagsTab('image'); setNaturalToTagsOpen(true); setQuickOpen(false); }}
+                    className="w-full text-left px-[12px] py-[7px] text-[11px] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
+                    style={{ color: 'rgb(var(--c-purple))' }}>
+                    🖼 {lang === 'ja' ? '画像からタグ生成' : 'Image to Tags'}
                   </button>
                 )}
                 <button onClick={() => { setColorPickerOpen(true); setQuickOpen(false); }}
@@ -2111,7 +2122,7 @@ export default function Loom() {
         onDelete={deleteCharacter}
         onSetFolder={setCharFolder} />}
       {historyOpen && <HistoryModal history={history} lang={lang} onClose={() => setHistoryOpen(false)} onRestore={restoreFromHistory} onDelete={id => setHistory(prev => prev.filter(h => h.id !== id))} />}
-      {naturalToTagsOpen && <NaturalToTagsModal lang={lang} apiConfig={apiConfig} blocks={blocks} onAddTags={handleAddTagsFromNatural} onClose={() => setNaturalToTagsOpen(false)} />}
+      {naturalToTagsOpen && <NaturalToTagsModal lang={lang} apiConfig={apiConfig} blocks={blocks} onAddTags={handleAddTagsFromNatural} onClose={() => setNaturalToTagsOpen(false)} initialTab={naturalToTagsTab} />}
       {templateOpen && <TemplateModal lang={lang} onApply={applyTemplate} onClose={() => setTemplateOpen(false)} />}
       {colorPickerOpen && <ColorPickerModal lang={lang} onApply={applyColorTag} onClose={() => setColorPickerOpen(false)} />}
       {sceneOpen && <SceneComposeModal characters={characters} lang={lang} activeTool={activeTool} theme={theme} onClose={() => setSceneOpen(false)} />}
@@ -2157,6 +2168,18 @@ export default function Loom() {
               backdropFilter: 'blur(8px)',
             }}>
             {saveStatus === 'saved' ? `💾 ${lang === 'ja' ? '保存済み' : 'Saved'}` : '⚠️ save err'}
+          </div>
+        </div>
+      )}
+
+      {/* ── Import success toast ── */}
+      {importToast && (
+        <div
+          className="fixed z-[500] right-4 bg-surface border rounded-[10px] shadow-xl px-4 py-3 text-[11px] font-mono max-w-[260px]"
+          style={{ bottom: (outputExpanded ? outputHeight : 80) + 12, borderColor: 'rgb(var(--c-teal) / 0.5)' }}
+        >
+          <div className="font-bold" style={{ color: 'rgb(var(--c-teal))' }}>
+            ✓ {lang === 'ja' ? `「${importToast.name}」を追加しました` : `"${importToast.name}" added`}
           </div>
         </div>
       )}
