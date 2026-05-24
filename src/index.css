@@ -14,7 +14,7 @@
   --border: 28 32 51;
   --border-bright: 52 60 90;
   --text: 225 232 255;
-  --muted: 128 142 175;
+  --muted: 142 156 188;
   --dim: 88 98 130;
   --panel: 12 15 26;
   --input-bg: 8 9 15;
@@ -39,8 +39,8 @@
   --bg: 244 245 250;
   --surface: 255 255 255;
   --surface-alt: 238 240 247;
-  --border: 210 215 232;
-  --border-bright: 182 188 212;
+  --border: 188 196 220;
+  --border-bright: 153 163 198;
   --text: 22 25 42;
   --muted: 100 110 145;
   --dim: 148 156 185;
@@ -83,3 +83,8 @@ body {
 ::-webkit-scrollbar-thumb { background: rgb(var(--border-bright)); border-radius: 4px; }
 
 input, textarea, button { font-family: inherit; }
+
+input::placeholder, textarea::placeholder {
+  color: rgb(var(--text) / 0.55);
+  opacity: 1;
+}

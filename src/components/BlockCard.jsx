@@ -555,7 +555,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             </div>
 
             {/* Search — always on its own row for clean layout */}
-            <div className="flex items-center gap-1 rounded-[6px] px-2 py-[3px] mt-[6px] bg-bg border border-line">
+            <div className="flex items-center gap-1 rounded-[6px] px-2 py-[3px] mt-[6px] bg-bg border border-line/50">
               <span className="text-[10px] text-muted">🔍</span>
               <input
                 value={search}

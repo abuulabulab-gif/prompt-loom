@@ -816,7 +816,7 @@ export default function Loom() {
           </button>
         )}
         {isWide && focusBlockId && (
-          <button onClick={() => setFocusBlockId(null)} className="bg-[#fbbf2422] border border-[#fbbf2460] rounded-[5px] px-[9px] py-1 text-warn cursor-pointer text-[10px] font-mono flex-shrink-0">
+          <button onClick={() => setFocusBlockId(null)} className="bg-tint-warn border border-warn-text/30 rounded-[5px] px-[9px] py-1 text-warn-text cursor-pointer text-[10px] font-mono flex-shrink-0">
             ⊗ {lang === 'ja' ? '集中解除' : 'Unfocus'}
           </button>
         )}
@@ -893,7 +893,7 @@ export default function Loom() {
             </div>
           </div>
         ))}
-        <button onClick={addCharacter} className="bg-transparent border border-dashed border-linebright rounded-[20px] px-[11px] py-1 text-muted cursor-pointer text-[11px] flex-shrink-0 whitespace-nowrap">+ {lang === 'ja' ? '新キャラ' : 'New'}</button>
+        <button onClick={addCharacter} className="bg-transparent border border-dashed border-muted/60 rounded-[20px] px-[11px] py-1 text-fg/65 cursor-pointer text-[11px] flex-shrink-0 whitespace-nowrap">+ {lang === 'ja' ? '新キャラ' : 'New'}</button>
         <button onClick={() => setLibraryOpen(true)}
           title={lang === 'ja' ? 'キャラクター格納庫' : 'Character Library'}
           className="bg-transparent border border-dim rounded-[20px] px-[9px] py-1 text-muted cursor-pointer text-[11px] flex-shrink-0 whitespace-nowrap">
@@ -937,7 +937,7 @@ export default function Loom() {
               <div className="flex items-center gap-[6px]">
                 <div className="flex gap-[3px] items-center flex-shrink-0">
                   {CHAR_COLORS.map(col => <div key={col} onClick={() => updateChar(activeChar.id, { color: col })}
-                    style={{ background: col, border: `2px solid ${activeChar.color === col ? 'white' : col + '50'}` }}
+                    style={{ background: col, border: `2px solid ${activeChar.color === col ? 'white' : 'rgba(0,0,0,0.18)'}` }}
                     className="w-[15px] h-[15px] rounded-full cursor-pointer box-border transition-all duration-[120ms]" />)}
                 </div>
                 <div className="w-px h-[12px] bg-dim flex-shrink-0" />
@@ -959,7 +959,7 @@ export default function Loom() {
               </div>
               <textarea value={activeChar.memo} onChange={e => updateChar(activeChar.id, { memo: e.target.value })}
                 placeholder={lang === 'ja' ? 'LoRA名、使用モデル、生成のコツなど自由にメモ...' : 'LoRA names, model, tips...'}
-                style={{ background: 'rgb(var(--bg))', border: `1px solid ${activeChar.color}40`, color: 'rgb(var(--text) / 0.8)' }}
+                style={{ background: 'rgb(var(--bg))', border: `1px solid ${activeChar.color}40`, color: 'rgb(var(--text))' }}
                 className="w-full min-h-[46px] rounded-[7px] text-[12px] px-[10px] py-[7px] font-mono resize-y box-border outline-none leading-[1.6]"
                 onFocus={e => e.target.style.borderColor = activeChar.color + '80'}
                 onBlur={e => e.target.style.borderColor = activeChar.color + '40'} />
@@ -1051,7 +1051,7 @@ export default function Loom() {
                 className="rounded-[7px] text-[13px] font-bold px-[10px] py-[4px] outline-none min-w-[90px] max-w-[150px]" />
               <div className="flex gap-[3px] items-center flex-shrink-0">
                 {CHAR_COLORS.map(col => <div key={col} onClick={() => updateChar(activeChar.id, { color: col })}
-                  style={{ background: col, border: `2px solid ${activeChar.color === col ? 'white' : col + '50'}` }}
+                  style={{ background: col, border: `2px solid ${activeChar.color === col ? 'white' : 'rgba(0,0,0,0.18)'}` }}
                   className="w-[14px] h-[14px] rounded-full cursor-pointer box-border transition-all duration-[120ms]" />)}
               </div>
               <div className="w-px h-[12px] bg-dim flex-shrink-0" />
@@ -1080,7 +1080,7 @@ export default function Loom() {
                   <div className="text-muted text-[10px] font-mono tracking-[0.07em] mb-[3px]">📝 {lang === 'ja' ? 'キャラクターメモ（LoRA・設定・コツなど）' : 'Character Memo'}</div>
                   <textarea value={activeChar.memo} onChange={e => updateChar(activeChar.id, { memo: e.target.value })}
                     placeholder={lang === 'ja' ? 'LoRA名、使用モデル、生成のコツなど自由にメモ...' : 'LoRA names, model, tips...'}
-                    style={{ background: 'rgb(var(--bg))', border: `1px solid ${activeChar.color}40`, color: 'rgb(var(--text) / 0.8)' }}
+                    style={{ background: 'rgb(var(--bg))', border: `1px solid ${activeChar.color}40`, color: 'rgb(var(--text))' }}
                     className="w-full min-h-[38px] rounded-[7px] text-[12px] px-[10px] py-[6px] font-mono resize-y box-border outline-none leading-[1.6]"
                     onFocus={e => e.target.style.borderColor = activeChar.color + '80'}
                     onBlur={e => e.target.style.borderColor = activeChar.color + '40'} />

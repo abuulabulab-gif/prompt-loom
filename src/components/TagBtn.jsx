@@ -27,7 +27,7 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
     : analyzed         ? analyzeColor
     : h                ? color
     : isFav            ? 'rgb(var(--warn-text))'
-    : 'rgb(var(--text) / 0.8)';
+    : 'rgb(var(--text) / 0.9)';
 
   const handleEnter = () => {
     setH(true);
@@ -80,7 +80,7 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
         onClick={onInsert}
         title={conflict ? (lang === 'ja' ? `⚠ 競合タグ: ${tag.en}` : `⚠ Conflicting tag: ${tag.en}`) : (lang === 'ja' ? tag.en : tag.ja)}
         style={{ color: fg }}
-        className={`bg-transparent border-none px-[7px] py-[3px] text-[11px] cursor-pointer font-mono ${(active || selected) ? 'font-bold' : 'font-normal'}`}
+        className={`bg-transparent border-none px-[6px] py-[3px] text-[11px] cursor-pointer font-mono tracking-tight ${(active || selected) ? 'font-bold' : 'font-normal'}`}
       >
         {conflict ? '⚠ ' : (active && !selectMode) ? '✓ ' : (analyzed && !active && !selectMode) ? '◎ ' : ''}
         {selectMode && selected ? '☑ ' : selectMode ? '☐ ' : ''}
