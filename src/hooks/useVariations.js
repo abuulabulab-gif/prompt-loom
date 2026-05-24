@@ -1,13 +1,18 @@
 import { useState } from "react";
 import { splitTags, bareTag, stripWeights, OPTIONAL_CAT_NAMES } from "../data/constants.js";
 
+// Blocks where ALL tags are kept unchanged (character identity)
+const STABLE_BLOCKS = new Set(['quality', 'attribute', 'body']);
+
+// Hair-related categories within the face block — these get varied
+const FACE_HAIR_CATS = new Set(['髪色', 'インナーカラー', '髪型', '前髪', '髪飾り・毛流れ']);
+
 export function useVariations(blocks, tool) {
   const [variations, setVariations] = useState([]);
   const [variationsOpen, setVariationsOpen] = useState(false);
   const [varCopied, setVarCopied] = useState(null);
 
   const generateVariations = () => {
-    const STABLE_BLOCKS = new Set(['quality', 'face', 'attribute', 'body']);
     const variants = [];
 
     for (let v = 0; v < 3; v++) {
@@ -16,11 +21,35 @@ export function useVariations(blocks, tool) {
 
       for (const block of blocks.filter(b => b.enabled !== false && b.id !== 'negative' && b.text?.trim())) {
         const tags = splitTags(block.text);
-
         let blockParts;
+
         if (STABLE_BLOCKS.has(block.id)) {
+          // Keep every tag — identity blocks never change
           blockParts = [...tags];
+
+        } else if (block.id === 'face') {
+          // Build tag→category map
+          const tagToCat = {};
+          for (const cat of block.cats) {
+            for (const t of cat.t) tagToCat[t.en.toLowerCase()] = cat.n;
+          }
+
+          // Identity tags: keep everything that is NOT a hair category
+          blockParts = tags.filter(tag => {
+            const catName = tagToCat[bareTag(tag).toLowerCase()];
+            return !catName || !FACE_HAIR_CATS.has(catName);
+          });
+
+          // Vary hair: pick fresh tags from key hair categories
+          for (const catName of ['髪色', '髪型', '前髪']) {
+            const cat = block.cats.find(c => c.n === catName);
+            if (!cat || cat.t.length === 0) continue;
+            if (catName === '前髪' && Math.random() < 0.4) continue;
+            blockParts.push(cat.t[Math.floor(Math.random() * cat.t.length)].en);
+          }
+
         } else {
+          // Non-stable blocks: keep core tags, optionally substitute/add one
           const tagToCat = {};
           for (const cat of block.cats) {
             for (const t of cat.t) tagToCat[t.en.toLowerCase()] = cat.n;
@@ -40,8 +69,7 @@ export function useVariations(blocks, tool) {
 
           blockParts = [...kept];
           if (corePool.length > 0 && Math.random() < 0.5) {
-            const pick = corePool[Math.floor(Math.random() * corePool.length)];
-            blockParts.push(pick.en);
+            blockParts.push(corePool[Math.floor(Math.random() * corePool.length)].en);
           }
         }
 

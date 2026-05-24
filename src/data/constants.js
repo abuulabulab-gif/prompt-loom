@@ -66,6 +66,9 @@ export const SPECIES_PARTS_MAP = {
 // ── Random generation: mutually exclusive category groups ────
 // exclusiveGroups: within each inner array, at most one cat is picked
 // skipIfPicked:    if cat[key] is picked, skip all cats in value[]
+// Tags excluded from random generation to enforce single-character output
+export const RANDOM_EXCLUDE_TAGS = new Set(['2girls', '2boys', 'multiple girls', 'multiple boys']);
+
 export const BLOCK_RANDOM_RULES = {
   background: {
     exclusiveGroups: [['シンプル', '屋外', '屋内']],

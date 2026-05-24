@@ -12,7 +12,7 @@ import LibraryModal from "./components/modals/LibraryModal.jsx";
 import {
   CHAR_COLORS, CHAR_EMOJIS, WARN_LEN, LIMIT_LEN,
   uid, appendTag, countTags, toggleTag, hasTag, removeTag,
-  deep, downloadJSON, stripWeights, toNaiWeights, OPTIONAL_CAT_NAMES, BLOCK_RANDOM_RULES, SPECIES_PARTS_MAP,
+  deep, downloadJSON, stripWeights, toNaiWeights, OPTIONAL_CAT_NAMES, BLOCK_RANDOM_RULES, SPECIES_PARTS_MAP, RANDOM_EXCLUDE_TAGS,
 } from "./data/constants.js";
 import { detectConflicts } from "./data/conflicts.js";
 import { TOOLS } from "./data/tools.js";
@@ -681,16 +681,18 @@ export default function Loom() {
 
         for (const cat of coreCats) {
           if (picks.length >= maxPicks || skippedCats.has(cat.n)) continue;
-          if (cat.t.length > 0) {
-            picks.push(cat.t[Math.floor(Math.random() * cat.t.length)]);
+          const validT = cat.t.filter(t => !RANDOM_EXCLUDE_TAGS.has(t.en));
+          if (validT.length > 0) {
+            picks.push(validT[Math.floor(Math.random() * validT.length)]);
             (rules.skipIfPicked?.[cat.n] || []).forEach(n => skippedCats.add(n));
           }
         }
         const shuffledOpt = [...optCats].sort(() => Math.random() - 0.5);
         for (const cat of shuffledOpt) {
           if (picks.length >= maxPicks || skippedCats.has(cat.n)) continue;
-          if (Math.random() < 0.4 && cat.t.length > 0) {
-            picks.push(cat.t[Math.floor(Math.random() * cat.t.length)]);
+          const validT = cat.t.filter(t => !RANDOM_EXCLUDE_TAGS.has(t.en));
+          if (Math.random() < 0.4 && validT.length > 0) {
+            picks.push(validT[Math.floor(Math.random() * validT.length)]);
             (rules.skipIfPicked?.[cat.n] || []).forEach(n => skippedCats.add(n));
           }
         }
