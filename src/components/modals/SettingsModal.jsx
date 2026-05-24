@@ -197,6 +197,41 @@ const GUIDE = (lang) => [
   },
 ];
 
+const PLATFORM_DIFF = (lang) => [
+  {
+    category: lang === 'ja' ? 'キャラクター識別' : 'Character ID',
+    rows: [
+      { feature: lang === 'ja' ? 'バー表示' : 'Bar display', mobile: lang === 'ja' ? '色の丸のみ' : 'Color dot only', pc: lang === 'ja' ? '色 + 種族絵文字 + 名前' : 'Color + species emoji + name' },
+      { feature: lang === 'ja' ? '絵文字の変更' : 'Change emoji', mobile: lang === 'ja' ? '設定なし（色のみ）' : 'Not available (color only)', pc: lang === 'ja' ? 'キャラパネルで種族絵文字を設定' : 'Set species emoji in char panel', mobileNa: true },
+    ],
+  },
+  {
+    category: lang === 'ja' ? 'レイアウト' : 'Layout',
+    rows: [
+      { feature: lang === 'ja' ? 'ブロック列数' : 'Block columns', mobile: lang === 'ja' ? '1列固定' : '1 column fixed', pc: lang === 'ja' ? '1/2/3列を切替（▢/▥/▦）' : '1/2/3 columns (▢/▥/▦)' },
+      { feature: lang === 'ja' ? '集中モード' : 'Focus mode', mobile: lang === 'ja' ? '非対応' : 'Not available', pc: lang === 'ja' ? '⊕でそのブロックを拡大表示' : '⊕ expands one block full-width', mobileNa: true },
+    ],
+  },
+  {
+    category: lang === 'ja' ? 'ブロック操作' : 'Block Controls',
+    rows: [
+      { feature: lang === 'ja' ? 'カスタムブロック上限' : 'Custom block limit', mobile: lang === 'ja' ? '最大3個' : 'Max 3', pc: lang === 'ja' ? '最大5個' : 'Max 5' },
+      { feature: lang === 'ja' ? '強度ボタン表示' : 'Strength buttons', mobile: lang === 'ja' ? '標準・強の2段階' : '2 levels (Norm / Strong)', pc: lang === 'ja' ? '6段階すべて表示' : 'All 6 levels shown' },
+      { feature: lang === 'ja' ? 'ブロックへのジャンプ' : 'Jump to block', mobile: lang === 'ja' ? 'グリッドアイコン → ドロワー一覧' : 'Grid icon → drawer list', pc: lang === 'ja' ? 'スクロールで移動' : 'Scroll to navigate' },
+      { feature: lang === 'ja' ? 'ブロックの非表示' : 'Hide block', mobile: lang === 'ja' ? 'Expertモード：ダブルタップ' : 'Expert: double-tap', pc: lang === 'ja' ? 'Expertモード：ダブルタップ' : 'Expert: double-tap' },
+    ],
+  },
+  {
+    category: lang === 'ja' ? '操作・機能' : 'Controls & Features',
+    rows: [
+      { feature: lang === 'ja' ? 'キーボードショートカット' : 'Keyboard shortcuts', mobile: lang === 'ja' ? '非対応' : 'Not available', pc: lang === 'ja' ? 'Ctrl+K / Ctrl+Enter など多数' : 'Ctrl+K, Ctrl+Enter and more', mobileNa: true },
+      { feature: lang === 'ja' ? 'データ入出力' : 'Export / Import', mobile: lang === 'ja' ? 'キャラパネル内のボタン' : 'Buttons in char panel', pc: lang === 'ja' ? 'ヘッダー ✦ ツールメニュー' : 'Header ✦ Tools menu' },
+      { feature: lang === 'ja' ? '出力バーの高さ調整' : 'Output bar resize', mobile: lang === 'ja' ? '▼で折りたたみのみ' : 'Collapse only (▼)', pc: lang === 'ja' ? 'ドラッグで自由に高さ調整' : 'Drag to resize freely' },
+      { feature: lang === 'ja' ? 'クラウド同期' : 'Cloud sync', mobile: lang === 'ja' ? '対応（Google ログイン）' : 'Supported (Google login)', pc: lang === 'ja' ? '対応（Google ログイン）' : 'Supported (Google login)' },
+    ],
+  },
+];
+
 export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds = new Set(), allBlocks = [], onRestoreBlock, onRestoreAllBlocks, theme, onToggleTheme, viewMode, onSetViewMode, onToggleLang, onShowWelcome, defaultTab }) {
   const [tab, setTab] = useState(defaultTab || 'shortcuts');
   const [openSections, setOpenSections] = useState(new Set(['🌱']));
@@ -212,7 +247,8 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
   const TABS = [
     { id: 'shortcuts', label: isMobile ? (lang === 'ja' ? '📱 使い方Tips' : '📱 Tips') : (lang === 'ja' ? '⌨️ ショートカット' : '⌨️ Shortcuts') },
     { id: 'guide',     label: lang === 'ja' ? '📘 使い方ガイド' : '📘 Guide' },
-    { id: 'about',     label: lang === 'ja' ? 'ℹ️ このアプリについて' : 'ℹ️ About' },
+    { id: 'platform',  label: lang === 'ja' ? '📱/💻 版の違い' : '📱/💻 Platforms' },
+    { id: 'about',     label: lang === 'ja' ? 'ℹ️ About' : 'ℹ️ About' },
   ];
 
   return (
@@ -429,6 +465,56 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
               <div className="text-center text-muted text-[10px] font-mono pt-[4px] pb-[2px]">
                 {lang === 'ja' ? '機能は随時追加予定 · prompt-loom.com' : 'More features coming · prompt-loom.com'}
               </div>
+            </div>
+          )}
+
+          {/* ── Platform comparison tab ── */}
+          {tab === 'platform' && (
+            <div className="px-[18px] py-[14px] space-y-[16px]">
+              <p className="text-muted text-[11px] font-mono bg-surfalt rounded-[7px] px-3 py-[7px]">
+                {lang === 'ja'
+                  ? '📱 スマホ版と 💻 PC版（600px以上）の主な機能差異をまとめています'
+                  : '📱 Mobile (below 600 px) vs 💻 PC — key feature differences at a glance'}
+              </p>
+
+              {PLATFORM_DIFF(lang).map(section => (
+                <div key={section.category}>
+                  <div className="text-muted text-[10px] font-mono font-bold tracking-[0.1em] uppercase mb-[8px]">
+                    {section.category}
+                  </div>
+                  <div className="rounded-[10px] overflow-hidden border border-line">
+                    {/* Header row */}
+                    <div className="grid grid-cols-[1fr_1fr_1fr] bg-surfalt border-b border-line">
+                      <div className="px-[10px] py-[6px] text-[9px] font-mono text-dim uppercase tracking-[0.08em]">
+                        {lang === 'ja' ? '機能' : 'Feature'}
+                      </div>
+                      <div className="px-[10px] py-[6px] text-[9px] font-mono text-dim uppercase tracking-[0.08em] border-l border-line">
+                        📱 {lang === 'ja' ? 'スマホ' : 'Mobile'}
+                      </div>
+                      <div className="px-[10px] py-[6px] text-[9px] font-mono text-dim uppercase tracking-[0.08em] border-l border-line">
+                        💻 PC
+                      </div>
+                    </div>
+                    {section.rows.map((row, i) => (
+                      <div key={i} className={`grid grid-cols-[1fr_1fr_1fr] ${i < section.rows.length - 1 ? 'border-b border-line' : ''}`}>
+                        <div className="px-[10px] py-[8px] text-[11px] text-muted font-mono">
+                          {row.feature}
+                        </div>
+                        <div className={`px-[10px] py-[8px] text-[11px] border-l border-line leading-snug ${row.mobileNa ? 'text-dim' : 'text-fg'}`}>
+                          {row.mobile}
+                        </div>
+                        <div className={`px-[10px] py-[8px] text-[11px] border-l border-line leading-snug ${row.pcNa ? 'text-dim' : 'text-fg'}`}>
+                          {row.pc}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+
+              <p className="text-dim text-[10px] font-mono text-center pt-[2px]">
+                {lang === 'ja' ? '画面幅 600px 以上で PC版レイアウトに切替わります' : 'PC layout activates at viewport width ≥ 600 px'}
+              </p>
             </div>
           )}
 
