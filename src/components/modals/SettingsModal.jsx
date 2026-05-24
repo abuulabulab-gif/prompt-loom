@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const APP_VERSION = 'v1.3';
+const APP_VERSION = 'v1.4';
 const APP_YEAR = '2026';
 
 const SHORTCUTS = (lang) => [
@@ -577,6 +577,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                 </div>
                 <div className="space-y-[5px]">
                   {[
+                    { v: 'v1.4', note: lang === 'ja' ? '絵文字を種族・職業系21種に刷新・セキュリティ強化・破綻タグの検出と生成防止拡充・ヘッダーグリッドアイコン・タグ辞書追加・設定にスマホ/PC差異タブ追加' : 'Emoji overhaul (21 species/archetype), security hardening, expanded conflict detection + generation prevention, grid header icon, tag dictionary additions, Mobile vs PC comparison tab in Settings' },
                     { v: 'v1.3', note: lang === 'ja' ? 'SFWタグ自動連携（ネガティブにnsfw自動追加/削除）・タグ大幅拡充（衣装・髪型・フットウェアほか）・単一キャラ生成保証・バリエーション同キャラ維持強化' : 'SFW auto-link (auto-add/remove nsfw in negative), major tag additions (outfits, hairstyles, footwear, etc.), single-character generation guaranteed, improved variations for same-character looks' },
                     { v: 'v1.2', note: lang === 'ja' ? 'Googleログイン＆Firestoreクラウド同期・.loom独自拡張子・スマホデータ入出力・ウェルカムヒントライトモード視認性改善・英語ローカライズ修正' : 'Google login & Firestore cloud sync, .loom file format, mobile export/import, welcome hint light-mode contrast fix, EN localization fixes' },
                     { v: 'v1.1', note: lang === 'ja' ? 'ボーダー描画バグ修正・フォーカスモードタグサイズ修正・スマホキャラパネルUI改善・ウェルカムヒント再表示ボタン・トースト再設計・Vercel Analytics導入' : 'Border rendering bug fixes, focus mode tag size fix, mobile char panel improvements, welcome hint re-show, toast redesign, Vercel Analytics' },
