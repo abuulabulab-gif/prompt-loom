@@ -1,4 +1,7 @@
-export default function WelcomeHint({ lang, theme, onSetLang, onSetTheme, onDismiss, onOpenGuide }) {
+const DONATE_URL = 'https://buymeacoffee.com/prompt_loom';
+const X_URL = 'https://x.com/prompt_loom';
+
+export default function WelcomeHint({ lang, theme, onSetLang, onSetTheme, onDismiss, onOpenGuide, onOpenSettings }) {
   const L = lang;
   const T = theme;
 
@@ -32,95 +35,182 @@ export default function WelcomeHint({ lang, theme, onSetLang, onSetTheme, onDism
       style={{ background: 'rgba(0,0,0,0.72)' }}
       onClick={e => e.target === e.currentTarget && onDismiss()}
     >
-      <div className="bg-surface border border-linebright rounded-[14px] shadow-2xl w-full max-w-[420px] p-6">
+      <div className="bg-surface border border-linebright rounded-[14px] shadow-2xl w-full max-w-[420px] overflow-y-auto max-h-[90vh]">
+        <div className="p-6">
 
-        {/* ── Header: title + lang/theme toggles ── */}
-        <div className="flex items-start gap-3 mb-5">
-          <div className="flex-1 min-w-0">
-            <div className="text-[22px] mb-[5px]">🧵</div>
-            <div className="text-[15px] font-bold text-fg">
-              {L === 'ja' ? 'LOOMへようこそ！' : 'Welcome to LOOM!'}
-            </div>
-            <div className="text-[11px] text-muted font-mono mt-1">
-              {L === 'ja' ? '基本の使い方は3ステップだけです' : 'Get started in just 3 steps'}
-            </div>
-          </div>
-
-          {/* Lang + Theme toggles */}
-          <div className="flex flex-col gap-[6px] flex-shrink-0">
-            {/* Language */}
-            <div className="flex rounded-[6px] border border-line text-[10px] font-mono overflow-hidden">
-              {[{ v: 'ja', label: '日本語' }, { v: 'en', label: 'English' }].map(({ v, label }, i) => (
-                <button
-                  key={v}
-                  onClick={() => onSetLang(v)}
-                  className={`flex-1 px-[10px] py-[5px] cursor-pointer transition-colors duration-100 ${L === v ? 'text-white font-bold' : 'bg-surfalt text-muted'} ${i === 0 ? '' : 'border-l border-line'}`}
-                  style={L === v ? { background: 'rgb(var(--c-blue))' } : undefined}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-            {/* Theme */}
-            <div className="flex rounded-[6px] border border-line text-[10px] font-mono overflow-hidden">
-              {[{ v: 'dark', icon: '🌙', ja: 'ダーク', en: 'Dark' }, { v: 'light', icon: '☀️', ja: 'ライト', en: 'Light' }].map(({ v, icon, ja, en }, i) => (
-                <button
-                  key={v}
-                  onClick={() => onSetTheme(v)}
-                  className={`flex-1 px-[9px] py-[5px] cursor-pointer transition-colors duration-100 ${T === v ? 'text-white font-bold' : 'bg-surfalt text-muted'} ${i === 0 ? '' : 'border-l border-line'}`}
-                  style={T === v ? { background: 'rgb(var(--c-blue))' } : undefined}
-                >
-                  {icon} {L === 'ja' ? ja : en}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* ── 3 Steps ── */}
-        <div className="flex flex-col gap-[7px] mb-4">
-          {steps.map((s, i) => (
-            <div key={i} className="flex items-start gap-3 bg-surfalt rounded-[9px] px-4 py-[10px]">
-              <span className="text-[16px] flex-shrink-0 mt-[1px]">{s.icon}</span>
-              <div>
-                <div className="text-[12px] font-bold text-fg flex items-center gap-[6px]">
-                  <span className="text-[9px] font-mono text-dim tracking-widest">STEP {i + 1}</span>
-                  {L === 'ja' ? s.ja : s.en}
-                </div>
-                <div className="text-[11px] text-muted font-mono mt-[2px] leading-[1.5]">
-                  {L === 'ja' ? s.subJa : s.subEn}
-                </div>
+          {/* ── Header: title + lang/theme toggles ── */}
+          <div className="flex items-start gap-3 mb-5">
+            <div className="flex-1 min-w-0">
+              <div className="text-[22px] mb-[5px]">🧵</div>
+              <div className="text-[15px] font-bold text-fg">
+                {L === 'ja' ? 'LOOMへようこそ！' : 'Welcome to LOOM!'}
+              </div>
+              <div className="text-[11px] text-muted font-mono mt-1">
+                {L === 'ja' ? '基本の使い方は3ステップだけです' : 'Get started in just 3 steps'}
               </div>
             </div>
-          ))}
-        </div>
 
-        {/* ── Guide link ── */}
-        <button
-          onClick={onOpenGuide}
-          className="w-full text-[11px] font-mono cursor-pointer rounded-[8px] py-[7px] mb-4 bg-transparent transition-colors duration-100"
-          style={{ border: '1px solid rgb(var(--c-blue) / 0.35)', color: 'rgb(var(--c-blue))' }}
-          onMouseOver={e => e.currentTarget.style.background = 'rgb(var(--c-blue) / 0.08)'}
-          onMouseOut={e => e.currentTarget.style.background = 'transparent'}
-        >
-          📖 {L === 'ja' ? '詳しくはガイドを見る →' : 'See the full feature guide →'}
-        </button>
+            {/* Lang + Theme toggles */}
+            <div className="flex flex-col gap-[6px] flex-shrink-0">
+              <div className="flex rounded-[6px] border border-line text-[10px] font-mono overflow-hidden">
+                {[{ v: 'ja', label: '日本語' }, { v: 'en', label: 'English' }].map(({ v, label }, i) => (
+                  <button
+                    key={v}
+                    onClick={() => onSetLang(v)}
+                    className={`flex-1 px-[10px] py-[5px] cursor-pointer transition-colors duration-100 ${L === v ? 'text-white font-bold' : 'bg-surfalt text-muted'} ${i === 0 ? '' : 'border-l border-line'}`}
+                    style={L === v ? { background: 'rgb(var(--c-blue))' } : undefined}
+                  >{label}</button>
+                ))}
+              </div>
+              <div className="flex rounded-[6px] border border-line text-[10px] font-mono overflow-hidden">
+                {[{ v: 'dark', icon: '🌙', ja: 'ダーク', en: 'Dark' }, { v: 'light', icon: '☀️', ja: 'ライト', en: 'Light' }].map(({ v, icon, ja, en }, i) => (
+                  <button
+                    key={v}
+                    onClick={() => onSetTheme(v)}
+                    className={`flex-1 px-[9px] py-[5px] cursor-pointer transition-colors duration-100 ${T === v ? 'text-white font-bold' : 'bg-surfalt text-muted'} ${i === 0 ? '' : 'border-l border-line'}`}
+                    style={T === v ? { background: 'rgb(var(--c-blue))' } : undefined}
+                  >{icon} {L === 'ja' ? ja : en}</button>
+                ))}
+              </div>
+            </div>
+          </div>
 
-        {/* ── Main CTA ── */}
-        <button
-          onClick={onDismiss}
-          className="w-full rounded-[9px] py-[10px] text-[13px] font-bold cursor-pointer border-none text-white"
-          style={{ background: 'rgb(var(--c-blue))' }}
-        >
-          {L === 'ja' ? 'わかった！始める →' : "Got it, let's go →"}
-        </button>
+          {/* ── 3 Steps ── */}
+          <div className="flex flex-col gap-[7px] mb-4">
+            {steps.map((s, i) => (
+              <div key={i} className="flex items-start gap-3 bg-surfalt rounded-[9px] px-4 py-[10px]">
+                <span className="text-[16px] flex-shrink-0 mt-[1px]">{s.icon}</span>
+                <div>
+                  <div className="text-[12px] font-bold text-fg flex items-center gap-[6px]">
+                    <span className="text-[9px] font-mono text-dim tracking-widest">STEP {i + 1}</span>
+                    {L === 'ja' ? s.ja : s.en}
+                  </div>
+                  <div className="text-[11px] text-muted font-mono mt-[2px] leading-[1.5]">
+                    {L === 'ja' ? s.subJa : s.subEn}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
 
-        {/* ── Footer ── */}
-        <div className="mt-3 text-center text-[10px] text-dim font-mono leading-[1.7]">
-          {L === 'ja'
-            ? <>⚙️ 設定からいつでも見直せます<br />言語・テーマの変更、このヒントの再表示も設定内で可能</>
-            : <>⚙️ All settings available anytime via ⚙️ Settings<br />Language, theme, and this hint can be changed there</>
-          }
+          {/* ── Info chips: local / cloud / AI ── */}
+          <div className="grid grid-cols-3 gap-[5px] mb-4">
+            {/* Local save */}
+            <div className="flex flex-col items-center gap-[3px] bg-surfalt rounded-[8px] px-[8px] py-[9px] text-center">
+              <span className="text-[14px]">🔒</span>
+              <span className="text-[10px] font-bold text-fg leading-tight">
+                {L === 'ja' ? 'ローカル保存' : 'Local-first'}
+              </span>
+              <span className="text-[9px] text-muted font-mono leading-tight">
+                {L === 'ja' ? 'ブラウザに自動保存。外部送信なし' : 'Auto-saved in browser. Nothing sent externally'}
+              </span>
+            </div>
+
+            {/* Cloud sync */}
+            <div className="flex flex-col items-center gap-[3px] bg-surfalt rounded-[8px] px-[8px] py-[9px] text-center">
+              <span className="text-[14px]">☁️</span>
+              <span className="text-[10px] font-bold text-fg leading-tight">
+                {L === 'ja' ? 'クラウド同期' : 'Cloud sync'}
+              </span>
+              <span className="text-[9px] text-muted font-mono leading-tight">
+                {L === 'ja' ? 'Googleログインで\nPC↔スマホ共有' : 'Sign in to sync\nacross devices'}
+              </span>
+            </div>
+
+            {/* AI features — clickable, opens Settings → API tab */}
+            <button
+              onClick={onOpenSettings}
+              className="flex flex-col items-center gap-[3px] rounded-[8px] px-[8px] py-[9px] text-center cursor-pointer transition-all duration-150 border"
+              style={{ background: 'rgb(var(--c-blue) / 0.06)', borderColor: 'rgb(var(--c-blue) / 0.28)' }}
+              onMouseOver={e => { e.currentTarget.style.background = 'rgb(var(--c-blue) / 0.13)'; e.currentTarget.style.borderColor = 'rgb(var(--c-blue) / 0.55)'; }}
+              onMouseOut={e => { e.currentTarget.style.background = 'rgb(var(--c-blue) / 0.06)'; e.currentTarget.style.borderColor = 'rgb(var(--c-blue) / 0.28)'; }}
+            >
+              <span className="text-[14px]">🤖</span>
+              <span className="text-[10px] font-bold leading-tight" style={{ color: 'rgb(var(--c-blue))' }}>
+                {L === 'ja' ? 'AI機能' : 'AI features'}
+              </span>
+              <span className="text-[9px] font-mono leading-tight" style={{ color: 'rgb(var(--c-blue) / 0.7)' }}>
+                {L === 'ja' ? '⚙️設定でAPIキーを登録→解放' : 'Add API key in\n⚙️ Settings to unlock'}
+              </span>
+            </button>
+          </div>
+
+          {/* ── API key note ── */}
+          <div
+            className="flex items-start gap-[8px] rounded-[8px] px-[10px] py-[8px] mb-4 text-[10px] font-mono leading-[1.6]"
+            style={{ background: 'rgb(var(--c-blue) / 0.06)', border: '1px solid rgb(var(--c-blue) / 0.18)' }}
+          >
+            <span className="flex-shrink-0 mt-[1px]">💡</span>
+            <span className="text-muted">
+              {L === 'ja'
+                ? <>Claude / OpenAI の APIキーを<button onClick={onOpenSettings} className="underline cursor-pointer font-bold" style={{ color: 'rgb(var(--c-blue))' }}>⚙️ 設定 → 🤖 API</button>から登録すると、自然文の整形・タグ提案・画像解析などのAI機能が使えるようになります。</>
+                : <>Register your Claude / OpenAI API key in <button onClick={onOpenSettings} className="underline cursor-pointer font-bold" style={{ color: 'rgb(var(--c-blue))' }}>⚙️ Settings → 🤖 API</button> to unlock AI polish, tag suggestions, and image-to-tags.</>
+              }
+            </span>
+          </div>
+
+          {/* ── Guide link ── */}
+          <button
+            onClick={onOpenGuide}
+            className="w-full text-[11px] font-mono cursor-pointer rounded-[8px] py-[7px] mb-3 bg-transparent transition-colors duration-100"
+            style={{ border: '1px solid rgb(var(--c-blue) / 0.35)', color: 'rgb(var(--c-blue))' }}
+            onMouseOver={e => e.currentTarget.style.background = 'rgb(var(--c-blue) / 0.08)'}
+            onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+          >
+            📖 {L === 'ja' ? '詳しくはガイドを見る →' : 'See the full feature guide →'}
+          </button>
+
+          {/* ── Main CTA ── */}
+          <button
+            onClick={onDismiss}
+            className="w-full rounded-[9px] py-[10px] text-[13px] font-bold cursor-pointer border-none text-white"
+            style={{ background: 'rgb(var(--c-blue))' }}
+          >
+            {L === 'ja' ? 'わかった！始める →' : "Got it, let's go →"}
+          </button>
+
+          {/* ── Footer: support + feedback + settings reminder ── */}
+          <div className="mt-3 pt-3 space-y-[6px]" style={{ borderTop: '1px solid rgb(var(--border) / 0.4)' }}>
+            {/* Support */}
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[9px] text-dim font-mono leading-tight">
+                {L === 'ja' ? '☕ 気に入っていただけたら、開発を応援いただけると励みになります！' : '☕ Enjoying LOOM? Supporting keeps development going!'}
+              </span>
+              <a
+                href={DONATE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[9px] font-mono font-bold flex-shrink-0 rounded-[4px] px-[7px] py-[3px] no-underline whitespace-nowrap transition-colors"
+                style={{ color: 'rgb(var(--c-warn))', background: 'rgb(var(--c-warn) / 0.1)', border: '1px solid rgb(var(--c-warn) / 0.3)' }}
+              >
+                Buy Me a Coffee ☕
+              </a>
+            </div>
+
+            {/* Feedback */}
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[9px] text-dim font-mono leading-tight">
+                {L === 'ja' ? '💬 不具合のご報告・機能のご要望は随時受付中です' : '💬 Bug reports & feature requests are always welcome'}
+              </span>
+              <a
+                href={X_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[9px] font-mono font-bold flex-shrink-0 rounded-[4px] px-[7px] py-[3px] no-underline whitespace-nowrap transition-colors"
+                style={{ color: 'rgb(var(--c-blue))', background: 'rgb(var(--c-blue) / 0.08)', border: '1px solid rgb(var(--c-blue) / 0.3)' }}
+              >
+                @prompt_loom
+              </a>
+            </div>
+
+            {/* Settings reminder */}
+            <div className="text-center text-[9px] text-dim font-mono pt-[2px]">
+              {L === 'ja'
+                ? '⚙️ 設定からいつでも言語・テーマ・APIキーの変更や、このヒントの再表示ができます'
+                : '⚙️ Language, theme, API key & this hint can be changed anytime in Settings'}
+            </div>
+          </div>
+
         </div>
       </div>
     </div>

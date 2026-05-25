@@ -136,6 +136,8 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
       <div
         className={`flex items-center gap-[6px] px-3 py-[9px]${block.collapsed ? '' : ' bg-surfalt border-b border-line'}`}
       >
+        {/* LEFT: drag + move + toggle + badge + icon + name — takes all available space */}
+        <div className="flex items-center gap-[6px] flex-1 min-w-0">
         {/* Drag handle */}
         <button
           {...listeners}
@@ -221,7 +223,10 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             {isLocked && <span className="ml-[6px] text-[11px]">🔒</span>}
           </span>
         )}
+        </div>{/* END LEFT group */}
 
+        {/* RIGHT: action buttons — never shrink, always vertically centered */}
+        <div className="flex items-center gap-[6px] flex-shrink-0">
         {/* Analyze match badge */}
         {analyzedCount > 0 && (
           <span className="text-[9px] font-mono font-bold px-[5px] py-[2px] rounded-[4px] flex-shrink-0"
@@ -323,6 +328,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           title={lang === 'ja' ? (block.collapsed ? '展開' : '折りたたむ') : (block.collapsed ? 'Expand' : 'Collapse')}
           className="bg-transparent border border-dim rounded-[5px] text-[10px] px-[6px] py-[2px] cursor-pointer text-muted"
         >{block.collapsed ? '▼' : '▲'}</button>
+        </div>{/* END RIGHT group */}
       </div>
 
       {/* ── Preset save row ────────────────────────────────── */}

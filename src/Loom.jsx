@@ -118,6 +118,7 @@ export default function Loom() {
   const [mainTab, setMainTab] = useState('editor');
   const [thumbs, setThumbs] = useState({});
   const [thumbPreview, setThumbPreview] = useState(null);
+  const [thumbDragOver, setThumbDragOver] = useState(false);
   const [layout, setLayout] = useState('1col');
   const [focusBlockId, setFocusBlockId] = useState(null);
   const [showWelcome, setShowWelcome] = useState(false);
@@ -607,6 +608,24 @@ export default function Loom() {
   const removeThumbAt = async (index) => {
     const current = thumbs[activeCharId] || [];
     const next = current.filter((_, i) => i !== index);
+    await saveCharImages(activeCharId, next);
+    setThumbs(prev => ({ ...prev, [activeCharId]: next }));
+  };
+  const handleThumbDrop = async (e) => {
+    e.preventDefault();
+    setThumbDragOver(false);
+    const current = thumbs[activeCharId] || [];
+    if (current.length >= 4) return;
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!['image/jpeg', 'image/png'].includes(file.type) || !['jpg', 'jpeg', 'png'].includes(ext)) {
+      alert(lang === 'ja' ? '対応フォーマットは JPG / PNG のみです' : 'Only JPG/PNG files are supported');
+      return;
+    }
+    const dataUrl = await compressImage(file);
+    if (!dataUrl) return;
+    const next = [...current, dataUrl];
     await saveCharImages(activeCharId, next);
     setThumbs(prev => ({ ...prev, [activeCharId]: next }));
   };
@@ -1461,22 +1480,40 @@ export default function Loom() {
                         {shared ? `✓ ${lang === 'ja' ? 'コピー済み' : 'Copied!'}` : `🔗 ${lang === 'ja' ? 'プロンプトをシェア' : 'Share prompt'}`}
                       </button>
                     </div>
-                    <div className="flex items-center gap-[5px] flex-wrap">
-                      {(thumbs[activeCharId] || []).map((img, i) => (
-                        <div key={i} className="relative flex-shrink-0">
-                          <img src={img} alt={`thumb-${i}`} onClick={() => setThumbPreview(img)} className="w-[48px] h-[48px] rounded-[6px] object-cover border border-line cursor-pointer hover:opacity-85 transition-opacity" />
-                          <button onClick={() => removeThumbAt(i)}
-                            className="absolute -top-[5px] -right-[5px] bg-surface border border-dim rounded-full w-[15px] h-[15px] text-[8px] flex items-center justify-center cursor-pointer text-muted leading-none">✕</button>
+                    {(() => {
+                      const thumbCount = (thumbs[activeCharId] || []).length;
+                      return (
+                        <div
+                          className="flex items-center gap-[5px] flex-wrap rounded-[7px] transition-all duration-150"
+                          style={thumbDragOver && thumbCount < 4 ? { outline: `2px dashed ${activeChar.color}90`, background: activeChar.color + '0d', padding: '4px', margin: '-4px' } : undefined}
+                          onDragOver={thumbCount < 4 ? e => { e.preventDefault(); setThumbDragOver(true); } : undefined}
+                          onDragLeave={() => setThumbDragOver(false)}
+                          onDrop={thumbCount < 4 ? handleThumbDrop : undefined}
+                        >
+                          {(thumbs[activeCharId] || []).map((img, i) => (
+                            <div key={i} className="relative flex-shrink-0">
+                              <img src={img} alt={`thumb-${i}`} onClick={() => setThumbPreview(img)} className="w-[48px] h-[48px] rounded-[6px] object-cover border border-line cursor-pointer hover:opacity-85 transition-opacity" />
+                              <button onClick={() => removeThumbAt(i)}
+                                className="absolute -top-[5px] -right-[5px] bg-surface border border-dim rounded-full w-[15px] h-[15px] text-[8px] flex items-center justify-center cursor-pointer text-muted leading-none">✕</button>
+                            </div>
+                          ))}
+                          {thumbCount < 4 && (
+                            <label
+                              style={{
+                                borderColor: thumbDragOver ? activeChar.color : activeChar.color + '50',
+                                color: activeChar.color,
+                                background: thumbDragOver ? activeChar.color + '18' : undefined,
+                              }}
+                              title={lang === 'ja' ? '画像をドラッグ＆ドロップ、またはクリックして選択（JPG/PNG）' : 'Drag & drop or click to select (JPG/PNG)'}
+                              className="w-[48px] h-[48px] border border-dashed rounded-[6px] flex items-center justify-center text-[20px] cursor-pointer flex-shrink-0 transition-all duration-150"
+                            >
+                              {thumbDragOver ? '↓' : '+'}
+                              <input type="file" accept=".jpg,.jpeg,.png" onChange={handleThumbUpload} className="hidden" />
+                            </label>
+                          )}
                         </div>
-                      ))}
-                      {(thumbs[activeCharId] || []).length < 4 && (
-                        <label style={{ borderColor: activeChar.color + '50', color: activeChar.color }}
-                          className="w-[48px] h-[48px] border border-dashed rounded-[6px] flex items-center justify-center text-[18px] cursor-pointer flex-shrink-0">
-                          +
-                          <input type="file" accept=".jpg,.jpeg,.png" onChange={handleThumbUpload} className="hidden" />
-                        </label>
-                      )}
-                    </div>
+                      );
+                    })()}
                   </div>
                 </div>
               </div>
@@ -2275,6 +2312,7 @@ export default function Loom() {
           onSetTheme={setTheme}
           onDismiss={dismissWelcome}
           onOpenGuide={() => { setSettingsTab('guide'); dismissWelcome(); setSettingsOpen(true); }}
+          onOpenSettings={() => { setSettingsTab('api'); dismissWelcome(); setSettingsOpen(true); }}
         />
       )}
       <GlobalTagSearch
