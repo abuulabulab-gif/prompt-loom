@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const APP_VERSION = 'v1.6';
+const APP_VERSION = 'v1.7';
 const APP_YEAR = '2026';
 
 const SHORTCUTS = (lang) => [
@@ -235,14 +235,13 @@ const PLATFORM_DIFF = (lang) => [
 
 export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds = new Set(), allBlocks = [], onRestoreBlock, onRestoreAllBlocks, theme, onToggleTheme, viewMode, onSetViewMode, onToggleLang, onShowWelcome, defaultTab, apiConfig, onSaveApiConfig }) {
   const [tab, setTab] = useState(defaultTab || 'shortcuts');
-  const [apiProvider, setApiProvider] = useState(apiConfig?.provider ?? 'openai');
-  const [apiKey, setApiKey]           = useState(apiConfig?.apiKey ?? '');
+  const [localInput, setLocalInput]   = useState({ openai: '', claude: '' });
   const [apiKeyVisible, setApiKeyVisible] = useState(false);
   const [apiSaved, setApiSaved]       = useState(false);
 
   useEffect(() => {
-    setApiProvider(apiConfig?.provider ?? 'openai');
-    setApiKey(apiConfig?.apiKey ?? '');
+    setLocalInput({ openai: '', claude: '' });
+    setApiKeyVisible(false);
   }, [apiConfig]);
   const [openSections, setOpenSections] = useState(new Set(['🌱']));
 
@@ -572,62 +571,56 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                 </p>
               </div>
 
-              {/* Provider */}
-              <div className="space-y-[8px]">
-                <div className="text-dim text-[10px] font-mono font-bold tracking-widest uppercase">
-                  {lang === 'ja' ? 'AIプロバイダー' : 'AI Provider'}
-                </div>
-                <div className="flex rounded-[7px] overflow-hidden border border-line text-[11px] font-mono">
-                  {[{ v: 'openai', label: 'OpenAI (GPT-4o mini)' }, { v: 'claude', label: 'Claude (Haiku)' }].map(({ v, label }, i) => (
-                    <button key={v} onClick={() => setApiProvider(v)}
-                      className={`flex-1 py-[8px] cursor-pointer transition-colors duration-100 ${i > 0 ? 'border-l border-line' : ''}`}
-                      style={apiProvider === v
-                        ? { background: 'rgb(var(--c-blue) / 0.12)', color: 'rgb(var(--c-blue))', fontWeight: 700 }
-                        : { background: 'transparent', color: 'rgb(var(--muted))' }}>
+              {/* Provider rows — one at a time: saving one locks the other */}
+              {[
+                { v: 'openai', label: 'OpenAI (GPT-4o mini)', placeholder: 'sk-...' },
+                { v: 'claude', label: 'Claude (Haiku)', placeholder: 'sk-ant-...' },
+              ].map(({ v, label, placeholder }) => {
+                const isSaved = !!(apiConfig?.apiKey?.trim()) && apiConfig?.provider === v;
+                const isLocked = !!(apiConfig?.apiKey?.trim()) && apiConfig?.provider !== v;
+                const inputVal = localInput[v] ?? '';
+                return (
+                  <div key={v} className={`space-y-[6px] transition-opacity duration-150 ${isLocked ? 'opacity-30 pointer-events-none select-none' : ''}`}>
+                    <div className="text-dim text-[10px] font-mono font-bold tracking-widest uppercase">
                       {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* API Key */}
-              <div className="space-y-[8px]">
-                <div className="text-dim text-[10px] font-mono font-bold tracking-widest uppercase">
-                  {lang === 'ja' ? 'APIキー' : 'API Key'}
-                </div>
-                <div className="flex gap-[6px]">
-                  <input
-                    type={apiKeyVisible ? 'text' : 'password'}
-                    value={apiKey}
-                    onChange={e => setApiKey(e.target.value)}
-                    placeholder={apiProvider === 'openai' ? 'sk-...' : 'sk-ant-...'}
-                    className="flex-1 rounded-[7px] px-[10px] py-[7px] text-[12px] font-mono outline-none border border-line bg-bg text-fg"
-                    spellCheck={false}
-                  />
-                  <button onClick={() => setApiKeyVisible(v => !v)}
-                    className="rounded-[7px] px-[10px] py-[7px] text-[11px] border border-line bg-surfalt text-muted cursor-pointer">
-                    {apiKeyVisible ? '🙈' : '👁'}
-                  </button>
-                </div>
-              </div>
-
-              {/* Save */}
-              <button
-                onClick={() => { onSaveApiConfig?.({ provider: apiProvider, apiKey }); setApiSaved(true); setTimeout(() => setApiSaved(false), 2000); }}
-                disabled={!apiKey.trim()}
-                className="w-full rounded-[8px] py-[9px] text-[12px] font-bold cursor-pointer border-none text-white transition-all duration-150 disabled:opacity-40 disabled:cursor-default"
-                style={{ background: apiSaved ? 'rgb(var(--c-green))' : 'rgb(var(--c-blue))' }}>
-                {apiSaved
-                  ? (lang === 'ja' ? '✓ 保存しました' : '✓ Saved')
-                  : (lang === 'ja' ? '保存' : 'Save')}
-              </button>
-
-              {apiKey.trim() && (
-                <button onClick={() => { setApiKey(''); onSaveApiConfig?.({ provider: apiProvider, apiKey: '' }); }}
-                  className="w-full rounded-[8px] py-[7px] text-[11px] font-mono cursor-pointer bg-transparent border border-dim text-muted">
-                  {lang === 'ja' ? 'APIキーを削除' : 'Remove API key'}
-                </button>
-              )}
+                    </div>
+                    <div className="flex gap-[6px]">
+                      <input
+                        type={isSaved && !apiKeyVisible ? 'password' : 'text'}
+                        value={isSaved ? apiConfig.apiKey : inputVal}
+                        readOnly={isSaved}
+                        onChange={e => !isSaved && setLocalInput(prev => ({ ...prev, [v]: e.target.value }))}
+                        placeholder={placeholder}
+                        className="flex-1 rounded-[7px] px-[10px] py-[7px] text-[12px] font-mono outline-none border bg-bg text-fg"
+                        style={isSaved ? { borderColor: 'rgb(var(--c-green) / 0.5)', opacity: 0.75 } : { borderColor: 'rgb(var(--border))' }}
+                        spellCheck={false}
+                      />
+                      {isSaved ? (
+                        <>
+                          <button onClick={() => setApiKeyVisible(x => !x)}
+                            className="rounded-[7px] px-[10px] py-[7px] text-[11px] border border-line bg-surfalt text-muted cursor-pointer shrink-0">
+                            {apiKeyVisible ? '🙈' : '👁'}
+                          </button>
+                          <button
+                            onClick={() => { onSaveApiConfig?.({ provider: v, apiKey: '' }); }}
+                            className="rounded-[7px] px-[10px] py-[7px] text-[11px] font-mono border border-dim bg-surfalt text-muted cursor-pointer shrink-0">
+                            {lang === 'ja' ? '削除' : 'Delete'}
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          onClick={() => { if (!inputVal.trim()) return; onSaveApiConfig?.({ provider: v, apiKey: inputVal }); setApiSaved(v); setTimeout(() => setApiSaved(false), 2000); }}
+                          disabled={!inputVal.trim()}
+                          className="rounded-[7px] px-[14px] py-[7px] text-[11px] font-bold cursor-pointer border-none text-white transition-all duration-150 disabled:opacity-40 disabled:cursor-default shrink-0"
+                          style={{ background: apiSaved === v ? 'rgb(var(--c-green))' : 'rgb(var(--c-blue))' }}
+                        >
+                          {apiSaved === v ? '✓' : (lang === 'ja' ? '保存' : 'Save')}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
 
@@ -690,6 +683,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                 </div>
                 <div className="space-y-[5px]">
                   {[
+                    { v: 'v1.7', note: lang === 'ja' ? 'ランダム生成システム全面再構築。Tier3タグ分類・おまかせ2モード（🧍キャラデザ/🖼️イラスト）・排他ルール（フレーミング×下半身・環境×エフェクト・ポーズ・表情・スタイル矛盾）・コンボシステム（武器→fighting stance・人魚→underwater等）。バリエーション生成を固定ブロック（種族・顔・体型）＋再ロールブロック（衣装・構図・背景・エフェクト・照明）方式に変更。武器タグ低確率枠（約12%）で追加。モード設定をLocalStorageで記憶。タグ・辞書・競合ルール追加' : 'Random generation system overhaul: Tier3 tag classification, 2-mode random (🧍 Char.Design / 🖼️ Illust), exclusion rules (framing × lower-body, environment × effects, pose, expression, style conflicts), combo system (weapon→fighting stance, mermaid→underwater, etc.). Variations redesigned: fixed blocks (attribute/face/body) + reroll blocks (outfit/composition/background/effect/lighting). Weapon tags at ~12% probability. Mode saved to LocalStorage. New tags, dictionary entries, conflict rules.' },
                     { v: 'v1.6', note: lang === 'ja' ? '画像からタグ生成（OpenAI/Claude Vision対応）。データ入出力を1キャラクター単位に統一。UI用語整理（バックアップ/復元/プロンプトをシェア）。ログイン案内強化・同期失敗トースト・APIキー取得リンク追加。URLシェアペイロード最適化' : 'Image-to-tags via vision API (OpenAI/Claude). Data import/export unified to single-character unit. UI label cleanup (Backup/Restore/Share prompt). Prominent sync login, sync-fail toast, API key acquisition links. Share URL payload optimization' },
                     { v: 'v1.5', note: lang === 'ja' ? 'AI機能追加：自然文タブのAI文章整形・✦ツールに自然文→タグ変換・出力バーにAIタグ提案（OpenAI/Claude対応）。PWAアイコン修正。ユーザーAPIキー方式を採用' : 'AI features: AI polish in Natural Text tab, Text→Tags in ✦ Tools, AI tag suggestions in output bar (OpenAI & Claude). PWA icon fix. User-provided API key approach.' },
                     { v: 'v1.4', note: lang === 'ja' ? '絵文字を種族・職業系21種に刷新・セキュリティ強化・破綻タグの検出と生成防止拡充・ヘッダーグリッドアイコン・タグ辞書追加・設定にスマホ/PC差異タブ追加' : 'Emoji overhaul (21 species/archetype), security hardening, expanded conflict detection + generation prevention, grid header icon, tag dictionary additions, Mobile vs PC comparison tab in Settings' },

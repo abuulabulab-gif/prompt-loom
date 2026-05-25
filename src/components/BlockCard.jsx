@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { STRENGTHS, uid, appendTag, countTags, hasTag, toggleTag, clampW, removeTag, OPTIONAL_CAT_NAMES, BLOCK_RANDOM_RULES } from "../data/constants.js";
+import { STRENGTHS, uid, appendTag, countTags, hasTag, toggleTag, clampW, removeTag, OPTIONAL_CAT_NAMES, BLOCK_RANDOM_RULES, TIER3_TAGS, RANDOM_EXCLUSION_RULES, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS } from "../data/constants.js";
 import { EXPRESSION_PRESETS, ALL_EXPR_TAGS } from "../data/expressions.js";
 import { NEG_PRESETS } from "../data/negSuggestions.js";
 import TagBtn from "./TagBtn.jsx";
@@ -455,7 +455,9 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             onChange={e => !isLocked && onUpdate({ text: e.target.value })}
             placeholder={isLocked
               ? (lang === 'ja' ? '🔒 ロック中' : '🔒 Locked')
-              : (lang === 'ja' ? `${block.name}のプロンプト` : `${block.nameEn} prompt`)}
+              : block.isCustomBlock
+                ? (lang === 'ja' ? 'カスタムプロンプトを入力' : 'Enter custom prompt')
+                : (lang === 'ja' ? `${block.name}のプロンプト` : `${block.nameEn} prompt`)}
             style={{ color: block.text ? 'rgb(var(--prompt-text))' : undefined }}
             className={`w-full ${focusMode ? 'min-h-[80px] max-h-[160px] text-[14px]' : 'min-h-[54px] max-h-[120px] text-[12px]'} rounded-[7px] px-[11px] py-[9px] font-mono resize-y box-border outline-none leading-[1.65] bg-bg ${block.text ? '' : 'text-muted'} ${isLocked ? 'border border-dim opacity-50' : 'border border-linebright'}`}
             onFocus={e => { if (!isLocked) e.target.style.borderColor = block.color + '80'; }}
@@ -513,6 +515,13 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                     let baseText = block.text;
                     for (const t of (block.lastRandomPicks || [])) baseText = removeTag(baseText, t.en);
 
+                    // Collect exclusions from tags already in baseText
+                    const excluded = new Set();
+                    baseText.split(',').map(s => s.trim().toLowerCase()).filter(Boolean).forEach(en => {
+                      const excl = RANDOM_EXCLUSION_RULES.get(en);
+                      if (excl) excl.forEach(e => excluded.add(e.toLowerCase()));
+                    });
+
                     // Apply BLOCK_RANDOM_RULES: resolve mutually exclusive category groups
                     const rules = BLOCK_RANDOM_RULES[block.id] || {};
                     const disabledCats = new Set();
@@ -529,24 +538,30 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
 
                     const picks = [];
                     const skippedCats = new Set(disabledCats);
-                    for (const cat of coreCats) {
-                      if (picks.length >= maxPicks || skippedCats.has(cat.n)) continue;
-                      const unused = cat.t.filter(t => !hasTag(baseText, t.en));
-                      if (unused.length > 0) {
-                        picks.push(unused[Math.floor(Math.random() * unused.length)]);
-                        (rules.skipIfPicked?.[cat.n] || []).forEach(n => skippedCats.add(n));
+                    const tryPick = (cat) => {
+                      if (picks.length >= maxPicks || skippedCats.has(cat.n)) return;
+                      const unused = cat.t.filter(t => {
+                        const en = t.en.toLowerCase();
+                        return !hasTag(baseText, t.en) && !TIER3_TAGS.has(en) && !excluded.has(en);
+                      });
+                      if (unused.length === 0) return;
+                      const pick = unused[Math.floor(Math.random() * unused.length)];
+                      // 武器タグは追加ゲート
+                      if (WEAPON_TAGS.has(pick.en.toLowerCase()) && Math.random() > WEAPON_PICK_PROB) return;
+                      picks.push(pick);
+                      if (WEAPON_TAGS.has(pick.en.toLowerCase())) {
+                        HAND_POSE_TAGS.forEach(t => excluded.add(t.toLowerCase()));
                       }
-                    }
+                      const newExcl = RANDOM_EXCLUSION_RULES.get(pick.en.toLowerCase());
+                      if (newExcl) newExcl.forEach(e => excluded.add(e.toLowerCase()));
+                      (rules.skipIfPicked?.[cat.n] || []).forEach(n => skippedCats.add(n));
+                    };
+
+                    for (const cat of coreCats) tryPick(cat);
                     const shuffledOpt = [...optCats].sort(() => Math.random() - 0.5);
                     for (const cat of shuffledOpt) {
                       if (picks.length >= maxPicks || skippedCats.has(cat.n)) continue;
-                      if (Math.random() < 0.45) {
-                        const unused = cat.t.filter(t => !hasTag(baseText, t.en));
-                        if (unused.length > 0) {
-                          picks.push(unused[Math.floor(Math.random() * unused.length)]);
-                          (rules.skipIfPicked?.[cat.n] || []).forEach(n => skippedCats.add(n));
-                        }
-                      }
+                      if (Math.random() < 0.45) tryPick(cat);
                     }
 
                     if (picks.length === 0) return;

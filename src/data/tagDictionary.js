@@ -267,6 +267,8 @@ export const TAG_DICT = {
   'finger heart':          { ja: '親指と人差し指を交差して作る小さなハートジェスチャー。韓国のアイドル文化から広まった', en: 'Small heart shape made by crossing thumb and index finger — popularized by Korean idol culture' },
   'hand heart':            { ja: '両手の親指と人差し指で大きなハートを作るジェスチャー。愛情・ファンサービスの表現', en: 'Large heart formed with both hands together — affectionate fan-service gesture' },
   'pinky out':             { ja: '小指だけ立てたジェスチャー。上品さ・繊細さ・お嬢様らしさを表現する', en: 'Pinky finger extended while holding a cup or in midair — suggests elegance or refinement' },
+  'finger to cheek':       { ja: '頬に人差し指を当てるしぐさ。考え中・甘え・可愛らしい表情とよく合う', en: 'Index finger pressed to the cheek — thinking, coy, or sweetly endearing expression' },
+  'finger to lips':        { ja: '唇に人差し指を当てる「シー」のポーズ。秘密めかした雰囲気・ミステリアス・妖艶な印象に', en: '"Shh" gesture with finger over lips — secretive, mysterious, or seductive nuance' },
 
   // ── 視線・演出補足 ──────────────────────────────────────────────
   'head tilt':             { ja: '首をかしげるポーズ。かわいらしさ・疑問・甘えを表すアニメの定番ジェスチャー', en: 'Head tilted to one side — expresses curiosity, cuteness, or coy flirtation; classic anime gesture' },

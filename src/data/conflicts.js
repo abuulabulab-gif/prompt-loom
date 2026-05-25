@@ -71,6 +71,11 @@ export const CONFLICT_RULES = [
   { tags:['split','standing'],           ja:'開脚と立ちが矛盾',               en:'split + standing' },
   { tags:['split','running'],            ja:'開脚と走りが矛盾',               en:'split + running' },
   { tags:['split','kneeling'],           ja:'開脚と膝立ちが矛盾',             en:'split + kneeling' },
+  { tags:['sleeping','standing'],        ja:'眠りと立ちが矛盾',               en:'sleeping + standing' },
+  { tags:['sleeping','jumping'],         ja:'眠りとジャンプが矛盾',           en:'sleeping + jumping' },
+  { tags:['sleeping','running'],         ja:'眠りと走りが矛盾',               en:'sleeping + running' },
+  { tags:['sleeping','dancing'],         ja:'眠りとダンスが矛盾',             en:'sleeping + dancing' },
+  { tags:['sleeping','fighting stance'], ja:'眠りと戦闘ポーズが矛盾',         en:'sleeping + fighting stance' },
 
   // ── 人数 ─────────────────────────────────────────────────────
   { tags:['solo','2girls'],              ja:'ひとりと女の子2人が矛盾',         en:'solo + 2girls' },

@@ -48,6 +48,8 @@ export const OPTIONAL_CAT_NAMES = new Set([
   '仕上がり', '顔の精細化',
   // アートスタイル（スタイルは外す → 常にコア扱い）
   '色調', 'レンダリング',
+  // 照明（Tier 2: ブロックレベル確率で制御するためカテゴリもオプション扱い）
+  '光源', '照明スタイル',
 ]);
 
 // ── Species → Special Parts auto-link ───────────────────────
@@ -78,6 +80,146 @@ export const BLOCK_RANDOM_RULES = {
     exclusiveGroups: [['シンプル', '屋外', '屋内']],
     skipIfPicked: { 'シンプル': ['時間・天気', '季節・雰囲気'] },
   },
+};
+
+// ── Tier 3 tags (0% from おまかせ; only added via combo rules) ──
+export const TIER3_TAGS = new Set([
+  // ボディフォーカス（センシティブ寄り）
+  'cleavage','sideboob','underboob','bare back','armpits','midriff',
+  'bare thighs','thighs','leg focus','wide hips',
+  // 足フォーカス
+  'soles','toes','foot focus','toenail polish',
+  // アイテム系保持タグ（武器はWEAPON_TAGSへ移動）
+  'holding flower','holding umbrella','holding cup','holding drink','holding ice cream',
+  'holding book','holding plush toy','holding smartphone','holding microphone',
+  'holding fan','holding key','holding lantern','holding torch',
+  // 極端なポーズ
+  'all fours','split','lying on back','lying on stomach','on side',
+  // 極端な表情・口
+  'crying','drunk','saliva','tongue out','tongue between teeth','licking lips',
+  // センシティブアクセサリー
+  'collar','garter belt',
+  // タトゥー
+  'tattoo','arm tattoo','back tattoo',
+]);
+
+// ── Weapon tags (格上げ: Tier3 → 低確率枠) ──────────────────
+// カテゴリ選択率40% × WEAPON_PICK_PROB = 実質約12%でおまかせに出現
+export const WEAPON_TAGS = new Set([
+  'holding sword','holding spear','holding dagger','holding knife','holding shield',
+  'holding staff','holding wand','holding bow','holding gun','holding rifle',
+]);
+export const WEAPON_PICK_PROB = 0.30;
+
+// 武器保持と同時に選ばれてはいけない手・指ポーズ
+export const HAND_POSE_TAGS = new Set([
+  'peace sign','v-sign','finger gun','pointing','pointing at viewer','pointing up',
+  'pointing to the side','finger to mouth','finger to chin','finger to cheek',
+  'finger to lips','ok sign','thumbs up','thumbs down','spread fingers',
+  'counting','waving','clapping','hand heart','finger heart','pinky out',
+]);
+
+// ── Tier 2 blocks (40% inclusion in おまかせ) ────────────────
+export const TIER2_BLOCK_IDS  = new Set(['lighting', 'effect']);
+export const TIER2_BLOCK_PROB = 0.40;
+
+// ── Random exclusion rules (frame-out + incompatibility) ─────
+// Key = tag that was picked; Value = Set of tags that must be removed
+const LOWER_BODY_FRAME_OUT = new Set([
+  'sneakers','loafers','mary janes','sandals','slippers','heels','pumps',
+  'high heels','platform shoes','ankle boots','boots','knee-high boots',
+  'thigh-high boots','platform boots','leg warmers','ankle socks','socks',
+  'knee-high socks','thighhighs','white thighhighs','black thighhighs','pantyhose',
+  'barefoot','soles','toes','foot focus','pointed toes','toenail polish',
+  'crossed legs','thigh gap','thigh strap',
+  'mini skirt','micro skirt','hot pants','shorts','leggings',
+  'bare thighs','thighs','leg focus','wide hips',
+]);
+
+export const RANDOM_EXCLUSION_RULES = new Map([
+  // フレーミング → 下半身タグ除外
+  ['extreme close-up', LOWER_BODY_FRAME_OUT],
+  ['close-up',         LOWER_BODY_FRAME_OUT],
+  ['face close-up',    LOWER_BODY_FRAME_OUT],
+  ['portrait',         LOWER_BODY_FRAME_OUT],
+  ['bust shot',        LOWER_BODY_FRAME_OUT],
+  ['upper body',       LOWER_BODY_FRAME_OUT],
+  ['cowboy shot',      LOWER_BODY_FRAME_OUT],
+  // 種族 × 衣装・足元（下半身がない種族）
+  ['mermaid', new Set([
+    'sneakers','loafers','mary janes','sandals','slippers','heels','pumps','high heels',
+    'platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
+    'ankle socks','socks','knee-high socks','thighhighs','white thighhighs','black thighhighs',
+    'pantyhose','leg warmers','barefoot',
+    'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','pants','jeans','leggings',
+  ])],
+  ['lamia', new Set([
+    'sneakers','loafers','mary janes','sandals','slippers','heels','pumps','high heels',
+    'platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
+    'ankle socks','socks','knee-high socks','thighhighs','white thighhighs','black thighhighs',
+    'pantyhose','leg warmers','barefoot',
+    'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','pants','jeans','leggings',
+  ])],
+  // 背景環境の矛盾
+  ['underwater',   new Set(['fire','explosion','embers','electricity','lightning','lens flare','god rays','sparkles'])],
+  ['outer space',  new Set(['rain','snowfall','wind','mist','fire','explosion','sunlight'])],
+  // ポーズの矛盾
+  ['lying on back',    new Set(['standing','walking','running','jumping','kneeling','on one knee','crouching','fighting stance','dancing'])],
+  ['lying on stomach', new Set(['standing','walking','running','jumping','kneeling','on one knee','crouching','fighting stance'])],
+  ['all fours',        new Set(['standing','jumping','running','sitting','sitting cross-legged','seiza','fighting stance','dancing'])],
+  ['seiza',            new Set(['standing','jumping','running','walking','fighting stance','dancing'])],
+  ['sitting cross-legged', new Set(['standing','jumping','running','walking','fighting stance'])],
+  // 表情の矛盾
+  ['smile',        new Set(['crying','sad','angry','disgusted','worried','pout','expressionless'])],
+  ['grin',         new Set(['crying','sad','angry','disgusted','expressionless'])],
+  ['laughing',     new Set(['crying','sad','angry','disgusted','expressionless','serious'])],
+  ['crying',       new Set(['smile','grin','laughing','wink','excited','blushing','shy','smirk'])],
+  ['angry',        new Set(['smile','light smile','grin','laughing','wink','excited','blushing','shy','embarrassed'])],
+  ['pout',         new Set(['grin','laughing','wink','excited'])],
+  ['expressionless',new Set(['smile','grin','laughing','wink','excited','crying','shy','embarrassed','blushing'])],
+  ['serious',      new Set(['laughing','grin','excited','blushing','embarrassed','shy'])],
+  // アートスタイルとレンダリングの矛盾
+  ['pixel art',  new Set(['depth of field','bokeh','subsurface scattering','smooth shading','soft shading','painterly','bloom'])],
+  ['lineart',    new Set(['watercolor','oil painting','depth of field','bokeh','subsurface scattering','smooth shading','soft shading'])],
+  ['sketch',     new Set(['cel shading','depth of field','bokeh','subsurface scattering','smooth shading','bloom','glowing'])],
+  ['flat design',new Set(['depth of field','bokeh','subsurface scattering','smooth shading','soft shading','painterly','bloom','glowing'])],
+  ['monochrome', new Set(['vibrant colors','colorful','neon colors','warm colors','cool colors','pastel colors','cel shading'])],
+  // fighting stance（コンボで追加された際の事後クリーンアップ用）
+  ['fighting stance', new Set(['lying on back','lying on stomach','all fours','seiza','sitting cross-legged','sleeping'])],
+]);
+
+// ── Combo rules: trigger tag → add tag in another block ──────
+export const RANDOM_COMBO_RULES = [
+  { trigger: 'holding sword',  blockId: 'composition', tag: 'fighting stance' },
+  { trigger: 'holding spear',  blockId: 'composition', tag: 'fighting stance' },
+  { trigger: 'holding dagger', blockId: 'composition', tag: 'fighting stance' },
+  { trigger: 'holding knife',  blockId: 'composition', tag: 'fighting stance' },
+  { trigger: 'holding bow',    blockId: 'composition', tag: 'fighting stance' },
+  { trigger: 'holding gun',    blockId: 'composition', tag: 'fighting stance' },
+  { trigger: 'holding rifle',  blockId: 'composition', tag: 'fighting stance' },
+  { trigger: 'holding shield', blockId: 'composition', tag: 'fighting stance' },
+  { trigger: 'mermaid',        blockId: 'background',  tag: 'underwater' },
+  { trigger: 'mermaid tail',   blockId: 'background',  tag: 'underwater' },
+  { trigger: 'rainy',          blockId: 'effect',      tag: 'rain' },
+  { trigger: 'snowy',          blockId: 'effect',      tag: 'snowfall' },
+  { trigger: 'night',          blockId: 'lighting',    tag: 'moonlight' },
+  { trigger: 'starry sky',     blockId: 'lighting',    tag: 'moonlight' },
+  { trigger: 'magical girl',   blockId: 'effect',      tag: 'magic circle' },
+  { trigger: 'bikini',         blockId: 'body',        tag: 'cleavage' },
+  { trigger: 'micro bikini',   blockId: 'body',        tag: 'cleavage' },
+  { trigger: 'swimsuit',       blockId: 'body',        tag: 'bare back' },
+  { trigger: 'beach',          blockId: 'body',        tag: 'barefoot' },
+  { trigger: 'rainy',          blockId: 'body',        tag: 'wet hair' },
+  { trigger: 'action',         blockId: 'composition', tag: 'fighting stance' },
+];
+
+// ── キャラデザモード固定タグ設定 ────────────────────────────
+export const CHARDESIGN_MODE_CONFIG = {
+  compositionDistanceTags: ['full body', 'upper body', 'cowboy shot'],
+  compositionAngleTags:    ['front view', 'side view'],
+  compositionPoseTags:     ['standing', 'sitting', 'hand on hip', 'arms behind back', 'arms crossed', 'leaning', 'pinup'],
+  backgroundTags:          ['white background', 'simple background', 'gradient background', 'bokeh background'],
+  lightingTags:            ['soft light', 'studio lighting', 'warm lighting', 'global illumination'],
 };
 
 // ── Utilities ────────────────────────────────────────────────
