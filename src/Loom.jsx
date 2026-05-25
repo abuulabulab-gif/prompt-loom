@@ -121,6 +121,19 @@ export default function Loom() {
   const [thumbDragOver, setThumbDragOver] = useState(false);
   const [layout, setLayout] = useState('1col');
   const [focusBlockId, setFocusBlockId] = useState(null);
+  const prevFocusId = useRef(null);
+
+  useEffect(() => {
+    if (focusBlockId) {
+      prevFocusId.current = focusBlockId;
+    } else if (prevFocusId.current) {
+      const id = prevFocusId.current;
+      prevFocusId.current = null;
+      requestAnimationFrame(() => {
+        document.getElementById(`block-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    }
+  }, [focusBlockId]);
   const [showWelcome, setShowWelcome] = useState(false);
   const [vw, setVw] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
 
@@ -1860,7 +1873,7 @@ export default function Loom() {
                   onMouseOver={e => { e.currentTarget.style.borderColor = dangerColor + '80'; e.currentTarget.style.color = dangerColor; }}
                   onMouseOut={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.color = ''; }}>🗑</button>
                 {outputTab !== 'natural' && (
-                  <button onClick={() => { if (!outputEditMode) { setOutputEditText(currentText); setOutputEditMode(true); setOutputExpanded(true); } else { setOutputEditMode(false); } }}
+                  <button onClick={() => { if (!outputEditMode) { if (!outputEditText) setOutputEditText(currentText); setOutputEditMode(true); setOutputExpanded(true); } else { setOutputEditMode(false); } }}
                     disabled={!currentText} title={lang === 'ja' ? 'コピー前に手直し' : 'Edit before copy'}
                     style={{ background: outputEditMode ? '#fbbf2422' : 'none', border: `1px solid ${outputEditMode ? '#fbbf2460' : 'rgb(var(--dim))'}`, color: outputEditMode ? '#fbbf24' : 'rgb(var(--muted))' }}
                     className="rounded-[6px] px-[9px] py-[5px] text-[11px] transition-all duration-200 cursor-pointer disabled:cursor-default font-mono">✏️</button>
@@ -1991,7 +2004,7 @@ export default function Loom() {
                   onMouseOver={e => { e.currentTarget.style.borderColor = dangerColor + '80'; e.currentTarget.style.color = dangerColor; }}
                   onMouseOut={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.color = ''; }}>🗑</button>
                 {outputTab !== 'natural' && (
-                  <button onClick={() => { if (!outputEditMode) { setOutputEditText(currentText); setOutputEditMode(true); setOutputExpanded(true); } else { setOutputEditMode(false); } }}
+                  <button onClick={() => { if (!outputEditMode) { if (!outputEditText) setOutputEditText(currentText); setOutputEditMode(true); setOutputExpanded(true); } else { setOutputEditMode(false); } }}
                     disabled={!currentText} title={lang === 'ja' ? 'コピー前に手直し' : 'Edit before copy'}
                     style={{ background: outputEditMode ? '#fbbf2422' : 'none', border: `1px solid ${outputEditMode ? '#fbbf2460' : 'rgb(var(--dim))'}`, color: outputEditMode ? '#fbbf24' : 'rgb(var(--muted))' }}
                     className="rounded-[6px] px-[9px] py-[4px] text-[11px] transition-all duration-200 cursor-pointer disabled:cursor-default font-mono flex-shrink-0">✏️</button>

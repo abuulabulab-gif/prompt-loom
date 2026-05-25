@@ -134,10 +134,10 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
     >
       {/* ── Header ─────────────────────────────────────────── */}
       <div
-        className={`flex items-center gap-[6px] px-3 py-[9px]${block.collapsed ? '' : ' bg-surfalt border-b border-line'}`}
+        className={`flex items-start gap-[6px] px-3 py-[9px]${block.collapsed ? '' : ' bg-surfalt border-b border-line'}`}
       >
         {/* LEFT: drag + move + toggle + badge + icon + name — takes all available space */}
-        <div className="flex items-center gap-[6px] flex-1 min-w-0">
+        <div className="flex items-start gap-[6px] flex-1 min-w-0">
         {/* Drag handle */}
         <button
           {...listeners}
@@ -206,7 +206,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             <span
               onClick={() => { setNameInput(block.name); setEditingName(true); }}
               title={lang === 'ja' ? 'クリックで名前を変更' : 'Click to rename'}
-              className={`${focusMode ? 'text-[16px]' : 'text-[13px]'} font-bold flex-1 min-w-0 truncate cursor-text group ${isLocked ? 'text-muted' : 'text-fg'}`}
+              className={`${focusMode ? 'text-[16px]' : 'text-[13px]'} font-bold flex-1 min-w-0 leading-snug cursor-text group ${isLocked ? 'text-muted' : 'text-fg'}`}
             >
               {lang === 'ja' ? block.name : block.nameEn}
               <span className="ml-[4px] text-[10px] text-dim opacity-0 group-hover:opacity-100 transition-opacity">✎</span>
@@ -214,7 +214,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           )
         ) : (
           <span
-            className={`${focusMode ? 'text-[16px]' : 'text-[13px]'} font-bold flex-1 min-w-0 truncate ${isLocked ? 'text-muted' : 'text-fg'}${onHide ? ' cursor-pointer select-none' : ''}`}
+            className={`${focusMode ? 'text-[16px]' : 'text-[13px]'} font-bold flex-1 min-w-0 leading-snug ${isLocked ? 'text-muted' : 'text-fg'}${onHide ? ' cursor-pointer select-none' : ''}`}
             onDoubleClick={onHide ? hideConfirm : undefined}
             onTouchStart={onHide ? handleDoubleTap : undefined}
             title={onHide ? (lang === 'ja' ? 'ダブルタップで非表示' : 'Double-tap to hide') : undefined}
@@ -225,8 +225,8 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
         )}
         </div>{/* END LEFT group */}
 
-        {/* RIGHT: action buttons — never shrink, always vertically centered */}
-        <div className="flex items-center gap-[6px] flex-shrink-0">
+        {/* RIGHT: action buttons — never shrink, align to top */}
+        <div className="flex items-start gap-[6px] flex-shrink-0">
         {/* Analyze match badge */}
         {analyzedCount > 0 && (
           <span className="text-[9px] font-mono font-bold px-[5px] py-[2px] rounded-[4px] flex-shrink-0"
@@ -252,7 +252,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               color: saving ? block.color : 'rgb(var(--muted))',
             }}
             className="rounded-[5px] px-[7px] py-[2px] text-[10px] cursor-pointer"
-          >💾{lang === 'ja' ? '保存' : 'Save'}</button>
+          >💾{!isMobile && (lang === 'ja' ? '保存' : ' Save')}</button>
         )}
 
         {/* Tag count */}
