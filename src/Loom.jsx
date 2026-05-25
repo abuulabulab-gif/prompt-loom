@@ -130,6 +130,7 @@ export default function Loom() {
   const [syncErrToast, setSyncErrToast] = useState(false);
   const cloudPushTimer = useRef(null);
   const isSyncingFromCloud = useRef(false);
+  const lastCloudPullAt = useRef(0);
 
   useEffect(() => {
     if (syncStatus !== 'error') return;
@@ -311,8 +312,49 @@ export default function Loom() {
         setSyncStatus('error');
       } finally {
         isSyncingFromCloud.current = false;
+        lastCloudPullAt.current = Date.now();
       }
     })();
+  }, [user?.uid, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Cloud sync: pull on app foreground (Page Visibility API) ──
+  // Fires when the tab/PWA returns to the foreground while already logged in.
+  // Prevents stale local data from overwriting newer cloud changes made on another device.
+  useEffect(() => {
+    if (!user || !loaded) return;
+    const handleVisibility = async () => {
+      if (document.visibilityState !== 'visible') return;
+      if (isSyncingFromCloud.current) return;
+      if (Date.now() - lastCloudPullAt.current < 30_000) return; // throttle: max once per 30 s
+      isSyncingFromCloud.current = true;
+      lastCloudPullAt.current = Date.now();
+      setSyncStatus('syncing');
+      try {
+        const remote = await pullFromCloud(user.uid);
+        if (remote) {
+          setCharacters(prev => mergeCharacters(prev, remote.characters, remote.characterOrder, orderUpdatedAt, remote.orderUpdatedAt));
+          if ((remote.orderUpdatedAt ?? 0) > orderUpdatedAt) setOrderUpdatedAt(remote.orderUpdatedAt);
+          if (remote.settings && (remote.settingsUpdatedAt ?? 0) > settingsUpdatedAt) {
+            isApplyingRemoteSettings.current = true;
+            const s = remote.settings;
+            if (s.theme) setTheme(s.theme);
+            if (s.lang) setLang(s.lang);
+            if (s.viewMode) setViewMode(s.viewMode);
+            if (s.activeTool) setActiveTool(s.activeTool);
+            if (s.toolSuffixes) setToolSuffixes(s.toolSuffixes);
+            if (s.history) setHistory(s.history);
+            setSettingsUpdatedAt(remote.settingsUpdatedAt);
+          }
+        }
+        setSyncStatus('synced');
+      } catch {
+        setSyncStatus('error');
+      } finally {
+        isSyncingFromCloud.current = false;
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, [user?.uid, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Cloud sync: debounced push on change ──
