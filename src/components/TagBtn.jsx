@@ -1,5 +1,9 @@
 import { useState, useRef } from "react";
 
+// タッチデバイス（スマホ）ではホバーが存在しないのでツールチップ無効
+const SUPPORTS_HOVER = typeof window !== 'undefined'
+  && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
 export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disabled, selectMode, selected, conflict, desc, large, onInsert, onToggleFav }) {
   const [h, setH] = useState(false);
   const [tipPos, setTipPos] = useState(null);
@@ -30,10 +34,12 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
     : 'rgb(var(--text) / 0.9)';
 
   const handleEnter = () => {
+    if (!SUPPORTS_HOVER) return;
     setH(true);
     if (desc && wrapRef.current) {
+      const zoom = parseFloat(document.documentElement.style.zoom) || 1;
       const r = wrapRef.current.getBoundingClientRect();
-      setTipPos({ x: Math.round(r.left + r.width / 2), y: Math.round(r.top) });
+      setTipPos({ x: Math.round((r.left + r.width / 2) / zoom), y: Math.round(r.top / zoom) });
     }
   };
   const handleLeave = () => { setH(false); setTipPos(null); };
@@ -47,7 +53,7 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
       className="inline-flex items-center rounded-[5px] overflow-hidden transition-all duration-100"
     >
       {/* Tooltip — position:fixed escapes parent overflow:hidden */}
-      {h && desc && tipPos && !selectMode && !disabled && (
+      {h && desc && tipPos && !selectMode && !disabled && SUPPORTS_HOVER && (
         <div style={{
           position: 'fixed',
           left: tipPos.x,
@@ -63,7 +69,6 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
           boxShadow: '0 6px 20px rgba(0,0,0,0.5)',
           whiteSpace: 'normal',
         }}>
-          <div style={{ fontSize: 9, fontFamily: 'monospace', color: 'rgba(255,255,255,0.38)', marginBottom: 3, letterSpacing: '0.04em' }}>{tag.en}</div>
           <div style={{ fontSize: 10, fontFamily: 'monospace', color: 'rgba(255,255,255,0.88)', lineHeight: 1.55 }}>
             {lang === 'ja' ? desc.ja : desc.en}
           </div>

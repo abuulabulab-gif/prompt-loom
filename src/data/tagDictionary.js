@@ -42,6 +42,7 @@ export const TAG_DICT = {
   'bedroom eyes':          { ja: 'うつろな・妖艶な半眼。色気のある視線', en: 'Heavy-lidded, seductive expression' },
   'fang':                  { ja: '八重歯。キャラの可愛さ・やんちゃさを演出する小さな牙', en: 'Small protruding canine tooth — cute or mischievous character' },
   'star-shaped pupils':    { ja: '星型の瞳孔。ファンタジー・魔法系キャラに', en: 'Star-shaped pupils instead of round — fantasy or magical effect' },
+  'heart-shaped pupils':   { ja: 'ハート型の瞳孔。恋愛・魅了状態のキャラ表現に。star-shaped pupilsの対になるセット', en: 'Heart-shaped pupils — used for lovestruck or charmed expressions; paired with star-shaped pupils' },
   'sparkling eyes':        { ja: '目の中にキラキラとしたハイライトが入る', en: 'Eyes with shiny, sparkling highlights inside' },
   'sleepy eyes':           { ja: 'たれ目。目尻が下がってやさしい・眠そうな印象', en: 'Drooping outer corners of the eyes — gentle or drowsy look' },
   'upturned eyes':         { ja: 'つり目。目尻が上がって気の強い・凛とした印象', en: 'Eyes with raised outer corners — sharp, strong impression' },
@@ -85,6 +86,8 @@ export const TAG_DICT = {
   'pleated skirt':         { ja: '細かいヒダ（プリーツ）のスカート。制服によく使われる', en: 'Skirt with knife-pleats, common in school uniforms' },
   'furisode':              { ja: '長い袖が特徴の振り袖。成人式・正装用の着物', en: 'Formal kimono with long flowing sleeves for special occasions' },
   'gothic lolita':         { ja: 'ゴスロリ。黒を基調にしたフリルたっぷりのロリータファッション', en: 'Black-dominant, Victorian-inspired frilly lolita fashion' },
+  'sci-fi armor':          { ja: 'SFアーマー。未来的な素材・デザインの全身鎧。fantasy armorのSF版として機械的なキャラに', en: 'Futuristic full-body armor with sleek tech design — the sci-fi counterpart to fantasy armor' },
+  'techwear':              { ja: 'テックウェア。防水・多機能ポケット・サイバーな配色のアーバンSFファッション。cybernetics・サイバーパンク背景と相性抜群', en: 'Urban tactical streetwear with a sci-fi edge — waterproof materials, utility pockets, cyberpunk palette' },
   'fingerless gloves':     { ja: '指先が出るグローブ。クール・アクション系キャラに映える', en: 'Gloves with exposed fingertips — action or edgy style' },
 
   // ── 特殊パーツ ────────────────────────────────────────────────
@@ -111,6 +114,7 @@ export const TAG_DICT = {
   "bird's-eye view":       { ja: '真上または高所から見下ろした俯瞰構図', en: 'Overhead or high top-down perspective' },
   "worm's-eye view":       { ja: '地面レベルから真上を見上げる極端なローアングル', en: 'Extreme low-angle view from ground level looking upward' },
   'over the shoulder':     { ja: '人物の肩越しに前方のシーンを見る構図', en: 'Camera looks over a character\'s shoulder into the scene' },
+  'fisheye':               { ja: '魚眼レンズ。手足が極端に手前に迫るダイナミックなパース。超広角のグワッとした歪み効果', en: 'Ultra-wide fisheye lens — extreme perspective distortion making near elements loom dramatically' },
   'dynamic':               { ja: '動きのある躍動感あふれる構図', en: 'High-energy composition with strong sense of movement' },
   'all fours':             { ja: '四つん這い。両手と両膝で地面につくポーズ', en: 'On hands and knees — quadruped-style pose' },
   'on one knee':           { ja: '片膝をついたポーズ。プロポーズや誓いのシーンにも', en: 'One knee on the ground — heroic, knightly, or proposal pose' },
@@ -119,12 +123,14 @@ export const TAG_DICT = {
   'from below':            { ja: '見上げ視点。斜め下から撮ったアングル', en: 'Looking up at the subject from below' },
   'low angle':             { ja: '低い位置からのアングル。迫力・威圧感が増す', en: 'Camera positioned low, making subject look imposing' },
   'high angle':            { ja: '高い位置からのアングル。俯瞰的・見下ろし気味', en: 'Camera positioned high, looking slightly down at the subject' },
+  'foreshortening':        { ja: 'パース強調。カメラに向かって伸びた手足が極端に大きく見える遠近法の演出。魚眼と組み合わせると特に迫力が出る', en: 'Exaggerated perspective where limbs pointing at the camera appear dramatically enlarged — amplified further with fisheye' },
 
   // ── ライティング ─────────────────────────────────────────────
   'rim light':             { ja: '被写体の輪郭を縁取る背面からの光。シルエットが光る', en: 'Light from behind that outlines the subject\'s silhouette' },
   'volumetric lighting':   { ja: '光筋・ゴッドレイ。霧や煙の中を光が通る体積光', en: 'Visible light rays through atmosphere — fog, dust, or mist' },
   'god rays':              { ja: '雲の隙間・木漏れ日など天から差す放射状の光線', en: 'Radiant beams of light breaking through clouds or foliage' },
   'bioluminescence':       { ja: '生物発光。海中の発光生物や発光植物の幻想的な青緑の輝き', en: 'Natural glowing light from living organisms — oceanic blue-green glow' },
+  'caustics':              { ja: 'コースティクス。水面・プール・水中シーンで肌や服に映る揺れる光の網目模様。underwater・poolとの組み合わせでクオリティが爆上がりする', en: 'Water-refracted light patterns rippling on surfaces — pairs with underwater or pool scenes for stunning realism' },
   'lens flare':            { ja: '強い光源に当たったレンズが作る光の星・滲み', en: 'Streaks and starbursts from direct light hitting the camera lens' },
   'backlight':             { ja: '逆光。背後から光が来てシルエット・後光のような表現に', en: 'Light source behind the subject — creates silhouette or halo' },
   'aurora':                { ja: 'オーロラ。夜空に揺れる緑・紫・青のカーテン状の光', en: 'Aurora borealis — shimmering green and purple curtains in the night sky' },
@@ -165,11 +171,15 @@ export const TAG_DICT = {
   'detailed background':   { ja: '背景を省略せず細部まで丁寧に描くよう誘導する', en: 'Prompts the AI to render a fully detailed, non-lazy background' },
   'chibi':                 { ja: '頭身が低い2〜3頭身のデフォルメキャラ。SD（スーパーデフォルメ）とも', en: 'Super-deformed 2–3 head-height exaggerated style (also called SD)' },
   'flat design':           { ja: 'シャドウなし・グラデなしのシンプルなフラットカラー。アイコン・ポスター風', en: 'Minimal vector-like design with no shadows or gradients — icon or poster look' },
+  'retro artstyle':        { ja: '90年代アニメ風のセル画塗り。鮮やかな色づかい・独特のハイライトと影の表現。現在のAIイラスト界で大流行中', en: '1990s-era anime cel-shading style — vibrant colors, distinctive flat highlights, and that nostalgic hand-drawn look' },
+  'tarot card':            { ja: 'タロットカード風。アール・ヌーヴォー調の装飾的な縦長フレームで画面が囲まれ、一気に神秘的・芸術的な雰囲気に', en: 'Tarot card format — art nouveau decorative border framing the image, instantly mystical and ornate' },
   'soft shading':          { ja: '影の境界がなだらかなやわらかいグラデーションシェーディング', en: 'Gentle, diffuse shading with soft transitions between light and shadow' },
 
   // ── 髪型 ──────────────────────────────────────────────────────
   'wolf cut':              { ja: 'ウルフカット。段差を付けてランダムに切り込んだワイルドな外ハネスタイル', en: 'Layered shaggy haircut with wispy ends — edgy, wild texture' },
   'hime cut':              { ja: '姫カット。眉ラインで水平に揃えた前髪＋サイドを直線に切り揃えたお姫様風', en: 'Princess cut: straight-across bangs with straight side curtains framing the face' },
+  'two side up':           { ja: 'ツーサイドアップ。後ろ髪を下ろしたまま両サイドだけを結ぶ王道アニメ髪型。ツインテールとは異なり後ろ髪が垂れる', en: 'Side-only updo — back hair left down, only the sides tied up; distinct from twin tails which gather all the hair' },
+  'hair updo':             { ja: 'アップヘア。髪をまとめて上に束ねたスタイルの総称。うなじや首筋が露わになり、知的・上品・色っぽい印象を与える', en: 'Hair gathered and pinned up — exposes the nape and neck; gives an elegant, sophisticated, or alluring impression' },
   'drill hair':            { ja: 'ドリルヘア（縦ロール）。コルクスクリュー状に巻いた螺旋ツインテール。お嬢様系キャラに多い', en: 'Tight corkscrew spiral curls, usually in twintails — classic ojou-sama/princess style' },
   'swept back hair':       { ja: '前髪をかき上げて後ろに流したスッキリしたスタイル。知的・クール系に', en: 'Hair brushed back from the forehead — clean, cool, or intellectual look' },
   'layered hair':          { ja: 'レイヤーカット。段差を付けて動きと軽さを出したスタイル', en: 'Layered cut with varying lengths for volume and movement' },
@@ -203,6 +213,7 @@ export const TAG_DICT = {
   'sports bra':            { ja: 'スポーツブラ。運動用のサポートブラ。ミドリフ見せスタイルに多用', en: 'Athletic supportive bra top — pairs with bare midriff activewear look' },
   'sweater vest':          { ja: 'セーターベスト（袖なしニット）。カジュアル知的系のアカデミックファッションに', en: 'Sleeveless knit vest — academic or preppy style' },
   'cloak':                 { ja: 'クローク。肩から羽織る袖なしのマント状の外套。ファンタジー系に', en: 'Sleeveless outer robe draped over the shoulders — fantasy or medieval style' },
+  'sleeveless':            { ja: 'ノースリーブ。袖がない衣装の総称。肩・二の腕・脇が露出し、軽快でアクティブな印象に', en: 'Any top with no sleeves — exposes shoulders and upper arms; sporty, breezy, or summer feel' },
 
   // ── フットウェア ─────────────────────────────────────────────
   'pumps':                 { ja: 'パンプス。ヒールがあり甲部分を覆う最もオーソドックスな女性用ドレスシューズ', en: 'Classic women\'s heeled dress shoes with a closed toe and no straps' },
@@ -211,6 +222,7 @@ export const TAG_DICT = {
   'loafers':               { ja: 'ローファー。紐なしのスリップオン式の革靴。制服・学生スタイルに', en: 'Slip-on leather shoes with no laces — school uniform or smart-casual style' },
   'thigh-high boots':      { ja: '太ももまで覆うロングブーツ。絶対領域との組み合わせが定番', en: 'Boots that reach all the way up to the thigh — often paired with miniskirts' },
   'knee-high boots':       { ja: 'ニーハイブーツ。膝まで覆うロングブーツ', en: 'Boots reaching up to the knee' },
+  'zettai ryouiki':        { ja: '絶対領域。ミニスカートの裾とニーソックス/ニーハイブーツの上端の間に見える太もも素肌部分の通称。この比率がキモで、7:4:3（スカート:領域:靴下）がゴールデン比とされる', en: 'The strip of bare thigh exposed between a miniskirt hem and the top of thigh-highs — a celebrated design ratio in anime; "absolute territory"' },
 
   // ── 持ち物・武器 ─────────────────────────────────────────────
   'holding fan':           { ja: '扇子（または団扇）を手に持つポーズ。和風・中華風・貴族系に映える', en: 'Holding a folding or flat fan — Japanese, Chinese, or aristocratic aesthetic' },
@@ -260,6 +272,7 @@ export const TAG_DICT = {
   // ── ポーズ補足 ───────────────────────────────────────────────────
   'seiza':                 { ja: '正座。膝を揃えて足の甲の上に座る日本の伝統的な座り方。和風シーンに映える', en: 'Traditional Japanese sitting posture — kneeling with shins on the floor; suits Japanese settings' },
   'floating':              { ja: '地面から浮かんでいるポーズ。魔法・念力・霊体などの演出に使われる', en: 'Character hovering above the ground — implies magic, psychic power, or supernatural nature' },
+  'arms behind head':      { ja: '両腕を頭の後ろで組むポーズ。脇を見せる構図の定番。リラックスした・余裕のある・自信ある雰囲気を演出する', en: 'Both arms raised and clasped behind the head — relaxed, confident pose that naturally exposes the armpits and underarms' },
   'split':                 { ja: '両脚を180度に開いた開脚ポーズ。柔軟性・ダンス・バトル系のキャラに映える', en: 'Legs spread 180° flat on the ground — showcases flexibility; suits dancers or acrobatic characters' },
   'pinup':                 { ja: 'ピンナップポスター風のポーズ。レトロ・官能的でエレガントな魅せ方。50年代のイラスト文化に由来', en: 'Classic pin-up poster pose — retro, alluring, and elegant; inspired by 1940s–50s poster art style' },
 

@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { STRENGTHS, uid, appendTag, countTags, hasTag, toggleTag, clampW, removeTag, OPTIONAL_CAT_NAMES, BLOCK_RANDOM_RULES, TIER3_TAGS, RANDOM_EXCLUSION_RULES, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS } from "../data/constants.js";
+import { STRENGTHS, uid, appendTag, countTags, hasTag, toggleTag, clampW, removeTag, OPTIONAL_CAT_NAMES, BLOCK_RANDOM_RULES, TIER3_TAGS, RANDOM_EXCLUSION_RULES, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS, TAG_PAIR_COMBOS, TAG_SPECIES_COMBOS } from "../data/constants.js";
 import { EXPRESSION_PRESETS, ALL_EXPR_TAGS } from "../data/expressions.js";
 import { NEG_PRESETS } from "../data/negSuggestions.js";
 import TagBtn from "./TagBtn.jsx";
@@ -104,9 +104,34 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
     navigator.vibrate?.(8);
     if (selectMode) {
       setSelectedTags(prev => prev.includes(en) ? prev.filter(x => x !== en) : [...prev, en]);
-    } else {
-      onUpdate({ text: toggleTag(block.text, en, block.strength) });
+      return;
     }
+    const willBeOn = !hasTag(block.text, en);
+    let newText = toggleTag(block.text, en, block.strength);
+
+    if (block.id === 'attribute') {
+      const enLower = en.toLowerCase();
+      // Bidirectional pair: sync companion tag
+      const pair = TAG_PAIR_COMBOS.get(enLower);
+      if (pair) {
+        if (willBeOn) {
+          if (!hasTag(newText, pair)) newText = appendTag(newText, pair, block.strength);
+        } else {
+          newText = removeTag(newText, pair);
+        }
+      }
+      // Species → parts: add when turning ON
+      if (willBeOn) {
+        const parts = TAG_SPECIES_COMBOS.get(enLower);
+        if (parts) {
+          for (const part of parts) {
+            if (!hasTag(newText, part)) newText = appendTag(newText, part, block.strength);
+          }
+        }
+      }
+    }
+
+    onUpdate({ text: newText });
   };
   const applyGroup = () => {
     if (selectedTags.length < 2) return;

@@ -59,15 +59,54 @@ export const SPECIES_PARTS_MAP = {
   'elf':         ['elf ears'],
   'dark elf':    ['elf ears'],
   'angel':       ['angel wings', 'halo'],
-  'demon':       ['demon wings', 'demon tail', 'small horns'],
-  'fairy':       ['fairy wings', 'elf ears'],
+  'demon':       ['demon horns', 'demon tail', 'demon wings'],
+  'fairy':       ['fairy wings'],
   'mermaid':     ['mermaid tail'],
-  'dragon girl': ['dragon horns', 'dragon tail'],
+  'dragon girl': ['dragon horns', 'dragon tail', 'scale skin'],
   'catgirl':     ['cat ears', 'cat tail'],
-  'kitsune':     ['fox ears', 'fox tail'],
   'oni':         ['oni horns'],
   'doll':        ['ball joints'],
+  'android':     ['cybernetics'],
 };
+
+// ── UI combo: bidirectional pairs (clicking either tag syncs the other) ──
+export const TAG_PAIR_COMBOS = new Map([
+  ['cat ears',    'cat tail'],   ['cat tail',    'cat ears'],
+  ['fox ears',    'fox tail'],   ['fox tail',    'fox ears'],
+  ['wolf ears',   'wolf tail'],  ['wolf tail',   'wolf ears'],
+  ['dog ears',    'dog tail'],   ['dog tail',    'dog ears'],
+  ['bunny ears',  'bunny tail'], ['bunny tail',  'bunny ears'],
+  ['horse ears',  'horse tail'], ['horse tail',  'horse ears'],
+  ['cow ears',    'cow tail'],   ['cow tail',    'cow ears'],
+  ['dragon horns','dragon tail'],['dragon tail', 'dragon horns'],
+  ['demon horns', 'demon tail'], ['demon tail',  'demon horns'],
+  ['angel wings', 'halo'],       ['halo',        'angel wings'],
+]);
+
+// ── UI combo: species → parts (one-way, fires only when species toggled ON) ──
+export const TAG_SPECIES_COMBOS = new Map([
+  ['catgirl',     ['cat ears', 'cat tail']],
+  ['angel',       ['angel wings', 'halo']],
+  ['demon',       ['demon horns', 'demon tail', 'demon wings']],
+  ['elf',         ['elf ears']],
+  ['dark elf',    ['elf ears']],
+  ['oni',         ['oni horns']],
+  ['dragon girl', ['dragon horns', 'dragon tail', 'scale skin']],
+  ['mermaid',     ['mermaid tail']],
+  ['fairy',       ['fairy wings']],
+  ['doll',        ['ball joints']],
+  ['android',     ['cybernetics']],
+]);
+
+// ── Random: kemonomimi base pairs (ears + tail sets) ──
+export const KEMONOMIMI_PAIRS = [
+  ['cat ears',   'cat tail'],
+  ['fox ears',   'fox tail'],
+  ['wolf ears',  'wolf tail'],
+  ['dog ears',   'dog tail'],
+  ['bunny ears', 'bunny tail'],
+  ['cow ears',   'cow tail'],
+];
 
 // ── Random generation: mutually exclusive category groups ────
 // exclusiveGroups: within each inner array, at most one cat is picked
@@ -101,6 +140,8 @@ export const TIER3_TAGS = new Set([
   'collar','garter belt',
   // タトゥー
   'tattoo','arm tattoo','back tattoo',
+  // 特殊フォーマット（手動選択専用）
+  'tarot card',
 ]);
 
 // ── Weapon tags (格上げ: Tier3 → 低確率枠) ──────────────────
@@ -160,6 +201,13 @@ export const RANDOM_EXCLUSION_RULES = new Map([
     'pantyhose','leg warmers','barefoot',
     'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','pants','jeans','leggings',
   ])],
+  // 裸足 → フットウェア全般を除外
+  ['barefoot', new Set([
+    'sneakers','loafers','mary janes','sandals','slippers','heels','pumps','high heels',
+    'platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
+    'leg warmers','ankle socks','socks','knee-high socks','thighhighs','white thighhighs',
+    'black thighhighs','pantyhose',
+  ])],
   // 背景環境の矛盾
   ['underwater',   new Set(['fire','explosion','embers','electricity','lightning','lens flare','god rays','sparkles'])],
   ['outer space',  new Set(['rain','snowfall','wind','mist','fire','explosion','sunlight'])],
@@ -179,11 +227,12 @@ export const RANDOM_EXCLUSION_RULES = new Map([
   ['expressionless',new Set(['smile','grin','laughing','wink','excited','crying','shy','embarrassed','blushing'])],
   ['serious',      new Set(['laughing','grin','excited','blushing','embarrassed','shy'])],
   // アートスタイルとレンダリングの矛盾
-  ['pixel art',  new Set(['depth of field','bokeh','subsurface scattering','smooth shading','soft shading','painterly','bloom'])],
-  ['lineart',    new Set(['watercolor','oil painting','depth of field','bokeh','subsurface scattering','smooth shading','soft shading'])],
-  ['sketch',     new Set(['cel shading','depth of field','bokeh','subsurface scattering','smooth shading','bloom','glowing'])],
-  ['flat design',new Set(['depth of field','bokeh','subsurface scattering','smooth shading','soft shading','painterly','bloom','glowing'])],
-  ['monochrome', new Set(['vibrant colors','colorful','neon colors','warm colors','cool colors','pastel colors','cel shading'])],
+  ['pixel art',       new Set(['depth of field','bokeh','subsurface scattering','smooth shading','soft shading','painterly','bloom'])],
+  ['lineart',         new Set(['watercolor','oil painting','depth of field','bokeh','subsurface scattering','smooth shading','soft shading'])],
+  ['sketch',          new Set(['cel shading','depth of field','bokeh','subsurface scattering','smooth shading','bloom','glowing'])],
+  ['flat design',     new Set(['depth of field','bokeh','subsurface scattering','smooth shading','soft shading','painterly','bloom','glowing'])],
+  ['retro artstyle',  new Set(['depth of field','bokeh','subsurface scattering','smooth shading','soft shading','painterly'])],
+  ['monochrome',      new Set(['vibrant colors','colorful','neon colors','warm colors','cool colors','pastel colors','cel shading'])],
   // fighting stance（コンボで追加された際の事後クリーンアップ用）
   ['fighting stance', new Set(['lying on back','lying on stomach','all fours','seiza','sitting cross-legged','sleeping'])],
 ]);
@@ -200,6 +249,9 @@ export const RANDOM_COMBO_RULES = [
   { trigger: 'holding shield', blockId: 'composition', tag: 'fighting stance' },
   { trigger: 'mermaid',        blockId: 'background',  tag: 'underwater' },
   { trigger: 'mermaid tail',   blockId: 'background',  tag: 'underwater' },
+  { trigger: 'mermaid',        blockId: 'lighting',    tag: 'caustics' },
+  { trigger: 'mermaid tail',   blockId: 'lighting',    tag: 'caustics' },
+  { trigger: 'underwater',     blockId: 'lighting',    tag: 'caustics' },
   { trigger: 'rainy',          blockId: 'effect',      tag: 'rain' },
   { trigger: 'snowy',          blockId: 'effect',      tag: 'snowfall' },
   { trigger: 'night',          blockId: 'lighting',    tag: 'moonlight' },
@@ -213,13 +265,34 @@ export const RANDOM_COMBO_RULES = [
   { trigger: 'action',         blockId: 'composition', tag: 'fighting stance' },
 ];
 
-// ── キャラデザモード固定タグ設定 ────────────────────────────
+// ── キャラデザモード：設定資料特化の厳格ルール ────────────
 export const CHARDESIGN_MODE_CONFIG = {
-  compositionDistanceTags: ['full body', 'upper body', 'cowboy shot'],
-  compositionAngleTags:    ['front view', 'side view'],
-  compositionPoseTags:     ['standing', 'sitting', 'hand on hip', 'arms behind back', 'arms crossed', 'leaning', 'pinup'],
-  backgroundTags:          ['white background', 'simple background', 'gradient background', 'bokeh background'],
-  lightingTags:            ['soft light', 'studio lighting', 'warm lighting', 'global illumination'],
+  // ブロック単位の固定テキスト（ランダム抽選を行わず強制上書き）
+  qualityText:     'best quality, ultra-detailed, highres, sharp focus',
+  artstyleText:    'illustration, flat color, cel shading, vibrant colors, hard shading',
+  backgroundText:  'white background, simple background',
+  compositionText: 'full body, front view, standing',
+
+  // 顔ブロック：表情を無表情に固定
+  forcedExpression: 'expressionless',
+
+  // 顔ブロック：抽選しないカテゴリ（動作・感情表現）
+  skipFaceCats: new Set(['口・歯']),
+
+  // メイク・顔演出から抽選を許可する物理的個性タグのみ（八重歯・そばかす・泣きぼくろ）
+  faceMakeupPhysical: new Set(['fang', 'freckles', 'mole under eye']),
+
+  // 顔ブロック：カテゴリは残すが特定タグを除外（動きのある髪）
+  skipFaceTags: new Set(['floating hair']),
+
+  // 体型ブロック：抽選しないカテゴリ（状態・ボディフォーカス）
+  skipBodyCats: new Set(['状態', 'ボディフォーカス']),
+
+  // 特徴ブロック：抽選しないカテゴリ（武器・アクション小物）
+  skipFeatureCats: new Set(['武器・小物']),
+
+  // コンボルールが変更してはいけないブロックID（固定ブロック）
+  fixedBlocks: new Set(['quality', 'artstyle', 'background', 'composition', 'effect', 'lighting']),
 };
 
 // ── Utilities ────────────────────────────────────────────────

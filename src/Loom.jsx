@@ -14,7 +14,7 @@ import {
   uid, appendTag, countTags, toggleTag, hasTag, removeTag, splitTags, bareTag,
   deep, downloadJSON, stripWeights, toNaiWeights, OPTIONAL_CAT_NAMES, BLOCK_RANDOM_RULES, SPECIES_PARTS_MAP, RANDOM_EXCLUDE_TAGS,
   TIER3_TAGS, TIER2_BLOCK_IDS, TIER2_BLOCK_PROB, RANDOM_EXCLUSION_RULES, RANDOM_COMBO_RULES, CHARDESIGN_MODE_CONFIG,
-  WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS,
+  WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS, KEMONOMIMI_PAIRS,
 } from "./data/constants.js";
 import { detectConflicts, CONFLICT_RULES } from "./data/conflicts.js";
 
@@ -957,7 +957,7 @@ export default function Loom() {
   };
 
   // ── Combo rules post-pass: add tags triggered by picked tags ──
-  const applyComboRules = (blockMap) => {
+  const applyComboRules = (blockMap, fixedBlockIds = null) => {
     const allPicked = [];
     for (const [, block] of blockMap) {
       splitTags(block.text || '').forEach(seg => allPicked.push(bareTag(seg).toLowerCase()));
@@ -966,6 +966,7 @@ export default function Loom() {
       if (!allPicked.includes(rule.trigger.toLowerCase())) continue;
       const target = blockMap.get(rule.blockId);
       if (!target || target.locked) continue;
+      if (fixedBlockIds?.has(rule.blockId)) continue;
       if (!hasTag(target.text, rule.tag)) {
         target.text = appendTag(target.text, rule.tag, target.strength);
       }
@@ -1011,53 +1012,124 @@ export default function Loom() {
           return block;
         }
 
-        // Tier2 blocks: skip with probability in both modes
-        if (TIER2_BLOCK_IDS.has(block.id) && Math.random() > TIER2_BLOCK_PROB) {
-          const cleared = { ...block, text: '', enabled: true, collapsed: false, lastRandomPicks: [] };
-          blockMap.set(block.id, cleared);
-          return cleared;
+        // Tier2 blocks: chardesignモードは常にスキップ、illustモードは確率スキップ
+        if (TIER2_BLOCK_IDS.has(block.id)) {
+          if (mode === 'chardesign' || Math.random() > TIER2_BLOCK_PROB) {
+            const cleared = { ...block, text: '', enabled: true, collapsed: false, lastRandomPicks: [] };
+            blockMap.set(block.id, cleared);
+            return cleared;
+          }
         }
 
         let newBlock;
 
-        if (mode === 'chardesign' && block.id === 'composition') {
-          // Mode A: fixed neutral composition
+        if (mode === 'chardesign') {
+          // ── 設定資料モード：ノイズゼロ・完全固定 ──
           const cfg = CHARDESIGN_MODE_CONFIG;
-          const dist  = cfg.compositionDistanceTags[Math.floor(Math.random() * cfg.compositionDistanceTags.length)];
-          const angle = Math.random() < 0.5 ? cfg.compositionAngleTags[Math.floor(Math.random() * cfg.compositionAngleTags.length)] : null;
-          const pose  = cfg.compositionPoseTags[Math.floor(Math.random() * cfg.compositionPoseTags.length)];
-          let text = dist;
-          if (angle) text = appendTag(text, angle, block.strength);
-          text = appendTag(text, pose, block.strength);
-          applyExclusionRules(dist, globalExcluded);
-          newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: [] };
 
-        } else if (mode === 'chardesign' && block.id === 'background') {
-          // Mode A: simple background only
-          const cfg = CHARDESIGN_MODE_CONFIG;
-          const bg = cfg.backgroundTags[Math.floor(Math.random() * cfg.backgroundTags.length)];
-          newBlock = { ...block, text: bg, enabled: true, collapsed: false, lastRandomPicks: [] };
+          if (block.id === 'quality') {
+            newBlock = { ...block, text: cfg.qualityText, enabled: true, collapsed: false, lastRandomPicks: [] };
 
-        } else if (mode === 'chardesign' && block.id === 'lighting') {
-          // Mode A: soft neutral lighting
-          const cfg = CHARDESIGN_MODE_CONFIG;
-          const lt = cfg.lightingTags[Math.floor(Math.random() * cfg.lightingTags.length)];
-          newBlock = { ...block, text: lt, enabled: true, collapsed: false, lastRandomPicks: [] };
+          } else if (block.id === 'artstyle') {
+            newBlock = { ...block, text: cfg.artstyleText, enabled: true, collapsed: false, lastRandomPicks: [] };
+
+          } else if (block.id === 'background') {
+            newBlock = { ...block, text: cfg.backgroundText, enabled: true, collapsed: false, lastRandomPicks: [] };
+
+          } else if (block.id === 'composition') {
+            newBlock = { ...block, text: cfg.compositionText, enabled: true, collapsed: false, lastRandomPicks: [] };
+
+          } else if (block.id === 'face') {
+            // 表情を無表情に固定、ノイズカテゴリをスキップ、floating hairを除外
+            const filteredBlock = {
+              ...block,
+              cats: block.cats
+                .filter(c => !cfg.skipFaceCats.has(c.n))
+                .map(c =>
+                  c.n === '表情'
+                    ? { ...c, t: c.t.filter(t => t.en === cfg.forcedExpression) }
+                    : c.n === '髪飾り・毛流れ'
+                    ? { ...c, t: c.t.filter(t => !cfg.skipFaceTags.has(t.en)) }
+                    : c.n === 'メイク・顔演出'
+                    ? { ...c, t: c.t.filter(t => cfg.faceMakeupPhysical.has(t.en)) }
+                    : c
+                ),
+            };
+            const picks = pickBlockTags(filteredBlock, globalExcluded);
+            let text = '';
+            for (const t of picks) text = appendTag(text, t.en, block.strength);
+            newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: picks };
+
+          } else if (block.id === 'body') {
+            const filteredBlock = { ...block, cats: block.cats.filter(c => !cfg.skipBodyCats.has(c.n)) };
+            const picks = pickBlockTags(filteredBlock, globalExcluded);
+            let text = '';
+            for (const t of picks) text = appendTag(text, t.en, block.strength);
+            newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: picks };
+
+          } else if (block.id === 'feature') {
+            const filteredBlock = { ...block, cats: block.cats.filter(c => !cfg.skipFeatureCats.has(c.n)) };
+            const picks = pickBlockTags(filteredBlock, globalExcluded);
+            let text = '';
+            for (const t of picks) text = appendTag(text, t.en, block.strength);
+            newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: picks };
+
+          } else {
+            // attribute, outfit など：通常抽選（種族パーツフックあり）
+            const picks = pickBlockTags(block, globalExcluded);
+            let text = '';
+            for (const t of picks) text = appendTag(text, t.en, block.strength);
+            if (block.id === 'attribute') {
+              const speciesCat = block.cats.find(cat => cat.n === '種族');
+              for (const pick of picks) {
+                if (!speciesCat?.t.some(st => st.en === pick.en)) continue;
+                const en = pick.en.toLowerCase();
+                if (en === 'kemonomimi') {
+                  const pair = KEMONOMIMI_PAIRS[Math.floor(Math.random() * KEMONOMIMI_PAIRS.length)];
+                  for (const partEn of pair) { if (!hasTag(text, partEn)) text = appendTag(text, partEn, block.strength); }
+                  continue;
+                }
+                if (en === 'human') {
+                  if (Math.random() < 0.1) {
+                    const pair = KEMONOMIMI_PAIRS[Math.floor(Math.random() * KEMONOMIMI_PAIRS.length)];
+                    for (const partEn of pair) { if (!hasTag(text, partEn)) text = appendTag(text, partEn, block.strength); }
+                  }
+                  continue;
+                }
+                for (const partEn of (SPECIES_PARTS_MAP[pick.en] || [])) {
+                  if (!hasTag(text, partEn)) text = appendTag(text, partEn, block.strength);
+                }
+              }
+            }
+            newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: picks };
+          }
 
         } else {
-          // Normal random pick
+          // ── イラストモード：通常ランダム抽選 ──
           const picks = pickBlockTags(block, globalExcluded);
           let text = '';
           for (const t of picks) text = appendTag(text, t.en, block.strength);
 
-          // Species auto-parts
+          // Species auto-parts + kemonomimi/human special hooks
           if (block.id === 'attribute') {
             const speciesCat = block.cats.find(cat => cat.n === '種族');
             for (const pick of picks) {
-              if (speciesCat?.t.some(st => st.en === pick.en)) {
-                for (const partEn of (SPECIES_PARTS_MAP[pick.en] || [])) {
-                  if (!hasTag(text, partEn)) text = appendTag(text, partEn, block.strength);
+              if (!speciesCat?.t.some(st => st.en === pick.en)) continue;
+              const en = pick.en.toLowerCase();
+              if (en === 'kemonomimi') {
+                const pair = KEMONOMIMI_PAIRS[Math.floor(Math.random() * KEMONOMIMI_PAIRS.length)];
+                for (const partEn of pair) { if (!hasTag(text, partEn)) text = appendTag(text, partEn, block.strength); }
+                continue;
+              }
+              if (en === 'human') {
+                if (Math.random() < 0.1) {
+                  const pair = KEMONOMIMI_PAIRS[Math.floor(Math.random() * KEMONOMIMI_PAIRS.length)];
+                  for (const partEn of pair) { if (!hasTag(text, partEn)) text = appendTag(text, partEn, block.strength); }
                 }
+                continue;
+              }
+              for (const partEn of (SPECIES_PARTS_MAP[pick.en] || [])) {
+                if (!hasTag(text, partEn)) text = appendTag(text, partEn, block.strength);
               }
             }
           }
@@ -1068,8 +1140,8 @@ export default function Loom() {
         return newBlock;
       });
 
-      // Combo rules post-pass (mutates blockMap entries in place)
-      applyComboRules(blockMap);
+      // Combo rules post-pass (chardesignモードは固定ブロックへの変更を禁止)
+      applyComboRules(blockMap, mode === 'chardesign' ? CHARDESIGN_MODE_CONFIG.fixedBlocks : null);
 
       // Sync text back from blockMap to newBlocks array
       return {

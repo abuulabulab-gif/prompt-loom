@@ -1,5 +1,49 @@
 import { TEMPLATES } from "../../data/templates.js";
 
+const styleTemplates = TEMPLATES.filter(t => t.apply.quality);
+const compTemplates  = TEMPLATES.filter(t => !t.apply.quality);
+
+const BLOCK_LABEL = {
+  quality:     { ja: '品質',   en: 'Quality' },
+  artstyle:    { ja: '作風',   en: 'Style'   },
+  background:  { ja: '背景',   en: 'BG'      },
+  composition: { ja: '構図',   en: 'View'    },
+  body:        { ja: '体型',   en: 'Body'    },
+  outfit:      { ja: '衣装',   en: 'Outfit'  },
+  face:        { ja: '顔',     en: 'Face'    },
+};
+
+function previewText(tmpl) {
+  const first = Object.values(tmpl.apply)[0] ?? '';
+  return first.length > 50 ? first.slice(0, 50) + '…' : first;
+}
+
+function TemplateCard({ tmpl, lang, onApply }) {
+  const targetBlocks = Object.keys(tmpl.apply);
+  return (
+    <div
+      onClick={() => onApply(tmpl)}
+      onMouseOver={e => { e.currentTarget.style.border = '1px solid #6c8fff60'; e.currentTarget.style.background = 'rgb(var(--dim))'; }}
+      onMouseOut={e => { e.currentTarget.style.border = ''; e.currentTarget.style.background = ''; }}
+      className="bg-surfalt border border-line rounded-[10px] p-[14px] cursor-pointer transition-all duration-150"
+    >
+      <div className="text-[24px] mb-[6px]">{tmpl.icon}</div>
+      <div className="text-fg text-[13px] font-bold mb-[3px]">{lang === 'ja' ? tmpl.name : tmpl.nameEn}</div>
+      <div className="text-muted text-[11px] mb-2">{lang === 'ja' ? tmpl.desc : tmpl.descEn}</div>
+      <div className="text-accent text-[10px] font-mono bg-bg px-2 py-[5px] rounded-[5px] break-all leading-[1.5] mb-2">
+        {previewText(tmpl)}
+      </div>
+      <div className="flex flex-wrap gap-1">
+        {targetBlocks.map(id => (
+          <span key={id} className="text-[9px] font-mono px-[5px] py-[2px] rounded-[3px] border border-dim text-muted">
+            {BLOCK_LABEL[id]?.[lang] ?? id}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function TemplateModal({ lang, onApply, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/85 z-[300] flex items-center justify-center p-5">
@@ -11,28 +55,35 @@ export default function TemplateModal({ lang, onApply, onClose }) {
           </button>
         </div>
 
-        <div className="px-[18px] py-[14px]">
-          <p className="text-muted text-[11px] font-mono mb-3">
+        <div className="px-[18px] py-[14px] overflow-y-auto max-h-[75vh]">
+          <p className="text-muted text-[11px] font-mono mb-1">
             {lang === 'ja'
-              ? '品質・スタイルブロックにテンプレートを適用します。他のブロックはそのまま保持されます。'
-              : 'Applies to Quality and Style blocks only. Other blocks are preserved.'}
+              ? '対象ブロックに上書き適用されます。'
+              : 'Applies directly to the target blocks.'}
           </p>
+          <p className="text-[#f87171] text-[10px] font-mono mb-4">
+            {lang === 'ja'
+              ? '⚠ 対象ブロックにすでに入っているタグは消えます。'
+              : '⚠ Existing tags in the target blocks will be cleared.'}
+          </p>
+
+          <div className="text-muted text-[10px] font-mono tracking-widest mb-2 uppercase">
+            {lang === 'ja' ? 'スタイル' : 'Style'}
+          </div>
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            {styleTemplates.map(tmpl => (
+              <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />
+            ))}
+          </div>
+
+          <div className="border-t border-dim mb-4" />
+
+          <div className="text-muted text-[10px] font-mono tracking-widest mb-2 uppercase">
+            {lang === 'ja' ? '構図・フェチ特化（SFW）' : 'Composition / Flair'}
+          </div>
           <div className="grid grid-cols-2 gap-2">
-            {TEMPLATES.map(tmpl => (
-              <div
-                key={tmpl.id}
-                onClick={() => onApply(tmpl)}
-                onMouseOver={e => { e.currentTarget.style.border = '1px solid #6c8fff60'; e.currentTarget.style.background = 'rgb(var(--dim))'; }}
-                onMouseOut={e => { e.currentTarget.style.border = ''; e.currentTarget.style.background = ''; }}
-                className="bg-surfalt border border-line rounded-[10px] p-[14px] cursor-pointer transition-all duration-150"
-              >
-                <div className="text-[24px] mb-[6px]">{tmpl.icon}</div>
-                <div className="text-fg text-[13px] font-bold mb-[3px]">{lang === 'ja' ? tmpl.name : tmpl.nameEn}</div>
-                <div className="text-muted text-[11px] mb-2">{lang === 'ja' ? tmpl.desc : tmpl.descEn}</div>
-                <div className="text-accent text-[10px] font-mono bg-bg px-2 py-[5px] rounded-[5px] break-all leading-[1.5]">
-                  {tmpl.apply.quality?.slice(0, 50)}…
-                </div>
-              </div>
+            {compTemplates.map(tmpl => (
+              <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />
             ))}
           </div>
         </div>
