@@ -9,8 +9,6 @@ import {
 } from 'firebase/auth';
 import { fbAuth } from '../firebase';
 
-// Mobile browsers (Android + iOS Chrome/Firefox) block signInWithPopup reliably
-const isMobileDevice = () => /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
 export function useAuth() {
   const [user, setUser] = useState(undefined); // undefined = still loading
@@ -19,10 +17,8 @@ export function useAuth() {
     let unsub = () => {};
 
     (async () => {
-      // On Android, signInWithRedirect causes a full page reload.
-      // We must await getRedirectResult BEFORE registering onAuthStateChanged,
-      // otherwise the listener fires with null (no user yet) and may never
-      // fire again after the redirect credential is applied.
+      // Handle any pending redirect result (e.g. fallback redirect from a popup-blocked browser).
+      // Must be awaited before registering onAuthStateChanged so the credential is already applied.
       try {
         await getRedirectResult(fbAuth);
       } catch (e) {
@@ -39,12 +35,18 @@ export function useAuth() {
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    if (isMobileDevice()) {
-      // Mobile: use redirect to avoid popup blocker / WebView restrictions on iOS & Android
-      await signInWithRedirect(fbAuth, provider);
-    } else {
-      // Desktop: popup is smoother UX
+    try {
+      // signInWithPopup works on all platforms including Android Chrome (via Chrome Custom Tab).
+      // Unlike signInWithRedirect, CCT-based popup communicates the result via onAuthStateChanged
+      // without requiring a page reload, so getRedirectResult is never left unread.
       await signInWithPopup(fbAuth, provider);
+    } catch (e) {
+      if (e?.code === 'auth/popup-blocked') {
+        // Only fall back to redirect when the browser explicitly blocks the popup
+        await signInWithRedirect(fbAuth, provider);
+      } else if (e?.code !== 'auth/popup-closed-by-user' && e?.code !== 'auth/cancelled-popup-request') {
+        throw e;
+      }
     }
   };
 
