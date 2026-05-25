@@ -1715,7 +1715,10 @@ export default function Loom() {
                             lang === 'ja' ? '新しいブロック名を入力してください' : 'Enter new block name',
                             b.name
                           );
-                          if (newName?.trim()) updateBlock(b.id, { name: newName.trim(), nameEn: newName.trim() });
+                          if (newName?.trim()) {
+                            const trimmed = newName.trim().slice(0, 20);
+                            updateBlock(b.id, { name: trimmed, nameEn: trimmed });
+                          }
                         }
                       }, 350);
                     }

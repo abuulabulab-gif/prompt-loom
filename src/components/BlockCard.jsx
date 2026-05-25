@@ -188,6 +188,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             <input
               value={nameInput}
               onChange={e => setNameInput(e.target.value)}
+              maxLength={20}
               onBlur={() => {
                 const n = nameInput.trim() || block.name;
                 onUpdate({ name: n, nameEn: n });
