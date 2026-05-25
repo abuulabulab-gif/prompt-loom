@@ -2,7 +2,18 @@ import { useState, useRef, useEffect } from 'react';
 
 export default function AuthButton({ user, loading, onSignIn, onSignOut, syncStatus, lang }) {
   const [open, setOpen] = useState(false);
+  const [dropPos, setDropPos] = useState({ top: 0, right: 8, width: 220 });
   const ref = useRef(null);
+
+  const handleToggle = () => {
+    if (!open && ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      const w = Math.min(220, window.innerWidth - 16);
+      const right = Math.max(8, window.innerWidth - rect.right);
+      setDropPos({ top: rect.bottom + 4, right, width: w });
+    }
+    setOpen(o => !o);
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -42,7 +53,7 @@ export default function AuthButton({ user, loading, onSignIn, onSignOut, syncSta
   return (
     <div ref={ref} className="relative">
       <button
-        onClick={() => setOpen(o => !o)}
+        onClick={handleToggle}
         style={{ borderColor: open ? 'rgb(var(--c-blue) / 0.5)' : '' }}
         className="bg-transparent border border-dim rounded-[6px] px-[7px] py-1 cursor-pointer text-[10px] font-mono whitespace-nowrap flex items-center gap-[5px] text-muted"
         title={user.displayName ?? user.email}
@@ -58,7 +69,7 @@ export default function AuthButton({ user, loading, onSignIn, onSignOut, syncSta
       </button>
 
       {open && (
-        <div className="absolute right-0 top-[calc(100%+4px)] bg-surface border border-line rounded-[8px] shadow-lg z-[400] min-w-[200px] overflow-hidden">
+        <div className="fixed bg-surface border border-line rounded-[8px] shadow-lg z-[400] overflow-hidden" style={dropPos}>
           <div className="px-[12px] py-[10px] border-b border-line">
             {user.photoURL && (
               <img src={user.photoURL} className="w-[28px] h-[28px] rounded-full mb-[6px]" alt="" referrerPolicy="no-referrer" />

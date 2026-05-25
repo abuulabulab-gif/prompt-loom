@@ -45,6 +45,8 @@ export const TAG_DICT = {
   'sparkling eyes':        { ja: '目の中にキラキラとしたハイライトが入る', en: 'Eyes with shiny, sparkling highlights inside' },
   'sleepy eyes':           { ja: 'たれ目。目尻が下がってやさしい・眠そうな印象', en: 'Drooping outer corners of the eyes — gentle or drowsy look' },
   'upturned eyes':         { ja: 'つり目。目尻が上がって気の強い・凛とした印象', en: 'Eyes with raised outer corners — sharp, strong impression' },
+  'dull eyes':             { ja: '"死んだ目"。感情が抜け落ちた虚ろな目つき。ゾンビ・洗脳・疲弊したキャラの表現に', en: 'Lifeless, vacant eyes — used for exhausted, brainwashed, or zombie-like characters' },
+  'empty eyes':            { ja: '瞳の中が空洞のような無のまなざし。感情の欠落・機械・幽霊的な印象に', en: 'Hollow, soul-less eyes with no highlight — robotic, ghostly, or emotionally void look' },
 
   // ── 顔：口・メイク ────────────────────────────────────────────
   'parted lips':           { ja: 'わずかに開いた唇。自然な色気を出す', en: 'Lips slightly open — natural, subtle allure' },
@@ -67,6 +69,8 @@ export const TAG_DICT = {
   'bare back':             { ja: '背中の素肌を見せる。後ろ向き構図やバックレスドレスで効果的', en: 'Exposed bare back — effective with back-view compositions or backless dresses' },
   'bare shoulders':        { ja: '肩が出た状態。オフショルダーや水着との組み合わせで自然に出る', en: 'Exposed bare shoulders — natural with off-shoulder tops or swimwear' },
   'cleavage':              { ja: '胸の谷間。ローカットやドレスで生まれる胸元の影', en: 'Visible cleavage between the chest — from low-cut tops or dresses' },
+  'sideboob':              { ja: '横から胸の側面が見える状態。⚠️ツールやサービスによってはNSFWと判定される場合があります', en: 'Breast visible from the side — ⚠️ may be flagged as NSFW depending on the tool or service' },
+  'underboob':             { ja: '胸の下側が見える状態。⚠️ツールによってはNSFWと判定される場合があります', en: 'Underside of breast visible — ⚠️ borderline SFW; may be flagged NSFW by some services' },
   'wide hips':             { ja: '広めのヒップラインを強調。女性らしいシルエットを際立たせる', en: 'Wide hip silhouette — accentuates a feminine figure' },
 
   // ── 衣装 ──────────────────────────────────────────────────────
@@ -174,6 +178,8 @@ export const TAG_DICT = {
   // ── メイク ────────────────────────────────────────────────────
   'blush stickers':        { ja: '頬に貼られたシール状のデコ頬紅。可愛い・あどけない印象を加える', en: 'Decorative sticker-style blush marks on cheeks — cute, innocent look' },
   'mole under eye':        { ja: '目の下の涙ぼくろ。色気・ミステリアスな印象を加える定番ポイント', en: 'Beauty mark / tear mole below the eye — adds allure or a mysterious quality' },
+  'nose blush':            { ja: '鼻先まで広がった赤み。日本のアニメ特有の表現で、照れや幼さを強調する', en: 'Blush that extends over the nose — exaggerated anime-style shyness or innocence' },
+  'glitter':               { ja: 'ラメ・グリッターのキラキラした輝き。フェス系メイクやファンタジー演出に', en: 'Sparkling glitter or shimmer effect — festive makeup or magical character look' },
 
   // ── 種族・特殊 ────────────────────────────────────────────────
   'succubus':              { ja: 'サキュバス。悪魔の種族で男性を誘惑する魔物。羽・角・尻尾が特徴的', en: 'Succubus — seductive demon with wings, horns, and a spaded tail' },
@@ -209,4 +215,67 @@ export const TAG_DICT = {
   // ── 持ち物・武器 ─────────────────────────────────────────────
   'holding fan':           { ja: '扇子（または団扇）を手に持つポーズ。和風・中華風・貴族系に映える', en: 'Holding a folding or flat fan — Japanese, Chinese, or aristocratic aesthetic' },
   'holding lantern':       { ja: '提灯やオイルランタンを手に持つ。和風・中世・ゴシック系の雰囲気に', en: 'Holding a paper lantern or oil lantern — historical, gothic, or Japanese ambiance' },
+
+  // ── 品質補足（NAI3専用等） ────────────────────────────────────────
+  'very aesthetic':        { ja: 'NovelAI v3（NAI3）専用の高品質タグ。美しさ・審美性を全体的に引き上げる。SD/MJでは効果薄', en: 'NovelAI v3–specific tag that boosts overall aesthetic quality — limited effect outside NAI3' },
+  'amazing quality':       { ja: 'NAI3でのmasterpieceに相当する最高品質タグ。NAI3向けに最適化されている', en: 'NAI3-specific top quality tag — equivalent to masterpiece but tuned for NovelAI v3' },
+  'extremely detailed':    { ja: 'ultra-detailedよりさらに細かい描写を要求する強力な仕上げ指定。高品質モデルで特に有効', en: 'Requests even finer detail than ultra-detailed — most impactful on high-quality models' },
+
+  // ── アートスタイル補足 ────────────────────────────────────────────
+  'light novel illustration': { ja: '日本のライトノベルの表紙・挿絵のような細密なアニメ絵柄。透明感のある色使いが特徴', en: 'Style matching Japanese light novel cover/insert art — clean, detailed anime with translucent coloring' },
+  'game cg':               { ja: 'PCゲーム・ギャルゲーのCGスチル風。精密な陰影と滑らかな塗りが特徴', en: 'PC visual novel or game event CG style — precise shading and polished smooth coloring' },
+  'ukiyo-e':               { ja: '江戸時代の浮世絵スタイル。輪郭線＋平塗り＋和風の構図。葛飾北斎・歌川広重風', en: 'Edo-period Japanese woodblock print style — bold outlines, flat color, Hokusai/Hiroshige aesthetic' },
+
+  // ── 種族補足 ─────────────────────────────────────────────────────
+  'kemonomimi':            { ja: '獣耳を持つ人間キャラの総称。catgirlより広い概念でどの獣耳でも使える汎用タグ', en: 'Generic term for animal-eared human characters — broader than catgirl; covers any animal ear type' },
+  'oni':                   { ja: '日本の鬼。角・金棒・虎柄の腰巻きが定番。赤鬼・青鬼など様々なバリエーション', en: 'Japanese demon/ogre with horns and a club — red or blue skin, tiger-stripe loincloth design' },
+
+  // ── 特殊パーツ補足 ──────────────────────────────────────────────
+  'oni horns':             { ja: '鬼に特有の大きくて太い角。小さな角（small horns）より迫力があり和風ファンタジーに', en: 'Large, thick horns characteristic of Japanese oni demons — more imposing than small horns' },
+  'third eye':             { ja: '額などに現れる第三の目。神秘・呪術・超能力系キャラの異能の象徴', en: 'An extra eye on the forehead — symbol of supernatural power or mysticism' },
+  'scale skin':            { ja: '鱗状の皮膚。竜娘・蛇娘・爬虫類系キャラの体表に使う', en: 'Reptilian scaled skin texture — for dragon girls, lamia, or lizard-type characters' },
+  'mechanical wings':      { ja: '金属・機械素材でできた翼。スチームパンク・サイボーグ系キャラに', en: 'Wings made of metal or mechanical parts — steampunk, cyborg, or android characters' },
+  'bunny tail':            { ja: 'うさぎの丸くて短いふわふわしっぽ。バニー系キャラや兎娘に', en: 'Small, round fluffy bunny tail — worn by bunny-girl characters or rabbit beastgirls' },
+
+  // ── 状態 ──────────────────────────────────────────────────────────
+  'wet':                   { ja: '体・衣装全体が濡れた状態。雨・水中・入浴後などのシチュエーション全般に', en: 'Character appearing soaked or dripping wet — rain, pool, or post-bath scenarios' },
+  'wet clothes':           { ja: '濡れた服が体に張り付いた表現。素肌感や体のラインが強調される', en: 'Wet fabric clinging to the body — emphasizes body lines through soaked clothing' },
+  'wet hair':              { ja: '濡れてまとまった髪。入浴後・雨の中など、しっとりとした色気を出す', en: 'Hair damp and clinging together — suggests bath, rain, or post-swim; adds subtle sensuality' },
+
+  // ── 素材・装飾 ───────────────────────────────────────────────────
+  'skintight':             { ja: '体のラインにぴったり密着した衣装の素材感。ボディスーツ・レオタード等と相性がよい', en: 'Clothing that fits skin-tight, emphasizing every body line — pairs well with bodysuit or leotard' },
+  'cleavage cutout':       { ja: '胸元部分を四角や丸く切り抜いたデザイン。谷間の露出を強調する', en: 'Opening cut into the chest area of an outfit — deliberately frames or exposes cleavage' },
+  'navel cutout':          { ja: 'おへそ周辺を切り抜いたウィンドウデザイン。へそ出しより局所的なカット', en: 'Small window opening in clothing over the navel — surgical navel exposure in the outfit design' },
+  'open shirt':            { ja: 'シャツのボタンを外してはだけた状態。カジュアルな色気・無造作感を演出', en: 'Shirt worn unbuttoned and open, revealing the chest — casual, effortless allure' },
+
+  // ── アクセサリー補足 ─────────────────────────────────────────────
+  'thigh strap':           { ja: '太もも部分に巻きつけるベルトやガーターストラップ。アクション系・セクシー系に', en: 'Strap or band worn around the thigh — action, tactical, or sexy outfit accent' },
+  'arm warmers':           { ja: '手首から肘にかけての袖なしカバー。フィンガーレスグローブより長くカジュアルな印象', en: 'Fabric sleeves covering the wrist to elbow with no attached gloves — alternative or gothic fashion' },
+  'anklet':                { ja: '足首につけるブレスレット。ビーチ・ボヘミアン・和装に合わせやすい', en: 'Bracelet worn around the ankle — beach, bohemian, or summer styling' },
+
+  // ── フットウェア補足 ─────────────────────────────────────────────
+  'platform boots':        { ja: '靴底が特別に厚いブーツ。ゴスロリ・パンク・原宿系に定番', en: 'Boots with an extra-thick platform sole — goth, punk, or Harajuku fashion' },
+  'leg warmers':           { ja: '足首から膝にかけてのカバー。ダンス・80年代ファッション・防寒用など幅広く使われる', en: 'Thick fabric tubes worn on the lower legs — dance, retro 80s, or cold-weather styling' },
+
+  // ── ポーズ補足 ───────────────────────────────────────────────────
+  'seiza':                 { ja: '正座。膝を揃えて足の甲の上に座る日本の伝統的な座り方。和風シーンに映える', en: 'Traditional Japanese sitting posture — kneeling with shins on the floor; suits Japanese settings' },
+  'floating':              { ja: '地面から浮かんでいるポーズ。魔法・念力・霊体などの演出に使われる', en: 'Character hovering above the ground — implies magic, psychic power, or supernatural nature' },
+  'split':                 { ja: '両脚を180度に開いた開脚ポーズ。柔軟性・ダンス・バトル系のキャラに映える', en: 'Legs spread 180° flat on the ground — showcases flexibility; suits dancers or acrobatic characters' },
+  'pinup':                 { ja: 'ピンナップポスター風のポーズ。レトロ・官能的でエレガントな魅せ方。50年代のイラスト文化に由来', en: 'Classic pin-up poster pose — retro, alluring, and elegant; inspired by 1940s–50s poster art style' },
+
+  // ── 手・指補足 ───────────────────────────────────────────────────
+  'finger heart':          { ja: '親指と人差し指を交差して作る小さなハートジェスチャー。韓国のアイドル文化から広まった', en: 'Small heart shape made by crossing thumb and index finger — popularized by Korean idol culture' },
+  'hand heart':            { ja: '両手の親指と人差し指で大きなハートを作るジェスチャー。愛情・ファンサービスの表現', en: 'Large heart formed with both hands together — affectionate fan-service gesture' },
+  'pinky out':             { ja: '小指だけ立てたジェスチャー。上品さ・繊細さ・お嬢様らしさを表現する', en: 'Pinky finger extended while holding a cup or in midair — suggests elegance or refinement' },
+
+  // ── 視線・演出補足 ──────────────────────────────────────────────
+  'head tilt':             { ja: '首をかしげるポーズ。かわいらしさ・疑問・甘えを表すアニメの定番ジェスチャー', en: 'Head tilted to one side — expresses curiosity, cuteness, or coy flirtation; classic anime gesture' },
+
+  // ── 照明スタイル補足 ─────────────────────────────────────────────
+  'warm lighting':         { ja: 'オレンジ・黄色系の暖かい色温度の照明。夕日・キャンドル・室内灯のような雰囲気', en: 'Orange or amber color temperature light — like sunset, candlelight, or a warm indoor lamp' },
+  'cold lighting':         { ja: '青・白系の冷たい色温度の照明。月光・蛍光灯・冬の屋外のような雰囲気', en: 'Blue or white color temperature light — like moonlight, fluorescent, or winter outdoor scenes' },
+
+  // ── 季節・雰囲気補足 ─────────────────────────────────────────────
+  'nostalgic':             { ja: '懐かしい・郷愁を誘う雰囲気。夕暮れ・古い街並み・フィルム写真のようなトーンに', en: 'Wistful, longing mood — evokes memories through warm faded tones and familiar settings' },
+  'dark atmosphere':       { ja: '暗く重苦しい不穏な雰囲気。ホラー・ダーク系・ヴィラン系シーンに', en: 'Oppressive, brooding mood — suits horror, dark fantasy, or villain-character scenes' },
 };

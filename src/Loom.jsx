@@ -105,7 +105,7 @@ export default function Loom() {
   const [templateOpen, setTemplateOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState('light');
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
   const [sceneOpen, setSceneOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);

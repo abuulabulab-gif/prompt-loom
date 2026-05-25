@@ -33,7 +33,7 @@ export const OPTIONAL_CAT_NAMES = new Set([
   // 属性
   '年齢感', '特殊パーツ',
   // 体型
-  '肌色', '細部', 'ボディフォーカス', '足',
+  '肌色', '細部', 'ボディフォーカス', '状態', '足',
   // 衣装
   '素材・装飾', '装飾アクセ',
   // 特徴
@@ -61,7 +61,9 @@ export const SPECIES_PARTS_MAP = {
   'fairy':       ['fairy wings', 'elf ears'],
   'mermaid':     ['mermaid tail'],
   'dragon girl': ['dragon horns', 'dragon tail'],
+  'catgirl':     ['cat ears', 'cat tail'],
   'kitsune':     ['fox ears', 'fox tail'],
+  'oni':         ['oni horns'],
   'doll':        ['ball joints'],
 };
 

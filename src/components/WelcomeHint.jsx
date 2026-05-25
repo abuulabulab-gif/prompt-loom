@@ -135,6 +135,19 @@ export default function WelcomeHint({ lang, theme, onSetLang, onSetTheme, onDism
             </button>
           </div>
 
+          {/* ── In-app browser warning ── */}
+          <div
+            className="flex items-start gap-[8px] rounded-[8px] px-[10px] py-[8px] mb-4 text-[10px] font-mono leading-[1.6]"
+            style={{ background: 'rgb(var(--c-warn) / 0.06)', border: '1px solid rgb(var(--c-warn) / 0.25)' }}
+          >
+            <span className="flex-shrink-0 mt-[1px]">⚠️</span>
+            <span className="text-muted">
+              {L === 'ja'
+                ? '※LINEやX（Twitter）などのアプリ内ブラウザからアクセスした場合、Googleのセキュリティ制限（エラー 403: disallowed_useragent）によりログイン・同期ができないことがあります。その場合は、右上のメニュー等から「Safari」や「Google Chrome」などの標準ブラウザに切り替えて（開き直して）ご利用ください。'
+                : '※If you access via in-app browsers such as LINE or X (Twitter), login/sync may fail due to Google\'s security restrictions (Error 403: disallowed_useragent). In that case, please open the link in a standard browser like Safari or Google Chrome.'}
+            </span>
+          </div>
+
           {/* ── API key note ── */}
           <div
             className="flex items-start gap-[8px] rounded-[8px] px-[10px] py-[8px] mb-4 text-[10px] font-mono leading-[1.6]"
