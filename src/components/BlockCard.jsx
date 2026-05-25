@@ -281,7 +281,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
 
         {/* Transfer to other character */}
         {otherChars?.length > 0 && (
-          <div className="relative flex-shrink-0">
+          <div className="relative flex-shrink-0 flex items-center">
             <button
               onClick={() => setTransferOpen(o => !o)}
               title={lang === 'ja' ? '他のキャラへ転送' : 'Transfer to character'}
