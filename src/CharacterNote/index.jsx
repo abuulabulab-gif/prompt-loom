@@ -39,7 +39,7 @@ export default function CharacterNote({ char, lang, activeTool, posText, negText
         />
       )}
       {tab === 'tagmap' && (
-        <TagMap char={char} lang={lang} onUpdate={onUpdateChar} />
+        <TagMap char={char} lang={lang} onUpdate={onUpdateChar} blocks={char.blocks || []} />
       )}
     </div>
   );

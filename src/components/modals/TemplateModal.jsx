@@ -1,12 +1,14 @@
 import { TEMPLATES } from "../../data/templates.js";
 
-const FETI_IDS = new Set(['highangle_armpit','lowangle_legs','midriff_navel','nape_lift','birdseye_lie','skintight_detail']);
+const FETI_IDS    = new Set(['highangle_armpit','lowangle_legs','midriff_navel','nape_lift','birdseye_lie','skintight_detail']);
 const DYNAMIC_IDS = new Set(['dynamic_booster']);
+const EXTREME_IDS = new Set(['lip_focus','eye_focus','fisheye']);
 
-const styleTemplates   = TEMPLATES.filter(t => t.apply.quality);
-const basicCompTemplates = TEMPLATES.filter(t => !t.apply.quality && !FETI_IDS.has(t.id) && !DYNAMIC_IDS.has(t.id));
-const fetiTemplates    = TEMPLATES.filter(t => FETI_IDS.has(t.id));
-const dynamicTemplates = TEMPLATES.filter(t => DYNAMIC_IDS.has(t.id));
+const styleTemplates    = TEMPLATES.filter(t => t.apply.quality);
+const basicCompTemplates = TEMPLATES.filter(t => !t.apply.quality && !FETI_IDS.has(t.id) && !DYNAMIC_IDS.has(t.id) && !EXTREME_IDS.has(t.id));
+const fetiTemplates     = TEMPLATES.filter(t => FETI_IDS.has(t.id));
+const dynamicTemplates  = TEMPLATES.filter(t => DYNAMIC_IDS.has(t.id));
+const extremeTemplates  = TEMPLATES.filter(t => EXTREME_IDS.has(t.id));
 
 const BLOCK_LABEL = {
   quality:     { ja: '品質',   en: 'Quality' },
@@ -43,6 +45,12 @@ function TemplateCard({ tmpl, lang, onApply }) {
         <div className="text-[9px] font-mono leading-[1.5] mb-2 px-[6px] py-[4px] rounded-[4px]"
           style={{ background: 'rgb(var(--c-warn) / 0.08)', color: 'rgb(var(--c-warn))', border: '1px solid rgb(var(--c-warn) / 0.25)' }}>
           {lang === 'ja' ? tmpl.sizeHintJa : tmpl.sizeHintEn}
+        </div>
+      )}
+      {(lang === 'ja' ? tmpl.negHintJa : tmpl.negHintEn) && (
+        <div className="text-[9px] font-mono leading-[1.5] mb-2 px-[6px] py-[4px] rounded-[4px]"
+          style={{ background: 'rgb(var(--accent) / 0.08)', color: 'rgb(var(--accent))', border: '1px solid rgb(var(--accent) / 0.25)' }}>
+          💡 {lang === 'ja' ? 'ネガ推奨: ' : 'Neg hint: '}{lang === 'ja' ? tmpl.negHintJa : tmpl.negHintEn}
         </div>
       )}
       <div className="flex flex-wrap gap-1">
@@ -115,8 +123,19 @@ export default function TemplateModal({ lang, onApply, onClose }) {
           <div className="text-muted text-[10px] font-mono tracking-widest mb-2 uppercase">
             {lang === 'ja' ? 'ダイナミック' : 'Dynamic'}
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2 mb-4">
             {dynamicTemplates.map(tmpl => (
+              <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />
+            ))}
+          </div>
+
+          <div className="border-t border-dim mb-4" />
+
+          <div className="text-muted text-[10px] font-mono tracking-widest mb-2 uppercase">
+            {lang === 'ja' ? '極限アングル・クローズアップ' : 'Extreme Close-Up'}
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {extremeTemplates.map(tmpl => (
               <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />
             ))}
           </div>

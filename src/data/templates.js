@@ -41,6 +41,8 @@ export const TEMPLATES = [
     // 役割: 衣装構造把握用。lineart/soft shadingを削除しflat cel shadingに統一（塗りブレ防止）
     sizeHintJa: '【推奨サイズ】横長（Landscape / 16:9等）⚠️ 縦長で生成するとキャラの体が融合（キメラ化）する危険があります！',
     sizeHintEn: '[Recommended] Landscape (16:9 etc.) ⚠️ Portrait orientation may cause body fusion (chimera artifacts)!',
+    negHintJa: 'dynamic pose, action pose, overlapping figures',
+    negHintEn: 'dynamic pose, action pose, overlapping figures',
     apply: {
       quality:     'masterpiece, best quality, ultra-detailed, highres, sharp focus',
       artstyle:    'illustration, flat color, cel shading',
@@ -95,6 +97,8 @@ export const TEMPLATES = [
     icon: '🦶',
     desc: '足先・俯瞰アングル・パース強調構図',
     descEn: 'Feet / bird-eye angle with foreshortening',
+    negHintJa: 'standing, low angle, from below',
+    negHintEn: 'standing, low angle, from below',
     apply: {
       composition: 'from above, high angle, sitting, looking up, foreshortening',
       body: 'barefoot, foot focus, toes',
@@ -121,6 +125,8 @@ export const TEMPLATES = [
     icon: '📸',
     desc: '見下ろし構図で脇・上半身を強調',
     descEn: 'Top-down view emphasizing armpits & upper body',
+    negHintJa: "low angle, from below, worm's-eye view",
+    negHintEn: "low angle, from below, worm's-eye view",
     apply: {
       composition: 'upper body, high angle, arms behind head',
       body: 'armpits, armpit focus',
@@ -133,6 +139,8 @@ export const TEMPLATES = [
     icon: '⬆️',
     desc: '超煽りアングルで脚・太ももを圧倒的に強調',
     descEn: 'Extreme low angle emphasizing legs and thighs',
+    negHintJa: "high angle, from above, bird's-eye view",
+    negHintEn: "high angle, from above, bird's-eye view",
     apply: {
       composition: 'full body, from below, low angle, foreshortening',
       body: 'thighs, leg focus',
@@ -158,6 +166,8 @@ export const TEMPLATES = [
     icon: '🌺',
     desc: '横顔・首筋・髪をかき上げる仕草と色気（正面視点）',
     descEn: 'Side view nape focus with hair-lifting gesture',
+    negHintJa: 'back view, hair down, covering neck, turtleneck',
+    negHintEn: 'back view, hair down, covering neck, turtleneck',
     apply: {
       composition: 'upper body, side view, hand behind head',
       body: 'nape, bare shoulders',
@@ -170,6 +180,8 @@ export const TEMPLATES = [
     icon: '🕊️',
     desc: '真上から見下ろし、髪が広がる仰向け寝転び構図',
     descEn: "Bird's-eye view of character lying down, hair splayed",
+    negHintJa: 'standing, walking, sitting, from below',
+    negHintEn: 'standing, walking, sitting, from below',
     apply: {
       composition: "bird's-eye view, lying on back, full body, looking up",
       face: 'floating hair',
@@ -195,9 +207,54 @@ export const TEMPLATES = [
     icon: '⚡',
     desc: '棒立ち防止。強烈な動き・遠近感・アクション構図を強制',
     descEn: 'Force dynamic angle, foreshortening & action composition',
+    negHintJa: 'standing, t-pose, arms at sides, static pose',
+    negHintEn: 'standing, t-pose, arms at sides, static pose',
     apply: {
       composition: 'dutch angle, dynamic angle, foreshortening, action pose, fighting stance',
       effect: 'motion blur, flying debris',
+    },
+  },
+  // ── 極限アングル・クローズアップ ──
+  {
+    id: 'lip_focus',
+    name: '口元・リップフォーカス',
+    nameEn: 'Lip Focus',
+    icon: '👄',
+    desc: '口元・唇に強烈にクローズアップした極限構図',
+    descEn: 'Extreme close-up focusing on lips and lower face',
+    negHintJa: 'eyes, upper body, full face, full body, zoomed out',
+    negHintEn: 'eyes, upper body, full face, full body, zoomed out',
+    apply: {
+      composition: 'close-up, lower half of face, macro shot',
+      face: 'parted lips, detailed lips',
+    },
+  },
+  {
+    id: 'eye_focus',
+    name: '瞳・アイフォーカス',
+    nameEn: 'Eye Focus',
+    icon: '👁️',
+    desc: '目・瞳だけに強烈にフォーカスした超クローズアップ構図',
+    descEn: 'Extreme close-up on eyes with detailed pupil focus',
+    negHintJa: 'full face, mouth focus, full body, zoomed out',
+    negHintEn: 'full face, mouth focus, full body, zoomed out',
+    apply: {
+      composition: 'extreme close-up on eyes, macro shot',
+      face: 'eye focus, detailed pupils',
+    },
+  },
+  {
+    id: 'fisheye',
+    name: '魚眼レンズ',
+    nameEn: 'Fisheye Lens',
+    icon: '🐟',
+    desc: '中央が膨らんで周囲が丸く歪む魚眼・超広角構図',
+    descEn: 'Fisheye lens distortion with extreme wide-angle perspective',
+    negHintJa: 'flat background, simple background, straight lines, normal perspective',
+    negHintEn: 'flat background, simple background, straight lines, normal perspective',
+    apply: {
+      composition: 'fisheye lens, extreme perspective, dutch angle, wide angle view',
+      effect: 'distorted background',
     },
   },
 ];

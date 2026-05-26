@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { uid, appendTag, splitTags } from "../data/constants.js";
+import { useState, useMemo } from "react";
+import { uid, appendTag, hasTag, splitTags } from "../data/constants.js";
 
 const BLOCK_OPTIONS = [
   { id: 'face',        ja: '顔・髪',       en: 'Face / Hair' },
@@ -16,7 +16,7 @@ const BLOCK_OPTIONS = [
   { id: 'negative',    ja: 'ネガティブ',   en: 'Negative' },
 ];
 
-export default function TagMap({ char, lang, onUpdate }) {
+export default function TagMap({ char, lang, onUpdate, blocks }) {
   const tagMap = char.tagMap || [];
   const [adding, setAdding] = useState(false);
   const [newLabel, setNewLabel] = useState('');
@@ -24,6 +24,17 @@ export default function TagMap({ char, lang, onUpdate }) {
   const [newBlock, setNewBlock] = useState('face');
   const [newNotes, setNewNotes] = useState('');
   const [insertedRow, setInsertedRow] = useState(null);
+
+  // Merge char.blocks with static BLOCK_OPTIONS (char.blocks take priority, custom blocks appended)
+  const blockOptions = useMemo(() => {
+    const charBlocks = blocks || [];
+    const charIds = new Set(charBlocks.map(b => b.id));
+    const result = charBlocks.map(b => ({ id: b.id, ja: b.name || b.nameEn || b.id, en: b.nameEn || b.name || b.id }));
+    BLOCK_OPTIONS.forEach(opt => { if (!charIds.has(opt.id)) result.push(opt); });
+    return result;
+  }, [blocks]);
+
+  const charBlockIds = useMemo(() => new Set((blocks || []).map(b => b.id)), [blocks]);
 
   const addRow = () => {
     if (!newLabel.trim()) return;
@@ -51,7 +62,9 @@ export default function TagMap({ char, lang, onUpdate }) {
     const target = blocks.find(b => b.id === row.targetBlock);
     if (!target) return;
     let text = target.text;
-    for (const tag of tags) text = appendTag(text, tag, target.strength || '1.0');
+    for (const tag of tags) {
+      if (!hasTag(text, tag)) text = appendTag(text, tag, target.strength || '1.0');
+    }
     onUpdate({ blocks: blocks.map(b => b.id === row.targetBlock ? { ...b, text } : b) });
     setInsertedRow(row.id);
     setTimeout(() => setInsertedRow(null), 1500);
@@ -60,7 +73,7 @@ export default function TagMap({ char, lang, onUpdate }) {
   const sorted = [...tagMap.filter(r => r.pinned), ...tagMap.filter(r => !r.pinned)];
 
   const blockLabel = id => {
-    const b = BLOCK_OPTIONS.find(b => b.id === id);
+    const b = blockOptions.find(b => b.id === id);
     return b ? (lang === 'ja' ? b.ja : b.en) : id;
   };
 
@@ -99,7 +112,7 @@ export default function TagMap({ char, lang, onUpdate }) {
               <div className="text-muted text-[10px] font-mono font-semibold mb-[3px]">{lang === 'ja' ? '対象ブロック' : 'Target block'}</div>
               <select value={newBlock} onChange={e => setNewBlock(e.target.value)}
                 className="w-full bg-surface border border-line rounded-[5px] text-[11px] px-[7px] py-[5px] font-mono text-fg outline-none cursor-pointer">
-                {BLOCK_OPTIONS.map(b => <option key={b.id} value={b.id}>{lang === 'ja' ? b.ja : b.en}</option>)}
+                {blockOptions.map(b => <option key={b.id} value={b.id}>{lang === 'ja' ? b.ja : b.en}</option>)}
               </select>
             </div>
             <div>
@@ -158,10 +171,15 @@ export default function TagMap({ char, lang, onUpdate }) {
                       className="bg-transparent border-none outline-none text-prompt text-[11px] font-mono w-full" />
                   </td>
                   <td className="py-[5px] pr-[10px]">
-                    <select value={row.targetBlock} onChange={e => updateRow(row.id, { targetBlock: e.target.value })}
-                      className="bg-transparent border-none outline-none text-muted text-[10px] font-mono cursor-pointer w-full">
-                      {BLOCK_OPTIONS.map(b => <option key={b.id} value={b.id}>{lang === 'ja' ? b.ja : b.en}</option>)}
-                    </select>
+                    <div className="flex items-center gap-[3px]">
+                      {!charBlockIds.has(row.targetBlock) && (
+                        <span title={lang === 'ja' ? 'このブロックは現在存在しません' : 'Block no longer exists'} className="text-[10px] flex-shrink-0">⚠️</span>
+                      )}
+                      <select value={row.targetBlock} onChange={e => updateRow(row.id, { targetBlock: e.target.value })}
+                        className="bg-transparent border-none outline-none text-muted text-[10px] font-mono cursor-pointer min-w-0">
+                        {blockOptions.map(b => <option key={b.id} value={b.id}>{lang === 'ja' ? b.ja : b.en}</option>)}
+                      </select>
+                    </div>
                   </td>
                   <td className="py-[5px] pr-[10px]">
                     <input value={row.notes} onChange={e => updateRow(row.id, { notes: e.target.value })}
@@ -171,9 +189,12 @@ export default function TagMap({ char, lang, onUpdate }) {
                   <td className="py-[5px]">
                     <div className="flex gap-[4px] items-center justify-end opacity-0 group-hover:opacity-100 transition-opacity">
                       <button onClick={() => insertToBlock(row)}
-                        style={{ borderColor: char.color + '60', color: char.color }}
-                        title={lang === 'ja' ? `「${blockLabel(row.targetBlock)}」ブロックに追加` : `Add to ${blockLabel(row.targetBlock)} block`}
-                        className="border rounded-[4px] px-[6px] py-[2px] text-[10px] cursor-pointer bg-transparent font-mono font-semibold">
+                        disabled={!charBlockIds.has(row.targetBlock)}
+                        style={charBlockIds.has(row.targetBlock) ? { borderColor: char.color + '60', color: char.color } : undefined}
+                        title={!charBlockIds.has(row.targetBlock)
+                          ? (lang === 'ja' ? 'ブロックが存在しません' : 'Block no longer exists')
+                          : (lang === 'ja' ? `「${blockLabel(row.targetBlock)}」ブロックに追加` : `Add to ${blockLabel(row.targetBlock)} block`)}
+                        className="border border-dim rounded-[4px] px-[6px] py-[2px] text-[10px] bg-transparent font-mono font-semibold disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer text-dim">
                         {insertedRow === row.id ? '✓' : '→'}
                       </button>
                       <button onClick={() => copyTags(row)}

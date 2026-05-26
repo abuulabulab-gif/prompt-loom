@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const APP_VERSION = 'v1.8';
+const APP_VERSION = 'v1.9';
 const APP_YEAR = '2026';
 
 const SHORTCUTS = (lang) => [
@@ -105,6 +105,12 @@ const MOBILE_TIPS = (lang) => [
       ? 'COPYボタンでプロンプトをクリップボードへコピー。✏️ボタンでコピー前に最終テキストを手直しできます'
       : 'COPY button copies the prompt. Tap ✏️ to manually edit the final text right before copying',
   },
+  {
+    icon: '💡',
+    text: lang === 'ja'
+      ? 'テンプレートに「💡 ネガ推奨:」が表示される場合、記載のタグをネガティブブロックに追加すると構図が安定します（例：魚眼レンズ → simple background をネガに追加）'
+      : 'When a template shows "💡 Neg hint:", add those tags to the Negative block for better composition (e.g. fisheye → add simple background to negative)',
+  },
 ];
 
 const GUIDE = (lang) => [
@@ -162,6 +168,7 @@ const GUIDE = (lang) => [
       { icon: '🕐 Ver', text: lang === 'ja' ? 'バージョン管理でブロック設定を名前付きスナップショットで保存。任意の時点に復元可能（最大10件）' : 'Version control saves named block-state snapshots. Restore to any of up to 10 saved points' },
       { icon: '⌘K', text: lang === 'ja' ? 'Ctrl+K コマンドパレットで全機能にキーボードからアクセス。「おまかせ」もここから実行可' : 'Ctrl+K command palette gives keyboard access to all features including Random generation' },
       { icon: '▦ Col', text: lang === 'ja' ? '【PC限定】列数切替（▢/▥/▦）でブロックを1/2/3列表示。ヘッダー右側に表示される' : '[PC only] Column toggle (▢/▥/▦) for 1/2/3-column block layout. Appears in the top-right header' },
+      { icon: '↩ Undo', text: lang === 'ja' ? 'テンプレート適用後、変更されたブロックのヘッダーに↩ボタンが表示される。ブロック単位でテンプレート適用前の状態に戻せる（5秒間有効）' : 'After applying a template, ↩ appears on each changed block. Click to revert that block individually (active for 5 seconds)' },
       { icon: '↺ Reset', text: lang === 'ja' ? '✦ ツールメニューの「↺ブロック順リセット」でブロックの並び順をデフォルトに戻す。カスタムブロックは末尾に残る' : '"↺ Reset block order" in ✦ Tools restores the default arrangement. Custom blocks stay at end' },
       { icon: '💾 Backup', text: lang === 'ja' ? '💾バックアップでキャラデータをファイルに保存・別端末に移せる。🔗プロンプトをシェアでタグをURLに変換、リンクを開くだけで相手のLOOMに読み込まれる' : '💾 Backup saves character data to a file for transfer or safekeeping. 🔗 Share prompt encodes tags into a URL — opening the link loads it directly into LOOM' },
     ],
@@ -171,9 +178,11 @@ const GUIDE = (lang) => [
     label: lang === 'ja' ? 'キャラシート — キャラクター管理ノート' : 'Character Sheet — Notes & Records',
     color: '#fb923c',
     items: [
-      { icon: '📋 Profile', text: lang === 'ja' ? 'プロフィールシート：性格・口調・外見・設定など10項目＋カスタム項目でキャラクターの詳細を記録できる' : 'Profile Sheet: 10 sections (personality, speech, appearance, backstory + custom) for detailed character notes' },
-      { icon: '📋 Log', text: lang === 'ja' ? 'プロンプトログ：生成したプロンプトを記録して後から参照。ラベルやツールでフィルタリングも可能' : 'Prompt Log: record generated prompts for later reference. Filter by label or tool' },
-      { icon: '🔗 Map', text: lang === 'ja' ? 'タグ対応表：キャラクターの設定（日本語）とプロンプトタグ（英語）を紐付けて管理。「→」でブロックに直接挿入' : 'Tag Map: link character settings (JA) to prompt tags (EN). "→" inserts directly into a block' },
+      { icon: '📋 Profile', text: lang === 'ja' ? 'プロフィールシート：性格・口調・外見・設定など10項目＋カスタム項目でキャラクターの詳細を記録できる。🏷 AIタグボタンをONにすると各フィールドにプロンプトタグ欄が展開され「→」でブロックに直接挿入可能' : 'Profile Sheet: 10 sections + custom fields for character details. Toggle 🏷 Tags to reveal per-field prompt tag rows — "→" inserts directly into the matching block' },
+      { icon: '📊 TSV', text: lang === 'ja' ? 'プロフィールシート右上の📊ボタンでTSV（タブ区切り）形式にコピー。Googleスプレッドシートに直接貼り付けてキャラ設定表として管理できる' : '📊 in the Profile Sheet header copies all data as TSV. Paste directly into Google Sheets for organized character management' },
+      { icon: '🔄 Import', text: lang === 'ja' ? 'プロフィールシートの🔄ボタンで現在のエディタのブロックタグをAIタグフィールドに一括インポート。ブロックの内容を設定シートに反映させるのに便利' : '🔄 Import pulls the current editor block tags into the matching AI tag fields in the Profile Sheet' },
+      { icon: '📋 Log', text: lang === 'ja' ? 'プロンプトログ：生成したプロンプトを記録して後から参照。ラベルやツールでフィルタリングも可能。COPYのたびに自動記録されるが、同じプロンプトは重複保存されない' : 'Prompt Log: records prompts automatically on COPY — deduplicates identical consecutive entries. Filter by label or tool' },
+      { icon: '🔗 Map', text: lang === 'ja' ? 'タグ対応表：キャラクターの設定（日本語）とプロンプトタグ（英語）を紐付けて管理。「→」でブロックに直接挿入（重複タグは自動スキップ）' : 'Tag Map: link character settings (JA) to prompt tags (EN). "→" inserts into a block — duplicate tags are auto-skipped' },
       { icon: '🕐 Ver', text: lang === 'ja' ? 'バージョン管理：ブロック状態をスナップショット保存（最大10件）。衣装違い・設定差分の管理に便利' : 'Version Control: snapshot block states (up to 10). Great for managing outfit variants or setting differences' },
       { icon: '🖼', text: lang === 'ja' ? 'サムネイル：生成した画像をキャラクターに紐付けて視覚的な参照として保存（最大4枚）' : 'Thumbnail: attach up to 4 generated images to the character as visual references' },
       { icon: '📝 Memo', text: lang === 'ja' ? 'キャラクターメモ：LoRA名・使用モデル・生成のコツなど、プロンプト以外の情報を自由に記録' : 'Character Memo: freely record LoRA names, model info, tips — anything beyond the prompt itself' },
@@ -683,6 +692,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                 </div>
                 <div className="space-y-[5px]">
                   {[
+                    { v: 'v1.9', note: lang === 'ja' ? '極限クローズアップテンプレート追加（口元・目・魚眼）。テンプレートにネガ推奨タグ（negHint）表示。全テンプレートタグをブロックで個別選択可能に統一。ブロック別テンプレート適用取り消し（↩）ボタン追加。キャラノート設定シートにAIタグフィールド・TSVエクスポート・エディタからのインポートを統合。プロンプトログの重複自動記録防止・タグ対応表の挿入時重複スキップ。ランダム生成から特定タグを除外するexcludeFromRandomフラグ追加。競合ルール・タグ辞書拡充' : 'New extreme close-up templates (lip focus, eye focus, fisheye). Templates show negHint suggestions. All template tags now individually selectable in blocks. Per-block template undo (↩) button. Character note profile sheet gains per-field AI tag rows, TSV export, and editor import. Prompt log dedup on COPY, tag map insert dedup. excludeFromRandom flag to prevent extreme tags in random generation. Expanded conflict rules and tag dictionary.' },
                     { v: 'v1.8', note: lang === 'ja' ? 'コードアーキテクチャ刷新：クラウド同期ロジックをuseCloudSync・ランダム生成ロジックをuseRandomGenフックに分離。新追加種族タグ（catgirl・dark elf・dragon girl・android・slime girl等）・artstyleタグ（retro artstyle・tarot card）・髪型タグ（layered hair）対応。競合ルール追加（レトロアニメ/タロットカード×リアル・3D、レイヤードヘア×ショート）。タグ辞書・破綻チェック全面監査' : 'Architecture refactor: cloud sync extracted to useCloudSync hook, random generation to useRandomGen hook. New species tags (catgirl, dark elf, dragon girl, android, slime girl, etc.), artstyle tags (retro artstyle, tarot card), hairstyle tag (layered hair). New conflict rules (retro artstyle/tarot card vs realistic/3D, layered hair vs short). Full tag dictionary & conflict audit.' },
                     { v: 'v1.7', note: lang === 'ja' ? 'ランダム生成システム全面再構築。Tier3タグ分類・おまかせ2モード（🧍キャラデザ/🖼️イラスト）・排他ルール（フレーミング×下半身・環境×エフェクト・ポーズ・表情・スタイル矛盾）・コンボシステム（武器→fighting stance・人魚→underwater等）。バリエーション生成を固定ブロック（種族・顔・体型）＋再ロールブロック（衣装・構図・背景・エフェクト・照明）方式に変更。武器タグ低確率枠（約12%）で追加。モード設定をLocalStorageで記憶。タグ・辞書・競合ルール追加' : 'Random generation system overhaul: Tier3 tag classification, 2-mode random (🧍 Char.Design / 🖼️ Illust), exclusion rules (framing × lower-body, environment × effects, pose, expression, style conflicts), combo system (weapon→fighting stance, mermaid→underwater, etc.). Variations redesigned: fixed blocks (attribute/face/body) + reroll blocks (outfit/composition/background/effect/lighting). Weapon tags at ~12% probability. Mode saved to LocalStorage. New tags, dictionary entries, conflict rules.' },
                     { v: 'v1.6', note: lang === 'ja' ? '画像からタグ生成（OpenAI/Claude Vision対応）。データ入出力を1キャラクター単位に統一。UI用語整理（バックアップ/復元/プロンプトをシェア）。ログイン案内強化・同期失敗トースト・APIキー取得リンク追加。URLシェアペイロード最適化' : 'Image-to-tags via vision API (OpenAI/Claude). Data import/export unified to single-character unit. UI label cleanup (Backup/Restore/Share prompt). Prominent sync login, sync-fail toast, API key acquisition links. Share URL payload optimization' },

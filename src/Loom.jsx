@@ -11,7 +11,7 @@ import WelcomeHint from "./components/WelcomeHint.jsx";
 import LibraryModal from "./components/modals/LibraryModal.jsx";
 import {
   CHAR_COLORS, CHAR_EMOJIS, WARN_LEN, LIMIT_LEN,
-  uid, appendTag, countTags, toggleTag, hasTag, removeTag,
+  uid, appendTag, splitTags, countTags, toggleTag, hasTag, removeTag,
   deep, downloadJSON, stripWeights, toNaiWeights, SPECIES_PARTS_MAP,
 } from "./data/constants.js";
 import { detectConflicts } from "./data/conflicts.js";
@@ -167,6 +167,7 @@ export default function Loom() {
   const [naturalToTagsOpen, setNaturalToTagsOpen] = useState(false);
   const [naturalToTagsTab, setNaturalToTagsTab] = useState('text'); // 'text' | 'image'
   const [importToast, setImportToast] = useState(null); // null | { name: string }
+  const [autoLogToast, setAutoLogToast] = useState(false);
   const [orderUpdatedAt, setOrderUpdatedAt] = useState(0);
   const [settingsUpdatedAt, setSettingsUpdatedAt] = useState(0);
   const [tagSuggestOpen, setTagSuggestOpen] = useState(false);
@@ -464,7 +465,7 @@ export default function Loom() {
     const r = characters.filter(c => c.id !== id);
     setCharacters(r);
     setOrderUpdatedAt(Date.now());
-    if (activeCharId === id) setActiveCharId(r.find(c => !c.archived)?.id || r[0].id);
+    if (activeCharId === id) setActiveCharId(r.find(c => !c.archived)?.id ?? r[0]?.id ?? null);
   };
   const archiveCharacter = (id, archive) => {
     const nonArchivedCount = characters.filter(c => !c.archived).length;
@@ -597,7 +598,7 @@ export default function Loom() {
       if (tmpl.apply[b.id] !== undefined) snapshot[b.id] = b.text;
     }
     if (templateUndoTimerRef.current) clearTimeout(templateUndoTimerRef.current);
-    setTemplateUndoBuf({ blockTexts: snapshot });
+    setTemplateUndoBuf({ blockTexts: snapshot, negHintJa: tmpl.negHintJa, negHintEn: tmpl.negHintEn });
     templateUndoTimerRef.current = setTimeout(() => setTemplateUndoBuf(null), 12000);
 
     setCharacters(prev => prev.map(c => {
@@ -615,6 +616,25 @@ export default function Loom() {
     }));
     clearTimeout(templateUndoTimerRef.current);
     setTemplateUndoBuf(null);
+  };
+
+  const undoSingleBlock = (blockId) => {
+    if (!templateUndoBuf || templateUndoBuf.blockTexts[blockId] === undefined) return;
+    const restoredText = templateUndoBuf.blockTexts[blockId];
+    setCharacters(prev => prev.map(c => {
+      if (c.id !== activeCharId) return c;
+      return { ...c, blocks: c.blocks.map(b => b.id === blockId ? { ...b, text: restoredText } : b) };
+    }));
+    setTemplateUndoBuf(prev => {
+      if (!prev) return null;
+      const newBlockTexts = { ...prev.blockTexts };
+      delete newBlockTexts[blockId];
+      if (Object.keys(newBlockTexts).length === 0) {
+        clearTimeout(templateUndoTimerRef.current);
+        return null;
+      }
+      return { ...prev, blockTexts: newBlockTexts };
+    });
   };
 
   // ── Output computation ──
@@ -684,7 +704,7 @@ export default function Loom() {
         if (textToCopy) {
           navigator.clipboard.writeText(textToCopy).then(() => {
             setCopied(true); setTimeout(() => setCopied(false), 2200);
-            if (posText) pushHistory({ id: uid(), ts: Date.now(), isSnapshot: false, charId: activeChar.id, charName: activeChar.name, charColor: activeChar.color, charEmoji: activeChar.emoji, blocks: deep(activeChar.blocks), posText, negText });
+            pushHistory(makeHistoryEntry(false));
           });
         }
         return;
@@ -783,9 +803,26 @@ export default function Loom() {
     navigator.clipboard.writeText(textToCopy).then(() => {
       setCopied(true); setTimeout(() => setCopied(false), 2200);
       pushHistory(makeHistoryEntry(false));
-      if (outputTab === 'positive' && textToCopy) {
-        const autoTitle = textToCopy.split(',')[0]?.trim().slice(0, 30) || '';
-        addToPromptLog({ id: uid(), ts: Date.now(), title: autoTitle, tool: activeTool, labels: [], posText: textToCopy, negText, memo: '', blocks: deep(activeChar.blocks) });
+      if (outputTab === 'positive' && textToCopy && localStorage.getItem('loom_autolog_copy') !== 'false') {
+        const log = activeChar.promptLog || [];
+        const lastEntry = log[0];
+        if (lastEntry && lastEntry.posText === textToCopy) {
+          // Same content: update timestamp only, don't create duplicate entry
+          setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : {
+            ...c, promptLog: [{ ...lastEntry, ts: Date.now() }, ...log.slice(1)],
+          }));
+          setAutoLogToast('saved');
+          setTimeout(() => setAutoLogToast(false), 2200);
+        } else if (log.length >= 100) {
+          setAutoLogToast('full');
+          setTimeout(() => setAutoLogToast(false), 2800);
+        } else {
+          const autoTitle = textToCopy.split(',')[0]?.trim().slice(0, 30) || '';
+          const slimBlocks = activeChar.blocks.map(b => { const { cats, lastRandomPicks, ...r } = b; return r; });
+          addToPromptLog({ id: uid(), ts: Date.now(), title: autoTitle, tool: activeTool, labels: [], posText: textToCopy, negText, memo: '', blocks: slimBlocks });
+          setAutoLogToast('saved');
+          setTimeout(() => setAutoLogToast(false), 2200);
+        }
       }
     });
   };
@@ -1487,7 +1524,7 @@ export default function Loom() {
           posText={finalPosText}
           negText={negText}
           onUpdateChar={upd => updateChar(activeCharId, upd)}
-          onRestoreBlocks={savedBlocks => { updateChar(activeCharId, { blocks: deep(savedBlocks) }); setMainTab('editor'); }}
+          onRestoreBlocks={savedBlocks => { updateChar(activeCharId, { blocks: mergeCharacterBlocks(savedBlocks) }); setMainTab('editor'); }}
         />
       )}
 
@@ -1504,7 +1541,7 @@ export default function Loom() {
                   onMove={dir => moveBlock(block.id, dir)}
                   isFirst={idx === 0} isLast={idx === visibleBlocks.length - 1}
                   onSavePreset={block.isPresetBlock ? (name, text) => savePreset(block.id, block.presetKey, name, text) : undefined}
-                  onFocus={isWide ? () => setFocusBlockId(focusBlockId === block.id ? null : block.id) : undefined}
+                  onFocus={() => setFocusBlockId(focusBlockId === block.id ? null : block.id)}
                   focused={focusBlockId === block.id}
                   otherChars={isMobile ? [] : otherChars}
                   onTransfer={(blockId, targetCharId) => transferBlock(blockId, targetCharId)}
@@ -1516,36 +1553,88 @@ export default function Loom() {
                   isCompact={effLayout === '3col' && !focusBlockId}
                   sceneActive={sceneOpen}
                   analyzeText={analyzeText}
-                  allBlocks={blocks} />
+                  allBlocks={blocks}
+                  onUndoBackup={templateUndoBuf?.blockTexts[block.id] !== undefined ? () => undoSingleBlock(block.id) : undefined} />
               );
 
               if (isWide && focusBlock) {
                 const focusIdx = visibleBlocks.findIndex(b => b.id === focusBlockId);
+                const focusTagMapRows = (activeChar.tagMap || []).filter(r => r.targetBlock === focusBlockId);
+                const insertTagMapRow = row => {
+                  const tags = splitTags(row.promptTags);
+                  if (tags.length === 0) return;
+                  const target = visibleBlocks.find(b => b.id === row.targetBlock);
+                  if (!target) return;
+                  let text = target.text;
+                  for (const tag of tags) text = appendTag(text, tag, target.strength || '1.0');
+                  handleBlockUpdate(target.id, { text });
+                };
                 return (
-                  <div className="max-w-[58.33rem] mx-auto px-[14px] py-[13px] flex gap-[12px] items-start">
-                    <div className="flex-1 min-w-0">
-                      <div className="text-muted text-[11px] font-mono mb-3 tracking-[0.07em] font-semibold">🔍 {lang === 'ja' ? '集中編集モード' : 'FOCUS MODE'}</div>
-                      {renderCard(focusBlock, focusIdx, true)}
-                    </div>
-                    <div className="w-[180px] flex-shrink-0">
-                      <div className="text-muted text-[9px] font-mono mb-2 tracking-[0.06em]">{lang === 'ja' ? '他のブロック' : 'Other blocks'}</div>
-                      {visibleBlocks.filter(b => b.id !== focusBlockId).map(b => {
-                        const num = visibleBlocks.findIndex(x => x.id === b.id) + 1;
-                        return (
-                          <div key={b.id} onClick={() => setFocusBlockId(b.id)}
-                            style={{ borderLeft: `3px solid ${b.enabled !== false ? b.color : 'rgb(var(--dim))'}`, opacity: b.enabled === false ? 0.5 : 1 }}
-                            className="bg-surface border border-line flex items-center gap-[6px] rounded-[6px] px-[7px] py-[5px] mb-[4px] cursor-pointer transition-all duration-[120ms]"
-                            onMouseOver={e => e.currentTarget.style.background = 'rgb(var(--surface-alt))'}
-                            onMouseOut={e => e.currentTarget.style.background = 'rgb(var(--surface))'}>
-                            <span style={{ background: b.color + '22', border: `1px solid ${b.color}60`, color: b.color }} className="min-w-[16px] h-[16px] rounded-full text-[9px] font-bold flex items-center justify-center font-mono flex-shrink-0">{num}</span>
-                            <span className="text-[11px]">{b.icon}</span>
-                            <span className="text-fg text-[10px] font-semibold truncate flex-1">{lang === 'ja' ? b.name : b.nameEn}</span>
-                            {b.text && <span style={{ color: b.color + '99' }} className="text-[9px] font-mono flex-shrink-0">{countTags(b.text)}</span>}
+                  <>
+                    {/* Backdrop */}
+                    <div className="fixed inset-0 z-[248] bg-black/60 backdrop-blur-[2px]" onClick={() => setFocusBlockId(null)} />
+                    {/* 3-pane modal */}
+                    <div className="fixed inset-0 z-[249] flex items-start justify-center pt-[12px] px-4 pb-4 pointer-events-none">
+                      <div className="w-full max-w-[72rem] flex gap-3 items-start pointer-events-auto" style={{ maxHeight: 'calc(100vh - 24px)' }}>
+                        {/* Left: BlockCard */}
+                        <div className="flex-1 min-w-0 flex flex-col overflow-hidden" style={{ maxHeight: 'calc(100vh - 24px)' }}>
+                          <div className="text-muted text-[11px] font-mono mb-2 tracking-[0.07em] font-semibold flex items-center gap-2 flex-shrink-0">
+                            🔍 {lang === 'ja' ? '集中編集モード' : 'FOCUS MODE'}
+                            <button onClick={() => setFocusBlockId(null)}
+                              className="ml-auto bg-transparent border border-dim rounded-[5px] px-[8px] py-[2px] text-[10px] font-mono text-dim cursor-pointer">
+                              {lang === 'ja' ? '閉じる' : 'Close'} ✕
+                            </button>
                           </div>
-                        );
-                      })}
+                          <div className="overflow-y-auto flex-1">{renderCard(focusBlock, focusIdx, true)}</div>
+                        </div>
+
+                        {/* Center: mini TagMap for this block */}
+                        {focusTagMapRows.length > 0 && (
+                          <div className="w-[210px] flex-shrink-0 flex flex-col" style={{ maxHeight: 'calc(100vh - 24px)' }}>
+                            <div className="text-muted text-[9px] font-mono mb-2 tracking-[0.06em] flex-shrink-0">
+                              🔗 {lang === 'ja' ? 'タグ対応表' : 'Tag Map'}
+                            </div>
+                            <div className="overflow-y-auto flex-1">
+                              {focusTagMapRows.map(row => (
+                                <div key={row.id} className="bg-surface border border-line rounded-[7px] px-[9px] py-[7px] mb-[5px]">
+                                  <div className="text-fg text-[10px] font-mono font-semibold mb-[4px] truncate">{row.label}</div>
+                                  <div className="text-prompt text-[9px] font-mono break-all leading-[1.4] mb-[6px] opacity-80">{row.promptTags}</div>
+                                  {row.notes && <div className="text-dim text-[9px] font-mono mb-[5px] leading-tight">{row.notes}</div>}
+                                  <button onClick={() => insertTagMapRow(row)}
+                                    style={{ borderColor: activeChar.color + '60', color: activeChar.color }}
+                                    className="border rounded-[4px] px-[7px] py-[2px] text-[9px] font-mono font-bold cursor-pointer bg-transparent">
+                                    → {lang === 'ja' ? '挿入' : 'Insert'}
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Right: block navigation */}
+                        <div className="w-[170px] flex-shrink-0 flex flex-col" style={{ maxHeight: 'calc(100vh - 24px)' }}>
+                          <div className="text-muted text-[9px] font-mono mb-2 tracking-[0.06em] flex-shrink-0">{lang === 'ja' ? '他のブロック' : 'Other blocks'}</div>
+                          <div className="overflow-y-auto flex-1">
+                            {visibleBlocks.filter(b => b.id !== focusBlockId).map(b => {
+                              const num = visibleBlocks.findIndex(x => x.id === b.id) + 1;
+                              return (
+                                <div key={b.id} onClick={() => setFocusBlockId(b.id)}
+                                  style={{ borderLeft: `3px solid ${b.enabled !== false ? b.color : 'rgb(var(--dim))'}`, opacity: b.enabled === false ? 0.5 : 1 }}
+                                  className="bg-surface border border-line flex items-center gap-[6px] rounded-[6px] px-[7px] py-[5px] mb-[4px] cursor-pointer transition-all duration-[120ms]"
+                                  onMouseOver={e => e.currentTarget.style.background = 'rgb(var(--surface-alt))'}
+                                  onMouseOut={e => e.currentTarget.style.background = 'rgb(var(--surface))'}>
+                                  <span style={{ background: b.color + '22', border: `1px solid ${b.color}60`, color: b.color }} className="min-w-[16px] h-[16px] rounded-full text-[9px] font-bold flex items-center justify-center font-mono flex-shrink-0">{num}</span>
+                                  <span className="text-[11px]">{b.icon}</span>
+                                  <span className="text-fg text-[10px] font-semibold truncate flex-1">{lang === 'ja' ? b.name : b.nameEn}</span>
+                                  {b.text && <span style={{ color: b.color + '99' }} className="text-[9px] font-mono flex-shrink-0">{countTags(b.text)}</span>}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  </>
                 );
               }
 
@@ -1581,6 +1670,44 @@ export default function Loom() {
           </SortableContext>
         </DndContext>
       )}
+
+      {/* ── Mobile focus mode fullscreen overlay ── */}
+      {isMobile && focusBlockId && mainTab === 'editor' && (() => {
+        const mFocusBlock = visibleBlocks.find(b => b.id === focusBlockId);
+        if (!mFocusBlock) return null;
+        const mFocusIdx = visibleBlocks.findIndex(b => b.id === focusBlockId);
+        return (
+          <div className="fixed inset-0 z-[260] bg-bg overflow-y-auto">
+            <div className="px-[14px] py-[12px]">
+              <div className="flex items-center gap-2 mb-3 flex-shrink-0">
+                <span className="text-fg text-[12px] font-bold font-mono">🔍 {lang === 'ja' ? '集中編集' : 'Focus'}</span>
+                <span className="text-muted text-[10px] font-mono">{mFocusBlock.icon} {lang === 'ja' ? mFocusBlock.name : mFocusBlock.nameEn}</span>
+                <button onClick={() => setFocusBlockId(null)}
+                  className="ml-auto bg-transparent border border-dim rounded-[6px] px-[10px] py-[4px] text-[11px] font-mono text-muted cursor-pointer">
+                  ✕ {lang === 'ja' ? '閉じる' : 'Close'}
+                </button>
+              </div>
+              <BlockCard block={mFocusBlock} lang={lang} orderNum={mFocusIdx + 1}
+                onUpdate={upd => handleBlockUpdate(mFocusBlock.id, upd)}
+                onMove={dir => moveBlock(mFocusBlock.id, dir)}
+                isFirst={mFocusIdx === 0} isLast={mFocusIdx === visibleBlocks.length - 1}
+                onFocus={undefined}
+                focused={true}
+                otherChars={[]}
+                onTransfer={undefined}
+                conflictTags={conflictingTagSet}
+                onRemove={mFocusBlock.isCustomBlock ? () => { removeBlock(mFocusBlock.id); setFocusBlockId(null); } : undefined}
+                onHide={undefined}
+                isMobile={true}
+                focusMode={true}
+                isCompact={false}
+                sceneActive={sceneOpen}
+                analyzeText={analyzeText}
+                allBlocks={blocks} />
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ── Mobile sidebar drawer — opened by LOOM logo icon ── */}
       {isMobile && jumpOpen && (
@@ -2244,15 +2371,23 @@ export default function Loom() {
       >
         {/* Template undo snackbar */}
         {templateUndoBuf && (
-          <div className="bg-surface border border-accent/40 rounded-[10px] shadow-xl px-4 py-3 text-[11px] font-mono max-w-[280px] flex items-center gap-3">
-            <span className="text-fg flex-1">{lang === 'ja' ? '✦ テンプレートを適用しました' : '✦ Template applied'}</span>
-            <button
-              onClick={undoTemplate}
-              className="border border-accent/60 rounded-[6px] px-[10px] py-[4px] text-accent text-[10px] font-bold cursor-pointer bg-transparent whitespace-nowrap"
-            >
-              {lang === 'ja' ? '元に戻す' : 'Undo'}
-            </button>
-            <button onClick={() => { clearTimeout(templateUndoTimerRef.current); setTemplateUndoBuf(null); }} className="text-dim cursor-pointer bg-transparent border-none text-[11px] leading-none p-0">×</button>
+          <div className="bg-surface border border-accent/40 rounded-[10px] shadow-xl px-4 py-3 text-[11px] font-mono max-w-[280px]">
+            <div className="flex items-center gap-3">
+              <span className="text-fg flex-1">{lang === 'ja' ? '✦ テンプレートを適用しました' : '✦ Template applied'}</span>
+              <button
+                onClick={undoTemplate}
+                className="border border-accent/60 rounded-[6px] px-[10px] py-[4px] text-accent text-[10px] font-bold cursor-pointer bg-transparent whitespace-nowrap"
+              >
+                {lang === 'ja' ? '元に戻す' : 'Undo'}
+              </button>
+              <button onClick={() => { clearTimeout(templateUndoTimerRef.current); setTemplateUndoBuf(null); }} className="text-dim cursor-pointer bg-transparent border-none text-[11px] leading-none p-0">×</button>
+            </div>
+            {(lang === 'ja' ? templateUndoBuf.negHintJa : templateUndoBuf.negHintEn) && (
+              <div className="mt-[6px] text-[9px] font-mono leading-[1.5] px-[6px] py-[3px] rounded-[4px]"
+                style={{ background: 'rgb(var(--accent) / 0.08)', color: 'rgb(var(--accent))', border: '1px solid rgb(var(--accent) / 0.25)' }}>
+                💡 {lang === 'ja' ? `ネガ推奨: ${templateUndoBuf.negHintJa}` : `Neg hint: ${templateUndoBuf.negHintEn}`}
+              </div>
+            )}
           </div>
         )}
 
@@ -2269,6 +2404,20 @@ export default function Loom() {
               {lang === 'ja'
                 ? 'クラウド同期できませんでした。プロンプトログを削除してデータを減らしてください。'
                 : 'Cloud sync failed. Delete some prompt log entries to reduce data size.'}
+            </div>
+          </div>
+        )}
+
+        {/* Auto-log toast */}
+        {autoLogToast && (
+          <div
+            className="bg-surface border rounded-[10px] shadow-xl px-4 py-3 text-[11px] font-mono max-w-[280px]"
+            style={{ borderColor: autoLogToast === 'full' ? 'rgb(var(--c-red) / 0.4)' : 'rgb(var(--c-blue) / 0.4)' }}
+          >
+            <div className="font-bold" style={{ color: autoLogToast === 'full' ? 'rgb(var(--c-red))' : 'rgb(var(--c-blue))' }}>
+              {autoLogToast === 'full'
+                ? (lang === 'ja' ? '⚠ ログが100件に達しています。手動で削除してください。' : '⚠ Log full (100 entries). Delete old entries first.')
+                : (lang === 'ja' ? '📝 プロンプトログに自動記録しました' : '📝 Auto-saved to Prompt Log')}
             </div>
           </div>
         )}

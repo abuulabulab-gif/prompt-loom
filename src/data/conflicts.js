@@ -103,6 +103,23 @@ export const CONFLICT_RULES = [
   { tags:['close-up','wide shot'],             ja:'クローズアップとワイドが矛盾',    en:'close-up + wide shot' },
   { tags:['bust shot','wide shot'],            ja:'バストアップとワイドが矛盾',      en:'bust shot + wide shot' },
 
+  // ── 超クローズアップ × 広い構図 ───────────────────────────────────
+  { tags:['extreme close-up on eyes','full body'],  ja:'目の超クローズアップと全身が矛盾',    en:'extreme close-up on eyes + full body' },
+  { tags:['extreme close-up on eyes','upper body'], ja:'目の超クローズアップと上半身が矛盾',  en:'extreme close-up on eyes + upper body' },
+  { tags:['extreme close-up on eyes','wide shot'],  ja:'目の超クローズアップとワイドが矛盾',  en:'extreme close-up on eyes + wide shot' },
+  { tags:['macro shot','full body'],           ja:'マクロショットと全身が矛盾',              en:'macro shot + full body' },
+  { tags:['macro shot','wide shot'],           ja:'マクロショットとワイドが矛盾',            en:'macro shot + wide shot' },
+  { tags:['lower half of face','full body'],   ja:'顔の下半分と全身が矛盾',                 en:'lower half of face + full body' },
+  { tags:['lower half of face','upper body'],  ja:'顔の下半分と上半身が矛盾',               en:'lower half of face + upper body' },
+  { tags:['lower half of face','wide shot'],   ja:'顔の下半分とワイドが矛盾',               en:'lower half of face + wide shot' },
+  { tags:['eye focus','full body'],            ja:'目フォーカスと全身が矛盾',               en:'eye focus + full body' },
+  { tags:['eye focus','upper body'],           ja:'目フォーカスと上半身が矛盾',             en:'eye focus + upper body' },
+
+  // ── 魚眼・広角 × シンプル背景 ────────────────────────────────────
+  { tags:['fisheye lens','simple background'], ja:'魚眼レンズとシンプル背景が矛盾（歪み効果が消える）', en:'fisheye lens + simple background' },
+  { tags:['fisheye lens','white background'],  ja:'魚眼レンズと白背景が矛盾（歪み効果が消える）',      en:'fisheye lens + white background' },
+  { tags:['extreme perspective','simple background'], ja:'極端なパースとシンプル背景が矛盾', en:'extreme perspective + simple background' },
+
   // ── カメラ角度 ─────────────────────────────────────────────────
   { tags:['from above','from below'],          ja:'見上げと見下ろしが矛盾',          en:'from above + from below' },
   { tags:['front view','back view'],           ja:'正面と後ろ向きが矛盾',            en:'front view + back view' },

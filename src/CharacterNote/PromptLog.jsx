@@ -8,6 +8,13 @@ export default function PromptLog({ char, lang, activeTool, posText, negText, on
   const [filterTool, setFilterTool] = useState('all');
   const [filterLabel, setFilterLabel] = useState('');
   const [search, setSearch] = useState('');
+  const [autoLog, setAutoLog] = useState(() => localStorage.getItem('loom_autolog_copy') !== 'false');
+
+  const toggleAutoLog = () => {
+    const next = !autoLog;
+    setAutoLog(next);
+    try { localStorage.setItem('loom_autolog_copy', String(next)); } catch {}
+  };
 
   const log = char.promptLog || [];
 
@@ -55,6 +62,16 @@ export default function PromptLog({ char, lang, activeTool, posText, negText, on
         <span className="text-fg text-[12px] font-bold">🗂 {lang === 'ja' ? 'プロンプトログ' : 'Prompt Log'}</span>
         <span className="text-muted text-[10px] font-mono font-semibold">{log.length}{lang === 'ja' ? '件' : ' entries'}</span>
         <div className="flex-1" />
+        <button
+          onClick={toggleAutoLog}
+          title={lang === 'ja' ? 'COPYで自動記録 ON/OFF' : 'Auto-log on COPY'}
+          className="border rounded-[6px] px-[8px] py-[4px] text-[10px] font-mono cursor-pointer flex-shrink-0 flex items-center gap-[4px]"
+          style={autoLog
+            ? { borderColor: char.color + '60', background: char.color + '18', color: char.color }
+            : { borderColor: 'rgb(var(--dim))', background: 'transparent', color: 'rgb(var(--muted))' }}>
+          <span>{autoLog ? '●' : '○'}</span>
+          <span>{lang === 'ja' ? '自動記録' : 'Auto-log'}</span>
+        </button>
         <button onClick={() => setRecordOpen(true)}
           style={{ background: char.color, color: '#000' }}
           className="border-none rounded-[7px] px-[11px] py-[5px] text-[11px] font-bold cursor-pointer flex-shrink-0">

@@ -38,7 +38,7 @@ const CATS_CLOSED = new Set([
 
 const SCENE_MANAGED_TAGS = new Set(['2girls', '2boys', 'multiple girls', 'multiple boys', '1other']);
 
-export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isFirst, isLast, onSavePreset, onFocus, focused, otherChars, onTransfer, conflictTags, onRemove, onHide, isMobile, isCompact, focusMode, sceneActive, analyzeText, allBlocks }) {
+export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isFirst, isLast, onSavePreset, onFocus, focused, otherChars, onTransfer, conflictTags, onRemove, onHide, isMobile, isCompact, focusMode, sceneActive, analyzeText, allBlocks, onUndoBackup }) {
   const [search, setSearch] = useState('');
   const [saving, setSaving] = useState(false);
   const [pName, setPName] = useState('');
@@ -290,6 +290,15 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           >
             {countTags(block.text)}{lang === 'ja' ? 'タグ' : 't'}
           </span>
+        )}
+
+        {/* Template block undo */}
+        {onUndoBackup !== undefined && (
+          <button
+            onClick={onUndoBackup}
+            title={lang === 'ja' ? 'テンプレート適用前に戻す' : 'Revert this block'}
+            className="bg-transparent border border-dim rounded-[5px] px-[6px] py-[2px] text-dim text-[10px] cursor-pointer flex-shrink-0"
+          >↩</button>
         )}
 
         {/* Focus mode */}

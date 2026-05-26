@@ -1,6 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { appendTag, hasTag, splitTags } from "../data/constants.js";
 
 const uid = () => Math.random().toString(36).slice(2, 9);
+
+// Static block option fallbacks (mirrors TagMap.jsx)
+const BLOCK_OPTS = [
+  { id: 'face',        ja: '顔・髪',         en: 'Face / Hair' },
+  { id: 'attribute',   ja: '属性',           en: 'Attribute' },
+  { id: 'body',        ja: '体型',           en: 'Body' },
+  { id: 'outfit',      ja: '衣装',           en: 'Outfit' },
+  { id: 'feature',     ja: '特徴',           en: 'Feature' },
+  { id: 'effect',      ja: 'エフェクト',     en: 'Effect' },
+  { id: 'artstyle',    ja: 'アートスタイル', en: 'Art Style' },
+  { id: 'composition', ja: '構図',           en: 'Composition' },
+  { id: 'background',  ja: '背景',           en: 'Background' },
+  { id: 'lighting',    ja: 'ライティング',   en: 'Lighting' },
+  { id: 'quality',     ja: '品質',           en: 'Quality' },
+  { id: 'negative',    ja: 'ネガティブ',     en: 'Negative' },
+];
 
 // ── Section definitions ────────────────────────────────────────────────────
 const SECTIONS = [
@@ -118,6 +135,57 @@ const SECTIONS = [
 
 const DEFAULT_OPEN = new Set(['basic', 'appearance', 'outfit', 'ai']);
 
+// ── TagRow ─────────────────────────────────────────────────────────────────
+function TagRow({ ft, color, blockOptions, charBlockIds, lang, onChange, onInsert }) {
+  const [inserted, setInserted] = useState(false);
+  const tags    = ft?.tags  || '';
+  const blockId = ft?.block || blockOptions[0]?.id || 'face';
+  const blockOk = charBlockIds.has(blockId);
+  const canInsert = tags.trim() && blockOk;
+
+  return (
+    <div className="flex gap-[8px] items-center mb-[7px]">
+      <span className="w-[120px] flex-shrink-0" />
+      <div className="flex-1 flex gap-[5px] items-center min-w-0">
+        <input
+          value={tags}
+          onChange={e => onChange({ block: blockId, tags: e.target.value })}
+          placeholder={lang === 'ja' ? 'AIタグ（例: silver hair, long hair）' : 'AI tags (e.g. silver hair, long hair)'}
+          className="flex-1 min-w-0 bg-bg border border-dashed rounded-[5px] text-[11px] px-[7px] py-[3px] font-mono text-prompt outline-none"
+          style={{ borderColor: tags ? color + '55' : 'rgb(var(--dim))' }}
+        />
+        <select
+          value={blockId}
+          onChange={e => onChange({ tags, block: e.target.value })}
+          title={!blockOk ? (lang === 'ja' ? 'このブロックは存在しません' : 'Block not found') : undefined}
+          className="bg-bg border rounded-[4px] text-[10px] px-[4px] py-[3px] font-mono text-muted outline-none cursor-pointer flex-shrink-0"
+          style={{ borderColor: blockOk ? 'rgb(var(--dim))' : 'rgb(var(--c-warn, 234 179 8) / 0.6)', maxWidth: '88px' }}
+        >
+          {blockOptions.map(b => <option key={b.id} value={b.id}>{b.label}</option>)}
+        </select>
+        <button
+          onClick={() => {
+            if (!canInsert) return;
+            onInsert();
+            setInserted(true);
+            setTimeout(() => setInserted(false), 1500);
+          }}
+          disabled={!canInsert}
+          title={
+            !blockOk      ? (lang === 'ja' ? 'ブロックが存在しません' : 'Block not found') :
+            !tags.trim()  ? (lang === 'ja' ? 'タグを入力してください' : 'Enter tags first') :
+                             (lang === 'ja' ? 'ブロックに挿入（重複スキップ）' : 'Insert to block (dedup)')
+          }
+          style={canInsert ? { borderColor: color + '60', color } : undefined}
+          className="border border-dim rounded-[4px] px-[6px] py-[2px] text-[10px] font-mono cursor-pointer bg-transparent flex-shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          {inserted ? '✓' : '→'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ── FieldRow ───────────────────────────────────────────────────────────────
 function FieldRow({ label, value, onChange, color, multi }) {
   const base = "flex-1 bg-bg border border-line rounded-[5px] text-[12px] px-[8px] py-[5px] font-mono text-fg outline-none";
@@ -141,24 +209,87 @@ function FieldRow({ label, value, onChange, color, multi }) {
 // ── ProfileSheet ───────────────────────────────────────────────────────────
 export default function ProfileSheet({ char, lang, onUpdate }) {
   const [openSecs, setOpenSecs] = useState(() => {
+    try {
+      const raw = localStorage.getItem(`loom_note_sections_${char.id}`);
+      const parsed = raw ? JSON.parse(raw) : null;
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed;
+    } catch {}
     const s = { _custom: true };
     SECTIONS.forEach(sec => { s[sec.id] = DEFAULT_OPEN.has(sec.id); });
     return s;
   });
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState(false); // false | 'text' | 'tsv'
+  const [showTagFields, setShowTagFields] = useState(() => {
+    try { return localStorage.getItem('loom_profile_tagfields') === 'true'; } catch {} return false;
+  });
 
-  const profile = char.profile || {};
+  const charIdRef = useRef(char.id);
+  useEffect(() => { charIdRef.current = char.id; });
 
-  // Backward-compat read: old top-level background/relationships are merged into their sections
+  // Reset section state on char switch
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(`loom_note_sections_${char.id}`);
+      const parsed = raw ? JSON.parse(raw) : null;
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) { setOpenSecs(parsed); return; }
+    } catch {}
+    const s = { _custom: true };
+    SECTIONS.forEach(sec => { s[sec.id] = DEFAULT_OPEN.has(sec.id); });
+    setOpenSecs(s);
+  }, [char.id]);
+
+  // Persist section state
+  useEffect(() => {
+    try { localStorage.setItem(`loom_note_sections_${charIdRef.current}`, JSON.stringify(openSecs)); } catch {}
+  }, [openSecs]);
+
+  const profile    = char.profile || {};
+  const fieldTags  = profile.fieldTags || {};
+
+  // Block options: char.blocks first, then static fallbacks for IDs not present
+  const blockOptions = useMemo(() => {
+    const charBlocks = char.blocks || [];
+    const charIds = new Set(charBlocks.map(b => b.id));
+    const result = charBlocks.map(b => ({
+      id: b.id,
+      label: lang === 'ja' ? (b.name || b.nameEn || b.id) : (b.nameEn || b.name || b.id),
+    }));
+    BLOCK_OPTS.forEach(opt => {
+      if (!charIds.has(opt.id)) result.push({ id: opt.id, label: lang === 'ja' ? opt.ja : opt.en });
+    });
+    return result;
+  }, [char.blocks, lang]);
+
+  const charBlockIds = useMemo(() => new Set((char.blocks || []).map(b => b.id)), [char.blocks]);
+
+  // Backward-compat read: old top-level fields merged into sections
   const getSection = (id) => {
     const base = profile[id] || {};
-    if (id === 'memo')     return { background: profile.background || '', ...base };
+    if (id === 'memo')      return { background: profile.background || '', ...base };
     if (id === 'relations') return { relationships: profile.relationships || '', ...base };
     return base;
   };
 
   const setField = (sectionId, key, val) => {
     onUpdate({ profile: { ...profile, [sectionId]: { ...(profile[sectionId] || {}), [key]: val } } });
+  };
+
+  // fieldTags stored as profile.fieldTags[`${sectionId}.${fieldKey}`] = { tags, block }
+  const setFieldTag = (key, upd) => {
+    const ft = profile.fieldTags || {};
+    onUpdate({ profile: { ...profile, fieldTags: { ...ft, [key]: { ...(ft[key] || {}), ...upd } } } });
+  };
+
+  // Insert tags into a block, skipping duplicates
+  const insertToBlock = (tags, blockId) => {
+    const blocks = char.blocks || [];
+    const target = blocks.find(b => b.id === blockId);
+    if (!target || !tags.trim()) return;
+    let text = target.text;
+    for (const tag of splitTags(tags)) {
+      if (!hasTag(text, tag)) text = appendTag(text, tag, target.strength || '1.0');
+    }
+    onUpdate({ blocks: blocks.map(b => b.id === blockId ? { ...b, text } : b) });
   };
 
   // Custom fields
@@ -176,19 +307,65 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
     onUpdate({ profile: { ...profile, customFields: customFields.filter(f => f.id !== id) } });
   };
 
-  // Section header toggle
-  const SecHeader = ({ sec }) => (
-    <button
-      onClick={() => setOpenSecs(prev => ({ ...prev, [sec.id]: !prev[sec.id] }))}
-      className="w-full flex items-center gap-[6px] text-[11px] font-bold font-mono mb-[7px] mt-[14px] cursor-pointer bg-transparent border-none p-0 text-left group"
-    >
-      <span style={{ color: char.color }}>{sec.icon} {lang === 'ja' ? sec.ja : sec.en}</span>
-      <span className="flex-1 border-b border-line mx-[4px]" />
-      <span className="text-dim text-[10px]">{openSecs[sec.id] ? '▲' : '▼'}</span>
-    </button>
-  );
+  // ── TSV export ─────────────────────────────────────────────────────────
+  const copyTSV = () => {
+    const blockLabel = id => (blockOptions.find(o => o.id === id)?.label) ?? id;
+    const esc = s => (s || '').trim().replace(/\t/g, ' ').replace(/\n+/g, ' ');
+    const header = lang === 'ja'
+      ? '設定項目\t設定内容\tAIプロンプトタグ\t対象ブロック'
+      : 'Field\tValue\tAI Prompt Tags\tTarget Block';
+    const lines = [header];
+    for (const sec of SECTIONS) {
+      const data = getSection(sec.id);
+      for (const f of sec.fields) {
+        const val  = esc(data[f.key]);
+        const ft   = fieldTags[`${sec.id}.${f.key}`];
+        const tags = esc(ft?.tags);
+        const blk  = ft?.block ? blockLabel(ft.block) : '';
+        if (val || tags) lines.push(`${lang === 'ja' ? f.ja : f.en}\t${val}\t${tags}\t${blk}`);
+      }
+    }
+    for (const cf of customFields) {
+      const val  = esc(cf.value);
+      const ft   = fieldTags[`custom.${cf.id}`];
+      const tags = esc(ft?.tags);
+      const blk  = ft?.block ? blockLabel(ft.block) : '';
+      if (val || tags) lines.push(`${esc(cf.label)}\t${val}\t${tags}\t${blk}`);
+    }
+    navigator.clipboard.writeText(lines.join('\n')).then(() => {
+      setCopied('tsv'); setTimeout(() => setCopied(false), 1800);
+    });
+  };
 
-  // Copy all filled fields as plain text
+  // ── Editor → fieldTags import ──────────────────────────────────────────
+  const importFromEditor = () => {
+    const blocks = char.blocks || [];
+    const ft = profile.fieldTags || {};
+    const updated = { ...ft };
+    let count = 0;
+    for (const [key, val] of Object.entries(ft)) {
+      if (!val?.block) continue;
+      const blk = blocks.find(b => b.id === val.block);
+      if (!blk?.text?.trim()) continue;
+      const newTags = blk.text.trim();
+      if (val.tags === newTags) continue;
+      updated[key] = { ...val, tags: newTags };
+      count++;
+    }
+    if (count === 0) {
+      alert(lang === 'ja'
+        ? '取り込み対象が見つかりません。先にタグ欄でブロックを指定してください。'
+        : 'No tag fields with block assignments. Set target blocks in tag rows first.');
+      return;
+    }
+    if (window.confirm(lang === 'ja'
+      ? `${count}件のタグ欄をエディタの現在のブロック内容で更新します。`
+      : `Update ${count} tag field(s) from current editor blocks?`)) {
+      onUpdate({ profile: { ...profile, fieldTags: updated } });
+    }
+  };
+
+  // ── Text copy ──────────────────────────────────────────────────────────
   const copyProfile = () => {
     const lines = [`【${char.name}】`];
     for (const sec of SECTIONS) {
@@ -212,28 +389,107 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
       cf.forEach(f => lines.push(`${f.label}: ${f.value.replace(/\n+/g, ' ')}`));
     }
     navigator.clipboard.writeText(lines.join('\n')).then(() => {
-      setCopied(true); setTimeout(() => setCopied(false), 1800);
+      setCopied('text'); setTimeout(() => setCopied(false), 1800);
     });
   };
 
+  const toggleShowTag = () => {
+    const next = !showTagFields;
+    setShowTagFields(next);
+    try { localStorage.setItem('loom_profile_tagfields', String(next)); } catch {}
+  };
+
+  const SecHeader = ({ sec }) => (
+    <button
+      onClick={() => setOpenSecs(prev => ({ ...prev, [sec.id]: !prev[sec.id] }))}
+      className="w-full flex items-center gap-[6px] text-[11px] font-bold font-mono mb-[7px] mt-[14px] cursor-pointer bg-transparent border-none p-0 text-left group"
+    >
+      <span style={{ color: char.color }}>{sec.icon} {lang === 'ja' ? sec.ja : sec.en}</span>
+      <span className="flex-1 border-b border-line mx-[4px]" />
+      <span className="text-dim text-[10px]">{openSecs[sec.id] ? '▲' : '▼'}</span>
+    </button>
+  );
+
   return (
     <div>
-      {/* Standard sections */}
+      {/* ── Toolbar ── */}
+      <div className="flex gap-[5px] flex-wrap items-center mb-[12px]">
+        <button
+          onClick={toggleShowTag}
+          style={showTagFields
+            ? { background: char.color + '18', borderColor: char.color + '60', color: char.color }
+            : undefined}
+          className={`rounded-[6px] px-[9px] py-[4px] text-[10px] font-mono cursor-pointer border transition-all ${showTagFields ? 'font-bold' : 'border-dim text-muted'}`}
+          title={lang === 'ja' ? '全フィールドのAIタグ入力欄を表示/非表示' : 'Show / hide AI tag rows for all fields'}
+        >
+          🏷 {lang === 'ja' ? (showTagFields ? 'タグ欄 ON' : 'タグ欄') : (showTagFields ? 'Tags ON' : 'Tags')}
+        </button>
+
+        <button
+          onClick={importFromEditor}
+          className="border border-dim rounded-[6px] px-[9px] py-[4px] text-[10px] font-mono cursor-pointer bg-transparent text-muted"
+          title={lang === 'ja' ? 'エディタの各ブロック内容でタグ欄を上書き（ブロック設定済み欄のみ）' : 'Overwrite tag rows from current editor blocks (only rows with a block set)'}
+        >
+          🔄 {lang === 'ja' ? 'エディタから取り込む' : 'Import from editor'}
+        </button>
+
+        <div className="flex-1" />
+
+        <button
+          onClick={copyProfile}
+          style={copied === 'text' ? { borderColor: char.color + '60', color: char.color } : undefined}
+          className="border border-dim rounded-[6px] px-[9px] py-[4px] text-[10px] font-mono cursor-pointer bg-transparent text-muted"
+        >
+          {copied === 'text'
+            ? `✓ ${lang === 'ja' ? 'コピー済み' : 'Copied!'}`
+            : `📋 ${lang === 'ja' ? 'テキスト' : 'Text'}`}
+        </button>
+
+        <button
+          onClick={copyTSV}
+          style={copied === 'tsv' ? { borderColor: char.color + '60', color: char.color } : undefined}
+          className="border border-dim rounded-[6px] px-[9px] py-[4px] text-[10px] font-mono cursor-pointer bg-transparent text-muted"
+          title={lang === 'ja' ? 'Google Sheetsなどにそのままペーストできるタブ区切り形式でコピー' : 'Copy as TSV — paste directly into Google Sheets etc.'}
+        >
+          {copied === 'tsv'
+            ? `✓ ${lang === 'ja' ? 'コピー済み' : 'Copied!'}`
+            : '📊 TSV'}
+        </button>
+      </div>
+
+      {/* ── Standard sections ── */}
       {SECTIONS.map(sec => {
         const data = getSection(sec.id);
         return (
           <div key={sec.id}>
             <SecHeader sec={sec} />
-            {openSecs[sec.id] && sec.fields.map(f => (
-              <FieldRow
-                key={f.key}
-                label={lang === 'ja' ? f.ja : f.en}
-                value={data[f.key] || ''}
-                onChange={v => setField(sec.id, f.key, v)}
-                color={char.color}
-                multi={f.multi}
-              />
-            ))}
+            {openSecs[sec.id] && sec.fields.map(f => {
+              const ftKey   = `${sec.id}.${f.key}`;
+              const ft      = fieldTags[ftKey];
+              const showTag = showTagFields || !!ft?.tags;
+              return (
+                <div key={f.key}>
+                  <FieldRow
+                    label={lang === 'ja' ? f.ja : f.en}
+                    value={data[f.key] || ''}
+                    onChange={v => setField(sec.id, f.key, v)}
+                    color={char.color}
+                    multi={f.multi}
+                  />
+                  {showTag && (
+                    <TagRow
+                      ft={ft}
+                      color={char.color}
+                      blockOptions={blockOptions}
+                      charBlockIds={charBlockIds}
+                      lang={lang}
+                      onChange={upd => setFieldTag(ftKey, upd)}
+                      onInsert={() => insertToBlock(ft?.tags || '', ft?.block || '')}
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
         );
       })}
@@ -249,30 +505,48 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
       </button>
       {openSecs._custom && (
         <>
-          {customFields.map(f => (
-            <div key={f.id} className="flex gap-[8px] mb-[5px] items-start group">
-              <span className="text-muted text-[10px] font-mono w-[120px] flex-shrink-0 pt-[6px] leading-tight flex items-start gap-[2px]">
-                <span className="break-all flex-1 leading-tight">{f.label}</span>
-                <button onClick={() => removeCustomField(f.id)}
-                  className="opacity-0 group-hover:opacity-100 text-[11px] cursor-pointer bg-transparent border-none text-dim hover:text-red-400 flex-shrink-0 leading-none">✕</button>
-              </span>
-              {f.multi ? (
-                <textarea value={f.value} onChange={e => updateCustomField(f.id, 'value', e.target.value)} placeholder="—"
-                  className="flex-1 bg-bg border border-line rounded-[5px] text-[12px] px-[8px] py-[5px] font-mono text-fg outline-none resize-y min-h-[48px] leading-[1.65]"
-                  onFocus={e => e.target.style.borderColor = char.color + '80'} onBlur={e => e.target.style.borderColor = ''} />
-              ) : (
-                <input value={f.value} onChange={e => updateCustomField(f.id, 'value', e.target.value)} placeholder="—"
-                  className="flex-1 bg-bg border border-line rounded-[5px] text-[12px] px-[8px] py-[5px] font-mono text-fg outline-none"
-                  onFocus={e => e.target.style.borderColor = char.color + '80'} onBlur={e => e.target.style.borderColor = ''} />
-              )}
-              <button
-                onClick={() => updateCustomField(f.id, 'multi', !f.multi)}
-                title={lang === 'ja' ? '1行 / 複数行を切替' : 'Toggle single / multi-line'}
-                className="text-[9px] font-mono cursor-pointer bg-transparent border border-dim rounded-[4px] px-[5px] py-[4px] text-muted flex-shrink-0 mt-[2px] whitespace-nowrap">
-                {f.multi ? '1L' : '多L'}
-              </button>
-            </div>
-          ))}
+          {customFields.map(f => {
+            const ftKey   = `custom.${f.id}`;
+            const ft      = fieldTags[ftKey];
+            const showTag = showTagFields || !!ft?.tags;
+            return (
+              <div key={f.id}>
+                <div className="flex gap-[8px] mb-[5px] items-start group">
+                  <span className="text-muted text-[10px] font-mono w-[120px] flex-shrink-0 pt-[6px] leading-tight flex items-start gap-[2px]">
+                    <span className="break-all flex-1 leading-tight">{f.label}</span>
+                    <button onClick={() => removeCustomField(f.id)}
+                      className="opacity-0 group-hover:opacity-100 text-[11px] cursor-pointer bg-transparent border-none text-dim hover:text-red-400 flex-shrink-0 leading-none">✕</button>
+                  </span>
+                  {f.multi ? (
+                    <textarea value={f.value} onChange={e => updateCustomField(f.id, 'value', e.target.value)} placeholder="—"
+                      className="flex-1 bg-bg border border-line rounded-[5px] text-[12px] px-[8px] py-[5px] font-mono text-fg outline-none resize-y min-h-[48px] leading-[1.65]"
+                      onFocus={e => e.target.style.borderColor = char.color + '80'} onBlur={e => e.target.style.borderColor = ''} />
+                  ) : (
+                    <input value={f.value} onChange={e => updateCustomField(f.id, 'value', e.target.value)} placeholder="—"
+                      className="flex-1 bg-bg border border-line rounded-[5px] text-[12px] px-[8px] py-[5px] font-mono text-fg outline-none"
+                      onFocus={e => e.target.style.borderColor = char.color + '80'} onBlur={e => e.target.style.borderColor = ''} />
+                  )}
+                  <button
+                    onClick={() => updateCustomField(f.id, 'multi', !f.multi)}
+                    title={lang === 'ja' ? '1行 / 複数行を切替' : 'Toggle single / multi-line'}
+                    className="text-[9px] font-mono cursor-pointer bg-transparent border border-dim rounded-[4px] px-[5px] py-[4px] text-muted flex-shrink-0 mt-[2px] whitespace-nowrap">
+                    {f.multi ? '1L' : '多L'}
+                  </button>
+                </div>
+                {showTag && (
+                  <TagRow
+                    ft={ft}
+                    color={char.color}
+                    blockOptions={blockOptions}
+                    charBlockIds={charBlockIds}
+                    lang={lang}
+                    onChange={upd => setFieldTag(ftKey, upd)}
+                    onInsert={() => insertToBlock(ft?.tags || '', ft?.block || '')}
+                  />
+                )}
+              </div>
+            );
+          })}
           <button onClick={addCustomField}
             className="w-full rounded-[7px] py-[7px] text-[11px] font-mono cursor-pointer border border-dashed mt-[4px] flex items-center justify-center gap-[5px]"
             style={{ borderColor: 'rgb(var(--dim))', color: 'rgb(var(--muted))', background: 'transparent' }}>
@@ -280,17 +554,6 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
           </button>
         </>
       )}
-
-      {/* Copy button */}
-      <div className="mt-[20px] flex justify-end">
-        <button onClick={copyProfile}
-          style={copied ? { borderColor: char.color + '60', color: char.color } : undefined}
-          className="border border-dim rounded-[6px] px-[12px] py-[5px] text-[10px] font-mono cursor-pointer bg-transparent text-muted">
-          {copied
-            ? `✓ ${lang === 'ja' ? 'コピー済み' : 'Copied!'}`
-            : `📋 ${lang === 'ja' ? '設定をテキストコピー' : 'Copy as text'}`}
-        </button>
-      </div>
     </div>
   );
 }

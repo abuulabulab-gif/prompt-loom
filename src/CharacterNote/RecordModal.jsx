@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { uid, deep } from "../data/constants.js";
+import { uid } from "../data/constants.js";
 import { TOOLS } from "../data/tools.js";
 
 export default function RecordModal({ char, lang, activeTool, posText, negText, existingLabels = [], onSave, onClose }) {
@@ -17,12 +17,13 @@ export default function RecordModal({ char, lang, activeTool, posText, negText, 
   };
 
   const handleSave = () => {
+    const slimBlocks = char.blocks.map(b => { const { cats, lastRandomPicks, ...r } = b; return r; });
     onSave({
       id: uid(), ts: Date.now(),
       title: title.trim(), tool, labels,
       posText, negText,
       memo: memo.trim(),
-      blocks: deep(char.blocks),
+      blocks: slimBlocks,
     });
     onClose();
   };

@@ -11,12 +11,16 @@ const slimVersionBlock = (b) => {
 
 const toCloudChars = (chars) =>
   chars.map(c => {
-    const { _thumbs, versions, ...rest } = c;
+    const { _thumbs, versions, promptLog, ...rest } = c;
     const slimVersions = (versions || []).map(ver => ({
       ...ver,
       blocks: (ver.blocks || []).map(slimVersionBlock),
     }));
-    return { ...rest, versions: slimVersions };
+    const slimPromptLog = (promptLog || []).map(entry => ({
+      ...entry,
+      blocks: entry.blocks ? entry.blocks.map(slimVersionBlock) : undefined,
+    }));
+    return { ...rest, versions: slimVersions, promptLog: slimPromptLog };
   });
 
 export async function pushToCloud(uid, characters, orderUpdatedAt, settings, settingsUpdatedAt) {

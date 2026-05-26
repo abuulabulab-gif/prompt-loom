@@ -34,6 +34,7 @@ function pickBlockTags(block, globalExcluded) {
     const validT = cat.t.filter(t => {
       const en = t.en.toLowerCase();
       return !RANDOM_EXCLUDE_TAGS.has(t.en)
+        && !t.excludeFromRandom
         && !TIER3_TAGS.has(en)
         && !globalExcluded.has(en);
     });

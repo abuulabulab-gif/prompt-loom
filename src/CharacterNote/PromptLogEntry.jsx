@@ -6,6 +6,8 @@ export default function PromptLogEntry({ entry, lang, char, onRestore, onDelete,
   const [editMode, setEditMode] = useState(false);
   const [editTitle, setEditTitle] = useState(entry.title || '');
   const [editMemo, setEditMemo] = useState(entry.memo || '');
+  const [editPosText, setEditPosText] = useState(entry.posText || '');
+  const [editNegText, setEditNegText] = useState(entry.negText || '');
   const [copied, setCopied] = useState(false);
 
   const fmtTs = ts => {
@@ -38,6 +40,12 @@ export default function PromptLogEntry({ entry, lang, char, onRestore, onDelete,
 
         {toolLabel && <span className="text-muted text-[10px] font-mono font-semibold flex-shrink-0">{toolLabel}</span>}
 
+        {entry.editedAt && (
+          <span className="text-[9px] font-mono px-[5px] py-[1px] rounded-[3px] border border-dim/50 text-dim flex-shrink-0">
+            {lang === 'ja' ? '編集済み' : 'Edited'}
+          </span>
+        )}
+
         {(entry.labels || []).map(l => (
           <span key={l}
             style={{ background: char.color + '20', border: `1px solid ${char.color}60`, color: char.color }}
@@ -62,20 +70,30 @@ export default function PromptLogEntry({ entry, lang, char, onRestore, onDelete,
       {/* Expanded body */}
       {expanded && (
         <div className="px-[12px] py-[10px] border-t border-line/50">
-          {entry.posText && (
+          {(entry.posText || editMode) && (
             <div className="mb-[8px]">
               <div className="text-muted text-[10px] font-mono font-bold mb-[3px] uppercase tracking-[0.08em]">Positive</div>
-              <div className="text-prompt text-[11px] font-mono break-all leading-[1.6] bg-bg rounded-[5px] px-[9px] py-[7px] select-all">
-                {entry.posText}
-              </div>
+              {editMode ? (
+                <textarea value={editPosText} onChange={e => setEditPosText(e.target.value)}
+                  className="w-full bg-bg border border-line rounded-[5px] text-[11px] px-[8px] py-[6px] font-mono text-prompt outline-none resize-y min-h-[60px] leading-[1.6]" />
+              ) : (
+                <div className="text-prompt text-[11px] font-mono break-all leading-[1.6] bg-bg rounded-[5px] px-[9px] py-[7px] select-all">
+                  {entry.posText}
+                </div>
+              )}
             </div>
           )}
-          {entry.negText && (
+          {(entry.negText || editMode) && (
             <div className="mb-[8px]">
               <div className="text-muted text-[10px] font-mono font-bold mb-[3px] uppercase tracking-[0.08em]">Negative</div>
-              <div className="text-muted text-[11px] font-mono break-all leading-[1.6] bg-bg rounded-[5px] px-[9px] py-[7px] select-all">
-                {entry.negText}
-              </div>
+              {editMode ? (
+                <textarea value={editNegText} onChange={e => setEditNegText(e.target.value)}
+                  className="w-full bg-bg border border-line rounded-[5px] text-[11px] px-[8px] py-[6px] font-mono text-muted outline-none resize-y min-h-[40px] leading-[1.6]" />
+              ) : (
+                <div className="text-muted text-[11px] font-mono break-all leading-[1.6] bg-bg rounded-[5px] px-[9px] py-[7px] select-all">
+                  {entry.negText}
+                </div>
+              )}
             </div>
           )}
 
@@ -104,13 +122,22 @@ export default function PromptLogEntry({ entry, lang, char, onRestore, onDelete,
             {editMode ? (
               <>
                 <button
-                  onClick={() => { onEdit({ ...entry, title: editTitle, memo: editMemo }); setEditMode(false); }}
+                  onClick={() => {
+                    onEdit({ ...entry, title: editTitle, memo: editMemo, posText: editPosText, negText: editNegText, editedAt: Date.now() });
+                    setEditMode(false);
+                  }}
                   style={{ background: char.color, color: '#000' }}
                   className="border-none rounded-[5px] px-[9px] py-[4px] text-[10px] font-bold cursor-pointer">
                   {lang === 'ja' ? '保存' : 'Save'}
                 </button>
                 <button
-                  onClick={() => { setEditMode(false); setEditTitle(entry.title || ''); setEditMemo(entry.memo || ''); }}
+                  onClick={() => {
+                    setEditMode(false);
+                    setEditTitle(entry.title || '');
+                    setEditMemo(entry.memo || '');
+                    setEditPosText(entry.posText || '');
+                    setEditNegText(entry.negText || '');
+                  }}
                   className="border border-dim rounded-[5px] px-[9px] py-[4px] text-[10px] font-mono cursor-pointer text-muted bg-transparent">
                   {lang === 'ja' ? 'キャンセル' : 'Cancel'}
                 </button>

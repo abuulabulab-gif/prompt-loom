@@ -50,6 +50,9 @@ export const TAG_DICT = {
   'empty eyes':            { ja: '瞳の中が空洞のような無のまなざし。感情の欠落・機械・幽霊的な印象に', en: 'Hollow, soul-less eyes with no highlight — robotic, ghostly, or emotionally void look' },
 
   // ── 顔：口・メイク ────────────────────────────────────────────
+  'detailed lips':         { ja: '唇の細部（輪郭・ハイライト・質感）を精細に描写する指示タグ。lip_focusテンプレートで使用', en: 'Directs detailed rendering of lip contour, highlights, and texture — used in the Lip Focus template' },
+  'eye focus':             { ja: '目を主役にした構図・描写の指示タグ。虹彩・ハイライト・まつ毛の精細描写を促す。全身・上半身と矛盾', en: 'Directs the AI to focus on the eyes as the main subject — promotes detailed iris and eyelash rendering; conflicts with full body or upper body' },
+  'detailed pupils':       { ja: '瞳孔の細部（虹彩模様・反射・深度）を精細に描写する指示タグ。eye_focusテンプレートで使用', en: 'Prompts detailed pupil and iris rendering with fine patterning and light reflections — used in the Eye Focus template' },
   'parted lips':           { ja: 'わずかに開いた唇。自然な色気を出す', en: 'Lips slightly open — natural, subtle allure' },
   'licking lips':          { ja: '唇を舐める仕草。艶やかな印象に', en: 'Tongue touching the lips — sensual or playful gesture' },
 
@@ -108,6 +111,18 @@ export const TAG_DICT = {
   'over-ear headphones':   { ja: '耳を覆うタイプの大きなヘッドフォン。存在感が強い', en: 'Large over-ear headphones covering the ears — more prominent and stylish' },
 
   // ── 構図 ──────────────────────────────────────────────────────
+  'macro shot':            { ja: '被写体の一部を超拡大したマクロ撮影構図。唇・瞳・肌など細部のディテール表現に使う。全身・ワイドと共存不可', en: 'Extreme close-up on a single feature (lips, eye, skin) — conflicts with full body or wide shot' },
+  'lower half of face':    { ja: '顔の下半分（鼻・唇・顎）にフォーカスした構図。lip_focusテンプレートの核。全身・上半身とは矛盾', en: 'Framing that shows only the lower half of the face — key tag for the lip-focus composition style' },
+  'extreme close-up on eyes': { ja: '目・瞳だけに極限まで寄った構図。虹彩・まつ毛・ハイライトを鮮明に描写。全身・ワイドと矛盾', en: 'Maximal zoom onto the eyes only — renders iris, lashes, and highlight in sharp detail; conflicts with full body or wide shots' },
+  'wide angle view':       { ja: '広角レンズで広い空間を収めた構図。背景を強調しつつキャラも含める', en: 'Wide-angle lens view capturing a broad scene alongside the character' },
+  'fisheye lens':          { ja: '魚眼レンズの明示的なタグ。より強い歪みと周縁の球面収差を誘導する。既存の fisheye より詳細な歪み表現向け。シンプル背景では歪みが消えるため非推奨', en: 'Explicit fisheye lens tag for stronger barrel distortion than fisheye alone — loses effect on simple backgrounds' },
+  'extreme perspective':   { ja: '超誇張されたパース。建物・廊下・地平線が急激に遠ざかる効果。魚眼やforeshortening と組み合わせると特に強力', en: 'Hyper-exaggerated vanishing-point perspective — objects rapidly recede; amplified by fisheye or foreshortening' },
+  'distorted background':  { ja: '背景が歪んで見える演出。魚眼・広角・魔法エフェクトの補助タグとして使う', en: 'Background that appears warped or distorted — used alongside fisheye or wide-angle compositions' },
+  'character sheet':       { ja: 'キャラクターシート形式の指示タグ。三面図・設定資料用画像生成に使う。ランダム生成では除外', en: 'Directive tag to generate a character reference sheet layout — used with turnaround/multiple views; excluded from random generation' },
+  'reference sheet':       { ja: '参照シート指示タグ。複数ビューや設定情報を一枚にまとめた資料用', en: 'Tells the AI to produce a multi-view or reference-format composition — use with character sheet templates' },
+  'expression sheet':      { ja: '表情集シートの指示タグ。同一キャラの複数の表情を一枚に並べる', en: 'Generates a sheet of different facial expressions for the same character' },
+  'color palette':         { ja: 'カラーパレット指示タグ。キャラのカラースキームを色見本付きで出力させる', en: 'Prompts the AI to include a color palette swatch alongside the character design' },
+
   'cowboy shot':           { ja: '太ももあたりまでのミッドショット。西部劇映画由来の呼称', en: 'Framing from the thighs up — classic cinematic mid-shot' },
   'bust shot':             { ja: '胸（バスト）から上のショット', en: 'Framing from the chest/bust upward' },
   'dutch angle':           { ja: 'カメラを斜めに傾けた構図。緊張感・不安感・独特の雰囲気を演出', en: 'Camera tilted diagonally — creates tension or psychological unease' },
