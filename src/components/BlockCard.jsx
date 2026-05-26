@@ -38,7 +38,7 @@ const CATS_CLOSED = new Set([
 
 const SCENE_MANAGED_TAGS = new Set(['2girls', '2boys', 'multiple girls', 'multiple boys', '1other']);
 
-export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isFirst, isLast, onSavePreset, onFocus, focused, otherChars, onTransfer, conflictTags, onRemove, onHide, isMobile, isCompact, focusMode, sceneActive, analyzeText, allBlocks, onUndoBackup }) {
+export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isFirst, isLast, onSavePreset, onFocus, focused, otherChars, onTransfer, conflictTags, onRemove, onHide, isMobile, isCompact, focusMode, sceneActive, analyzeText, allBlocks, onUndoBackup, isLight }) {
   const [search, setSearch] = useState('');
   const [saving, setSaving] = useState(false);
   const [pName, setPName] = useState('');
@@ -49,6 +49,8 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
   const [transferOpen, setTransferOpen] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(block.name);
+
+  const blockColor = isLight ? (block.colorLight ?? block.color) : block.color;
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: block.id });
 
@@ -151,7 +153,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
       ref={setNodeRef}
       id={`block-${block.id}`}
       style={{
-        borderLeftColor: block.enabled !== false ? block.color : 'rgb(var(--dim))',
+        borderLeftColor: block.enabled !== false ? blockColor : 'rgb(var(--dim))',
         transform: CSS.Transform.toString(transform),
         transition,
       }}
@@ -187,7 +189,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
         {/* Toggle switch */}
         <div
           onClick={() => onUpdate({ enabled: block.enabled === false })}
-          style={block.enabled !== false ? { background: block.color } : undefined}
+          style={block.enabled !== false ? { background: blockColor } : undefined}
           className={`w-7 h-4 rounded-full relative cursor-pointer flex-shrink-0 transition-colors duration-200${block.enabled !== false ? '' : ' bg-dim'}`}
         >
           <div className={`absolute top-[2px] w-3 h-3 rounded-full bg-white transition-[left] duration-200 ${block.enabled !== false ? 'left-[14px]' : 'left-[2px]'}`} />
@@ -196,7 +198,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
         {/* Order badge */}
         {orderNum && (
           <span
-            style={{ background: block.color + '22', border: `1px solid ${block.color}60`, color: block.color }}
+            style={{ background: blockColor + '22', border: `1px solid ${blockColor}60`, color: blockColor }}
             className="flex-shrink-0 min-w-[18px] h-[18px] rounded-full text-[10px] font-bold font-mono flex items-center justify-center"
           >{orderNum}</span>
         )}
@@ -226,7 +228,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               }}
               autoFocus
               onClick={e => e.stopPropagation()}
-              style={{ border: `1px solid ${block.color}80` }}
+              style={{ border: `1px solid ${blockColor}80` }}
               className="text-[13px] font-bold bg-bg rounded-[5px] px-[6px] py-[1px] outline-none text-fg flex-1 min-w-0 font-mono"
             />
           ) : (
@@ -265,7 +267,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
         {/* Lock */}
         <button
           onClick={() => onUpdate({ locked: !block.locked })}
-          style={isLocked ? { border: `1px solid ${block.color}`, color: block.color } : undefined}
+          style={isLocked ? { border: `1px solid ${blockColor}`, color: blockColor } : undefined}
           className={`bg-transparent rounded-[5px] ${focusMode ? 'px-[9px] py-[4px] text-[13px]' : 'px-[6px] py-[2px] text-[10px]'} cursor-pointer flex-shrink-0${isLocked ? '' : ' border border-dim text-dim'}`}
         >{isLocked ? '🔒' : '🔓'}</button>
 
@@ -274,9 +276,9 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           <button
             onClick={() => setSaving(s => !s)}
             style={{
-              background: saving ? block.color + '22' : 'none',
-              border: `1px solid ${saving ? block.color : 'rgb(var(--dim))'}`,
-              color: saving ? block.color : 'rgb(var(--muted))',
+              background: saving ? blockColor + '22' : 'none',
+              border: `1px solid ${saving ? blockColor : 'rgb(var(--dim))'}`,
+              color: saving ? blockColor : 'rgb(var(--muted))',
             }}
             className="rounded-[5px] px-[7px] py-[2px] text-[10px] cursor-pointer"
           >💾{!isMobile && (lang === 'ja' ? '保存' : ' Save')}</button>
@@ -285,7 +287,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
         {/* Tag count — same height as adjacent buttons */}
         {block.text && (
           <span
-            style={{ background: block.color + '20', border: `1px solid ${block.color}70`, color: block.color }}
+            style={{ background: blockColor + '20', border: `1px solid ${blockColor}70`, color: blockColor }}
             className={`inline-flex items-center font-mono font-bold rounded-[4px] flex-shrink-0 ${focusMode ? 'text-[13px] px-[8px] py-[3px] h-[30px]' : 'text-[10px] px-[5px] py-[2px] h-[22px]'}`}
           >
             {countTags(block.text)}{lang === 'ja' ? 'タグ' : 't'}
@@ -307,9 +309,9 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             onClick={onFocus}
             title={focused ? (lang === 'ja' ? '集中モード解除' : 'Exit focus') : (lang === 'ja' ? '集中編集' : 'Focus')}
             style={{
-              background: focused ? block.color + '22' : 'none',
-              border: `1px solid ${focused ? block.color : 'rgb(var(--dim))'}`,
-              color: focused ? block.color : 'rgb(var(--muted))',
+              background: focused ? blockColor + '22' : 'none',
+              border: `1px solid ${focused ? blockColor : 'rgb(var(--dim))'}`,
+              color: focused ? blockColor : 'rgb(var(--muted))',
             }}
             className={`rounded-[5px] cursor-pointer flex-shrink-0 ${focusMode ? 'px-[9px] py-[4px] text-[13px]' : 'px-[6px] py-[2px] text-[10px]'}`}
           >{focused ? '⊗' : '⊕'}</button>
@@ -370,7 +372,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
       {/* ── Preset save row ────────────────────────────────── */}
       {saving && (
         <div className="flex gap-[6px] items-center px-3 py-[7px] bg-bg border-b border-line">
-          <span style={{ color: block.color }} className="text-[11px] flex-shrink-0">
+          <span style={{ color: blockColor }} className="text-[11px] flex-shrink-0">
             {lang === 'ja' ? 'プリセット名:' : 'Name:'}
           </span>
           <input
@@ -379,12 +381,12 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             autoFocus
             onKeyDown={e => { if (e.key === 'Enter') doSave(); if (e.key === 'Escape') { setSaving(false); setPName(''); } }}
             placeholder={lang === 'ja' ? '例: 夏服' : 'e.g. summer outfit'}
-            style={{ border: `1px solid ${block.color}60` }}
+            style={{ border: `1px solid ${blockColor}60` }}
             className="flex-1 rounded-[5px] text-[12px] px-[9px] py-1 outline-none font-mono bg-bg text-fg"
           />
           <button
             onClick={doSave}
-            style={{ background: block.color }}
+            style={{ background: blockColor }}
             className="border-none rounded-[5px] text-black px-3 py-1 text-[11px] cursor-pointer font-bold"
           >{lang === 'ja' ? '保存' : 'Save'}</button>
           <button
@@ -463,7 +465,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                         onClick={() => applyExpr(preset)}
                         disabled={isLocked}
                         title={preset.tags.join(', ')}
-                        style={active ? { background: block.color + '22', border: `1px solid ${block.color}`, color: block.color } : undefined}
+                        style={active ? { background: blockColor + '22', border: `1px solid ${blockColor}`, color: blockColor } : undefined}
                         className={`rounded-[6px] px-[7px] py-[3px] text-[11px] cursor-pointer disabled:cursor-default transition-all duration-[120ms] font-mono ${active ? 'font-bold' : 'border border-dim text-muted font-normal'}`}
                       >
                         {preset.icon} {lang === 'ja' ? preset.ja : preset.en}
@@ -495,7 +497,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                 : (lang === 'ja' ? `${block.name}のプロンプト` : `${block.nameEn} prompt`)}
             style={{ color: block.text ? 'rgb(var(--prompt-text))' : undefined }}
             className={`w-full ${focusMode ? 'min-h-[80px] max-h-[160px] text-[14px]' : 'min-h-[54px] max-h-[120px] text-[12px]'} rounded-[7px] px-[11px] py-[9px] font-mono resize-y box-border outline-none leading-[1.65] bg-bg ${block.text ? '' : 'text-muted'} ${isLocked ? 'border border-dim opacity-50' : 'border border-linebright'}`}
-            onFocus={e => { if (!isLocked) e.target.style.borderColor = block.color + '80'; }}
+            onFocus={e => { if (!isLocked) e.target.style.borderColor = blockColor + '80'; }}
             onBlur={e => { e.target.style.borderColor = ''; }}
           />
 
@@ -515,8 +517,8 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                     <span
                       key={i}
                       style={isRandom
-                        ? { background: block.color + '15', border: `1px dashed ${block.color}80`, color: block.color }
-                        : { background: 'rgb(var(--surface-alt))', border: `1px solid ${block.color}50`, color: block.color }}
+                        ? { background: blockColor + '15', border: `1px dashed ${blockColor}80`, color: blockColor }
+                        : { background: 'rgb(var(--surface-alt))', border: `1px solid ${blockColor}50`, color: blockColor }}
                       className={`inline-flex items-center gap-[3px] rounded-[4px] font-mono ${focusMode ? 'px-[8px] py-[3px] text-[12px]' : 'px-[5px] py-[1px] text-[9px]'}`}
                     >
                       <span className="opacity-60 text-[8px]">{isRandom ? '🎲' : '👤'}</span>
@@ -538,7 +540,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   disabled={isLocked}
                   onClick={() => onUpdate({ strength: s.v })}
                   title={s.v}
-                  style={block.strength === s.v ? { background: block.color + '22', border: `1px solid ${block.color}`, color: block.color } : undefined}
+                  style={block.strength === s.v ? { background: blockColor + '22', border: `1px solid ${blockColor}`, color: blockColor } : undefined}
                   className={`rounded-[5px] cursor-pointer disabled:cursor-default font-mono whitespace-nowrap transition-all duration-[120ms] ${focusMode ? 'py-[5px] text-[13px]' : 'py-[2px] text-[10px]'} ${isCompact ? 'px-[4px]' : (focusMode ? 'px-[10px]' : 'px-[6px]')} ${block.strength === s.v ? 'font-bold' : 'font-normal border border-dim text-muted'}`}
                 >
                   {lang === 'ja' ? s.l : s.le}
@@ -551,7 +553,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                 <button disabled={isLocked} onClick={() => adjustWeight(-0.05)} title="-0.05"
                   className={`bg-transparent border border-dim text-muted rounded-[5px_0_0_5px] cursor-pointer disabled:cursor-default font-mono ${focusMode ? 'px-[9px] py-[5px] text-[14px]' : 'px-[6px] py-[2px] text-[11px]'}`}>−</button>
                 <span
-                  style={block.strength !== '1.0' ? { color: block.color } : undefined}
+                  style={block.strength !== '1.0' ? { color: blockColor } : undefined}
                   className={`font-mono text-center px-0 bg-bg border-t border-b border-dim${block.strength !== '1.0' ? '' : ' text-muted'} ${focusMode ? 'text-[13px] min-w-[40px] py-[5px]' : 'text-[10px] min-w-[30px] py-[2px]'}`}
                 >{block.strength}</span>
                 <button disabled={isLocked} onClick={() => adjustWeight(0.05)} title="+0.05"
@@ -564,9 +566,9 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                 onClick={() => { setSelectMode(m => !m); setSelectedTags([]); }}
                 title={lang === 'ja' ? '複数選択して括弧でまとめる' : 'Select multiple to group'}
                 style={{
-                  background: selectMode ? block.color + '22' : 'transparent',
-                  border: `1px solid ${selectMode ? block.color : 'rgb(var(--dim))'}`,
-                  color: selectMode ? block.color : 'rgb(var(--muted))',
+                  background: selectMode ? blockColor + '22' : 'transparent',
+                  border: `1px solid ${selectMode ? blockColor : 'rgb(var(--dim))'}`,
+                  color: selectMode ? blockColor : 'rgb(var(--muted))',
                 }}
                 className={`rounded-[5px] cursor-pointer disabled:cursor-default font-mono ${focusMode ? 'px-[10px] py-[5px] text-[13px]' : 'px-2 py-[2px] text-[10px]'}`}
               >{selectMode ? (lang === 'ja' ? '選択中' : 'Selecting') : (lang === 'ja' ? '⊞まとめ' : '⊞Group')}</button>
@@ -647,7 +649,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                     onUpdate({ text, collapsed: false, lastRandomPicks: picks });
                   }}
                   title={lang === 'ja' ? (displayPicks.length > 0 ? '再抽選' : 'ランダムでタグ追加') : (displayPicks.length > 0 ? 'Re-roll' : 'Add random tags')}
-                  style={displayPicks.length > 0 ? { borderColor: block.color, color: block.color } : undefined}
+                  style={displayPicks.length > 0 ? { borderColor: blockColor, color: blockColor } : undefined}
                   className={`border border-dim text-muted rounded-[5px] cursor-pointer font-mono ${focusMode ? 'px-[9px] py-[5px] text-[14px]' : 'px-[5px] py-[2px] text-[11px]'}`}
                 >🎲{displayPicks.length > 0 ? ' ↻' : ''}</button>
               )}
@@ -674,7 +676,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               <span className="text-muted text-[10px] font-mono font-semibold">{lang === 'ja' ? '🎲 追加:' : '🎲 added:'}</span>
               {displayPicks.map(t => (
                 <span key={t.en}
-                  style={{ background: block.color + '22', border: `1px solid ${block.color}60`, color: block.color }}
+                  style={{ background: blockColor + '22', border: `1px solid ${blockColor}60`, color: blockColor }}
                   className="text-[10px] font-mono px-[6px] py-[1px] rounded-[4px] font-semibold"
                 >{lang === 'ja' ? t.ja : t.en}</span>
               ))}
@@ -685,10 +687,10 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           {/* Select mode bar */}
           {selectMode && (
             <div
-              style={{ background: block.color + '12', border: `1px dashed ${block.color}60` }}
+              style={{ background: blockColor + '12', border: `1px dashed ${blockColor}60` }}
               className="flex items-center gap-2 flex-wrap mb-[10px] px-[10px] py-2 rounded-[7px]"
             >
-              <span style={{ color: block.color }} className="text-[10px] font-mono">
+              <span style={{ color: blockColor }} className="text-[10px] font-mono">
                 {lang === 'ja' ? `⊞ ${selectedTags.length}個選択中` : `⊞ ${selectedTags.length} selected`}
               </span>
               {selectedTags.length >= 2 && (
@@ -700,7 +702,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               <button
                 disabled={selectedTags.length < 2}
                 onClick={applyGroup}
-                style={selectedTags.length >= 2 ? { background: block.color } : undefined}
+                style={selectedTags.length >= 2 ? { background: blockColor } : undefined}
                 className={`border-none rounded-[5px] px-3 py-1 text-[10px] cursor-pointer disabled:cursor-default font-bold ${selectedTags.length >= 2 ? 'text-black' : 'bg-dim text-muted'}`}
               >{lang === 'ja' ? '括弧でまとめて追加' : 'Group & add'}</button>
               <button
@@ -721,7 +723,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   const tag = allTags.find(t => t.en === en);
                   if (!tag) return null;
                   return (
-                    <TagBtn key={en} tag={tag} color={block.color} lang={lang} isFav disabled={isLocked}
+                    <TagBtn key={en} tag={tag} color={blockColor} lang={lang} isFav disabled={isLocked}
                       active={hasTag(block.text, en)} selectMode={selectMode} selected={selectedTags.includes(en)}
                       conflict={conflictTags?.has(en.toLowerCase()) && hasTag(block.text, en)}
                       desc={TAG_DICT[en]} large={focusMode}
@@ -741,7 +743,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               {searchResults.length > 0 ? (
                 <div className="flex flex-wrap gap-1">
                   {searchResults.map(tag => (
-                    <TagBtn key={tag.en} tag={tag} color={block.color} lang={lang}
+                    <TagBtn key={tag.en} tag={tag} color={blockColor} lang={lang}
                       isFav={block.favTags?.includes(tag.en)} disabled={isLocked}
                       active={hasTag(block.text, tag.en)}
                       analyzed={!!analyzeText && hasTag(analyzeText, tag.en) && !hasTag(block.text, tag.en)}
@@ -768,7 +770,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   onClick={() => toggleCat(cat)}
                   className="w-full flex items-center gap-[6px] py-[4px] bg-transparent border-none cursor-pointer text-left select-none"
                 >
-                  <span style={isOpen ? { color: block.color } : undefined} className={`text-[10px] flex-shrink-0 font-bold${isOpen ? '' : ' text-muted'}`}>
+                  <span style={isOpen ? { color: blockColor } : undefined} className={`text-[10px] flex-shrink-0 font-bold${isOpen ? '' : ' text-muted'}`}>
                     {isOpen ? '▼' : '▶'}
                   </span>
                   <span className={`${focusMode ? 'text-[13px]' : 'text-[11px]'} font-mono font-medium ${isOpen ? 'text-fg' : 'text-muted'}`}>
@@ -784,7 +786,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                       : cat.t
                     ).filter((tag, i, arr) => arr.findIndex(t => t.en === tag.en) === i)
                     .map(tag => (
-                      <TagBtn key={tag.en} tag={tag} color={block.color} lang={lang}
+                      <TagBtn key={tag.en} tag={tag} color={blockColor} lang={lang}
                         isFav={block.favTags?.includes(tag.en)} disabled={isLocked}
                         active={hasTag(block.text, tag.en)}
                         analyzed={!!analyzeText && hasTag(analyzeText, tag.en) && !hasTag(block.text, tag.en)}
@@ -806,8 +808,8 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
 
           {/* Custom tags */}
           {!search && (block.customTags || []).length > 0 && (
-            <div className="mb-2 p-2 rounded-[7px] bg-bg" style={{ border: `1px solid ${block.color}30` }}>
-              <div style={{ color: block.color }} className="text-[10px] font-mono mb-[5px]">
+            <div className="mb-2 p-2 rounded-[7px] bg-bg" style={{ border: `1px solid ${blockColor}30` }}>
+              <div style={{ color: blockColor }} className="text-[10px] font-mono mb-[5px]">
                 ✏️ {lang === 'ja' ? 'カスタム' : 'Custom'}
               </div>
               <div className="flex flex-wrap gap-1">
@@ -815,15 +817,15 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   <div
                     key={ct.id}
                     style={{
-                      background: hasTag(block.text, ct.text) ? block.color + '22' : 'rgb(var(--surface-alt))',
-                      border: `1px solid ${hasTag(block.text, ct.text) ? block.color + '90' : block.color + '40'}`,
+                      background: hasTag(block.text, ct.text) ? blockColor + '22' : 'rgb(var(--surface-alt))',
+                      border: `1px solid ${hasTag(block.text, ct.text) ? blockColor + '90' : blockColor + '40'}`,
                     }}
                     className="inline-flex items-center rounded-[5px] overflow-hidden"
                   >
                     <button
                       disabled={isLocked}
                       onClick={() => onUpdate({ text: toggleTag(block.text, ct.text, block.strength) })}
-                      style={{ color: block.color }}
+                      style={{ color: blockColor }}
                       className={`bg-transparent border-none px-2 py-[3px] text-[11px] cursor-pointer disabled:cursor-default font-mono ${hasTag(block.text, ct.text) ? 'font-bold' : 'font-normal'}`}
                     >{hasTag(block.text, ct.text) ? '✓ ' : ''}{ct.text}</button>
                     <button
@@ -851,10 +853,10 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   autoFocus
                   onKeyDown={e => { if (e.key === 'Enter') handleAddCustom(); if (e.key === 'Escape') { setAddingCustom(false); setCustomInput(''); } }}
                   placeholder={lang === 'ja' ? 'タグを入力（英語推奨）...' : 'Enter tag text...'}
-                  style={{ border: `1px solid ${block.color}60` }}
+                  style={{ border: `1px solid ${blockColor}60` }}
                   className="flex-1 rounded-[5px] text-[11px] px-[9px] py-1 outline-none font-mono bg-bg text-fg"
                 />
-                <button onClick={handleAddCustom} style={{ background: block.color }}
+                <button onClick={handleAddCustom} style={{ background: blockColor }}
                   className="border-none rounded-[5px] text-black px-[10px] py-1 text-[11px] cursor-pointer font-bold">
                   {lang === 'ja' ? '追加' : 'Add'}
                 </button>
@@ -865,11 +867,11 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               <button
                 onClick={() => setAddingCustom(true)}
                 disabled={isLocked}
-                onMouseOver={e => { if (!isLocked) e.target.style.borderColor = block.color; }}
-                onMouseOut={e => e.target.style.borderColor = isLocked ? 'rgb(var(--dim))' : block.color + '60'}
+                onMouseOver={e => { if (!isLocked) e.target.style.borderColor = blockColor; }}
+                onMouseOut={e => e.target.style.borderColor = isLocked ? 'rgb(var(--dim))' : blockColor + '60'}
                 style={{
-                  border: `1px dashed ${isLocked ? 'rgb(var(--dim))' : block.color + '60'}`,
-                  color: isLocked ? 'rgb(var(--muted))' : block.color,
+                  border: `1px dashed ${isLocked ? 'rgb(var(--dim))' : blockColor + '60'}`,
+                  color: isLocked ? 'rgb(var(--muted))' : blockColor,
                 }}
                 className="bg-transparent rounded-[5px] px-[10px] py-[3px] text-[10px] cursor-pointer disabled:cursor-default font-mono mt-1"
               >+ {lang === 'ja' ? 'カスタムタグ追加' : 'Add custom tag'}</button>

@@ -1550,7 +1550,8 @@ export default function Loom() {
                   sceneActive={sceneOpen}
                   analyzeText={analyzeText}
                   allBlocks={blocks}
-                  onUndoBackup={templateUndoBuf?.blockTexts[block.id] !== undefined ? () => undoSingleBlock(block.id) : undefined} />
+                  onUndoBackup={templateUndoBuf?.blockTexts[block.id] !== undefined ? () => undoSingleBlock(block.id) : undefined}
+                  isLight={theme === 'light'} />
               );
 
               if (isWide && focusBlock) {
@@ -1702,7 +1703,8 @@ export default function Loom() {
                 isCompact={false}
                 sceneActive={sceneOpen}
                 analyzeText={analyzeText}
-                allBlocks={blocks} />
+                allBlocks={blocks}
+                isLight={theme === 'light'} />
             </div>
           </div>
         );
