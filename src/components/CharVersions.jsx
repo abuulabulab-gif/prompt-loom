@@ -10,7 +10,7 @@ export default function CharVersions({ activeChar, lang, onSave, onRestore, onDe
       <div className="flex items-center gap-2 mb-[4px]">
         <span className="text-muted text-[10px] font-mono">🕐 {lang === 'ja' ? 'バージョン管理' : 'Versions'}</span>
         <span className="text-muted text-[10px] font-mono">{versions.length}/10</span>
-        <button onClick={() => setOpen(o => !o)} className="text-dim text-[10px] cursor-pointer border border-dim rounded-[4px] px-[5px] py-[1px]">{open ? '▲' : '▼'}</button>
+        <button onClick={() => setOpen(o => !o)} className="text-muted text-[10px] cursor-pointer border border-dim rounded-[4px] px-[5px] py-[1px]">{open ? '▲' : '▼'}</button>
       </div>
       {open && (
         <>
@@ -25,13 +25,13 @@ export default function CharVersions({ activeChar, lang, onSave, onRestore, onDe
             </button>
           </div>
           {versions.length === 0
-            ? <span className="text-dim text-[11px] font-mono">{lang === 'ja' ? '（まだバージョンがありません）' : '(no versions saved)'}</span>
+            ? <span className="text-muted text-[11px] font-mono">{lang === 'ja' ? '（まだバージョンがありません）' : '(no versions saved)'}</span>
             : versions.map(v => (
               <div key={v.id} className="flex items-center gap-[5px] mb-[3px]">
                 <span className="text-muted text-[10px] font-mono flex-shrink-0">{fmtTs(v.ts)}</span>
                 <span className="text-fg text-[11px] flex-1 truncate">{v.name}</span>
                 <button onClick={() => onRestore(v)} style={{ color, borderColor: color + '60' }} className="border rounded-[4px] px-[6px] py-[1px] text-[10px] cursor-pointer bg-transparent font-mono">{lang === 'ja' ? '復元' : 'Restore'}</button>
-                <button onClick={() => onDelete(v.id)} className="text-dim text-[10px] cursor-pointer px-1">✕</button>
+                <button onClick={() => onDelete(v.id)} className="text-muted text-[10px] cursor-pointer px-1">✕</button>
               </div>
             ))
           }

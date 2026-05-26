@@ -292,7 +292,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
         <div className="px-[14px] py-[10px] border-b border-line flex-shrink-0 flex flex-wrap gap-x-[16px] gap-y-[8px] items-center">
           {/* Theme */}
           <div className="flex items-center gap-[7px]">
-            <span className="text-dim text-[10px] font-mono whitespace-nowrap">{lang === 'ja' ? 'テーマ' : 'Theme'}</span>
+            <span className="text-muted text-[10px] font-mono whitespace-nowrap">{lang === 'ja' ? 'テーマ' : 'Theme'}</span>
             <button onClick={onToggleTheme}
               className="flex items-center gap-[5px] rounded-[5px] px-[9px] py-[4px] text-[11px] font-mono font-bold cursor-pointer border transition-all duration-150 bg-surfalt border-line text-fg">
               {theme === 'dark' ? '🌙' : '☀️'}
@@ -301,7 +301,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
           </div>
           {/* Language */}
           <div className="flex items-center gap-[7px]">
-            <span className="text-dim text-[10px] font-mono whitespace-nowrap">{lang === 'ja' ? '言語' : 'Language'}</span>
+            <span className="text-muted text-[10px] font-mono whitespace-nowrap">{lang === 'ja' ? '言語' : 'Language'}</span>
             <button onClick={onToggleLang}
               className="rounded-[5px] px-[9px] py-[4px] text-[11px] font-mono font-bold cursor-pointer border bg-surfalt border-line text-fg">
               {lang === 'ja' ? '🇯🇵 日本語' : '🇺🇸 English'}
@@ -309,7 +309,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
           </div>
           {/* View mode */}
           <div className="flex items-center gap-[7px]">
-            <span className="text-dim text-[10px] font-mono whitespace-nowrap">{lang === 'ja' ? '表示モード' : 'View mode'}</span>
+            <span className="text-muted text-[10px] font-mono whitespace-nowrap">{lang === 'ja' ? '表示モード' : 'View mode'}</span>
             <div className="flex rounded-[5px] overflow-hidden border border-line">
               {([
                 ['simple', '📋', lang === 'ja' ? 'シンプル' : 'Simple',  'rgb(var(--warn-text))', 'rgb(var(--warn-text) / 0.13)', 'rgb(var(--warn-text) / 0.38)'],
@@ -508,13 +508,13 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                   <div className="rounded-[10px] overflow-hidden border border-line">
                     {/* Header row */}
                     <div className="grid grid-cols-[1fr_1fr_1fr] bg-surfalt border-b border-line">
-                      <div className="px-[10px] py-[6px] text-[9px] font-mono text-dim uppercase tracking-[0.08em]">
+                      <div className="px-[10px] py-[6px] text-[9px] font-mono text-muted uppercase tracking-[0.08em]">
                         {lang === 'ja' ? '機能' : 'Feature'}
                       </div>
-                      <div className="px-[10px] py-[6px] text-[9px] font-mono text-dim uppercase tracking-[0.08em] border-l border-line">
+                      <div className="px-[10px] py-[6px] text-[9px] font-mono text-muted uppercase tracking-[0.08em] border-l border-line">
                         📱 {lang === 'ja' ? 'スマホ' : 'Mobile'}
                       </div>
-                      <div className="px-[10px] py-[6px] text-[9px] font-mono text-dim uppercase tracking-[0.08em] border-l border-line">
+                      <div className="px-[10px] py-[6px] text-[9px] font-mono text-muted uppercase tracking-[0.08em] border-l border-line">
                         💻 PC
                       </div>
                     </div>
@@ -535,7 +535,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                 </div>
               ))}
 
-              <p className="text-dim text-[10px] font-mono text-center pt-[2px]">
+              <p className="text-muted text-[10px] font-mono text-center pt-[2px]">
                 {lang === 'ja' ? '画面幅 600px 以上で PC版レイアウトに切替わります' : 'PC layout activates at viewport width ≥ 600 px'}
               </p>
             </div>
@@ -552,7 +552,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
 
               {/* API key acquisition links */}
               <div className="rounded-[8px] border border-line bg-surfalt px-[14px] py-[11px] space-y-[8px]">
-                <div className="text-dim text-[10px] font-mono font-bold tracking-widest uppercase mb-[4px]">
+                <div className="text-muted text-[10px] font-mono font-bold tracking-widest uppercase mb-[4px]">
                   {lang === 'ja' ? 'APIキーの取得先' : 'Where to get API keys'}
                 </div>
                 <div className="flex items-center gap-[10px]">
@@ -577,7 +577,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                     console.anthropic.com →
                   </a>
                 </div>
-                <p className="text-dim text-[10px] font-mono leading-[1.6] pt-[2px]">
+                <p className="text-muted text-[10px] font-mono leading-[1.6] pt-[2px]">
                   {lang === 'ja'
                     ? '無料枠あり。どちらも登録後すぐにキーを発行できます。利用料金はご自身のアカウントで発生します。'
                     : 'Both have free tiers. Keys can be issued immediately after registration. Usage fees apply to your own account.'}
@@ -594,7 +594,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                 const inputVal = localInput[v] ?? '';
                 return (
                   <div key={v} className={`space-y-[6px] transition-opacity duration-150 ${isLocked ? 'opacity-30 pointer-events-none select-none' : ''}`}>
-                    <div className="text-dim text-[10px] font-mono font-bold tracking-widest uppercase">
+                    <div className="text-muted text-[10px] font-mono font-bold tracking-widest uppercase">
                       {label}
                     </div>
                     <div className="flex gap-[6px]">
@@ -740,7 +740,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                     'Use of prompts and content generated by this app is subject to each AI service\'s terms of use (Midjourney, NovelAI, etc.). The developer bears no responsibility for such content.',
                     'The developer shall not be liable for any damages arising from use of this app, including data loss or issues related to generated content.',
                   ]).map((text, i) => (
-                    <li key={i} className="flex gap-[6px] items-start text-dim text-[10px] leading-[1.6]">
+                    <li key={i} className="flex gap-[6px] items-start text-muted text-[10px] leading-[1.6]">
                       <span className="flex-shrink-0 mt-[2px]">·</span>
                       <span>{text}</span>
                     </li>

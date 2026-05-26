@@ -1134,7 +1134,7 @@ export default function Loom() {
             <>
               <div className="fixed inset-0 z-[199]" onClick={() => setDataMenuOpen(false)} />
               <div className="absolute right-0 top-full mt-[4px] z-[200] bg-surface border border-line rounded-[9px] shadow-xl py-[4px] min-w-[210px]">
-                <div className="px-[10px] py-[4px] text-[9px] font-mono text-dim uppercase tracking-wider">
+                <div className="px-[10px] py-[4px] text-[9px] font-mono text-muted uppercase tracking-wider">
                   {lang === 'ja' ? `選択中: ${activeChar?.name}` : `Selected: ${activeChar?.name}`}
                 </div>
                 <button onClick={() => { handleExport(); setDataMenuOpen(false); }}
@@ -1146,7 +1146,7 @@ export default function Loom() {
                   <span className="text-dim">↑</span>{lang === 'ja' ? 'バックアップから復元' : 'Restore from backup'}
                 </button>
                 <div className="border-t border-line mx-2 my-[4px]" />
-                <div className="px-[10px] py-[4px] text-[9px] font-mono text-dim uppercase tracking-wider">{lang === 'ja' ? 'プリセット' : 'Presets'}</div>
+                <div className="px-[10px] py-[4px] text-[9px] font-mono text-muted uppercase tracking-wider">{lang === 'ja' ? 'プリセット' : 'Presets'}</div>
                 <button onClick={() => { handlePresetExport(); setDataMenuOpen(false); }}
                   className="w-full text-left px-[12px] py-[6px] text-[11px] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
                   <span className="text-dim">↓</span>{lang === 'ja' ? '衣装・構図プリセット書き出し' : 'Export costume & shot presets'}
@@ -1297,7 +1297,7 @@ export default function Loom() {
                   <span className="text-muted text-[10px] font-mono flex-shrink-0">{label}:</span>
                   <div className="flex flex-wrap gap-[4px]">
                     {(activeChar[key] || []).length === 0
-                      ? <span className="text-dim text-[10px] font-mono">{lang === 'ja' ? '（💾で保存）' : '(use 💾)'}</span>
+                      ? <span className="text-muted text-[10px] font-mono">{lang === 'ja' ? '（💾で保存）' : '(use 💾)'}</span>
                       : (activeChar[key] || []).map(p => (
                           <PresetChip key={p.id} preset={p} color={activeChar.color} lang={lang}
                             otherChars={characters.filter(c => c.id !== activeCharId)}
@@ -1317,7 +1317,7 @@ export default function Loom() {
                 <button onClick={addLora} style={{ color: charColor(activeChar.color), borderColor: activeChar.color + '60' }} className="ml-auto border rounded-[5px] px-[7px] py-[2px] text-[10px] cursor-pointer font-mono bg-transparent">+ LoRA</button>
               </div>
               {(activeChar.loras || []).length === 0
-                ? <span className="text-dim text-[11px] font-mono">{lang === 'ja' ? '（SD/NAI使用時は出力に自動追加されます）' : '(auto-added to output for SD/NAI)'}</span>
+                ? <span className="text-muted text-[11px] font-mono">{lang === 'ja' ? '（SD/NAI使用時は出力に自動追加されます）' : '(auto-added to output for SD/NAI)'}</span>
                 : (activeChar.loras || []).map(l => (
                   <div key={l.id} className="flex gap-[5px] items-center mb-[3px]">
                     <input value={l.name} onChange={e => updateLora(l.id, { name: e.target.value })}
@@ -1328,7 +1328,7 @@ export default function Loom() {
                       type="number" step="0.05" min="0.1" max="1.5"
                       style={{ border: `1px solid ${activeChar.color}40` }}
                       className="w-[54px] bg-bg rounded-[5px] text-[11px] px-[5px] py-[3px] outline-none font-mono text-fg" />
-                    <button onClick={() => deleteLora(l.id)} className="text-dim text-[11px] cursor-pointer px-1">✕</button>
+                    <button onClick={() => deleteLora(l.id)} className="text-muted text-[11px] cursor-pointer px-1">✕</button>
                   </div>
                 ))
               }
@@ -1339,7 +1339,7 @@ export default function Loom() {
                 <span className="text-muted text-[10px] font-mono">🖼 {lang === 'ja' ? `サムネイル (${(thumbs[activeCharId] || []).length}/4)` : `Images (${(thumbs[activeCharId] || []).length}/4)`}</span>
                 <button onClick={copyShareUrl}
                   style={shared ? { borderColor: goodColor + '60', color: goodColor } : undefined}
-                  className="border border-dim rounded-[5px] px-[7px] py-[2px] text-dim text-[10px] cursor-pointer font-mono">
+                  className="border border-dim rounded-[5px] px-[7px] py-[2px] text-muted text-[10px] cursor-pointer font-mono">
                   {shared ? `✓ ${lang === 'ja' ? 'コピー済み' : 'Copied!'}` : `🔗 ${lang === 'ja' ? 'プロンプトをシェア' : 'Share prompt'}`}
                 </button>
               </div>
@@ -1425,7 +1425,7 @@ export default function Loom() {
                       <span className="text-muted text-[10px] font-mono flex-shrink-0">{label}:</span>
                       <div className="flex flex-wrap gap-[4px]">
                         {(activeChar[key] || []).length === 0
-                          ? <span className="text-dim text-[10px] font-mono">{lang === 'ja' ? '（💾で保存）' : '(use 💾)'}</span>
+                          ? <span className="text-muted text-[10px] font-mono">{lang === 'ja' ? '（💾で保存）' : '(use 💾)'}</span>
                           : (activeChar[key] || []).map(p => (
                               <PresetChip key={p.id} preset={p} color={activeChar.color} lang={lang}
                                 otherChars={characters.filter(c => c.id !== activeCharId)}
@@ -1447,7 +1447,7 @@ export default function Loom() {
                       <button onClick={addLora} style={{ color: charColor(activeChar.color), borderColor: activeChar.color + '60' }} className="ml-auto border rounded-[5px] px-[7px] py-[2px] text-[10px] cursor-pointer font-mono bg-transparent">+ LoRA</button>
                     </div>
                     {(activeChar.loras || []).length === 0
-                      ? <span className="text-dim text-[10px] font-mono">{lang === 'ja' ? 'SD/NAI用（出力に自動追加）' : 'SD/NAI: auto-appended'}</span>
+                      ? <span className="text-muted text-[10px] font-mono">{lang === 'ja' ? 'SD/NAI用（出力に自動追加）' : 'SD/NAI: auto-appended'}</span>
                       : (activeChar.loras || []).map(l => (
                         <div key={l.id} className="flex gap-[5px] items-center mb-[3px]">
                           <input value={l.name} onChange={e => updateLora(l.id, { name: e.target.value })}
@@ -1458,7 +1458,7 @@ export default function Loom() {
                             type="number" step="0.05" min="0.1" max="1.5"
                             style={{ border: `1px solid ${activeChar.color}40` }}
                             className="w-[54px] bg-bg rounded-[5px] text-[11px] px-[5px] py-[3px] outline-none font-mono text-fg flex-shrink-0" />
-                          <button onClick={() => deleteLora(l.id)} className="text-dim text-[11px] cursor-pointer px-1 flex-shrink-0">✕</button>
+                          <button onClick={() => deleteLora(l.id)} className="text-muted text-[11px] cursor-pointer px-1 flex-shrink-0">✕</button>
                         </div>
                       ))
                     }
@@ -1471,7 +1471,7 @@ export default function Loom() {
                       <span className="text-muted text-[10px] font-mono">🖼 {lang === 'ja' ? `サムネイル (${(thumbs[activeCharId] || []).length}/4)` : `Images (${(thumbs[activeCharId] || []).length}/4)`}</span>
                       <button onClick={copyShareUrl}
                         style={shared ? { borderColor: goodColor + '60', color: goodColor } : undefined}
-                        className="border border-dim rounded-[5px] px-[7px] py-[2px] text-dim text-[10px] cursor-pointer font-mono">
+                        className="border border-dim rounded-[5px] px-[7px] py-[2px] text-muted text-[10px] cursor-pointer font-mono">
                         {shared ? `✓ ${lang === 'ja' ? 'コピー済み' : 'Copied!'}` : `🔗 ${lang === 'ja' ? 'プロンプトをシェア' : 'Share prompt'}`}
                       </button>
                     </div>
@@ -1605,7 +1605,7 @@ export default function Loom() {
                                 <div key={row.id} className="bg-surface border border-line rounded-[7px] px-[9px] py-[7px] mb-[5px]">
                                   <div className="text-fg text-[10px] font-mono font-semibold mb-[4px] truncate">{row.label}</div>
                                   <div className="text-prompt text-[9px] font-mono break-all leading-[1.4] mb-[6px] opacity-80">{row.promptTags}</div>
-                                  {row.notes && <div className="text-dim text-[9px] font-mono mb-[5px] leading-tight">{row.notes}</div>}
+                                  {row.notes && <div className="text-muted text-[9px] font-mono mb-[5px] leading-tight">{row.notes}</div>}
                                   <button onClick={() => insertTagMapRow(row)}
                                     style={{ borderColor: activeChar.color + '60', color: charColor(activeChar.color) }}
                                     className="border rounded-[4px] px-[7px] py-[2px] text-[9px] font-mono font-bold cursor-pointer bg-transparent">
@@ -1771,11 +1771,11 @@ export default function Loom() {
                         <span className="text-[11px] font-mono truncate" style={{ color: b.enabled !== false ? 'rgb(var(--text))' : 'rgb(var(--muted))' }}>
                           {b.name}
                         </span>
-                        <span className="text-[8px] font-mono text-dim leading-none mt-[2px]">
+                        <span className="text-[9px] font-mono text-muted leading-none mt-[2px]">
                           {lang === 'ja' ? 'タップ:名前変更 · 2回:非表示' : 'Tap:rename · 2×:hide'}
                         </span>
                       </div>
-                      <span className="text-[9px] font-mono text-dim flex-shrink-0">✎</span>
+                      <span className="text-[9px] font-mono text-muted flex-shrink-0">✎</span>
                       {b.text && (
                         <span className="text-[9px] font-mono font-bold flex-shrink-0" style={{ color: b.color }}>
                           {countTags(b.text)}t
@@ -1976,7 +1976,7 @@ export default function Loom() {
                             style={{ color: activeTool === t.id ? 'rgb(var(--c-blue-s))' : 'rgb(var(--text) / 0.8)' }}>
                             <span className="w-4 text-center text-[10px]">{activeTool === t.id ? '✓' : ''}</span>
                             <span className="flex-1">{t.icon} {t.name}</span>
-                            <span className="text-[10px] text-dim">{lang === 'ja' ? t.note : t.noteEn}</span>
+                            <span className="text-[10px] text-muted">{lang === 'ja' ? t.note : t.noteEn}</span>
                           </button>
                         ))}
                       </div>
@@ -2242,7 +2242,7 @@ export default function Loom() {
                     </button>
                   )}
                   <button onClick={startVariations} className="text-accent text-[10px] font-mono cursor-pointer border border-[#4a6fff50] rounded-[4px] px-[7px] py-[1px]">↻ {lang === 'ja' ? '再生成' : 'Re-roll'}</button>
-                  <button onClick={() => setVariationsOpen(false)} className="text-dim text-[10px] cursor-pointer">✕</button>
+                  <button onClick={() => setVariationsOpen(false)} className="text-muted text-[10px] cursor-pointer">✕</button>
                 </div>
               </div>
               <div className="divide-y divide-line max-h-[240px] overflow-y-auto">
@@ -2387,7 +2387,7 @@ export default function Loom() {
               >
                 {lang === 'ja' ? '元に戻す' : 'Undo'}
               </button>
-              <button onClick={() => { clearTimeout(templateUndoTimerRef.current); setTemplateUndoBuf(null); }} className="text-dim cursor-pointer bg-transparent border-none text-[11px] leading-none p-0">×</button>
+              <button onClick={() => { clearTimeout(templateUndoTimerRef.current); setTemplateUndoBuf(null); }} className="text-muted cursor-pointer bg-transparent border-none text-[11px] leading-none p-0">×</button>
             </div>
             {(lang === 'ja' ? templateUndoBuf.negHintJa : templateUndoBuf.negHintEn) && (
               <div className="mt-[6px] text-[9px] font-mono leading-[1.5] px-[6px] py-[3px] rounded-[4px]"
@@ -2454,7 +2454,7 @@ export default function Loom() {
             </div>
             <button
               onClick={() => setSyncErrToast(false)}
-              className="mt-2 text-dim cursor-pointer bg-transparent border-none text-[10px] p-0"
+              className="mt-2 text-muted cursor-pointer bg-transparent border-none text-[10px] p-0"
             >
               {lang === 'ja' ? '閉じる' : 'Dismiss'}
             </button>
