@@ -33,7 +33,7 @@ export const OPTIONAL_CAT_NAMES = new Set([
   // 属性
   '年齢感', '特殊パーツ',
   // 体型
-  '肌色', '細部', 'ボディフォーカス', '状態', '足',
+  '肌色', '肌質感', '細部', 'ボディフォーカス', '状態', '足',
   // 衣装
   '素材・装飾', '装飾アクセ',
   // 特徴
@@ -124,7 +124,7 @@ export const BLOCK_RANDOM_RULES = {
 // ── Tier 3 tags (0% from おまかせ; only added via combo rules) ──
 export const TIER3_TAGS = new Set([
   // ボディフォーカス（センシティブ寄り）
-  'cleavage','sideboob','underboob','bare back','armpits','midriff',
+  'cleavage','sideboob','underboob','bare back','armpits','armpit focus','midriff','midriff focus',
   'bare thighs','thighs','leg focus','wide hips',
   // 足フォーカス
   'soles','toes','foot focus','toenail polish',

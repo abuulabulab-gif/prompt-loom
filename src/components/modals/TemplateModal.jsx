@@ -1,7 +1,12 @@
 import { TEMPLATES } from "../../data/templates.js";
 
-const styleTemplates = TEMPLATES.filter(t => t.apply.quality);
-const compTemplates  = TEMPLATES.filter(t => !t.apply.quality);
+const FETI_IDS = new Set(['highangle_armpit','lowangle_legs','midriff_navel','nape_lift','birdseye_lie','skintight_detail']);
+const DYNAMIC_IDS = new Set(['dynamic_booster']);
+
+const styleTemplates   = TEMPLATES.filter(t => t.apply.quality);
+const basicCompTemplates = TEMPLATES.filter(t => !t.apply.quality && !FETI_IDS.has(t.id) && !DYNAMIC_IDS.has(t.id));
+const fetiTemplates    = TEMPLATES.filter(t => FETI_IDS.has(t.id));
+const dynamicTemplates = TEMPLATES.filter(t => DYNAMIC_IDS.has(t.id));
 
 const BLOCK_LABEL = {
   quality:     { ja: '品質',   en: 'Quality' },
@@ -11,6 +16,7 @@ const BLOCK_LABEL = {
   body:        { ja: '体型',   en: 'Body'    },
   outfit:      { ja: '衣装',   en: 'Outfit'  },
   face:        { ja: '顔',     en: 'Face'    },
+  effect:      { ja: '効果',   en: 'Effect'  },
 };
 
 function previewText(tmpl) {
@@ -85,10 +91,32 @@ export default function TemplateModal({ lang, onApply, onClose }) {
           <div className="border-t border-dim mb-4" />
 
           <div className="text-muted text-[10px] font-mono tracking-widest mb-2 uppercase">
-            {lang === 'ja' ? '構図・フェチ特化（SFW）' : 'Composition / Flair'}
+            {lang === 'ja' ? '構図・設定資料（SFW）' : 'Composition / Reference'}
+          </div>
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            {basicCompTemplates.map(tmpl => (
+              <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />
+            ))}
+          </div>
+
+          <div className="border-t border-dim mb-4" />
+
+          <div className="text-muted text-[10px] font-mono tracking-widest mb-2 uppercase">
+            {lang === 'ja' ? 'フェチ構図（SFW）' : 'Flair / Feti Composition'}
+          </div>
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            {fetiTemplates.map(tmpl => (
+              <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />
+            ))}
+          </div>
+
+          <div className="border-t border-dim mb-4" />
+
+          <div className="text-muted text-[10px] font-mono tracking-widest mb-2 uppercase">
+            {lang === 'ja' ? 'ダイナミック' : 'Dynamic'}
           </div>
           <div className="grid grid-cols-2 gap-2">
-            {compTemplates.map(tmpl => (
+            {dynamicTemplates.map(tmpl => (
               <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />
             ))}
           </div>
