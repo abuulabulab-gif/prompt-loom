@@ -11,24 +11,10 @@ import WelcomeHint from "./components/WelcomeHint.jsx";
 import LibraryModal from "./components/modals/LibraryModal.jsx";
 import {
   CHAR_COLORS, CHAR_EMOJIS, WARN_LEN, LIMIT_LEN,
-  uid, appendTag, countTags, toggleTag, hasTag, removeTag, splitTags, bareTag,
-  deep, downloadJSON, stripWeights, toNaiWeights, OPTIONAL_CAT_NAMES, BLOCK_RANDOM_RULES, SPECIES_PARTS_MAP, RANDOM_EXCLUDE_TAGS,
-  TIER3_TAGS, TIER2_BLOCK_IDS, TIER2_BLOCK_PROB, RANDOM_EXCLUSION_RULES, RANDOM_COMBO_RULES, CHARDESIGN_MODE_CONFIG,
-  WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS, KEMONOMIMI_PAIRS,
+  uid, appendTag, countTags, toggleTag, hasTag, removeTag,
+  deep, downloadJSON, stripWeights, toNaiWeights, SPECIES_PARTS_MAP,
 } from "./data/constants.js";
-import { detectConflicts, CONFLICT_RULES } from "./data/conflicts.js";
-
-// Pre-built reverse lookup for conflict-aware random generation
-const CONFLICT_MAP = new Map();
-for (const r of CONFLICT_RULES) {
-  for (let i = 0; i < r.tags.length; i++) {
-    const key = r.tags[i].toLowerCase();
-    if (!CONFLICT_MAP.has(key)) CONFLICT_MAP.set(key, new Set());
-    for (let j = 0; j < r.tags.length; j++) {
-      if (i !== j) CONFLICT_MAP.get(key).add(r.tags[j].toLowerCase());
-    }
-  }
-}
+import { detectConflicts } from "./data/conflicts.js";
 import { TOOLS } from "./data/tools.js";
 import { buildColorTag } from "./data/colors.js";
 import { makeCharacter, makeCustomBlock, BLOCKS_DEF } from "./data/blocks.js";
@@ -47,8 +33,9 @@ import { callAI, callNaturalToTags, callTagSuggest } from "./utils/aiApi.js";
 import NaturalToTagsModal from "./components/modals/NaturalToTagsModal.jsx";
 import CharacterNote from "./CharacterNote/index.jsx";
 import { useAuth } from "./hooks/useAuth.js";
-import { pushToCloud, pullFromCloud, mergeCharacters } from "./sync/firestore.js";
 import AuthButton from "./components/AuthButton.jsx";
+import { useCloudSync } from "./hooks/useCloudSync.js";
+import { useRandomGen } from "./hooks/useRandomGen.js";
 
 // Merge saved blocks with current BLOCKS_DEF so newly added/removed tags
 // are always reflected in existing characters without wiping user data.
@@ -141,18 +128,6 @@ export default function Loom() {
 
   // ── Auth & cloud sync ──
   const { user, signInWithGoogle, signOut } = useAuth();
-  const [syncStatus, setSyncStatus] = useState(''); // '' | 'syncing' | 'synced' | 'error'
-  const [syncErrToast, setSyncErrToast] = useState(false);
-  const cloudPushTimer = useRef(null);
-  const isSyncingFromCloud = useRef(false);
-  const lastCloudPullAt = useRef(0);
-
-  useEffect(() => {
-    if (syncStatus !== 'error') return;
-    setSyncErrToast(true);
-    const t = setTimeout(() => setSyncErrToast(false), 7000);
-    return () => clearTimeout(t);
-  }, [syncStatus]);
 
   useEffect(() => {
     const onResize = () => setVw(window.innerWidth);
@@ -187,7 +162,6 @@ export default function Loom() {
   const [analyzeText, setAnalyzeText] = useState('');
   const [dataMenuOpen, setDataMenuOpen] = useState(false);
   const [toolPickerOpen, setToolPickerOpen] = useState(false);
-  const [randomMode, setRandomMode] = useState(() => localStorage.getItem('loom_randomMode') || 'illust');
   const [naturalLang, setNaturalLang] = useState('ja');
   const [apiConfig, setApiConfig] = useState({ provider: 'openai', apiKey: '' });
   const [aiResult, setAiResult] = useState('');
@@ -196,19 +170,29 @@ export default function Loom() {
   const [naturalToTagsOpen, setNaturalToTagsOpen] = useState(false);
   const [naturalToTagsTab, setNaturalToTagsTab] = useState('text'); // 'text' | 'image'
   const [importToast, setImportToast] = useState(null); // null | { name: string }
-  const [dataSizeToast, setDataSizeToast] = useState(false);
   const [orderUpdatedAt, setOrderUpdatedAt] = useState(0);
   const [settingsUpdatedAt, setSettingsUpdatedAt] = useState(0);
-  const isApplyingRemoteSettings = useRef(false);
   const [tagSuggestOpen, setTagSuggestOpen] = useState(false);
   const [tagSuggestions, setTagSuggestions] = useState([]);
   const [tagSuggestBusy, setTagSuggestBusy] = useState(false);
   const [tagSuggestError, setTagSuggestError] = useState('');
   const [jumpOpen, setJumpOpen] = useState(false);
+  // Template undo buffer: stores block text snapshot before template apply
+  const [templateUndoBuf, setTemplateUndoBuf] = useState(null); // null | { blockTexts: {[id]: string}, timer: any }
+  const templateUndoTimerRef = useRef(null);
   const sidebarLastTapRef = useRef({});
 
   const activeChar = characters.find(c => c.id === activeCharId) || characters[0];
   const blocks = activeChar?.blocks || [];
+
+  const { syncStatus, syncErrToast, setSyncErrToast, dataSizeToast, handleSignIn, markRemoteApply } = useCloudSync({
+    user, signInWithGoogle, loaded,
+    characters, orderUpdatedAt, settingsUpdatedAt,
+    setCharacters, setOrderUpdatedAt, setSettingsUpdatedAt,
+    theme, lang, viewMode, activeTool, toolSuffixes, history,
+    setTheme, setLang, setViewMode, setActiveTool, setToolSuffixes, setHistory,
+  });
+  const { randomMode, setRandomMode, generateRandomChar } = useRandomGen({ blocks, lang, activeCharId, setCharacters });
 
   // ── Storage: load on mount ──
   useEffect(() => {
@@ -231,7 +215,7 @@ export default function Loom() {
             }
             setThumbs(tmap);
           }
-          isApplyingRemoteSettings.current = true;
+          markRemoteApply();
           if (d.history) setHistory(d.history);
           if (d.lang) setLang(d.lang);
           if (d.activeTool) setActiveTool(d.activeTool);
@@ -275,7 +259,7 @@ export default function Loom() {
       } catch {}
       setLoaded(true);
     })();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Storage: auto-save on change ──
   useEffect(() => {
@@ -290,111 +274,6 @@ export default function Loom() {
       } catch { setSaveStatus('err'); }
     }, 800);
   }, [characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight, orderUpdatedAt, settingsUpdatedAt, loaded]);
-
-  // ── Settings change watcher: bump settingsUpdatedAt on user-driven changes ──
-  useEffect(() => {
-    if (!loaded) return;
-    if (isApplyingRemoteSettings.current) { isApplyingRemoteSettings.current = false; return; }
-    setSettingsUpdatedAt(Date.now());
-  }, [theme, lang, viewMode, activeTool, toolSuffixes, history, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // ── Cloud sync: pull on login ──
-  useEffect(() => {
-    if (!user || !loaded) return;
-    (async () => {
-      isSyncingFromCloud.current = true;
-      setSyncStatus('syncing');
-      try {
-        const remote = await pullFromCloud(user.uid);
-        if (remote) {
-          setCharacters(prev => mergeCharacters(prev, remote.characters, remote.characterOrder, orderUpdatedAt, remote.orderUpdatedAt));
-          if ((remote.orderUpdatedAt ?? 0) > orderUpdatedAt) {
-            setOrderUpdatedAt(remote.orderUpdatedAt);
-          }
-          if (remote.settings && (remote.settingsUpdatedAt ?? 0) > settingsUpdatedAt) {
-            isApplyingRemoteSettings.current = true;
-            const s = remote.settings;
-            if (s.theme) setTheme(s.theme);
-            if (s.lang) setLang(s.lang);
-            if (s.viewMode) setViewMode(s.viewMode);
-            if (s.activeTool) setActiveTool(s.activeTool);
-            if (s.toolSuffixes) setToolSuffixes(s.toolSuffixes);
-            if (s.history) setHistory(s.history);
-            setSettingsUpdatedAt(remote.settingsUpdatedAt);
-          }
-        }
-        setSyncStatus('synced');
-      } catch {
-        setSyncStatus('error');
-      } finally {
-        isSyncingFromCloud.current = false;
-        lastCloudPullAt.current = Date.now();
-      }
-    })();
-  }, [user?.uid, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // ── Cloud sync: pull on app foreground (Page Visibility API) ──
-  // Fires when the tab/PWA returns to the foreground while already logged in.
-  // Prevents stale local data from overwriting newer cloud changes made on another device.
-  useEffect(() => {
-    if (!user || !loaded) return;
-    const handleVisibility = async () => {
-      if (document.visibilityState !== 'visible') return;
-      if (isSyncingFromCloud.current) return;
-      if (Date.now() - lastCloudPullAt.current < 30_000) return; // throttle: max once per 30 s
-      isSyncingFromCloud.current = true;
-      lastCloudPullAt.current = Date.now();
-      setSyncStatus('syncing');
-      try {
-        const remote = await pullFromCloud(user.uid);
-        if (remote) {
-          setCharacters(prev => mergeCharacters(prev, remote.characters, remote.characterOrder, orderUpdatedAt, remote.orderUpdatedAt));
-          if ((remote.orderUpdatedAt ?? 0) > orderUpdatedAt) setOrderUpdatedAt(remote.orderUpdatedAt);
-          if (remote.settings && (remote.settingsUpdatedAt ?? 0) > settingsUpdatedAt) {
-            isApplyingRemoteSettings.current = true;
-            const s = remote.settings;
-            if (s.theme) setTheme(s.theme);
-            if (s.lang) setLang(s.lang);
-            if (s.viewMode) setViewMode(s.viewMode);
-            if (s.activeTool) setActiveTool(s.activeTool);
-            if (s.toolSuffixes) setToolSuffixes(s.toolSuffixes);
-            if (s.history) setHistory(s.history);
-            setSettingsUpdatedAt(remote.settingsUpdatedAt);
-          }
-        }
-        setSyncStatus('synced');
-      } catch {
-        setSyncStatus('error');
-      } finally {
-        isSyncingFromCloud.current = false;
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibility);
-    return () => document.removeEventListener('visibilitychange', handleVisibility);
-  }, [user?.uid, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // ── Cloud sync: debounced push on change ──
-  useEffect(() => {
-    if (!user || !loaded || isSyncingFromCloud.current) return;
-    if (cloudPushTimer.current) clearTimeout(cloudPushTimer.current);
-    cloudPushTimer.current = setTimeout(async () => {
-      if (!user) return;
-      setSyncStatus('syncing');
-      const result = await pushToCloud(
-        user.uid, characters, orderUpdatedAt,
-        { theme, lang, viewMode, activeTool, toolSuffixes, history },
-        settingsUpdatedAt,
-      );
-      setSyncStatus(result.ok ? 'synced' : 'error');
-      if (!result.ok && result.tooBig) { setDataSizeToast(true); setTimeout(() => setDataSizeToast(false), 6000); }
-    }, 3000);
-  }, [characters, orderUpdatedAt, settingsUpdatedAt, user, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // ── Cloud sync: sign-in handler ──
-  const handleSignIn = async () => {
-    try { await signInWithGoogle(); }
-    catch (e) { if (e.code !== 'auth/popup-closed-by-user') console.error(e); }
-  };
 
   // ── Color picker apply ──
   const TARGET_TO_BLOCK = { hair: 'face', eyes: 'face', skin: 'body', dress: 'outfit', shirt: 'outfit', skirt: 'outfit', jacket: 'outfit', ribbon: 'outfit', shoes: 'outfit', theme: 'artstyle' };
@@ -710,11 +589,30 @@ export default function Loom() {
 
   // ── Templates ──
   const applyTemplate = (tmpl) => {
+    // Save undo snapshot of blocks that will be overwritten
+    const snapshot = {};
+    for (const b of activeChar.blocks) {
+      if (tmpl.apply[b.id] !== undefined) snapshot[b.id] = b.text;
+    }
+    if (templateUndoTimerRef.current) clearTimeout(templateUndoTimerRef.current);
+    setTemplateUndoBuf({ blockTexts: snapshot });
+    templateUndoTimerRef.current = setTimeout(() => setTemplateUndoBuf(null), 12000);
+
     setCharacters(prev => prev.map(c => {
       if (c.id !== activeCharId) return c;
       return { ...c, blocks: c.blocks.map(b => { if (tmpl.apply[b.id] !== undefined) return { ...b, text: tmpl.apply[b.id] }; return b; }) };
     }));
     setTemplateOpen(false);
+  };
+
+  const undoTemplate = () => {
+    if (!templateUndoBuf) return;
+    setCharacters(prev => prev.map(c => {
+      if (c.id !== activeCharId) return c;
+      return { ...c, blocks: c.blocks.map(b => templateUndoBuf.blockTexts[b.id] !== undefined ? { ...b, text: templateUndoBuf.blockTexts[b.id] } : b) };
+    }));
+    clearTimeout(templateUndoTimerRef.current);
+    setTemplateUndoBuf(null);
   };
 
   // ── Output computation ──
@@ -755,7 +653,14 @@ export default function Loom() {
   // ── History ──
   const makeHistoryEntry = (isSnapshot = false) => {
     if (!posText) return null;
-    return { id: uid(), ts: Date.now(), isSnapshot, charId: activeChar.id, charName: activeChar.name, charColor: activeChar.color, charEmoji: activeChar.emoji, blocks: deep(activeChar.blocks), posText, negText };
+    // Strip cats from blocks — they're in BLOCKS_DEF and can be reconstructed on restore.
+    // This prevents history from ballooning to megabytes and breaking cloud sync.
+    const slimBlocks = activeChar.blocks.map(b =>
+      b.isCustomBlock
+        ? { id: b.id, name: b.name, nameEn: b.nameEn, icon: b.icon, color: b.color, text: b.text, enabled: b.enabled, strength: b.strength, locked: b.locked, isCustomBlock: true }
+        : { id: b.id, text: b.text, enabled: b.enabled, strength: b.strength, locked: b.locked }
+    );
+    return { id: uid(), ts: Date.now(), isSnapshot, charId: activeChar.id, charName: activeChar.name, charColor: activeChar.color, charEmoji: activeChar.emoji, blocks: slimBlocks, posText, negText };
   };
   const pushHistory = (entry) => { if (!entry) return; setHistory(prev => [entry, ...prev.filter(e => e.posText !== posText)].slice(0, 20)); };
 
@@ -901,257 +806,11 @@ export default function Loom() {
     ));
   };
 
-  // ── Helper: apply exclusion rules, removing conflicting tags from accumulated set ──
-  const applyExclusionRules = (pickedEnTag, excludedTags) => {
-    const excl = RANDOM_EXCLUSION_RULES.get(pickedEnTag.toLowerCase());
-    if (excl) excl.forEach(e => excludedTags.add(e.toLowerCase()));
+  const restoreFromHistory = (entry) => {
+    // Rebuild full block objects (with cats) from slim history snapshot
+    setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, blocks: mergeCharacterBlocks(entry.blocks) } : c));
+    setHistoryOpen(false);
   };
-
-  // ── Helper: pick tags for one block (shared by full-random and mode overrides) ──
-  const pickBlockTags = (block, globalExcluded) => {
-    const rules = BLOCK_RANDOM_RULES[block.id] || {};
-    const disabledCats = new Set();
-
-    for (const group of (rules.exclusiveGroups || [])) {
-      const present = group.filter(n => block.cats.some(c => c.n === n));
-      if (present.length < 2) continue;
-      const winner = present[Math.floor(Math.random() * present.length)];
-      present.forEach(n => { if (n !== winner) disabledCats.add(n); });
-    }
-
-    const coreCats = block.cats.filter(cat => !OPTIONAL_CAT_NAMES.has(cat.n) && !disabledCats.has(cat.n));
-    const optCats  = block.cats.filter(cat =>  OPTIONAL_CAT_NAMES.has(cat.n) && !disabledCats.has(cat.n));
-    const maxPicks = Math.min(2 + Math.floor(block.cats.length / 3), 6);
-    const picks = [];
-    const skippedCats = new Set(disabledCats);
-
-    const doPick = (cat) => {
-      if (picks.length >= maxPicks || skippedCats.has(cat.n)) return;
-      const validT = cat.t.filter(t => {
-        const en = t.en.toLowerCase();
-        return !RANDOM_EXCLUDE_TAGS.has(t.en)
-          && !TIER3_TAGS.has(en)
-          && !globalExcluded.has(en);
-      });
-      if (validT.length === 0) return;
-      const pick = validT[Math.floor(Math.random() * validT.length)];
-      // 武器タグは追加ゲート（実質~12%）
-      if (WEAPON_TAGS.has(pick.en.toLowerCase()) && Math.random() > WEAPON_PICK_PROB) return;
-      picks.push(pick);
-      for (const ct of (CONFLICT_MAP.get(pick.en.toLowerCase()) || [])) globalExcluded.add(ct);
-      applyExclusionRules(pick.en, globalExcluded);
-      // 武器が当たった場合は手・指ポーズを以降の全ブロックから除外
-      if (WEAPON_TAGS.has(pick.en.toLowerCase())) {
-        HAND_POSE_TAGS.forEach(t => globalExcluded.add(t.toLowerCase()));
-      }
-      (rules.skipIfPicked?.[cat.n] || []).forEach(n => skippedCats.add(n));
-    };
-
-    for (const cat of coreCats) doPick(cat);
-    const shuffledOpt = [...optCats].sort(() => Math.random() - 0.5);
-    for (const cat of shuffledOpt) {
-      if (picks.length >= maxPicks) break;
-      if (!skippedCats.has(cat.n) && Math.random() < 0.4) doPick(cat);
-    }
-    return picks;
-  };
-
-  // ── Combo rules post-pass: add tags triggered by picked tags ──
-  const applyComboRules = (blockMap, fixedBlockIds = null) => {
-    const allPicked = [];
-    for (const [, block] of blockMap) {
-      splitTags(block.text || '').forEach(seg => allPicked.push(bareTag(seg).toLowerCase()));
-    }
-    for (const rule of RANDOM_COMBO_RULES) {
-      if (!allPicked.includes(rule.trigger.toLowerCase())) continue;
-      const target = blockMap.get(rule.blockId);
-      if (!target || target.locked) continue;
-      if (fixedBlockIds?.has(rule.blockId)) continue;
-      if (!hasTag(target.text, rule.tag)) {
-        target.text = appendTag(target.text, rule.tag, target.strength);
-      }
-      // コンボで追加したタグと競合する既存タグを除去（fighting stance→横臥ポーズ除去 等）
-      const conflicts = RANDOM_EXCLUSION_RULES.get(rule.tag.toLowerCase());
-      if (conflicts) {
-        for (const conflictTag of conflicts) {
-          if (hasTag(target.text, conflictTag)) {
-            target.text = removeTag(target.text, conflictTag);
-          }
-        }
-      }
-      // 武器コンボの場合、トリガーブロック側の手・指ポーズも除去
-      if (WEAPON_TAGS.has(rule.trigger.toLowerCase())) {
-        const triggerBlock = blockMap.get(rule.blockId);
-        if (triggerBlock) {
-          for (const handTag of HAND_POSE_TAGS) {
-            if (hasTag(triggerBlock.text, handTag)) {
-              triggerBlock.text = removeTag(triggerBlock.text, handTag);
-            }
-          }
-        }
-      }
-    }
-  };
-
-  const generateRandomChar = (mode = randomMode) => {
-    if (posText && !window.confirm(
-      lang === 'ja'
-        ? '現在のプロンプトをリセットしてランダム生成しますか？'
-        : 'Reset current prompt and generate a random character?'
-    )) return;
-
-    setCharacters(prev => prev.map(c => {
-      if (c.id !== activeCharId) return c;
-
-      const globalExcluded = new Set();
-      const blockMap = new Map(); // id → mutable block copy
-
-      const newBlocks = c.blocks.map(block => {
-        if (block.locked || block.id === 'negative') {
-          blockMap.set(block.id, { ...block });
-          return block;
-        }
-
-        // Tier2 blocks: chardesignモードは常にスキップ、illustモードは確率スキップ
-        if (TIER2_BLOCK_IDS.has(block.id)) {
-          if (mode === 'chardesign' || Math.random() > TIER2_BLOCK_PROB) {
-            const cleared = { ...block, text: '', enabled: true, collapsed: false, lastRandomPicks: [] };
-            blockMap.set(block.id, cleared);
-            return cleared;
-          }
-        }
-
-        let newBlock;
-
-        if (mode === 'chardesign') {
-          // ── 設定資料モード：ノイズゼロ・完全固定 ──
-          const cfg = CHARDESIGN_MODE_CONFIG;
-
-          if (block.id === 'quality') {
-            newBlock = { ...block, text: cfg.qualityText, enabled: true, collapsed: false, lastRandomPicks: [] };
-
-          } else if (block.id === 'artstyle') {
-            newBlock = { ...block, text: cfg.artstyleText, enabled: true, collapsed: false, lastRandomPicks: [] };
-
-          } else if (block.id === 'background') {
-            newBlock = { ...block, text: cfg.backgroundText, enabled: true, collapsed: false, lastRandomPicks: [] };
-
-          } else if (block.id === 'composition') {
-            newBlock = { ...block, text: cfg.compositionText, enabled: true, collapsed: false, lastRandomPicks: [] };
-
-          } else if (block.id === 'face') {
-            // 表情を無表情に固定、ノイズカテゴリをスキップ、floating hairを除外
-            const filteredBlock = {
-              ...block,
-              cats: block.cats
-                .filter(c => !cfg.skipFaceCats.has(c.n))
-                .map(c =>
-                  c.n === '表情'
-                    ? { ...c, t: c.t.filter(t => t.en === cfg.forcedExpression) }
-                    : c.n === '髪飾り・毛流れ'
-                    ? { ...c, t: c.t.filter(t => !cfg.skipFaceTags.has(t.en)) }
-                    : c.n === 'メイク・顔演出'
-                    ? { ...c, t: c.t.filter(t => cfg.faceMakeupPhysical.has(t.en)) }
-                    : c
-                ),
-            };
-            const picks = pickBlockTags(filteredBlock, globalExcluded);
-            let text = '';
-            for (const t of picks) text = appendTag(text, t.en, block.strength);
-            newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: picks };
-
-          } else if (block.id === 'body') {
-            const filteredBlock = { ...block, cats: block.cats.filter(c => !cfg.skipBodyCats.has(c.n)) };
-            const picks = pickBlockTags(filteredBlock, globalExcluded);
-            let text = '';
-            for (const t of picks) text = appendTag(text, t.en, block.strength);
-            newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: picks };
-
-          } else if (block.id === 'feature') {
-            const filteredBlock = { ...block, cats: block.cats.filter(c => !cfg.skipFeatureCats.has(c.n)) };
-            const picks = pickBlockTags(filteredBlock, globalExcluded);
-            let text = '';
-            for (const t of picks) text = appendTag(text, t.en, block.strength);
-            newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: picks };
-
-          } else {
-            // attribute, outfit など：通常抽選（種族パーツフックあり）
-            const picks = pickBlockTags(block, globalExcluded);
-            let text = '';
-            for (const t of picks) text = appendTag(text, t.en, block.strength);
-            if (block.id === 'attribute') {
-              const speciesCat = block.cats.find(cat => cat.n === '種族');
-              for (const pick of picks) {
-                if (!speciesCat?.t.some(st => st.en === pick.en)) continue;
-                const en = pick.en.toLowerCase();
-                if (en === 'kemonomimi') {
-                  const pair = KEMONOMIMI_PAIRS[Math.floor(Math.random() * KEMONOMIMI_PAIRS.length)];
-                  for (const partEn of pair) { if (!hasTag(text, partEn)) text = appendTag(text, partEn, block.strength); }
-                  continue;
-                }
-                if (en === 'human') {
-                  if (Math.random() < 0.1) {
-                    const pair = KEMONOMIMI_PAIRS[Math.floor(Math.random() * KEMONOMIMI_PAIRS.length)];
-                    for (const partEn of pair) { if (!hasTag(text, partEn)) text = appendTag(text, partEn, block.strength); }
-                  }
-                  continue;
-                }
-                for (const partEn of (SPECIES_PARTS_MAP[pick.en] || [])) {
-                  if (!hasTag(text, partEn)) text = appendTag(text, partEn, block.strength);
-                }
-              }
-            }
-            newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: picks };
-          }
-
-        } else {
-          // ── イラストモード：通常ランダム抽選 ──
-          const picks = pickBlockTags(block, globalExcluded);
-          let text = '';
-          for (const t of picks) text = appendTag(text, t.en, block.strength);
-
-          // Species auto-parts + kemonomimi/human special hooks
-          if (block.id === 'attribute') {
-            const speciesCat = block.cats.find(cat => cat.n === '種族');
-            for (const pick of picks) {
-              if (!speciesCat?.t.some(st => st.en === pick.en)) continue;
-              const en = pick.en.toLowerCase();
-              if (en === 'kemonomimi') {
-                const pair = KEMONOMIMI_PAIRS[Math.floor(Math.random() * KEMONOMIMI_PAIRS.length)];
-                for (const partEn of pair) { if (!hasTag(text, partEn)) text = appendTag(text, partEn, block.strength); }
-                continue;
-              }
-              if (en === 'human') {
-                if (Math.random() < 0.1) {
-                  const pair = KEMONOMIMI_PAIRS[Math.floor(Math.random() * KEMONOMIMI_PAIRS.length)];
-                  for (const partEn of pair) { if (!hasTag(text, partEn)) text = appendTag(text, partEn, block.strength); }
-                }
-                continue;
-              }
-              for (const partEn of (SPECIES_PARTS_MAP[pick.en] || [])) {
-                if (!hasTag(text, partEn)) text = appendTag(text, partEn, block.strength);
-              }
-            }
-          }
-          newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: picks };
-        }
-
-        blockMap.set(block.id, newBlock);
-        return newBlock;
-      });
-
-      // Combo rules post-pass (chardesignモードは固定ブロックへの変更を禁止)
-      applyComboRules(blockMap, mode === 'chardesign' ? CHARDESIGN_MODE_CONFIG.fixedBlocks : null);
-
-      // Sync text back from blockMap to newBlocks array
-      return {
-        ...c,
-        blocks: newBlocks.map(b => blockMap.has(b.id) ? blockMap.get(b.id) : b),
-      };
-    }));
-  };
-
-  const restoreFromHistory = (entry) => { setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, blocks: deep(entry.blocks) } : c)); setHistoryOpen(false); };
 
   // ── Export/Import (1 character) ──
   const handleExport = () => downloadJSON(
@@ -2509,57 +2168,74 @@ export default function Loom() {
         </div>
       )}
 
-      {/* ── Data size warning toast ── */}
-      {dataSizeToast && (
-        <div
-          className="fixed z-[500] right-4 bg-surface border rounded-[10px] shadow-xl px-4 py-3 text-[11px] font-mono max-w-[280px]"
-          style={{ bottom: (outputExpanded ? outputHeight : 80) + 12, borderColor: 'rgb(var(--c-orange, var(--c-warn)) / 0.5)' }}
-        >
-          <div className="font-bold mb-1" style={{ color: 'rgb(var(--warn-text, var(--c-orange)))' }}>
-            ⚠ {lang === 'ja' ? 'データが大きすぎます' : 'Data too large'}
+      {/* ── Stacked toast container (bottom-right) ── */}
+      <div
+        className="fixed z-[500] right-4 flex flex-col-reverse gap-[8px]"
+        style={{ bottom: (outputExpanded ? outputHeight : 80) + 12 }}
+      >
+        {/* Template undo snackbar */}
+        {templateUndoBuf && (
+          <div className="bg-surface border border-accent/40 rounded-[10px] shadow-xl px-4 py-3 text-[11px] font-mono max-w-[280px] flex items-center gap-3">
+            <span className="text-fg flex-1">{lang === 'ja' ? '✦ テンプレートを適用しました' : '✦ Template applied'}</span>
+            <button
+              onClick={undoTemplate}
+              className="border border-accent/60 rounded-[6px] px-[10px] py-[4px] text-accent text-[10px] font-bold cursor-pointer bg-transparent whitespace-nowrap"
+            >
+              {lang === 'ja' ? '元に戻す' : 'Undo'}
+            </button>
+            <button onClick={() => { clearTimeout(templateUndoTimerRef.current); setTemplateUndoBuf(null); }} className="text-dim cursor-pointer bg-transparent border-none text-[11px] leading-none p-0">×</button>
           </div>
-          <div className="text-muted leading-[1.55]">
-            {lang === 'ja'
-              ? 'クラウド同期できませんでした。プロンプトログを削除してデータを減らしてください。'
-              : 'Cloud sync failed. Delete some prompt log entries to reduce data size.'}
-          </div>
-        </div>
-      )}
+        )}
 
-      {/* ── Import success toast ── */}
-      {importToast && (
-        <div
-          className="fixed z-[500] right-4 bg-surface border rounded-[10px] shadow-xl px-4 py-3 text-[11px] font-mono max-w-[260px]"
-          style={{ bottom: (outputExpanded ? outputHeight : 80) + 12, borderColor: 'rgb(var(--c-teal) / 0.5)' }}
-        >
-          <div className="font-bold" style={{ color: 'rgb(var(--c-teal))' }}>
-            ✓ {lang === 'ja' ? `「${importToast.name}」を追加しました` : `"${importToast.name}" added`}
-          </div>
-        </div>
-      )}
-
-      {/* ── Sync error toast ── */}
-      {syncErrToast && user && (
-        <div
-          className="fixed z-[500] right-4 bg-surface border border-red-400/50 rounded-[10px] shadow-xl px-4 py-3 text-[11px] font-mono max-w-[240px]"
-          style={{ bottom: (outputExpanded ? outputHeight : 80) + 12 }}
-        >
-          <div className="font-bold mb-1" style={{ color: 'rgb(var(--c-red))' }}>
-            ⚠ {lang === 'ja' ? '同期に失敗しました' : 'Sync failed'}
-          </div>
-          <div className="text-muted leading-[1.55]">
-            {lang === 'ja'
-              ? 'ネットワークを確認してください。データはこの端末に保存されています。'
-              : 'Check your network. Data is saved locally on this device.'}
-          </div>
-          <button
-            onClick={() => setSyncErrToast(false)}
-            className="mt-2 text-dim cursor-pointer bg-transparent border-none text-[10px] p-0"
+        {/* Data size warning toast */}
+        {dataSizeToast && (
+          <div
+            className="bg-surface border rounded-[10px] shadow-xl px-4 py-3 text-[11px] font-mono max-w-[280px]"
+            style={{ borderColor: 'rgb(var(--c-orange, var(--c-warn)) / 0.5)' }}
           >
-            {lang === 'ja' ? '閉じる' : 'Dismiss'}
-          </button>
-        </div>
-      )}
+            <div className="font-bold mb-1" style={{ color: 'rgb(var(--warn-text, var(--c-orange)))' }}>
+              ⚠ {lang === 'ja' ? 'データが大きすぎます' : 'Data too large'}
+            </div>
+            <div className="text-muted leading-[1.55]">
+              {lang === 'ja'
+                ? 'クラウド同期できませんでした。プロンプトログを削除してデータを減らしてください。'
+                : 'Cloud sync failed. Delete some prompt log entries to reduce data size.'}
+            </div>
+          </div>
+        )}
+
+        {/* Import success toast */}
+        {importToast && (
+          <div
+            className="bg-surface border rounded-[10px] shadow-xl px-4 py-3 text-[11px] font-mono max-w-[260px]"
+            style={{ borderColor: 'rgb(var(--c-teal) / 0.5)' }}
+          >
+            <div className="font-bold" style={{ color: 'rgb(var(--c-teal))' }}>
+              ✓ {lang === 'ja' ? `「${importToast.name}」を追加しました` : `"${importToast.name}" added`}
+            </div>
+          </div>
+        )}
+
+        {/* Sync error toast */}
+        {syncErrToast && user && (
+          <div className="bg-surface border border-red-400/50 rounded-[10px] shadow-xl px-4 py-3 text-[11px] font-mono max-w-[240px]">
+            <div className="font-bold mb-1" style={{ color: 'rgb(var(--c-red))' }}>
+              ⚠ {lang === 'ja' ? '同期に失敗しました' : 'Sync failed'}
+            </div>
+            <div className="text-muted leading-[1.55]">
+              {lang === 'ja'
+                ? 'ネットワークを確認してください。データはこの端末に保存されています。'
+                : 'Check your network. Data is saved locally on this device.'}
+            </div>
+            <button
+              onClick={() => setSyncErrToast(false)}
+              className="mt-2 text-dim cursor-pointer bg-transparent border-none text-[10px] p-0"
+            >
+              {lang === 'ja' ? '閉じる' : 'Dismiss'}
+            </button>
+          </div>
+        )}
+      </div>
 
       {showWelcome && loaded && (
         <WelcomeHint

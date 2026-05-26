@@ -231,6 +231,8 @@ export const CONFLICT_RULES = [
   { tags:['drill hair','very short hair'],ja:'ドリルヘアと超ショートが矛盾',               en:'drill hair + very short hair' },
   { tags:['hime cut','very short hair'],  ja:'姫カットと超ショートが矛盾（長さが必要）',    en:'hime cut + very short hair' },
   { tags:['wolf cut','very short hair'],  ja:'ウルフカットと超ショートが矛盾',              en:'wolf cut + very short hair' },
+  { tags:['layered hair','very short hair'],ja:'レイヤードと超ショートが矛盾（長さが必要）', en:'layered hair + very short hair' },
+  { tags:['layered hair','pixie cut'],    ja:'レイヤードとピクシーカットが矛盾',            en:'layered hair + pixie cut' },
 
   // ── アートスタイル（新追加）────────────────────────────────────
   { tags:['chibi','realistic'],           ja:'SD（ちび）とリアルが矛盾',                   en:'chibi + realistic' },
@@ -240,6 +242,12 @@ export const CONFLICT_RULES = [
   { tags:['flat design','painterly'],     ja:'フラットデザインとペインタリーが矛盾',        en:'flat design + painterly' },
   { tags:['flat design','watercolor'],    ja:'フラットデザインと水彩が矛盾',               en:'flat design + watercolor' },
   { tags:['soft shading','cel shading'],  ja:'ソフトシェーディングとセルシェードが矛盾',    en:'soft shading + cel shading' },
+  { tags:['retro artstyle','realistic'],      ja:'レトロアニメとリアルが矛盾',          en:'retro artstyle + realistic' },
+  { tags:['retro artstyle','photorealistic'], ja:'レトロアニメとフォトリアルが矛盾',    en:'retro artstyle + photorealistic' },
+  { tags:['retro artstyle','3D rendering'],   ja:'レトロアニメと3Dレンダリングが矛盾',  en:'retro artstyle + 3D rendering' },
+  { tags:['tarot card','realistic'],          ja:'タロットカードとリアルが矛盾',        en:'tarot card + realistic' },
+  { tags:['tarot card','photorealistic'],     ja:'タロットカードとフォトリアルが矛盾',  en:'tarot card + photorealistic' },
+  { tags:['tarot card','3D rendering'],       ja:'タロットカードと3Dレンダリングが矛盾',en:'tarot card + 3D rendering' },
 
   // ── 天候 ──────────────────────────────────────────────────────
   { tags:['lightning','clear sky'],       ja:'雷と晴れが矛盾',                             en:'lightning + clear sky' },
@@ -255,3 +263,15 @@ export const detectConflicts = text => {
   const bares = splitTags(text).map(s => bareTag(s).toLowerCase());
   return CONFLICT_RULES.filter(r => r.tags.every(t => bares.includes(t.toLowerCase())));
 };
+
+// Pre-built reverse lookup: tag → Set of conflicting tags (lowercase)
+export const CONFLICT_MAP = new Map();
+for (const r of CONFLICT_RULES) {
+  for (let i = 0; i < r.tags.length; i++) {
+    const key = r.tags[i].toLowerCase();
+    if (!CONFLICT_MAP.has(key)) CONFLICT_MAP.set(key, new Set());
+    for (let j = 0; j < r.tags.length; j++) {
+      if (i !== j) CONFLICT_MAP.get(key).add(r.tags[j].toLowerCase());
+    }
+  }
+}

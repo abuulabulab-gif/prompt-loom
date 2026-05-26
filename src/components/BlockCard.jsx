@@ -281,11 +281,11 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           >💾{!isMobile && (lang === 'ja' ? '保存' : ' Save')}</button>
         )}
 
-        {/* Tag count */}
+        {/* Tag count — same height as adjacent buttons */}
         {block.text && (
           <span
             style={{ background: block.color + '20', border: `1px solid ${block.color}70`, color: block.color }}
-            className="text-[10px] font-mono font-bold px-[5px] py-[2px] rounded-[4px] flex-shrink-0 leading-none"
+            className="inline-flex items-center text-[10px] font-mono font-bold px-[5px] py-[2px] rounded-[4px] flex-shrink-0 h-[22px]"
           >
             {countTags(block.text)}{lang === 'ja' ? 'タグ' : 't'}
           </span>
@@ -488,6 +488,35 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             onFocus={e => { if (!isLocked) e.target.style.borderColor = block.color + '80'; }}
             onBlur={e => { e.target.style.borderColor = ''; }}
           />
+
+          {/* ── Active-tag preview strip ──────────────────────── */}
+          {(() => {
+            if (!block.text) return null;
+            const activeTags = block.text.split(',').map(s => s.trim()).filter(Boolean);
+            if (activeTags.length === 0) return null;
+            const randomEnSet = new Set((block.lastRandomPicks || []).map(t => t.en.toLowerCase()));
+            return (
+              <div className="mt-[6px] mb-[4px] flex flex-wrap gap-[4px] items-center">
+                {activeTags.map((raw, i) => {
+                  // Strip weight syntax for lookup: (tag:1.2) → tag
+                  const bare = raw.replace(/^\((.+?)(?::\d[\d.]*)?[\)]+$/, '$1').trim();
+                  const isRandom = randomEnSet.has(bare.toLowerCase());
+                  return (
+                    <span
+                      key={i}
+                      style={isRandom
+                        ? { background: block.color + '15', border: `1px dashed ${block.color}80`, color: block.color }
+                        : { background: 'rgb(var(--surface-alt))', border: `1px solid ${block.color}50`, color: block.color }}
+                      className="inline-flex items-center gap-[3px] rounded-[4px] px-[5px] py-[1px] text-[9px] font-mono"
+                    >
+                      <span className="opacity-60 text-[8px]">{isRandom ? '🎲' : '👤'}</span>
+                      {bare}
+                    </span>
+                  );
+                })}
+              </div>
+            );
+          })()}
 
           {/* Strength + controls row */}
           <div className="my-[9px] mb-[11px]">

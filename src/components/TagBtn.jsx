@@ -1,13 +1,19 @@
 import { useState, useRef } from "react";
 
-// タッチデバイス（スマホ）ではホバーが存在しないのでツールチップ無効
 const SUPPORTS_HOVER = typeof window !== 'undefined'
   && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+const IS_TOUCH = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+
+const LONG_PRESS_MS = 420;
 
 export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disabled, selectMode, selected, conflict, desc, large, onInsert, onToggleFav }) {
   const [h, setH] = useState(false);
   const [tipPos, setTipPos] = useState(null);
+  const [longTip, setLongTip] = useState(false); // touch long-press tooltip
   const wrapRef = useRef(null);
+  const longPressTimer = useRef(null);
+  const longFired = useRef(false);
 
   const warnColor    = 'rgb(var(--c-red))';
   const analyzeColor = 'rgb(var(--c-teal))';
@@ -44,16 +50,46 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
   };
   const handleLeave = () => { setH(false); setTipPos(null); };
 
+  // Long-press tooltip for touch devices
+  const handleTouchStart = (e) => {
+    if (!desc || !wrapRef.current) return;
+    longFired.current = false;
+    longPressTimer.current = setTimeout(() => {
+      longFired.current = true;
+      const r = wrapRef.current.getBoundingClientRect();
+      setTipPos({ x: Math.round(r.left + r.width / 2), y: Math.round(r.top) });
+      setLongTip(true);
+    }, LONG_PRESS_MS);
+  };
+  const handleTouchEnd = () => {
+    clearTimeout(longPressTimer.current);
+    if (longFired.current) {
+      // Long press fired — suppress the click so tag is NOT toggled
+      setTimeout(() => { setLongTip(false); setTipPos(null); longFired.current = false; }, 1800);
+    }
+  };
+  const handleTouchMove = () => {
+    clearTimeout(longPressTimer.current);
+    setLongTip(false);
+    setTipPos(null);
+  };
+
+  const showTip = (h && desc && tipPos && !selectMode && !disabled && SUPPORTS_HOVER)
+               || (longTip && desc && tipPos && !selectMode && !disabled);
+
   return (
     <div
       ref={wrapRef}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
+      onTouchStart={IS_TOUCH ? handleTouchStart : undefined}
+      onTouchEnd={IS_TOUCH ? handleTouchEnd : undefined}
+      onTouchMove={IS_TOUCH ? handleTouchMove : undefined}
       style={{ background: bg, border: `1px solid ${bd}`, opacity: disabled ? 0.4 : 1, boxShadow: active && !selectMode ? `0 0 0 1px ${color}40` : 'none' }}
       className="inline-flex items-center rounded-[5px] overflow-hidden transition-all duration-100"
     >
       {/* Tooltip — position:fixed escapes parent overflow:hidden */}
-      {h && desc && tipPos && !selectMode && !disabled && SUPPORTS_HOVER && (
+      {showTip && (
         <div style={{
           position: 'fixed',
           left: tipPos.x,
@@ -82,7 +118,11 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
       )}
       <button
         disabled={disabled}
-        onClick={onInsert}
+        onClick={(e) => {
+          // Suppress click when a long-press tooltip just fired
+          if (longFired.current) { e.preventDefault(); return; }
+          onInsert(e);
+        }}
         title={conflict ? (lang === 'ja' ? `⚠ 競合タグ: ${tag.en}` : `⚠ Conflicting tag: ${tag.en}`) : (lang === 'ja' ? tag.en : tag.ja)}
         style={{ color: fg }}
         className={`bg-transparent border-none px-[7px] py-[3px] ${large ? 'text-[13px]' : 'text-[12px]'} cursor-pointer font-mono tracking-tight ${(active || selected) ? 'font-bold' : 'font-normal'}`}

@@ -44,10 +44,17 @@ src/
 │   └── RecordModal.jsx
 ├── hooks/
 │   ├── useVariations.js      ← バリエーション生成（3種類）
-│   └── useOutputDrag.js      ← 出力エリアのリサイズドラッグ
+│   ├── useOutputDrag.js      ← 出力エリアのリサイズドラッグ
+│   ├── useCloudSync.js       ← クラウド同期（pull/push/visibility）・設定変更検知
+│   └── useRandomGen.js       ← ランダム生成（pickBlockTags・applyComboRules・generateRandomChar）
 └── utils/
     └── naturalLanguage.js    ← 自然文生成（JA/EN）
 ```
+
+### `data/conflicts.js` エクスポート
+- `CONFLICT_RULES` — 競合ルール配列（detectConflicts が使用）
+- `detectConflicts(text)` — テキスト内の競合タグ検出
+- `CONFLICT_MAP` — ランダム生成用逆引きMap（`tag → Set<競合tag>`）、useRandomGen が import して使用
 
 ---
 
@@ -66,6 +73,26 @@ src/
 | `outputTab` | 'positive'｜'negative'｜'natural' | 出力タブ |
 | `jumpOpen` | boolean | スマホ用サイドバー開閉 |
 | `hiddenBlockIds` | Set<string> | `activeChar.hiddenBlocks`から生成 |
+
+### フックが管理する状態（Loom.jsx では宣言しない）
+
+| フック | 管理する値 |
+|--------|------------|
+| `useCloudSync` | `syncStatus`, `syncErrToast`, `dataSizeToast`, `handleSignIn`, `isApplyingRemoteSettings` |
+| `useRandomGen` | `randomMode`, `setRandomMode`, `generateRandomChar` |
+
+### Loom.jsx のセクション順序（目安）
+1. imports（~35行）
+2. `mergeCharacterBlocks()` ユーティリティ関数
+3. `export default function Loom()` — state宣言（~130行）
+4. `activeChar` / `blocks` 導出
+5. **`useCloudSync` / `useRandomGen` フック呼び出し**
+6. storage load/save useEffect（IndexedDB）
+7. ブロック・キャラ操作ヘルパー（updateBlock, handleBlockUpdate, addCustomBlock …）
+8. キャラ管理ヘルパー（addCharacter, deleteCharacter …）
+9. 出力計算（posText, negText, finalPosText …）
+10. History / Keyboard shortcuts
+11. `return (...)` JSX
 
 ---
 
