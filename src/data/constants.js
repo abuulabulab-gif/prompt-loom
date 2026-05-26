@@ -235,6 +235,17 @@ export const RANDOM_EXCLUSION_RULES = new Map([
   ['monochrome',      new Set(['vibrant colors','colorful','neon colors','warm colors','cool colors','pastel colors','cel shading'])],
   // fighting stance（コンボで追加された際の事後クリーンアップ用）
   ['fighting stance', new Set(['lying on back','lying on stomach','all fours','seiza','sitting cross-legged','sleeping'])],
+  // 男性キャラ → 女性向け衣装・下着・ホーザリー除外
+  ['1boy', new Set([
+    'dress','sundress','sweater dress','wedding dress','evening gown',
+    'sailor uniform','maid outfit','furisode','cheongsam','shrine maiden',
+    'nurse','magical girl','gothic lolita','idol costume','cheerleader',
+    'race queen','bikini armor','bunny suit','leotard',
+    'school swimsuit','bikini','micro bikini','lingerie',
+    'blouse','off shoulder','crop top','halter top','tube top','sports bra',
+    'skirt','pleated skirt','mini skirt','micro skirt','hot pants',
+    'thighhighs','white thighhighs','black thighhighs','pantyhose',
+  ])],
 ]);
 
 // ── Combo rules: trigger tag → add tag in another block ──────
