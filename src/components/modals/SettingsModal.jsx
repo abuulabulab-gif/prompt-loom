@@ -262,9 +262,9 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/80 z-[300] flex items-center justify-center p-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/80 z-[300] flex items-start justify-center px-4 pt-[6dvh] pb-4" onClick={onClose}>
       <div onClick={e => e.stopPropagation()}
-        className="bg-surface border border-linebright rounded-[14px] w-full max-w-[540px] overflow-hidden flex flex-col max-h-[80dvh]">
+        className="bg-surface border border-linebright rounded-[14px] w-full max-w-[540px] overflow-hidden flex flex-col h-[80dvh]">
 
         {/* Header */}
         <div className="px-[18px] py-[13px] border-b border-line flex items-center justify-between flex-shrink-0">
@@ -341,7 +341,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
         </div>
 
         {/* Body — scrollable */}
-        <div className="overflow-y-auto flex-1 min-h-0 min-h-[400px]">
+        <div className="overflow-y-auto flex-1 min-h-0">
 
           {/* ── Shortcuts / Mobile Tips tab ── */}
           {tab === 'shortcuts' && (
