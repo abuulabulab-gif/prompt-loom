@@ -160,10 +160,10 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
     >
       {/* ── Header ─────────────────────────────────────────── */}
       <div
-        className={`flex items-start gap-[6px] px-3 ${focusMode ? 'py-[13px]' : 'py-[9px]'}${block.collapsed ? '' : ' bg-surfalt border-b border-line'}`}
+        className={`flex flex-wrap items-start gap-x-[6px] gap-y-[4px] px-3 ${focusMode ? 'py-[13px]' : 'py-[9px]'}${block.collapsed ? '' : ' bg-surfalt border-b border-line'}`}
       >
         {/* LEFT: drag + move + toggle + badge + icon + name — takes all available space */}
-        <div className="flex items-start gap-[6px] flex-1 min-w-0">
+        <div className="flex items-start gap-[6px] flex-1 min-w-[130px]">
         {/* Drag handle */}
         <button
           {...listeners}
