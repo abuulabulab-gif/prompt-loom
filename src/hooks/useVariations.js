@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { splitTags, bareTag, appendTag, removeTag, hasTag, stripWeights, OPTIONAL_CAT_NAMES, BLOCK_RANDOM_RULES, TIER3_TAGS, RANDOM_EXCLUSION_RULES, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS } from "../data/constants.js";
+import { CONFLICT_MAP } from "../data/conflicts.js";
 
 // Blocks whose content is fixed across all variations (character identity)
 const VAR_FIXED_BLOCKS = new Set(['quality', 'artstyle', 'attribute', 'face', 'body', 'negative']);
@@ -14,10 +15,12 @@ function pickForBlock(block, allPickedTags) {
   const excluded = new Set();
   const rules = BLOCK_RANDOM_RULES[block.id] || {};
 
-  // 固定ブロックのタグから排他ルールを先に全部収集（種族 → 衣装制約 等）
+  // 固定ブロックのタグから排他ルールを先に全部収集（種族 → 衣装制約 + 競合マップ）
   for (const tag of allPickedTags) {
     const excl = RANDOM_EXCLUSION_RULES.get(tag.toLowerCase());
     if (excl) excl.forEach(e => excluded.add(e.toLowerCase()));
+    const cfMap = CONFLICT_MAP.get(tag.toLowerCase());
+    if (cfMap) cfMap.forEach(e => excluded.add(e));
   }
 
   // exclusiveGroups（背景の屋外/屋内/シンプル排他 等）
@@ -75,13 +78,17 @@ function applyVariationCombos(rerolledMap) {
     if (!hasTag(rerolledMap[blockId], tag)) {
       rerolledMap[blockId] = appendTag(rerolledMap[blockId], tag, '1.0');
     }
-    // コンボタグと競合する既存タグを除去
-    const conflicts = RANDOM_EXCLUSION_RULES.get(tag.toLowerCase());
-    if (conflicts) {
-      for (const ct of conflicts) {
-        if (hasTag(rerolledMap[blockId], ct)) {
-          rerolledMap[blockId] = removeTag(rerolledMap[blockId], ct);
-        }
+    // コンボタグと競合する既存タグを除去（RANDOM_EXCLUSION_RULES + CONFLICT_MAP）
+    const excl = RANDOM_EXCLUSION_RULES.get(tag.toLowerCase());
+    if (excl) {
+      for (const ct of excl) {
+        if (hasTag(rerolledMap[blockId], ct)) rerolledMap[blockId] = removeTag(rerolledMap[blockId], ct);
+      }
+    }
+    const cfMap = CONFLICT_MAP.get(tag.toLowerCase());
+    if (cfMap) {
+      for (const ct of cfMap) {
+        if (hasTag(rerolledMap[blockId], ct)) rerolledMap[blockId] = removeTag(rerolledMap[blockId], ct);
       }
     }
   };

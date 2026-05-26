@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { STRENGTHS, uid, appendTag, countTags, hasTag, toggleTag, clampW, removeTag, OPTIONAL_CAT_NAMES, BLOCK_RANDOM_RULES, TIER3_TAGS, RANDOM_EXCLUSION_RULES, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS, TAG_PAIR_COMBOS, TAG_SPECIES_COMBOS } from "../data/constants.js";
+import { CONFLICT_MAP } from "../data/conflicts.js";
 import { EXPRESSION_PRESETS, ALL_EXPR_TAGS } from "../data/expressions.js";
 import { NEG_PRESETS } from "../data/negSuggestions.js";
 import TagBtn from "./TagBtn.jsx";
@@ -569,11 +570,13 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                     let baseText = block.text;
                     for (const t of (block.lastRandomPicks || [])) baseText = removeTag(baseText, t.en);
 
-                    // Collect exclusions from tags already in baseText
+                    // Collect exclusions from tags already in baseText (RANDOM_EXCLUSION_RULES + CONFLICT_MAP)
                     const excluded = new Set();
                     baseText.split(',').map(s => s.trim().toLowerCase()).filter(Boolean).forEach(en => {
                       const excl = RANDOM_EXCLUSION_RULES.get(en);
                       if (excl) excl.forEach(e => excluded.add(e.toLowerCase()));
+                      const cfMap = CONFLICT_MAP.get(en);
+                      if (cfMap) cfMap.forEach(e => excluded.add(e));
                     });
 
                     // Apply BLOCK_RANDOM_RULES: resolve mutually exclusive category groups
