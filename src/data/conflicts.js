@@ -1,5 +1,10 @@
 import { splitTags, bareTag } from './constants.js';
 
+// Helper: generate multiple {tags,ja,en} pairs from one trigger → many targets
+function mk(a, bs, ja) {
+  return bs.map(b => ({ tags: [a, b], ja, en: `${a} + ${b}` }));
+}
+
 export const CONFLICT_RULES = [
   // ── 年齢・体型 ────────────────────────────────────────────────
   { tags:['loli','mature female'],      ja:'幼い体型と成熟体型が矛盾',        en:'loli + mature female' },
@@ -257,6 +262,95 @@ export const CONFLICT_RULES = [
   { tags:['outer space','bedroom'],       ja:'宇宙空間と寝室背景が矛盾',                   en:'outer space + bedroom' },
   { tags:['outer space','classroom'],     ja:'宇宙空間と教室背景が矛盾',                   en:'outer space + classroom' },
   { tags:['outer space','cafe'],          ja:'宇宙空間とカフェ背景が矛盾',                 en:'outer space + cafe' },
+
+  // ══════════════════════════════════════════════════════════════════
+  // ① 性別×胸・ボディフォーカス
+  // ══════════════════════════════════════════════════════════════════
+  ...mk('1boy', ['small breasts','medium breasts','large breasts','huge breasts'],
+    '男性キャラと胸サイズが矛盾'),
+  ...mk('1boy', ['cleavage','sideboob','underboob'],
+    '男性キャラと胸フォーカスが矛盾'),
+
+  // ── 男性キャラ×女性向け衣装・アイテム ─────────────────────────────
+  ...mk('1boy', [
+    'dress','sundress','sweater dress','wedding dress','evening gown',
+    'sailor uniform','maid outfit','furisode','cheongsam','shrine maiden',
+    'nurse','magical girl','gothic lolita','idol costume','cheerleader',
+    'race queen','bikini armor','bunny suit','leotard',
+    'school swimsuit','bikini','micro bikini','lingerie',
+    'blouse','off shoulder','crop top','halter top','tube top','sports bra',
+    'skirt','pleated skirt','mini skirt','micro skirt','hot pants',
+    'thighhighs','white thighhighs','black thighhighs','pantyhose',
+  ], '男性キャラと女性向け衣装・アイテムが矛盾'),
+
+  // ── 幼い体型×極端な描写 ─────────────────────────────────────────
+  ...mk('loli',  ['huge breasts','large breasts'],                '幼い体型と大きな胸が矛盾'),
+  ...mk('loli',  ['cleavage','sideboob','underboob',
+                  'lingerie','micro bikini'],                      '幼い体型と過激な描写が矛盾'),
+  ...mk('young', ['huge breasts'],                                '年齢感タグと極端な胸サイズが矛盾'),
+
+  // ══════════════════════════════════════════════════════════════════
+  // ② 衣装の重ね着パニック（全身服×ボトムス）
+  // ══════════════════════════════════════════════════════════════════
+  // ドレス類（スカート一体型）→ パンツ・レギンス追加は矛盾
+  ...['dress','sundress','sweater dress','wedding dress','evening gown'].flatMap(o =>
+    mk(o, ['pants','jeans','leggings'], `${o}とボトムスが重ね着で矛盾`)),
+  // ワンピース型（全身カバー）→ ボトムス全般と矛盾
+  ...['swimsuit','one-piece swimsuit','school swimsuit',
+      'bunny suit','leotard','bodysuit'].flatMap(o =>
+    mk(o, ['skirt','pleated skirt','mini skirt','micro skirt',
+           'pants','jeans','leggings','shorts','hot pants'], `${o}とボトムスが重ね着で矛盾`)),
+  ...mk('maid outfit', ['pants','jeans','leggings'],  'メイド服とパンツ類が重ね着で矛盾'),
+  ...mk('cheongsam',   ['pants','jeans','leggings'],  'チャイナドレスとパンツ類が重ね着で矛盾'),
+
+  // ══════════════════════════════════════════════════════════════════
+  // ③ 視点×ボディフォーカス（前後の同時指定）
+  // ══════════════════════════════════════════════════════════════════
+  ...mk('back view',
+    ['cleavage','sideboob','underboob','midriff','navel cutout','cleavage cutout'],
+    '後ろ姿と前面ボディフォーカスの同時指定が矛盾'),
+
+  // ══════════════════════════════════════════════════════════════════
+  // ④ 睡眠×視線・インタラクション
+  // ══════════════════════════════════════════════════════════════════
+  ...mk('sleeping', [
+    'looking at viewer','looking away','looking down','looking up','eye contact',
+    'wink','head tilt','waving','pointing','peace sign','v-sign','reaching toward viewer',
+  ], '睡眠状態と視線・インタラクションが矛盾'),
+
+  // ══════════════════════════════════════════════════════════════════
+  // ⑤ 環境×衣装・エフェクト
+  // ══════════════════════════════════════════════════════════════════
+  // 冬・雪 × 水着・裸足
+  ...mk('snowy',
+    ['bikini','micro bikini','swimsuit','one-piece swimsuit','school swimsuit','barefoot'],
+    '雪の環境と夏向け衣装・裸足が矛盾'),
+  ...mk('snow',
+    ['bikini','micro bikini','swimsuit','one-piece swimsuit','school swimsuit','barefoot'],
+    '雪の環境と夏向け衣装・裸足が矛盾'),
+  // 水中 × 使用不可アイテム・エフェクト
+  ...mk('underwater',
+    ['holding umbrella','fire','explosion','embers','electricity'],
+    '水中環境と相容れないアイテム・エフェクトが矛盾'),
+
+  // ══════════════════════════════════════════════════════════════════
+  // ⑥ 髪型の物理法則（短い髪×結ぶ・編む系スタイル）
+  //    ※same-cat なのでランダム生成には影響しないが手動選択時の UI 警告として機能
+  // ══════════════════════════════════════════════════════════════════
+  ...mk('very short hair', [
+    'twin tails','two side up','ponytail','high ponytail','low ponytail','side ponytail',
+    'hair updo','half updo','hair bun','double bun','braid','side braid',
+  ], '超ショートヘアと長さが必要な髪型が矛盾'),
+  ...mk('pixie cut', [
+    'twin tails','two side up','ponytail','high ponytail','low ponytail','side ponytail',
+    'hair updo','half updo','hair bun','double bun','braid','side braid',
+  ], 'ピクシーカットと長さが必要な髪型が矛盾'),
+  ...mk('short hair',
+    ['twin tails','two side up','braid','side braid','hair updo','hair bun'],
+    'ショートヘアと長さが必要な髪型が矛盾'),
+  ...mk('bob cut',
+    ['twin tails','braid','hair updo','hair bun','double bun'],
+    'ボブカットと長さが必要な髪型が矛盾'),
 ];
 
 export const detectConflicts = text => {
