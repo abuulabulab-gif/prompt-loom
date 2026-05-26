@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-html { font-size: 19.2px; }
+html { font-size: 24px; }
 
 /* Prevent accidental text selection everywhere; allow it only in editable fields */
 * { -webkit-user-select: none; user-select: none; }

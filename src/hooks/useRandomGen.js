@@ -154,12 +154,14 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
         } else if (mode === 'chardesign') {
           const cfg = CHARDESIGN_MODE_CONFIG;
 
-          if (block.id === 'artstyle') {
-            newBlock = { ...block, text: cfg.artstyleText, enabled: true, collapsed: false, lastRandomPicks: [] };
-          } else if (block.id === 'background') {
-            newBlock = { ...block, text: cfg.backgroundText, enabled: true, collapsed: false, lastRandomPicks: [] };
-          } else if (block.id === 'composition') {
-            newBlock = { ...block, text: cfg.compositionText, enabled: true, collapsed: false, lastRandomPicks: [] };
+          // Fixed blocks — direct assignment, random pick is NEVER executed for these
+          const chardesignFixedText = {
+            artstyle:    cfg.artstyleText,
+            background:  cfg.backgroundText,
+            composition: cfg.compositionText,
+          };
+          if (Object.hasOwn(chardesignFixedText, block.id)) {
+            newBlock = { ...block, text: chardesignFixedText[block.id], enabled: true, collapsed: false, lastRandomPicks: [] };
           } else if (block.id === 'face') {
             const filteredBlock = {
               ...block,

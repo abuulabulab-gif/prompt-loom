@@ -26,8 +26,11 @@ export const TEMPLATES = [
   {
     id:'asset', name:'素材・白背景', nameEn:'Clean Asset', icon:'🎨',
     desc:'立ち絵・透過素材・キャラ素材向け', descEn:'Character asset / transparent bg',
+    // 役割: ノイズなしの純粋なキャラ単体素材。masterpiece追加でベースライン品質を統一
+    sizeHintJa: '【推奨サイズ】縦長（Portrait）',
+    sizeHintEn: '[Recommended] Portrait (vertical)',
     apply: {
-      quality:    'best quality, ultra-detailed, highres, sharp focus',
+      quality:    'masterpiece, best quality, ultra-detailed, highres, sharp focus',
       artstyle:   'illustration, flat color, cel shading, vibrant colors, hard shading',
       background: 'white background, simple background',
     },
@@ -35,9 +38,12 @@ export const TEMPLATES = [
   {
     id:'sanmenzu', name:'三面図', nameEn:'3-View Sheet', icon:'📐',
     desc:'正面・側面・背面の三面参考図', descEn:'Front / side / back reference sheet',
+    // 役割: 衣装構造把握用。lineart/soft shadingを削除しflat cel shadingに統一（塗りブレ防止）
+    sizeHintJa: '【推奨サイズ】横長（Landscape / 16:9等）⚠️ 縦長で生成するとキャラの体が融合（キメラ化）する危険があります！',
+    sizeHintEn: '[Recommended] Landscape (16:9 etc.) ⚠️ Portrait orientation may cause body fusion (chimera artifacts)!',
     apply: {
-      quality:     'best quality, ultra-detailed, highres, sharp focus',
-      artstyle:    'illustration, lineart, flat color, cel shading, soft shading',
+      quality:     'masterpiece, best quality, ultra-detailed, highres, sharp focus',
+      artstyle:    'illustration, flat color, cel shading',
       composition: 'character sheet, multiple views, front view, side view, back view, full body, turnaround',
       background:  'white background, simple background',
     },
@@ -45,10 +51,13 @@ export const TEMPLATES = [
   {
     id:'chardesign', name:'キャラ設定シート', nameEn:'Design Sheet', icon:'🎭',
     desc:'デザイン資料・設定画・表情集向け', descEn:'Character design reference / expression sheet',
+    // 役割: キャラデザインのバイブル。lineart削除、color palette/notes/text追加で設定資料らしさ演出
+    sizeHintJa: '【推奨サイズ】横長（Landscape）または正方形（Square）',
+    sizeHintEn: '[Recommended] Landscape or Square',
     apply: {
       quality:     'masterpiece, best quality, ultra-detailed, highres, sharp focus',
-      artstyle:    'concept art, illustration, digital art, lineart',
-      composition: 'character design sheet, reference sheet, full body, expression sheet',
+      artstyle:    'concept art, illustration, digital art',
+      composition: 'character design sheet, reference sheet, full body, expression sheet, color palette, notes, text',
       background:  'white background, simple background',
     },
   },

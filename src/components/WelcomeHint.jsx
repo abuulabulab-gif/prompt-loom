@@ -63,7 +63,7 @@ export default function WelcomeHint({ lang, theme, onSetLang, onSetTheme, onDism
                 ))}
               </div>
               <div className="flex rounded-[6px] border border-line text-[10px] font-mono overflow-hidden">
-                {[{ v: 'dark', icon: '🌙', ja: 'ダーク', en: 'Dark' }, { v: 'light', icon: '☀️', ja: 'ライト', en: 'Light' }].map(({ v, icon, ja, en }, i) => (
+                {[{ v: 'light', icon: '☀️', ja: 'ライト', en: 'Light' }, { v: 'dark', icon: '🌙', ja: 'ダーク', en: 'Dark' }].map(({ v, icon, ja, en }, i) => (
                   <button
                     key={v}
                     onClick={() => onSetTheme(v)}

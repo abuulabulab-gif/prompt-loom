@@ -138,10 +138,7 @@ export default function Loom() {
   const isWide = vw >= 900;
   const isMobile = vw < 600;
   const effLayout = isWide ? layout : '1col';
-  const contentMax = focusBlockId && isWide ? '1200px'
-    : isWide && effLayout === '3col' ? '1400px'
-    : isWide && effLayout === '2col' ? '1200px'
-    : '760px';
+  const contentMax = isWide ? '1400px' : '760px';
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -458,6 +455,10 @@ export default function Loom() {
   const duplicateCharacter = (id) => { const src = characters.find(c => c.id === id); if (!src) return; const copy = { ...deep(src), id: uid(), name: src.name + ' (コピー)' }; setCharacters(prev => { const i = prev.findIndex(c => c.id === id); const next = [...prev]; next.splice(i + 1, 0, copy); return next; }); setActiveCharId(copy.id); setOrderUpdatedAt(Date.now()); };
   const deleteCharacter = async (id) => {
     if (characters.length <= 1) return;
+    const charName = characters.find(c => c.id === id)?.name ?? '';
+    if (!window.confirm(lang === 'ja'
+      ? `「${charName}」を削除しますか？（この操作は取り消せません）`
+      : `Delete "${charName}"? This cannot be undone.`)) return;
     await deleteCharImages(id);
     setThumbs(prev => { const n = { ...prev }; delete n[id]; return n; });
     const r = characters.filter(c => c.id !== id);
@@ -897,6 +898,47 @@ export default function Loom() {
   const { variations, variationsOpen, setVariationsOpen, varCopied, generateVariations, copyVariation } = useVariations(blocks, tool);
   const [varNatSet, setVarNatSet] = useState(new Set());
   const toggleVarNat = (i) => setVarNatSet(prev => { const n = new Set(prev); n.has(i) ? n.delete(i) : n.add(i); return n; });
+
+  // ── Variation ⇄ main swap system ──
+  const [varSource, setVarSource] = useState('original');  // 'original' | 'var0' | 'var1' | 'var2'
+  const [varBuffers, setVarBuffers] = useState({});         // { source: { blockId: text } }
+
+  const captureBlockTexts = () => blocks.reduce((acc, b) => ({ ...acc, [b.id]: b.text }), {});
+
+  const startVariations = () => {
+    if (!posText) return;
+    setVarBuffers({ original: captureBlockTexts() });
+    setVarSource('original');
+    generateVariations();
+    setVarNatSet(new Set());
+  };
+
+  const applyVariation = (varIdx) => {
+    const sourceKey = `var${varIdx}`;
+    const buf = varBuffers[sourceKey];
+    const targetVarBlocks = variations[varIdx]?.blocks ?? [];
+    setVarBuffers(prev => ({ ...prev, [varSource]: captureBlockTexts() }));
+    setCharacters(prev => prev.map(c => {
+      if (c.id !== activeCharId) return c;
+      return { ...c, blocks: c.blocks.map(b => {
+        const text = buf?.[b.id] ?? (targetVarBlocks.find(vb => vb.id === b.id)?.text ?? b.text);
+        return { ...b, text };
+      })};
+    }));
+    setVarSource(sourceKey);
+  };
+
+  const restoreOriginal = () => {
+    if (varSource === 'original') return;
+    const buf = varBuffers.original;
+    if (!buf) return;
+    setVarBuffers(prev => ({ ...prev, [varSource]: captureBlockTexts() }));
+    setCharacters(prev => prev.map(c => {
+      if (c.id !== activeCharId) return c;
+      return { ...c, blocks: c.blocks.map(b => ({ ...b, text: buf[b.id] ?? b.text })) };
+    }));
+    setVarSource('original');
+  };
 
   // ── Command Palette commands ──
   const paletteCommands = [
@@ -1522,7 +1564,7 @@ export default function Loom() {
                 const col1 = [], col2 = [];
                 visibleBlocks.forEach((b, i) => (i % 2 === 0 ? col1 : col2).push([b, i]));
                 return (
-                  <div className="max-w-[1200px] mx-auto px-[14px] py-[13px] flex gap-3 items-start">
+                  <div className="max-w-[1400px] mx-auto px-[14px] py-[13px] flex gap-3 items-start">
                     <div className="flex-1 min-w-0">{col1.map(([b, i]) => renderCard(b, i))}</div>
                     <div className="flex-1 min-w-0">{col2.map(([b, i]) => renderCard(b, i))}</div>
                   </div>
@@ -1530,7 +1572,7 @@ export default function Loom() {
               }
 
               return (
-                <div className="max-w-[760px] mx-auto px-[14px] py-[13px]">
+                <div className="max-w-[1400px] mx-auto px-[14px] py-[13px]">
                   {visibleBlocks.map((b, i) => renderCard(b, i))}
                 </div>
               );
@@ -1840,7 +1882,7 @@ export default function Loom() {
                 )}
                 <span className="text-dim flex-shrink-0 select-none text-[11px] mx-[2px]">│</span>
                 {/* バリエ + 解析 */}
-                <button onClick={() => { if (!posText) return; generateVariations(); setVarNatSet(new Set()); }} disabled={!posText}
+                <button onClick={startVariations} disabled={!posText}
                   title={lang === 'ja' ? 'バリエーションを3種類生成' : 'Generate 3 variations'}
                   style={{ background: variationsOpen ? 'rgb(var(--tint-accent))' : 'none', border: `1px solid ${variationsOpen ? 'rgb(var(--c-blue) / 0.5)' : 'rgb(var(--dim))'}`, color: variationsOpen ? 'rgb(var(--c-blue-s))' : 'rgb(var(--muted))' }}
                   className="rounded-[6px] px-[9px] py-[4px] text-[11px] cursor-pointer disabled:cursor-default font-mono flex-shrink-0">
@@ -2047,9 +2089,24 @@ export default function Loom() {
           {outputExpanded && variationsOpen && variations.length > 0 && outputTab === 'positive' && (
             <div className="flex-shrink-0 mb-[6px] bg-bg border border-linebright rounded-[8px] overflow-hidden">
               <div className="flex items-center justify-between px-3 py-[6px] border-b border-line">
-                <span className="text-[10px] font-mono text-muted">🎲 {lang === 'ja' ? `バリエーション (${variations.length}種)` : `Variations (${variations.length})`}</span>
-                <div className="flex gap-2">
-                  <button onClick={() => { generateVariations(); setVarNatSet(new Set()); }} className="text-accent text-[10px] font-mono cursor-pointer border border-[#4a6fff50] rounded-[4px] px-[7px] py-[1px]">↻ {lang === 'ja' ? '再生成' : 'Re-roll'}</button>
+                <div className="flex items-center gap-[6px]">
+                  <span className="text-[10px] font-mono text-muted">🎲 {lang === 'ja' ? `バリエーション (${variations.length}種)` : `Variations (${variations.length})`}</span>
+                  {/* Source indicator */}
+                  <span className="text-[9px] font-mono px-[5px] py-[1px] rounded-[3px]"
+                    style={varSource === 'original'
+                      ? { background: 'rgb(var(--surface-alt))', color: 'rgb(var(--muted))' }
+                      : { background: 'rgb(var(--c-blue) / 0.15)', color: 'rgb(var(--c-blue))' }}>
+                    {varSource === 'original' ? `🏠 ${lang === 'ja' ? 'オリジナル' : 'Original'}` : `🎲${parseInt(varSource.slice(3)) + 1} ${lang === 'ja' ? '編集中' : 'Editing'}`}
+                  </span>
+                </div>
+                <div className="flex gap-[6px] items-center">
+                  {varSource !== 'original' && varBuffers.original && (
+                    <button onClick={restoreOriginal}
+                      className="text-[9px] font-mono cursor-pointer border border-dim rounded-[4px] px-[6px] py-[1px] text-muted">
+                      🏠 {lang === 'ja' ? '戻す' : 'Restore'}
+                    </button>
+                  )}
+                  <button onClick={startVariations} className="text-accent text-[10px] font-mono cursor-pointer border border-[#4a6fff50] rounded-[4px] px-[7px] py-[1px]">↻ {lang === 'ja' ? '再生成' : 'Re-roll'}</button>
                   <button onClick={() => setVariationsOpen(false)} className="text-dim text-[10px] cursor-pointer">✕</button>
                 </div>
               </div>
@@ -2058,14 +2115,24 @@ export default function Loom() {
                   const isNat = varNatSet.has(i);
                   const natText = naturalLang === 'ja' ? toNaturalJa(v.blocks) : toNaturalEn(v.blocks);
                   const natColor = theme === 'dark' ? '#34d399' : '#0a7a4a';
+                  const isActive = varSource === `var${i}`;
                   return (
-                    <div key={i} className="flex gap-2 items-start px-3 py-[7px]">
+                    <div key={i} className="flex gap-2 items-start px-3 py-[7px]"
+                      style={isActive ? { background: 'rgb(var(--c-blue) / 0.06)' } : undefined}>
                       <span className="text-muted text-[10px] font-mono font-semibold flex-shrink-0 mt-[2px]">{i + 1}</span>
                       <span className={`text-[11px] flex-1 break-words leading-[1.6] select-all ${isNat ? 'font-sans' : 'font-mono break-all text-prompt'}`}
                         style={isNat ? { color: natColor } : undefined}>
                         {isNat ? natText : v.prompt}
                       </span>
                       <div className="flex gap-[5px] flex-shrink-0 items-center">
+                        {/* Apply to main */}
+                        <button onClick={() => applyVariation(i)}
+                          className="rounded-[4px] px-[6px] py-[2px] text-[9px] font-mono cursor-pointer border"
+                          style={isActive
+                            ? { background: 'rgb(var(--c-blue) / 0.15)', borderColor: 'rgb(var(--c-blue) / 0.5)', color: 'rgb(var(--c-blue))' }
+                            : { background: 'transparent', borderColor: 'rgb(var(--dim))', color: 'rgb(var(--muted))' }}>
+                          {isActive ? (lang === 'ja' ? '✏️ 編集中' : '✏️ Editing') : (lang === 'ja' ? '→ 適用' : '→ Apply')}
+                        </button>
                         <button onClick={() => toggleVarNat(i)}
                           className="rounded-[4px] px-[6px] py-[2px] text-[9px] font-mono cursor-pointer border"
                           style={isNat

@@ -33,6 +33,12 @@ function TemplateCard({ tmpl, lang, onApply }) {
       <div className="text-accent text-[10px] font-mono bg-bg px-2 py-[5px] rounded-[5px] break-all leading-[1.5] mb-2">
         {previewText(tmpl)}
       </div>
+      {(lang === 'ja' ? tmpl.sizeHintJa : tmpl.sizeHintEn) && (
+        <div className="text-[9px] font-mono leading-[1.5] mb-2 px-[6px] py-[4px] rounded-[4px]"
+          style={{ background: 'rgb(var(--c-warn) / 0.08)', color: 'rgb(var(--c-warn))', border: '1px solid rgb(var(--c-warn) / 0.25)' }}>
+          {lang === 'ja' ? tmpl.sizeHintJa : tmpl.sizeHintEn}
+        </div>
+      )}
       <div className="flex flex-wrap gap-1">
         {targetBlocks.map(id => (
           <span key={id} className="text-[9px] font-mono px-[5px] py-[2px] rounded-[3px] border border-dim text-muted">
