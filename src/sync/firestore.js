@@ -1,10 +1,22 @@
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { fstore } from '../firebase';
 
+// Strip heavy per-block fields from version snapshots before cloud push.
+// `cats` is always rebuilt from BLOCKS_DEF via mergeCharacterBlocks on restore.
+// `lastRandomPicks` is ephemeral UI state, not needed in cloud storage.
+const slimVersionBlock = (b) => {
+  const { cats, lastRandomPicks, ...rest } = b;
+  return rest;
+};
+
 const toCloudChars = (chars) =>
   chars.map(c => {
-    const { _thumbs, ...rest } = c;
-    return rest;
+    const { _thumbs, versions, ...rest } = c;
+    const slimVersions = (versions || []).map(ver => ({
+      ...ver,
+      blocks: (ver.blocks || []).map(slimVersionBlock),
+    }));
+    return { ...rest, versions: slimVersions };
   });
 
 export async function pushToCloud(uid, characters, orderUpdatedAt, settings, settingsUpdatedAt) {

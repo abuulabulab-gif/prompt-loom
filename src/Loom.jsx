@@ -498,7 +498,8 @@ export default function Loom() {
   };
   const restoreVersion = (ver) => {
     if (!window.confirm(lang === 'ja' ? `"${ver.name}" を復元しますか？（現在のブロックが上書きされます）` : `Restore "${ver.name}"? Current blocks will be overwritten.`)) return;
-    updateChar(activeCharId, { blocks: deep(ver.blocks), memo: ver.memo });
+    // mergeCharacterBlocks re-adds cats from BLOCKS_DEF (needed for cloud-loaded versions where cats were stripped)
+    updateChar(activeCharId, { blocks: mergeCharacterBlocks(ver.blocks), memo: ver.memo });
   };
   const deleteVersion = (verId) => updateChar(activeCharId, { versions: (activeChar.versions || []).filter(v => v.id !== verId) });
 

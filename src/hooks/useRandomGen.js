@@ -68,6 +68,7 @@ function applyComboRules(blockMap, fixedBlockIds = null) {
     const target = blockMap.get(rule.blockId);
     if (!target || target.locked) continue;
     if (fixedBlockIds?.has(rule.blockId)) continue;
+    if (rule.prob !== undefined && Math.random() > rule.prob) continue;
     if (!hasTag(target.text, rule.tag)) {
       target.text = appendTag(target.text, rule.tag, target.strength);
     }

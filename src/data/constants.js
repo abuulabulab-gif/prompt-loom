@@ -144,6 +144,8 @@ export const TIER3_TAGS = new Set([
   'tarot card',
   // 種族専用パーツ（コンボルール経由でのみ付与）
   'ball joints','cybernetics','scale skin','translucent skin','liquid body','porcelain skin',
+  // レア肌色（コンボルール経由でのみ付与）
+  'red skin','blue skin','grey skin',
 ]);
 
 // ── Weapon tags (格上げ: Tier3 → 低確率枠) ──────────────────
@@ -268,6 +270,13 @@ export const RANDOM_COMBO_RULES = [
   { trigger: 'slime girl',     blockId: 'body',        tag: 'translucent skin' },
   { trigger: 'slime girl',     blockId: 'body',        tag: 'liquid body' },
   { trigger: 'doll',           blockId: 'body',        tag: 'porcelain skin' },
+  // レア肌色：種族トリガー時に確率付与
+  { trigger: 'oni',            blockId: 'body',        tag: 'red skin',  prob: 0.25 },
+  { trigger: 'demon',          blockId: 'body',        tag: 'blue skin', prob: 0.25 },
+  { trigger: 'dragon girl',    blockId: 'body',        tag: 'red skin',  prob: 0.10 },
+  { trigger: 'monster girl',   blockId: 'body',        tag: 'red skin',  prob: 0.10 },
+  { trigger: 'elf',            blockId: 'body',        tag: 'grey skin', prob: 0.25 },
+  { trigger: 'dark elf',       blockId: 'body',        tag: 'grey skin', prob: 0.25 },
 ];
 
 // ── キャラデザモード：設定資料特化の厳格ルール ────────────
