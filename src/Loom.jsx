@@ -104,7 +104,8 @@ export default function Loom() {
   const simpleMode = viewMode === 'simple';
   const expertMode = viewMode === 'expert';
   const cycleViewMode = () => setViewMode(m => m === 'normal' ? 'simple' : m === 'simple' ? 'expert' : 'normal');
-  const [mainTab, setMainTab] = useState('editor');
+  const [mainTab, setMainTab] = useState(() => localStorage.getItem('loom_mainTab') || 'editor');
+  useEffect(() => { localStorage.setItem('loom_mainTab', mainTab); }, [mainTab]);
   const [thumbs, setThumbs] = useState({});
   const [thumbPreview, setThumbPreview] = useState(null);
   const [thumbDragOver, setThumbDragOver] = useState(false);
