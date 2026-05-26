@@ -1106,11 +1106,6 @@ export default function Loom() {
             {layout === '3col' ? `▦ ${lang === 'ja' ? '3列' : '3col'}` : layout === '2col' ? `▥ ${lang === 'ja' ? '2列' : '2col'}` : `▢ ${lang === 'ja' ? '1列' : '1col'}`}
           </button>
         )}
-        {isWide && focusBlockId && (
-          <button onClick={() => setFocusBlockId(null)} className="bg-tint-warn border border-warn-text/30 rounded-[5px] px-[9px] py-1 text-warn-text cursor-pointer text-[10px] font-mono flex-shrink-0">
-            ⊗ {lang === 'ja' ? '集中解除' : 'Unfocus'}
-          </button>
-        )}
         {/* 🕐 履歴 */}
         <button onClick={() => setHistoryOpen(true)}
           title={lang === 'ja' ? 'プロンプト履歴 (H)' : 'Prompt history (H)'}
@@ -1578,10 +1573,13 @@ export default function Loom() {
                       <div className="w-full max-w-[72rem] flex gap-3 items-start pointer-events-auto" style={{ maxHeight: 'calc(100vh - 24px)' }}>
                         {/* Left: BlockCard */}
                         <div className="flex-1 min-w-0 flex flex-col overflow-hidden" style={{ maxHeight: 'calc(100vh - 24px)' }}>
-                          <div className="text-muted text-[11px] font-mono mb-2 tracking-[0.07em] font-semibold flex items-center gap-2 flex-shrink-0">
-                            🔍 {lang === 'ja' ? '集中編集モード' : 'FOCUS MODE'}
+                          <div className="mb-2 flex items-center gap-2 flex-shrink-0">
+                            <span style={{ background: focusBlock.color + '22', border: `1px solid ${focusBlock.color}80`, color: focusBlock.color, textShadow: '0 0 8px currentColor' }} className="text-[12px] font-mono font-bold px-[10px] py-[3px] rounded-full tracking-[0.08em]">
+                              🔍 {lang === 'ja' ? '集中編集モード' : 'FOCUS MODE'}
+                            </span>
                             <button onClick={() => setFocusBlockId(null)}
-                              className="ml-auto bg-transparent border border-dim rounded-[5px] px-[8px] py-[2px] text-[10px] font-mono text-dim cursor-pointer">
+                              style={{ borderColor: focusBlock.color + '60', color: focusBlock.color }}
+                              className="ml-auto border rounded-[5px] px-[9px] py-[3px] text-[11px] font-mono font-semibold cursor-pointer bg-transparent">
                               {lang === 'ja' ? '閉じる' : 'Close'} ✕
                             </button>
                           </div>
@@ -1614,13 +1612,13 @@ export default function Loom() {
                         {/* Right: block navigation */}
                         <div className="w-[170px] flex-shrink-0 flex flex-col" style={{ maxHeight: 'calc(100vh - 24px)' }}>
                           <div className="text-muted text-[9px] font-mono mb-2 tracking-[0.06em] flex-shrink-0">{lang === 'ja' ? '他のブロック' : 'Other blocks'}</div>
-                          <div className="overflow-y-auto flex-1">
+                          <div className="flex-1 flex flex-col justify-between gap-[3px]">
                             {visibleBlocks.filter(b => b.id !== focusBlockId).map(b => {
                               const num = visibleBlocks.findIndex(x => x.id === b.id) + 1;
                               return (
                                 <div key={b.id} onClick={() => setFocusBlockId(b.id)}
                                   style={{ borderLeft: `3px solid ${b.enabled !== false ? b.color : 'rgb(var(--dim))'}`, opacity: b.enabled === false ? 0.5 : 1 }}
-                                  className="bg-surface border border-line flex items-center gap-[6px] rounded-[6px] px-[7px] py-[5px] mb-[4px] cursor-pointer transition-all duration-[120ms]"
+                                  className="bg-surface border border-line flex items-center gap-[6px] rounded-[6px] px-[7px] py-[5px] cursor-pointer transition-all duration-[120ms]"
                                   onMouseOver={e => e.currentTarget.style.background = 'rgb(var(--surface-alt))'}
                                   onMouseOut={e => e.currentTarget.style.background = 'rgb(var(--surface))'}>
                                   <span style={{ background: b.color + '22', border: `1px solid ${b.color}60`, color: b.color }} className="min-w-[16px] h-[16px] rounded-full text-[9px] font-bold flex items-center justify-center font-mono flex-shrink-0">{num}</span>

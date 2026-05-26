@@ -160,7 +160,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
     >
       {/* ── Header ─────────────────────────────────────────── */}
       <div
-        className={`flex items-start gap-[6px] px-3 py-[9px]${block.collapsed ? '' : ' bg-surfalt border-b border-line'}`}
+        className={`flex items-start gap-[6px] px-3 ${focusMode ? 'py-[13px]' : 'py-[9px]'}${block.collapsed ? '' : ' bg-surfalt border-b border-line'}`}
       >
         {/* LEFT: drag + move + toggle + badge + icon + name — takes all available space */}
         <div className="flex items-start gap-[6px] flex-1 min-w-0">
@@ -266,7 +266,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
         <button
           onClick={() => onUpdate({ locked: !block.locked })}
           style={isLocked ? { border: `1px solid ${block.color}`, color: block.color } : undefined}
-          className={`bg-transparent rounded-[5px] px-[6px] py-[2px] text-[10px] cursor-pointer flex-shrink-0${isLocked ? '' : ' border border-dim text-dim'}`}
+          className={`bg-transparent rounded-[5px] ${focusMode ? 'px-[9px] py-[4px] text-[13px]' : 'px-[6px] py-[2px] text-[10px]'} cursor-pointer flex-shrink-0${isLocked ? '' : ' border border-dim text-dim'}`}
         >{isLocked ? '🔒' : '🔓'}</button>
 
         {/* Preset save */}
@@ -286,7 +286,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
         {block.text && (
           <span
             style={{ background: block.color + '20', border: `1px solid ${block.color}70`, color: block.color }}
-            className="inline-flex items-center text-[10px] font-mono font-bold px-[5px] py-[2px] rounded-[4px] flex-shrink-0 h-[22px]"
+            className={`inline-flex items-center font-mono font-bold rounded-[4px] flex-shrink-0 ${focusMode ? 'text-[13px] px-[8px] py-[3px] h-[30px]' : 'text-[10px] px-[5px] py-[2px] h-[22px]'}`}
           >
             {countTags(block.text)}{lang === 'ja' ? 'タグ' : 't'}
           </span>
@@ -297,7 +297,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           <button
             onClick={onUndoBackup}
             title={lang === 'ja' ? 'テンプレート適用前に戻す' : 'Revert this block'}
-            className="bg-transparent border border-dim rounded-[5px] px-[6px] py-[2px] text-dim text-[10px] cursor-pointer flex-shrink-0"
+            className={`bg-transparent border border-dim rounded-[5px] text-dim cursor-pointer flex-shrink-0 ${focusMode ? 'px-[9px] py-[4px] text-[13px]' : 'px-[6px] py-[2px] text-[10px]'}`}
           >↩</button>
         )}
 
@@ -311,7 +311,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               border: `1px solid ${focused ? block.color : 'rgb(var(--dim))'}`,
               color: focused ? block.color : 'rgb(var(--muted))',
             }}
-            className="rounded-[5px] px-[6px] py-[2px] text-[10px] cursor-pointer flex-shrink-0"
+            className={`rounded-[5px] cursor-pointer flex-shrink-0 ${focusMode ? 'px-[9px] py-[4px] text-[13px]' : 'px-[6px] py-[2px] text-[10px]'}`}
           >{focused ? '⊗' : '⊕'}</button>
         )}
 
@@ -355,14 +355,14 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           }}
           disabled={isLocked}
           title={lang === 'ja' ? 'テキストをクリア' : 'Clear text'}
-          className={`bg-transparent border border-dim rounded-[5px] text-[10px] px-[6px] py-[2px] cursor-pointer disabled:cursor-default disabled:opacity-30 ${isLocked ? 'text-dim' : 'text-muted'}`}
+          className={`bg-transparent border border-dim rounded-[5px] cursor-pointer disabled:cursor-default disabled:opacity-30 ${focusMode ? 'text-[13px] px-[10px] py-[4px]' : 'text-[10px] px-[6px] py-[2px]'} ${isLocked ? 'text-dim' : 'text-muted'}`}
         >✕</button>
 
         {/* Collapse block */}
         <button
           onClick={() => onUpdate({ collapsed: !block.collapsed })}
           title={lang === 'ja' ? (block.collapsed ? '展開' : '折りたたむ') : (block.collapsed ? 'Expand' : 'Collapse')}
-          className="bg-transparent border border-dim rounded-[5px] text-[10px] px-[6px] py-[2px] cursor-pointer text-muted"
+          className={`bg-transparent border border-dim rounded-[5px] cursor-pointer text-muted ${focusMode ? 'text-[13px] px-[10px] py-[4px]' : 'text-[10px] px-[6px] py-[2px]'}`}
         >{block.collapsed ? '▼' : '▲'}</button>
         </div>{/* END RIGHT group */}
       </div>
@@ -517,7 +517,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                       style={isRandom
                         ? { background: block.color + '15', border: `1px dashed ${block.color}80`, color: block.color }
                         : { background: 'rgb(var(--surface-alt))', border: `1px solid ${block.color}50`, color: block.color }}
-                      className="inline-flex items-center gap-[3px] rounded-[4px] px-[5px] py-[1px] text-[9px] font-mono"
+                      className={`inline-flex items-center gap-[3px] rounded-[4px] font-mono ${focusMode ? 'px-[8px] py-[3px] text-[12px]' : 'px-[5px] py-[1px] text-[9px]'}`}
                     >
                       <span className="opacity-60 text-[8px]">{isRandom ? '🎲' : '👤'}</span>
                       {bare}
@@ -531,7 +531,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           {/* Strength + controls row */}
           <div className="my-[9px] mb-[11px]">
             <div className={`flex items-center flex-wrap ${isCompact ? 'gap-[3px]' : 'gap-[5px]'}`}>
-              <span className="text-[10px] font-mono font-semibold text-muted">{lang === 'ja' ? '強度:' : 'Str:'}</span>
+              <span className={`${focusMode ? 'text-[13px]' : 'text-[10px]'} font-mono font-semibold text-muted`}>{lang === 'ja' ? '強度:' : 'Str:'}</span>
 
               {(isMobile ? STRENGTHS.filter(s => s.v === '1.0' || s.v === '1.2') : STRENGTHS).map(s => (
                 <button key={s.v}
@@ -539,7 +539,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   onClick={() => onUpdate({ strength: s.v })}
                   title={s.v}
                   style={block.strength === s.v ? { background: block.color + '22', border: `1px solid ${block.color}`, color: block.color } : undefined}
-                  className={`rounded-[5px] py-[2px] text-[10px] cursor-pointer disabled:cursor-default font-mono whitespace-nowrap transition-all duration-[120ms] ${isCompact ? 'px-[4px]' : 'px-[6px]'} ${block.strength === s.v ? 'font-bold' : 'font-normal border border-dim text-muted'}`}
+                  className={`rounded-[5px] cursor-pointer disabled:cursor-default font-mono whitespace-nowrap transition-all duration-[120ms] ${focusMode ? 'py-[5px] text-[13px]' : 'py-[2px] text-[10px]'} ${isCompact ? 'px-[4px]' : (focusMode ? 'px-[10px]' : 'px-[6px]')} ${block.strength === s.v ? 'font-bold' : 'font-normal border border-dim text-muted'}`}
                 >
                   {lang === 'ja' ? s.l : s.le}
                   {!isCompact && <span className="opacity-50 ml-[3px] text-[9px]">{s.v}</span>}
@@ -549,13 +549,13 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               {/* ±0.05 fine adjust */}
               <div className="flex items-center gap-[2px] ml-[2px]">
                 <button disabled={isLocked} onClick={() => adjustWeight(-0.05)} title="-0.05"
-                  className="bg-transparent border border-dim text-muted rounded-[5px_0_0_5px] px-[6px] py-[2px] text-[11px] cursor-pointer disabled:cursor-default font-mono">−</button>
+                  className={`bg-transparent border border-dim text-muted rounded-[5px_0_0_5px] cursor-pointer disabled:cursor-default font-mono ${focusMode ? 'px-[9px] py-[5px] text-[14px]' : 'px-[6px] py-[2px] text-[11px]'}`}>−</button>
                 <span
                   style={block.strength !== '1.0' ? { color: block.color } : undefined}
-                  className={`text-[10px] font-mono min-w-[30px] text-center px-0 py-[2px] bg-bg border-t border-b border-dim${block.strength !== '1.0' ? '' : ' text-muted'}`}
+                  className={`font-mono text-center px-0 bg-bg border-t border-b border-dim${block.strength !== '1.0' ? '' : ' text-muted'} ${focusMode ? 'text-[13px] min-w-[40px] py-[5px]' : 'text-[10px] min-w-[30px] py-[2px]'}`}
                 >{block.strength}</span>
                 <button disabled={isLocked} onClick={() => adjustWeight(0.05)} title="+0.05"
-                  className="bg-transparent border border-dim text-muted rounded-[0_5px_5px_0] px-[6px] py-[2px] text-[11px] cursor-pointer disabled:cursor-default font-mono">＋</button>
+                  className={`bg-transparent border border-dim text-muted rounded-[0_5px_5px_0] cursor-pointer disabled:cursor-default font-mono ${focusMode ? 'px-[9px] py-[5px] text-[14px]' : 'px-[6px] py-[2px] text-[11px]'}`}>＋</button>
               </div>
 
               {/* Select/group mode */}
@@ -568,7 +568,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   border: `1px solid ${selectMode ? block.color : 'rgb(var(--dim))'}`,
                   color: selectMode ? block.color : 'rgb(var(--muted))',
                 }}
-                className="rounded-[5px] px-2 py-[2px] text-[10px] cursor-pointer disabled:cursor-default font-mono"
+                className={`rounded-[5px] cursor-pointer disabled:cursor-default font-mono ${focusMode ? 'px-[10px] py-[5px] text-[13px]' : 'px-2 py-[2px] text-[10px]'}`}
               >{selectMode ? (lang === 'ja' ? '選択中' : 'Selecting') : (lang === 'ja' ? '⊞まとめ' : '⊞Group')}</button>
 
               {/* Random inspiration */}
@@ -648,7 +648,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   }}
                   title={lang === 'ja' ? (displayPicks.length > 0 ? '再抽選' : 'ランダムでタグ追加') : (displayPicks.length > 0 ? 'Re-roll' : 'Add random tags')}
                   style={displayPicks.length > 0 ? { borderColor: block.color, color: block.color } : undefined}
-                  className="border border-dim text-muted rounded-[5px] px-[5px] py-[2px] text-[11px] cursor-pointer font-mono"
+                  className={`border border-dim text-muted rounded-[5px] cursor-pointer font-mono ${focusMode ? 'px-[9px] py-[5px] text-[14px]' : 'px-[5px] py-[2px] text-[11px]'}`}
                 >🎲{displayPicks.length > 0 ? ' ↻' : ''}</button>
               )}
             </div>
@@ -660,7 +660,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder={lang === 'ja' ? 'タグ検索...' : 'Search tags...'}
-                className="bg-transparent border-none outline-none text-[11px] flex-1 font-mono text-fg"
+                className={`bg-transparent border-none outline-none flex-1 font-mono text-fg ${focusMode ? 'text-[14px]' : 'text-[11px]'}`}
               />
               {search && (
                 <span onClick={() => setSearch('')} className="cursor-pointer text-[10px] text-muted">×</span>

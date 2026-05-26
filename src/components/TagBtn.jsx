@@ -124,7 +124,7 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
         }}
         title={conflict ? (lang === 'ja' ? `⚠ 競合タグ: ${tag.en}` : `⚠ Conflicting tag: ${tag.en}`) : (lang === 'ja' ? tag.en : tag.ja)}
         style={{ color: fg }}
-        className={`bg-transparent border-none px-[7px] py-[3px] ${large ? 'text-[13px]' : 'text-[12px]'} cursor-pointer font-mono tracking-tight ${(active || selected) ? 'font-bold' : 'font-normal'}`}
+        className={`bg-transparent border-none cursor-pointer font-mono tracking-tight ${large ? 'px-[10px] py-[6px] text-[15px]' : 'px-[7px] py-[3px] text-[12px]'} ${(active || selected) ? 'font-bold' : 'font-normal'}`}
       >
         {conflict ? '⚠ ' : (active && !selectMode) ? '✓ ' : (analyzed && !active && !selectMode) ? '◎ ' : ''}
         {selectMode && selected ? '☑ ' : selectMode ? '☐ ' : ''}
@@ -133,7 +133,7 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
       {onToggleFav && !selectMode && ((active && h) || isFav) && (
         <button
           onClick={e => { e.stopPropagation(); onToggleFav(); }}
-          className={`bg-transparent border-l border-dim px-[5px] py-[3px] cursor-pointer text-[10px] leading-none ${isFav ? 'text-warn' : 'text-muted'}`}
+          className={`bg-transparent border-l border-dim cursor-pointer leading-none ${large ? 'px-[7px] py-[6px] text-[13px]' : 'px-[5px] py-[3px] text-[10px]'} ${isFav ? 'text-warn' : 'text-muted'}`}
         >★</button>
       )}
     </div>
