@@ -64,10 +64,13 @@ function TemplateCard({ tmpl, lang, onApply }) {
   );
 }
 
-export default function TemplateModal({ lang, onApply, onClose }) {
+export default function TemplateModal({ lang, isMobile, onApply, onClose }) {
+  const gridCls = isMobile ? 'grid grid-cols-2 gap-2' : 'grid gap-2';
+  const gridStyle = isMobile ? {} : { gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))' };
+
   return (
     <div className="fixed inset-0 bg-black/85 z-[300] flex items-center justify-center p-5">
-      <div className="bg-surface border border-linebright rounded-[14px] w-full max-w-[560px] lg:max-w-[920px] overflow-hidden">
+      <div className="bg-surface border border-linebright rounded-[14px] w-full max-w-[920px] overflow-hidden">
         <div className="px-[18px] py-[14px] border-b border-line flex items-center justify-between">
           <span className="text-fg text-[14px] font-bold">✦ {lang === 'ja' ? 'ブロックテンプレート' : 'Block Templates'}</span>
           <button onClick={onClose} className="bg-transparent border border-dim rounded-[6px] px-[10px] py-1 text-muted cursor-pointer text-[12px]">
@@ -90,7 +93,7 @@ export default function TemplateModal({ lang, onApply, onClose }) {
           <div className="text-muted text-[10px] font-mono tracking-widest mb-2 uppercase">
             {lang === 'ja' ? 'スタイル' : 'Style'}
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 mb-4">
+          <div className={`${gridCls} mb-4`} style={gridStyle}>
             {styleTemplates.map(tmpl => (
               <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />
             ))}
@@ -101,7 +104,7 @@ export default function TemplateModal({ lang, onApply, onClose }) {
           <div className="text-muted text-[10px] font-mono tracking-widest mb-2 uppercase">
             {lang === 'ja' ? '構図・設定資料（SFW）' : 'Composition / Reference'}
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 mb-4">
+          <div className={`${gridCls} mb-4`} style={gridStyle}>
             {basicCompTemplates.map(tmpl => (
               <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />
             ))}
@@ -112,7 +115,7 @@ export default function TemplateModal({ lang, onApply, onClose }) {
           <div className="text-muted text-[10px] font-mono tracking-widest mb-2 uppercase">
             {lang === 'ja' ? 'フェチ構図（SFW）' : 'Flair / Feti Composition'}
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 mb-4">
+          <div className={`${gridCls} mb-4`} style={gridStyle}>
             {fetiTemplates.map(tmpl => (
               <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />
             ))}
@@ -123,7 +126,7 @@ export default function TemplateModal({ lang, onApply, onClose }) {
           <div className="text-muted text-[10px] font-mono tracking-widest mb-2 uppercase">
             {lang === 'ja' ? 'ダイナミック' : 'Dynamic'}
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 mb-4">
+          <div className={`${gridCls} mb-4`} style={gridStyle}>
             {dynamicTemplates.map(tmpl => (
               <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />
             ))}
@@ -134,7 +137,7 @@ export default function TemplateModal({ lang, onApply, onClose }) {
           <div className="text-muted text-[10px] font-mono tracking-widest mb-2 uppercase">
             {lang === 'ja' ? '極限アングル・クローズアップ' : 'Extreme Close-Up'}
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+          <div className={gridCls} style={gridStyle}>
             {extremeTemplates.map(tmpl => (
               <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />
             ))}
