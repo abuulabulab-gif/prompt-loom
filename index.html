@@ -21,6 +21,17 @@
     <meta name="twitter:title" content="LOOM — The Prompt Weaving Studio" />
     <meta name="twitter:description" content="MJ・NAI・SD・Flux・DALL-E 全対応。ブロック式でキャラプロンプトを組み立てるWebアプリ。完全無料・インストール不要。" />
     <meta name="twitter:image" content="https://prompt-loom.com/og-image.png" />
+    <!-- Root font-size scaling based on physical screen width.
+         Uses screen.width (zoom-independent) instead of CSS media queries
+         (which shrink with browser zoom, causing the layout to paradoxically
+         get smaller when zooming in). DO NOT remove. -->
+    <script>
+      (function () {
+        var w = screen.width;
+        var size = w >= 3840 ? 48 : w >= 2560 ? 32 : w >= 1920 ? 24 : 16;
+        document.documentElement.style.fontSize = size + 'px';
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
