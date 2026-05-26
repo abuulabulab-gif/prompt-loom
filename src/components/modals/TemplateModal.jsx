@@ -1,8 +1,8 @@
 import { TEMPLATES } from "../../data/templates.js";
 
 const FETI_IDS    = new Set(['highangle_armpit','lowangle_legs','midriff_navel','nape_lift','birdseye_lie','skintight_detail']);
-const DYNAMIC_IDS = new Set(['dynamic_booster']);
-const EXTREME_IDS = new Set(['lip_focus','eye_focus','fisheye']);
+const DYNAMIC_IDS = new Set(['dynamic_booster','extreme_perspective']);
+const EXTREME_IDS = new Set(['lip_focus','eye_focus','fisheye','from_below','from_above']);
 
 const styleTemplates    = TEMPLATES.filter(t => t.apply.quality);
 const basicCompTemplates = TEMPLATES.filter(t => !t.apply.quality && !FETI_IDS.has(t.id) && !DYNAMIC_IDS.has(t.id) && !EXTREME_IDS.has(t.id));
@@ -67,7 +67,7 @@ function TemplateCard({ tmpl, lang, onApply }) {
 export default function TemplateModal({ lang, onApply, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/85 z-[300] flex items-center justify-center p-5">
-      <div className="bg-surface border border-linebright rounded-[14px] w-full max-w-[560px] overflow-hidden">
+      <div className="bg-surface border border-linebright rounded-[14px] w-full max-w-[560px] sm:max-w-[920px] overflow-hidden">
         <div className="px-[18px] py-[14px] border-b border-line flex items-center justify-between">
           <span className="text-fg text-[14px] font-bold">✦ {lang === 'ja' ? 'ブロックテンプレート' : 'Block Templates'}</span>
           <button onClick={onClose} className="bg-transparent border border-dim rounded-[6px] px-[10px] py-1 text-muted cursor-pointer text-[12px]">
@@ -90,7 +90,7 @@ export default function TemplateModal({ lang, onApply, onClose }) {
           <div className="text-muted text-[10px] font-mono tracking-widest mb-2 uppercase">
             {lang === 'ja' ? 'スタイル' : 'Style'}
           </div>
-          <div className="grid grid-cols-2 gap-2 mb-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
             {styleTemplates.map(tmpl => (
               <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />
             ))}
@@ -101,7 +101,7 @@ export default function TemplateModal({ lang, onApply, onClose }) {
           <div className="text-muted text-[10px] font-mono tracking-widest mb-2 uppercase">
             {lang === 'ja' ? '構図・設定資料（SFW）' : 'Composition / Reference'}
           </div>
-          <div className="grid grid-cols-2 gap-2 mb-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
             {basicCompTemplates.map(tmpl => (
               <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />
             ))}
@@ -112,7 +112,7 @@ export default function TemplateModal({ lang, onApply, onClose }) {
           <div className="text-muted text-[10px] font-mono tracking-widest mb-2 uppercase">
             {lang === 'ja' ? 'フェチ構図（SFW）' : 'Flair / Feti Composition'}
           </div>
-          <div className="grid grid-cols-2 gap-2 mb-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
             {fetiTemplates.map(tmpl => (
               <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />
             ))}
@@ -123,7 +123,7 @@ export default function TemplateModal({ lang, onApply, onClose }) {
           <div className="text-muted text-[10px] font-mono tracking-widest mb-2 uppercase">
             {lang === 'ja' ? 'ダイナミック' : 'Dynamic'}
           </div>
-          <div className="grid grid-cols-2 gap-2 mb-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
             {dynamicTemplates.map(tmpl => (
               <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />
             ))}
@@ -134,7 +134,7 @@ export default function TemplateModal({ lang, onApply, onClose }) {
           <div className="text-muted text-[10px] font-mono tracking-widest mb-2 uppercase">
             {lang === 'ja' ? '極限アングル・クローズアップ' : 'Extreme Close-Up'}
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {extremeTemplates.map(tmpl => (
               <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />
             ))}

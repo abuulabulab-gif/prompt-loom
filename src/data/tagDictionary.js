@@ -139,6 +139,7 @@ export const TAG_DICT = {
   'low angle':             { ja: '低い位置からのアングル。迫力・威圧感が増す', en: 'Camera positioned low, making subject look imposing' },
   'high angle':            { ja: '高い位置からのアングル。俯瞰的・見下ろし気味', en: 'Camera positioned high, looking slightly down at the subject' },
   'foreshortening':        { ja: 'パース強調。カメラに向かって伸びた手足が極端に大きく見える遠近法の演出。魚眼と組み合わせると特に迫力が出る', en: 'Exaggerated perspective where limbs pointing at the camera appear dramatically enlarged — amplified further with fisheye' },
+  'dynamic angle':         { ja: '大胆に傾けたカメラアングル。ポーズや構図に躍動感を与える基本的なダイナミック演出。foreshortening と組み合わせると特に効果的', en: 'Boldly tilted camera angle that adds energy and movement to any pose — especially effective combined with foreshortening' },
 
   // ── ライティング ─────────────────────────────────────────────
   'rim light':             { ja: '被写体の輪郭を縁取る背面からの光。シルエットが光る', en: 'Light from behind that outlines the subject\'s silhouette' },

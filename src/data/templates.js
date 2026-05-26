@@ -195,7 +195,7 @@ export const TEMPLATES = [
     desc: 'タイツ・食い込みで肉感と立体感を最大化',
     descEn: 'Skin-tight clothing detail with maximum thigh emphasis',
     apply: {
-      composition: 'cowboy shot',
+      composition: 'lower body',
       body: 'thighs, thigh gap, zettai ryouiki',
       outfit: 'thighhighs, skintight',
     },
@@ -212,6 +212,19 @@ export const TEMPLATES = [
     apply: {
       composition: 'dutch angle, dynamic angle, foreshortening, action pose, fighting stance',
       effect: 'motion blur, flying debris',
+    },
+  },
+  {
+    id: 'extreme_perspective',
+    name: '極端な遠近法',
+    nameEn: 'Extreme Perspective',
+    icon: '💥',
+    desc: '手前のものを爆発的に大きく、奥を極小に描くパース効果。手や武器が画面から飛び出してくる圧倒的な迫力',
+    descEn: 'Objects in the foreground are dramatically oversized, receding into the distance — creates a flying-at-viewer impact',
+    negHintJa: 'flat perspective, symmetrical body, front view, simple background',
+    negHintEn: 'flat perspective, symmetrical body, front view, simple background',
+    apply: {
+      composition: 'extreme perspective, foreshortening, dynamic angle',
     },
   },
   // ── 極限アングル・クローズアップ ──
@@ -255,6 +268,32 @@ export const TEMPLATES = [
     apply: {
       composition: 'fisheye lens, extreme perspective, dutch angle, wide angle view',
       effect: 'distorted background',
+    },
+  },
+  {
+    id: 'from_below',
+    name: '煽りアングル',
+    nameEn: 'Low Angle Shot',
+    icon: '⬆️',
+    desc: '地面近くから見上げる構図。キャラの存在感・威圧感・支配力を最大化する',
+    descEn: 'Camera from below looking up — maximizes the subject\'s presence, dominance, and imposing scale',
+    negHintJa: 'from above, bird\'s-eye view, high angle, lying',
+    negHintEn: 'from above, bird\'s-eye view, high angle, lying',
+    apply: {
+      composition: "from below, worm's-eye view, low angle",
+    },
+  },
+  {
+    id: 'from_above',
+    name: '俯瞰アングル',
+    nameEn: 'High Angle Shot',
+    icon: '⬇️',
+    desc: '上空から見下ろす俯瞰構図。立ち・アクション対応（真俯瞰・寝そべりとは別）',
+    descEn: 'Camera from above looking down — works with standing or action poses, distinct from the bird\'s-eye sprawl template',
+    negHintJa: "from below, worm's-eye view, low angle, lying on back",
+    negHintEn: "from below, worm's-eye view, low angle, lying on back",
+    apply: {
+      composition: "from above, high angle, bird's-eye view",
     },
   },
 ];
