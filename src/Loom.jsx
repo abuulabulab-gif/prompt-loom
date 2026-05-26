@@ -10,7 +10,7 @@ import db, { loadState, saveState, saveCharImages, loadCharImages, deleteCharIma
 import WelcomeHint from "./components/WelcomeHint.jsx";
 import LibraryModal from "./components/modals/LibraryModal.jsx";
 import {
-  CHAR_COLORS, CHAR_EMOJIS, WARN_LEN, LIMIT_LEN,
+  CHAR_COLORS, CHAR_COLORS_LIGHT, CHAR_EMOJIS, WARN_LEN, LIMIT_LEN,
   uid, appendTag, splitTags, countTags, toggleTag, hasTag, removeTag,
   deep, downloadJSON, stripWeights, toNaiWeights, SPECIES_PARTS_MAP,
 } from "./data/constants.js";
@@ -669,6 +669,12 @@ export default function Loom() {
   const goodColor = theme === 'dark' ? '#4fffb0' : '#059655';
   const warnColor = theme === 'dark' ? '#fbbf24' : '#b45309';
   const dangerColor = theme === 'dark' ? '#f87171' : '#dc2626';
+  const charColor = (raw) => {
+    if (theme !== 'light' || !raw) return raw;
+    const idx = CHAR_COLORS.indexOf(raw);
+    return idx >= 0 ? CHAR_COLORS_LIGHT[idx] : raw;
+  };
+  const blockTextColor = (b) => theme === 'light' ? (b.colorLight ?? b.color) : b.color;
   const tokenColor = textToCopy.length > LIMIT_LEN ? dangerColor : textToCopy.length > WARN_LEN ? warnColor : goodColor;
   const conflicts = detectConflicts(posText);
   const conflictingTagSet = new Set(conflicts.flatMap(r => r.tags).map(t => t.toLowerCase()));
@@ -1188,10 +1194,10 @@ export default function Loom() {
                 className="flex items-center gap-1 rounded-[20px] px-[9px] py-1 cursor-pointer transition-all duration-150">
                 <span style={{ background: c.color }} className="w-[7px] h-[7px] rounded-full flex-shrink-0" />
                 <span className="text-[12px]">{c.emoji}</span>
-                <span style={{ color: activeCharId === c.id ? c.color : 'rgb(var(--text))' }} className="text-[12px] font-semibold whitespace-nowrap">{c.name}</span>
+                <span style={{ color: activeCharId === c.id ? charColor(c.color) : 'rgb(var(--text))' }} className="text-[12px] font-semibold whitespace-nowrap">{c.name}</span>
                 <span onClick={e => { e.stopPropagation(); duplicateCharacter(c.id); }} title={lang === 'ja' ? '複製' : 'Dup'}
                   className="text-dim text-[10px] cursor-pointer px-px leading-none"
-                  onMouseOver={e => e.target.style.color = c.color} onMouseOut={e => e.target.style.color = 'rgb(var(--dim))'}>⊕</span>
+                  onMouseOver={e => e.target.style.color = charColor(c.color)} onMouseOut={e => e.target.style.color = 'rgb(var(--dim))'}>⊕</span>
                 {characters.length > 1 && <span onClick={e => { e.stopPropagation(); deleteCharacter(c.id); }}
                   className="text-dim text-[10px] cursor-pointer px-px leading-none"
                   onMouseOver={e => e.target.style.color = '#f87171'} onMouseOut={e => e.target.style.color = 'rgb(var(--dim))'}>✕</span>}
@@ -1208,7 +1214,7 @@ export default function Loom() {
         <div className="flex-1" />
         {characters.length > 1 && (
           <select value={compareCharId || ''} onChange={e => setCompareCharId(e.target.value || null)}
-            style={{ border: `1px solid ${compareCharId ? '#fbbf2460' : 'rgb(var(--dim))'}`, color: compareCharId ? '#fbbf24' : 'rgb(var(--muted))' }}
+            style={{ border: `1px solid ${compareCharId ? warnColor + '60' : 'rgb(var(--dim))'}`, color: compareCharId ? warnColor : 'rgb(var(--muted))' }}
             className="bg-surfalt rounded-[6px] px-[7px] py-1 text-[10px] cursor-pointer font-mono outline-none flex-shrink-0">
             <option value="">{lang === 'ja' ? '🆚 比較' : '🆚 Compare'}</option>
             {characters.filter(c => c.id !== activeCharId).map(c => <option key={c.id} value={c.id}>{c.emoji} {c.name}</option>)}
@@ -1217,12 +1223,12 @@ export default function Loom() {
         {isMobile && <button onClick={() => setCharPanelOpen(p => !p)} className="bg-transparent border border-dim rounded-[5px] text-muted cursor-pointer text-[11px] px-[9px] py-1 flex-shrink-0 whitespace-nowrap">{charPanelOpen ? '▲' : '▼'} {lang === 'ja' ? '詳細' : 'Info'}</button>}
         <div className="flex gap-[4px] flex-shrink-0">
           <button onClick={() => setMainTab('editor')}
-            style={mainTab === 'editor' ? { background: activeChar?.color + '22', borderColor: activeChar?.color, color: activeChar?.color } : undefined}
+            style={mainTab === 'editor' ? { background: activeChar?.color + '22', borderColor: activeChar?.color, color: charColor(activeChar?.color) } : undefined}
             className={`rounded-[5px] px-[9px] py-1 text-[10px] font-mono cursor-pointer transition-all duration-[120ms] ${mainTab === 'editor' ? 'border font-bold' : 'border border-dim text-muted'}`}>
             🧩{isMobile ? '' : (' ' + (lang === 'ja' ? 'エディタ' : 'Editor'))}
           </button>
           <button onClick={() => setMainTab('note')}
-            style={mainTab === 'note' ? { background: activeChar?.color + '22', borderColor: activeChar?.color, color: activeChar?.color } : undefined}
+            style={mainTab === 'note' ? { background: activeChar?.color + '22', borderColor: activeChar?.color, color: charColor(activeChar?.color) } : undefined}
             className={`rounded-[5px] px-[9px] py-1 text-[10px] font-mono cursor-pointer transition-all duration-[120ms] ${mainTab === 'note' ? 'border font-bold' : 'border border-dim text-muted'}`}>
             📖{isMobile ? '' : (' ' + (lang === 'ja' ? 'キャラノート' : 'Note'))}
           </button>
@@ -1308,7 +1314,7 @@ export default function Loom() {
                 {(activeTool === 'sd' || activeTool === 'nai') && (activeChar.loras || []).some(l => l.name.trim()) && (
                   <span className="text-muted text-[10px] font-mono">{lang === 'ja' ? '→ 出力に自動追加中' : '→ auto-appended'}</span>
                 )}
-                <button onClick={addLora} style={{ color: activeChar.color, borderColor: activeChar.color + '60' }} className="ml-auto border rounded-[5px] px-[7px] py-[2px] text-[10px] cursor-pointer font-mono bg-transparent">+ LoRA</button>
+                <button onClick={addLora} style={{ color: charColor(activeChar.color), borderColor: activeChar.color + '60' }} className="ml-auto border rounded-[5px] px-[7px] py-[2px] text-[10px] cursor-pointer font-mono bg-transparent">+ LoRA</button>
               </div>
               {(activeChar.loras || []).length === 0
                 ? <span className="text-dim text-[11px] font-mono">{lang === 'ja' ? '（SD/NAI使用時は出力に自動追加されます）' : '(auto-added to output for SD/NAI)'}</span>
@@ -1346,7 +1352,7 @@ export default function Loom() {
                   </div>
                 ))}
                 {(thumbs[activeCharId] || []).length < 4 && (
-                  <label style={{ borderColor: activeChar.color + '50', color: activeChar.color }}
+                  <label style={{ borderColor: activeChar.color + '50', color: charColor(activeChar.color) }}
                     className="w-[52px] h-[52px] border border-dashed rounded-[6px] flex items-center justify-center text-[18px] cursor-pointer flex-shrink-0">
                     +
                     <input type="file" accept=".jpg,.jpeg,.png" onChange={handleThumbUpload} className="hidden" />
@@ -1438,7 +1444,7 @@ export default function Loom() {
                       {(activeTool === 'sd' || activeTool === 'nai') && (activeChar.loras || []).some(l => l.name.trim()) && (
                         <span className="text-muted text-[9px] font-mono">{lang === 'ja' ? '→ 出力追加中' : '→ appended'}</span>
                       )}
-                      <button onClick={addLora} style={{ color: activeChar.color, borderColor: activeChar.color + '60' }} className="ml-auto border rounded-[5px] px-[7px] py-[2px] text-[10px] cursor-pointer font-mono bg-transparent">+ LoRA</button>
+                      <button onClick={addLora} style={{ color: charColor(activeChar.color), borderColor: activeChar.color + '60' }} className="ml-auto border rounded-[5px] px-[7px] py-[2px] text-[10px] cursor-pointer font-mono bg-transparent">+ LoRA</button>
                     </div>
                     {(activeChar.loras || []).length === 0
                       ? <span className="text-dim text-[10px] font-mono">{lang === 'ja' ? 'SD/NAI用（出力に自動追加）' : 'SD/NAI: auto-appended'}</span>
@@ -1601,7 +1607,7 @@ export default function Loom() {
                                   <div className="text-prompt text-[9px] font-mono break-all leading-[1.4] mb-[6px] opacity-80">{row.promptTags}</div>
                                   {row.notes && <div className="text-dim text-[9px] font-mono mb-[5px] leading-tight">{row.notes}</div>}
                                   <button onClick={() => insertTagMapRow(row)}
-                                    style={{ borderColor: activeChar.color + '60', color: activeChar.color }}
+                                    style={{ borderColor: activeChar.color + '60', color: charColor(activeChar.color) }}
                                     className="border rounded-[4px] px-[7px] py-[2px] text-[9px] font-mono font-bold cursor-pointer bg-transparent">
                                     → {lang === 'ja' ? '挿入' : 'Insert'}
                                   </button>
@@ -1899,7 +1905,7 @@ export default function Loom() {
                 <button onClick={() => setOutputExpanded(p => !p)}
                   className="bg-transparent border border-dim rounded-[6px] text-muted cursor-pointer text-[11px] px-[7px] py-[5px]">{outputExpanded ? '▼' : '▲'}</button>
                 <button onClick={handleSnapshot} disabled={!posText} title={lang === 'ja' ? 'スナップショット（履歴に手動保存）' : 'Snapshot'}
-                  style={{ background: snapped ? '#fbbf2415' : 'none', border: `1px solid ${snapped ? '#fbbf2460' : 'rgb(var(--dim))'}` }}
+                  style={{ background: snapped ? warnColor + '22' : 'none', border: `1px solid ${snapped ? warnColor + '60' : 'rgb(var(--dim))'}` }}
                   className={`rounded-[6px] px-[9px] py-[5px] text-[12px] inline-flex items-center justify-center leading-none transition-all duration-200 ${snapped ? 'text-warn' : 'text-muted'} ${posText ? 'cursor-pointer' : 'cursor-default'}`}>📸</button>
                 <button onClick={handleResetAll} title={lang === 'ja' ? 'プロンプトをすべてリセット' : 'Reset all'}
                   className="rounded-[6px] px-[9px] py-[5px] text-[11px] cursor-pointer font-mono border border-dim text-muted"
@@ -1908,7 +1914,7 @@ export default function Loom() {
                 {outputTab !== 'natural' && (
                   <button onClick={() => { if (!outputEditMode) { if (!outputEditText) setOutputEditText(currentText); setOutputEditMode(true); setOutputExpanded(true); } else { setOutputEditMode(false); } }}
                     disabled={!currentText} title={lang === 'ja' ? 'コピー前に手直し' : 'Edit before copy'}
-                    style={{ background: outputEditMode ? '#fbbf2422' : 'none', border: `1px solid ${outputEditMode ? '#fbbf2460' : 'rgb(var(--dim))'}`, color: outputEditMode ? '#fbbf24' : 'rgb(var(--muted))' }}
+                    style={{ background: outputEditMode ? warnColor + '22' : 'none', border: `1px solid ${outputEditMode ? warnColor + '60' : 'rgb(var(--dim))'}`, color: outputEditMode ? warnColor : 'rgb(var(--muted))' }}
                     className="rounded-[6px] px-[9px] py-[5px] text-[11px] transition-all duration-200 cursor-pointer disabled:cursor-default font-mono">✏️</button>
                 )}
                 {/* Mobile MJ AR chips */}
@@ -2030,7 +2036,7 @@ export default function Loom() {
                 <button onClick={() => setOutputExpanded(p => !p)} title={lang === 'ja' ? '出力エリアを折りたたむ/展開' : 'Collapse/expand output'}
                   className="bg-transparent border border-dim rounded-[6px] text-muted cursor-pointer text-[11px] px-[7px] py-[4px] flex-shrink-0">{outputExpanded ? '▼' : '▲'}</button>
                 <button onClick={handleSnapshot} disabled={!posText} title={lang === 'ja' ? 'スナップショット（履歴に手動保存）' : 'Snapshot'}
-                  style={{ background: snapped ? '#fbbf2415' : 'none', border: `1px solid ${snapped ? '#fbbf2460' : 'rgb(var(--dim))'}` }}
+                  style={{ background: snapped ? warnColor + '22' : 'none', border: `1px solid ${snapped ? warnColor + '60' : 'rgb(var(--dim))'}` }}
                   className={`rounded-[6px] px-[9px] py-[4px] text-[12px] inline-flex items-center justify-center leading-none transition-all duration-200 flex-shrink-0 ${snapped ? 'text-warn' : 'text-muted'} ${posText ? 'cursor-pointer' : 'cursor-default'}`}>📸</button>
                 <button onClick={handleResetAll} title={lang === 'ja' ? 'プロンプトをすべてリセット' : 'Reset all prompts'}
                   className="rounded-[6px] px-[9px] py-[4px] text-[11px] cursor-pointer font-mono border border-dim text-muted transition-all duration-200 flex-shrink-0"
@@ -2039,7 +2045,7 @@ export default function Loom() {
                 {outputTab !== 'natural' && (
                   <button onClick={() => { if (!outputEditMode) { if (!outputEditText) setOutputEditText(currentText); setOutputEditMode(true); setOutputExpanded(true); } else { setOutputEditMode(false); } }}
                     disabled={!currentText} title={lang === 'ja' ? 'コピー前に手直し' : 'Edit before copy'}
-                    style={{ background: outputEditMode ? '#fbbf2422' : 'none', border: `1px solid ${outputEditMode ? '#fbbf2460' : 'rgb(var(--dim))'}`, color: outputEditMode ? '#fbbf24' : 'rgb(var(--muted))' }}
+                    style={{ background: outputEditMode ? warnColor + '22' : 'none', border: `1px solid ${outputEditMode ? warnColor + '60' : 'rgb(var(--dim))'}`, color: outputEditMode ? warnColor : 'rgb(var(--muted))' }}
                     className="rounded-[6px] px-[9px] py-[4px] text-[11px] transition-all duration-200 cursor-pointer disabled:cursor-default font-mono flex-shrink-0">✏️</button>
                 )}
                 {apiConfig.apiKey && outputTab === 'positive' && (
@@ -2196,7 +2202,7 @@ export default function Loom() {
               </div>
               <div className="flex gap-[6px] flex-wrap mt-[3px]">
                 {balanceBlocks.map(b => (
-                  <span key={b.id} style={{ color: b.color }} className="text-[10px] font-mono font-semibold">
+                  <span key={b.id} style={{ color: blockTextColor(b) }} className="text-[10px] font-mono font-semibold">
                     {b.icon}{countTags(b.text)}
                   </span>
                 ))}
@@ -2205,7 +2211,7 @@ export default function Loom() {
           )}
 
           {outputExpanded && conflicts.length > 0 && outputTab === 'positive' && (
-            <div className="flex-shrink-0 mb-[6px] px-[10px] py-[6px] bg-tint-warn border border-[#fbbf2450] rounded-[7px] flex items-center gap-2 flex-wrap">
+            <div className="flex-shrink-0 mb-[6px] px-[10px] py-[6px] bg-tint-warn border border-warn/30 rounded-[7px] flex items-center gap-2 flex-wrap">
               <span className="text-warn-text text-[10px] font-bold flex-shrink-0">⚠️ {lang === 'ja' ? '矛盾の可能性' : 'Possible conflict'}</span>
               {conflicts.map((c, i) => (
                 <span key={i} className="text-warn-text/80 text-[10px] font-mono bg-tint-warn-tag px-[7px] py-[2px] rounded-[4px]">
@@ -2291,7 +2297,7 @@ export default function Loom() {
             <textarea
               value={outputEditText}
               onChange={e => setOutputEditText(e.target.value)}
-              style={{ border: `2px solid #fbbf2460` }}
+              style={{ border: `2px solid ${warnColor}60` }}
               className="flex-1 min-h-[42px] bg-bg rounded-[8px] px-3 py-[9px] text-[12px] font-mono leading-[1.65] break-all text-prompt outline-none resize-none"
               autoFocus
               placeholder={lang === 'ja' ? 'テキストを手直ししてからコピー...' : 'Edit text then copy...'}
@@ -2301,7 +2307,7 @@ export default function Loom() {
                 border: `1px solid ${outputTab === 'natural' ? (theme === 'dark' ? '#34d39940' : '#0a7a4a40') : outputTab === 'positive' ? 'rgb(var(--output-border))' : 'rgb(var(--tint-danger))'}`,
                 color: outputTab === 'natural' ? (theme === 'dark' ? '#34d399' : '#0a7a4a') : undefined,
               }}
-              className={`flex-1 min-h-[42px] overflow-y-auto bg-bg rounded-[8px] px-3 py-[9px] leading-[1.75] break-words select-all ${outputTab === 'natural' ? 'text-[13px] font-sans' : 'text-[12px] font-mono break-all'} ${currentText ? outputTab === 'positive' ? 'text-prompt' : outputTab === 'natural' ? '' : 'text-[#ff8090]' : 'text-muted'}`}>
+              className={`flex-1 min-h-[42px] overflow-y-auto bg-bg rounded-[8px] px-3 py-[9px] leading-[1.75] break-words select-all ${outputTab === 'natural' ? 'text-[13px] font-sans' : 'text-[12px] font-mono break-all'} ${currentText ? outputTab === 'positive' ? 'text-prompt' : outputTab === 'natural' ? '' : 'text-danger' : 'text-muted'}`}>
               {currentText || (outputTab === 'positive' ? (lang === 'ja' ? '← ブロックを有効にしてタグをクリック' : '← Enable blocks and click tags') : outputTab === 'natural' ? (lang === 'ja' ? '← ブロックにタグを追加すると自然文が生成されます' : '← Add tags to blocks to generate natural language') : (lang === 'ja' ? '← ネガティブブロックにタグを追加' : '← Add tags to Negative block'))}
             </div>
           ))}
@@ -2385,7 +2391,7 @@ export default function Loom() {
             </div>
             {(lang === 'ja' ? templateUndoBuf.negHintJa : templateUndoBuf.negHintEn) && (
               <div className="mt-[6px] text-[9px] font-mono leading-[1.5] px-[6px] py-[3px] rounded-[4px]"
-                style={{ background: 'rgb(var(--accent) / 0.08)', color: 'rgb(var(--accent))', border: '1px solid rgb(var(--accent) / 0.25)' }}>
+                style={{ background: 'rgb(var(--c-blue) / 0.08)', color: 'rgb(var(--c-blue))', border: '1px solid rgb(var(--c-blue) / 0.25)' }}>
                 💡 {lang === 'ja' ? `ネガ推奨: ${templateUndoBuf.negHintJa}` : `Neg hint: ${templateUndoBuf.negHintEn}`}
               </div>
             )}

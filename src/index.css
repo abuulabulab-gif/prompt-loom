@@ -47,6 +47,7 @@ input, textarea, [contenteditable] { -webkit-user-select: text; user-select: tex
   --c-purple: 192 132 252;
   --c-red:    248 113 113;
   --c-teal:    34 197  94;
+  --c-orange: 251 146  60;
 }
 
 [data-theme="light"] {
@@ -75,6 +76,7 @@ input, textarea, [contenteditable] { -webkit-user-select: text; user-select: tex
   --c-purple: 124  58 237;
   --c-red:    185  28  28;
   --c-teal:    21 128  61;
+  --c-orange: 194  65  12;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }

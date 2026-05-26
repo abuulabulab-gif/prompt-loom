@@ -49,7 +49,7 @@ function TemplateCard({ tmpl, lang, onApply }) {
       )}
       {(lang === 'ja' ? tmpl.negHintJa : tmpl.negHintEn) && (
         <div className="text-[9px] font-mono leading-[1.5] mb-2 px-[6px] py-[4px] rounded-[4px]"
-          style={{ background: 'rgb(var(--accent) / 0.08)', color: 'rgb(var(--accent))', border: '1px solid rgb(var(--accent) / 0.25)' }}>
+          style={{ background: 'rgb(var(--c-blue) / 0.08)', color: 'rgb(var(--c-blue))', border: '1px solid rgb(var(--c-blue) / 0.25)' }}>
           💡 {lang === 'ja' ? 'ネガ推奨: ' : 'Neg hint: '}{lang === 'ja' ? tmpl.negHintJa : tmpl.negHintEn}
         </div>
       )}

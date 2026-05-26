@@ -26,11 +26,11 @@ export default {
         'tint-danger':   'rgb(var(--tint-danger)    / <alpha-value>)',
         'warn-text':     'rgb(var(--warn-text)      / <alpha-value>)',
         'prompt':        'rgb(var(--prompt-text)    / <alpha-value>)',
-        // semantic accents (theme-independent)
-        accent:    '#6c8fff',
+        // semantic accents (theme-sensitive via CSS vars)
+        accent:    'rgb(var(--c-blue)    / <alpha-value>)',
         good:      'rgb(var(--good-text) / <alpha-value>)',
-        warn:      '#fbbf24',
-        danger:    '#f87171',
+        warn:      'rgb(var(--warn-text) / <alpha-value>)',
+        danger:    'rgb(var(--c-red)     / <alpha-value>)',
       },
       fontFamily: {
         sans: ['"Segoe UI"', '"Noto Sans JP"', '-apple-system', 'sans-serif'],

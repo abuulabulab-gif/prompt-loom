@@ -176,7 +176,9 @@ const GUIDE = (lang) => [
   {
     icon: '📖',
     label: lang === 'ja' ? 'キャラシート — キャラクター管理ノート' : 'Character Sheet — Notes & Records',
-    color: '#fb923c',
+    color: 'rgb(var(--c-orange))',
+    iconBg: 'rgb(var(--c-orange) / 0.1)',
+    iconBd: 'rgb(var(--c-orange) / 0.28)',
     items: [
       { icon: '📋 Profile', text: lang === 'ja' ? 'プロフィールシート：性格・口調・外見・設定など10項目＋カスタム項目でキャラクターの詳細を記録できる。🏷 AIタグボタンをONにすると各フィールドにプロンプトタグ欄が展開され「→」でブロックに直接挿入可能' : 'Profile Sheet: 10 sections + custom fields for character details. Toggle 🏷 Tags to reveal per-field prompt tag rows — "→" inserts directly into the matching block' },
       { icon: '📊 TSV', text: lang === 'ja' ? 'プロフィールシート右上の📊ボタンでTSV（タブ区切り）形式にコピー。Googleスプレッドシートに直接貼り付けてキャラ設定表として管理できる' : '📊 in the Profile Sheet header copies all data as TSV. Paste directly into Google Sheets for organized character management' },
@@ -192,7 +194,9 @@ const GUIDE = (lang) => [
   {
     icon: '🎛',
     label: lang === 'ja' ? 'その他の機能一覧' : 'More Features',
-    color: '#94a3b8',
+    color: 'rgb(var(--muted))',
+    iconBg: 'rgb(var(--dim) / 0.3)',
+    iconBd: 'rgb(var(--dim) / 0.6)',
     items: [
       { icon: '🎬 Scene', text: lang === 'ja' ? '【キャラ2体以上で有効】シーン合成（✦ツール→🎬）：2〜3キャラのプロンプトを1つに合成。BREAKタグ区切り・比重調整に対応' : '[2+ characters required] Scene Compose (✦ Tools → 🎬): merge 2–3 character prompts. Supports BREAK separators and weight ratios' },
       { icon: '🆚 Diff', text: lang === 'ja' ? '【キャラ2体以上で有効】比較パネル（🆚）：キャラバーのエディタボタン左に現れるボタンから起動。2キャラのブロック設定を横並びで差分確認できる' : '[2+ characters required] Compare Panel (🆚): launched from the button left of the editor tab in the character bar. View two characters side-by-side' },
