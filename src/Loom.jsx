@@ -1472,7 +1472,8 @@ export default function Loom() {
                   focusMode={isFocusMode}
                   isCompact={effLayout === '3col' && !focusBlockId}
                   sceneActive={sceneOpen}
-                  analyzeText={analyzeText} />
+                  analyzeText={analyzeText}
+                  allBlocks={blocks} />
               );
 
               if (isWide && focusBlock) {

@@ -142,6 +142,8 @@ export const TIER3_TAGS = new Set([
   'tattoo','arm tattoo','back tattoo',
   // 特殊フォーマット（手動選択専用）
   'tarot card',
+  // 種族専用パーツ（コンボルール経由でのみ付与）
+  'ball joints','cybernetics','scale skin','translucent skin','liquid body','porcelain skin',
 ]);
 
 // ── Weapon tags (格上げ: Tier3 → 低確率枠) ──────────────────
@@ -263,12 +265,15 @@ export const RANDOM_COMBO_RULES = [
   { trigger: 'beach',          blockId: 'body',        tag: 'barefoot' },
   { trigger: 'rainy',          blockId: 'body',        tag: 'wet hair' },
   { trigger: 'action',         blockId: 'composition', tag: 'fighting stance' },
+  { trigger: 'slime girl',     blockId: 'body',        tag: 'translucent skin' },
+  { trigger: 'slime girl',     blockId: 'body',        tag: 'liquid body' },
+  { trigger: 'doll',           blockId: 'body',        tag: 'porcelain skin' },
 ];
 
 // ── キャラデザモード：設定資料特化の厳格ルール ────────────
 export const CHARDESIGN_MODE_CONFIG = {
   // ブロック単位の固定テキスト（ランダム抽選を行わず強制上書き）
-  qualityText:     'best quality, ultra-detailed, highres, sharp focus',
+  qualityText:     'masterpiece, best quality, ultra-detailed, highres, absurdres, official art',
   artstyleText:    'illustration, flat color, cel shading, vibrant colors, hard shading',
   backgroundText:  'white background, simple background',
   compositionText: 'full body, front view, standing',

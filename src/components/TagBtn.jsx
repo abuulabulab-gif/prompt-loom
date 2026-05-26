@@ -43,9 +43,8 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
     if (!SUPPORTS_HOVER) return;
     setH(true);
     if (desc && wrapRef.current) {
-      const zoom = parseFloat(document.documentElement.style.zoom) || 1;
       const r = wrapRef.current.getBoundingClientRect();
-      setTipPos({ x: Math.round((r.left + r.width / 2) / zoom), y: Math.round(r.top / zoom) });
+      setTipPos({ x: Math.round(r.left + r.width / 2), y: Math.round(r.top) });
     }
   };
   const handleLeave = () => { setH(false); setTipPos(null); };

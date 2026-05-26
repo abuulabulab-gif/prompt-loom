@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+html { font-size: 19.2px; }
+
 /* Prevent accidental text selection everywhere; allow it only in editable fields */
 * { -webkit-user-select: none; user-select: none; }
 input, textarea, [contenteditable] { -webkit-user-select: text; user-select: text; }

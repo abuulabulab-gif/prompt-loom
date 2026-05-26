@@ -148,12 +148,13 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
 
         let newBlock;
 
-        if (mode === 'chardesign') {
+        // Quality is always fixed regardless of mode
+        if (block.id === 'quality') {
+          newBlock = { ...block, text: 'masterpiece, best quality, ultra-detailed, highres, absurdres, official art', enabled: true, collapsed: false, lastRandomPicks: [] };
+        } else if (mode === 'chardesign') {
           const cfg = CHARDESIGN_MODE_CONFIG;
 
-          if (block.id === 'quality') {
-            newBlock = { ...block, text: cfg.qualityText, enabled: true, collapsed: false, lastRandomPicks: [] };
-          } else if (block.id === 'artstyle') {
+          if (block.id === 'artstyle') {
             newBlock = { ...block, text: cfg.artstyleText, enabled: true, collapsed: false, lastRandomPicks: [] };
           } else if (block.id === 'background') {
             newBlock = { ...block, text: cfg.backgroundText, enabled: true, collapsed: false, lastRandomPicks: [] };

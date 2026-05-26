@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { STRENGTHS, uid, appendTag, countTags, hasTag, toggleTag, clampW, removeTag, OPTIONAL_CAT_NAMES, BLOCK_RANDOM_RULES, TIER3_TAGS, RANDOM_EXCLUSION_RULES, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS, TAG_PAIR_COMBOS, TAG_SPECIES_COMBOS } from "../data/constants.js";
+import { STRENGTHS, uid, appendTag, countTags, hasTag, toggleTag, clampW, removeTag, splitTags, bareTag, OPTIONAL_CAT_NAMES, BLOCK_RANDOM_RULES, TIER3_TAGS, RANDOM_EXCLUSION_RULES, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS, TAG_PAIR_COMBOS, TAG_SPECIES_COMBOS } from "../data/constants.js";
 import { CONFLICT_MAP } from "../data/conflicts.js";
 import { EXPRESSION_PRESETS, ALL_EXPR_TAGS } from "../data/expressions.js";
 import { NEG_PRESETS } from "../data/negSuggestions.js";
@@ -38,7 +38,7 @@ const CATS_CLOSED = new Set([
 
 const SCENE_MANAGED_TAGS = new Set(['2girls', '2boys', 'multiple girls', 'multiple boys', '1other']);
 
-export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isFirst, isLast, onSavePreset, onFocus, focused, otherChars, onTransfer, conflictTags, onRemove, onHide, isMobile, isCompact, focusMode, sceneActive, analyzeText }) {
+export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isFirst, isLast, onSavePreset, onFocus, focused, otherChars, onTransfer, conflictTags, onRemove, onHide, isMobile, isCompact, focusMode, sceneActive, analyzeText, allBlocks }) {
   const [search, setSearch] = useState('');
   const [saving, setSaving] = useState(false);
   const [pName, setPName] = useState('');
@@ -570,8 +570,19 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                     let baseText = block.text;
                     for (const t of (block.lastRandomPicks || [])) baseText = removeTag(baseText, t.en);
 
-                    // Collect exclusions from tags already in baseText (RANDOM_EXCLUSION_RULES + CONFLICT_MAP)
+                    // Collect exclusions from all other enabled blocks first (cross-block awareness)
                     const excluded = new Set();
+                    for (const other of (allBlocks || [])) {
+                      if (other.id === block.id || other.enabled === false) continue;
+                      splitTags(other.text || '').forEach(seg => {
+                        const en = bareTag(seg).toLowerCase();
+                        const excl = RANDOM_EXCLUSION_RULES.get(en);
+                        if (excl) excl.forEach(e => excluded.add(e.toLowerCase()));
+                        const cfMap = CONFLICT_MAP.get(en);
+                        if (cfMap) cfMap.forEach(e => excluded.add(e));
+                      });
+                    }
+                    // Then add exclusions from this block's own baseText
                     baseText.split(',').map(s => s.trim().toLowerCase()).filter(Boolean).forEach(en => {
                       const excl = RANDOM_EXCLUSION_RULES.get(en);
                       if (excl) excl.forEach(e => excluded.add(e.toLowerCase()));
