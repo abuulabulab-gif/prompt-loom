@@ -138,7 +138,7 @@ export default function Loom() {
   const isWide = vw >= 900;
   const isMobile = vw < 600;
   const effLayout = isWide ? layout : '1col';
-  const contentMax = isWide ? '1400px' : '760px';
+  const contentMax = isWide ? '58.33rem' : '31.67rem';
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -1522,7 +1522,7 @@ export default function Loom() {
               if (isWide && focusBlock) {
                 const focusIdx = visibleBlocks.findIndex(b => b.id === focusBlockId);
                 return (
-                  <div className="max-w-[1400px] mx-auto px-[14px] py-[13px] flex gap-[12px] items-start">
+                  <div className="max-w-[58.33rem] mx-auto px-[14px] py-[13px] flex gap-[12px] items-start">
                     <div className="flex-1 min-w-0">
                       <div className="text-muted text-[11px] font-mono mb-3 tracking-[0.07em] font-semibold">🔍 {lang === 'ja' ? '集中編集モード' : 'FOCUS MODE'}</div>
                       {renderCard(focusBlock, focusIdx, true)}
@@ -1553,7 +1553,7 @@ export default function Loom() {
                 const cols = [[], [], []];
                 visibleBlocks.forEach((b, i) => cols[i % 3].push([b, i]));
                 return (
-                  <div className="max-w-[1400px] mx-auto px-[14px] py-[13px] flex gap-3 items-start">
+                  <div className="max-w-[58.33rem] mx-auto px-[14px] py-[13px] flex gap-3 items-start">
                     {cols.map((col, ci) => (
                       <div key={ci} className="flex-1 min-w-0">{col.map(([b, i]) => renderCard(b, i))}</div>
                     ))}
@@ -1565,7 +1565,7 @@ export default function Loom() {
                 const col1 = [], col2 = [];
                 visibleBlocks.forEach((b, i) => (i % 2 === 0 ? col1 : col2).push([b, i]));
                 return (
-                  <div className="max-w-[1400px] mx-auto px-[14px] py-[13px] flex gap-3 items-start">
+                  <div className="max-w-[58.33rem] mx-auto px-[14px] py-[13px] flex gap-3 items-start">
                     <div className="flex-1 min-w-0">{col1.map(([b, i]) => renderCard(b, i))}</div>
                     <div className="flex-1 min-w-0">{col2.map(([b, i]) => renderCard(b, i))}</div>
                   </div>
@@ -1573,7 +1573,7 @@ export default function Loom() {
               }
 
               return (
-                <div className="max-w-[1400px] mx-auto px-[14px] py-[13px]">
+                <div className="max-w-[58.33rem] mx-auto px-[14px] py-[13px]">
                   {visibleBlocks.map((b, i) => renderCard(b, i))}
                 </div>
               );

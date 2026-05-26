@@ -3,6 +3,8 @@
 @tailwind utilities;
 
 html { font-size: 24px; }
+@media (min-width: 2560px) { html { font-size: 32px; } }
+@media (min-width: 3840px) { html { font-size: 48px; } }
 
 /* Prevent accidental text selection everywhere; allow it only in editable fields */
 * { -webkit-user-select: none; user-select: none; }
