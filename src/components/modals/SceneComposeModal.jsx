@@ -68,23 +68,23 @@ export default function SceneComposeModal({ characters, lang, theme, onClose }) 
   return (
     <div className="fixed inset-0 bg-black/[0.82] z-[300] flex items-center justify-center p-4" onClick={onClose}>
       <div onClick={e => e.stopPropagation()}
-        className="bg-surface border border-linebright rounded-[14px] w-full max-w-[620px] max-h-[90vh] overflow-y-auto p-[18px]">
+        className="bg-surface border border-linebright rounded-[0.875rem] w-full max-w-[38.75rem] max-h-[90vh] overflow-y-auto p-[1.125rem]">
 
-        <div className="flex items-center justify-between mb-[6px]">
-          <span className="text-fg text-[15px] font-extrabold">🎬 {lang === 'ja' ? 'シーン合成' : 'Scene Compose'}</span>
-          <button onClick={onClose} className="bg-transparent border border-dim rounded-[6px] px-[10px] py-1 text-muted cursor-pointer text-[12px]">
+        <div className="flex items-center justify-between mb-1.5">
+          <span className="text-fg text-[0.9375rem] font-extrabold">🎬 {lang === 'ja' ? 'シーン合成' : 'Scene Compose'}</span>
+          <button onClick={onClose} className="bg-transparent border border-dim rounded-md px-2.5 py-1 text-muted cursor-pointer text-xs">
             {lang === 'ja' ? '閉じる' : 'Close'}
           </button>
         </div>
-        <div className="text-muted text-[11px] mb-[14px]">
+        <div className="text-muted text-[0.6875rem] mb-3.5">
           {lang === 'ja' ? '保存済みキャラを2〜3人選んで1枚の画像用プロンプトに合成します' : 'Combine 2-3 saved characters into one image prompt'}
         </div>
 
         {/* Step 1: select chars */}
-        <div className="text-muted text-[10px] font-mono mb-[6px] tracking-[0.07em]">
+        <div className="text-muted text-[0.625rem] font-mono mb-1.5 tracking-[0.07em]">
           {lang === 'ja' ? `① キャラを選ぶ（${selected.length}/3）` : `① Select characters (${selected.length}/3)`}
         </div>
-        <div className="flex flex-wrap gap-[6px] mb-[14px]">
+        <div className="flex flex-wrap gap-1.5 mb-3.5">
           {characters.map(c => {
             const sel = selected.find(s => s.charId === c.id);
             return (
@@ -93,10 +93,10 @@ export default function SceneComposeModal({ characters, lang, theme, onClose }) 
                   background: sel ? c.color + '22' : 'rgb(var(--surface-alt))',
                   border: `1px solid ${sel ? c.color : 'rgb(var(--border))'}`,
                 }}
-                className="flex items-center gap-[6px] rounded-[9px] px-[11px] py-[7px] cursor-pointer transition-all duration-[120ms]">
-                <span className="text-[15px]">{c.emoji}</span>
-                <span style={{ color: sel ? c.color : 'rgb(var(--text))' }} className="text-[12px] font-semibold">{c.name}</span>
-                {sel && <span style={{ color: c.color }} className="text-[10px] font-mono">✓</span>}
+                className="flex items-center gap-1.5 rounded-[0.5625rem] px-[0.6875rem] py-[0.4375rem] cursor-pointer transition-all duration-[120ms]">
+                <span className="text-[0.9375rem]">{c.emoji}</span>
+                <span style={{ color: sel ? c.color : 'rgb(var(--text))' }} className="text-xs font-semibold">{c.name}</span>
+                {sel && <span style={{ color: c.color }} className="text-[0.625rem] font-mono">✓</span>}
               </div>
             );
           })}
@@ -105,14 +105,14 @@ export default function SceneComposeModal({ characters, lang, theme, onClose }) 
         {/* Step 2: positions */}
         {selected.length > 0 && (
           <>
-            <div className="text-muted text-[10px] font-mono mb-[6px] tracking-[0.07em]">{lang === 'ja' ? '② 配置を決める' : '② Positions'}</div>
-            <div className="mb-[14px]">
+            <div className="text-muted text-[0.625rem] font-mono mb-1.5 tracking-[0.07em]">{lang === 'ja' ? '② 配置を決める' : '② Positions'}</div>
+            <div className="mb-3.5">
               {selected.map(s => {
                 const c = characters.find(ch => ch.id === s.charId);
                 return (
-                  <div key={s.charId} className="flex items-center gap-2 mb-[6px]">
-                    <span className="text-[14px]">{c.emoji}</span>
-                    <span style={{ color: c.color }} className="text-[12px] font-semibold min-w-[70px]">{c.name}</span>
+                  <div key={s.charId} className="flex items-center gap-2 mb-1.5">
+                    <span className="text-sm">{c.emoji}</span>
+                    <span style={{ color: c.color }} className="text-xs font-semibold min-w-[4.375rem]">{c.name}</span>
                     <div className="flex gap-1">
                       {SCENE_POSITIONS.map(p => (
                         <button key={p.id} onClick={() => setPos(s.charId, p.id)}
@@ -121,7 +121,7 @@ export default function SceneComposeModal({ characters, lang, theme, onClose }) 
                             border: `1px solid ${s.position === p.id ? c.color : 'rgb(var(--border))'}`,
                             color: s.position === p.id ? c.color : 'rgb(var(--muted))',
                           }}
-                          className="rounded-[5px] px-[9px] py-[3px] text-[10px] cursor-pointer font-mono">
+                          className="rounded-[0.3125rem] px-[0.5625rem] py-[0.1875rem] text-[0.625rem] cursor-pointer font-mono">
                           {lang === 'ja' ? p.ja : p.en}
                         </button>
                       ))}
@@ -136,11 +136,11 @@ export default function SceneComposeModal({ characters, lang, theme, onClose }) 
         {/* Step 3: relation */}
         {selected.length > 1 && (
           <>
-            <div className="text-muted text-[10px] font-mono mb-[6px] tracking-[0.07em]">{lang === 'ja' ? '③ 関係性' : '③ Relationship'}</div>
-            <div className="flex flex-wrap gap-[5px] mb-[14px]">
+            <div className="text-muted text-[0.625rem] font-mono mb-1.5 tracking-[0.07em]">{lang === 'ja' ? '③ 関係性' : '③ Relationship'}</div>
+            <div className="flex flex-wrap gap-[0.3125rem] mb-3.5">
               {SCENE_RELATIONS.map(r => (
                 <button key={r.ja} onClick={() => setRelation(r)}
-                  className={`rounded-[6px] px-[10px] py-1 text-[11px] cursor-pointer font-mono ${relation.ja === r.ja ? 'bg-[#6c8fff22] border border-accent text-accent' : 'bg-surfalt border border-line text-fg'}`}>
+                  className={`rounded-md px-2.5 py-1 text-[0.6875rem] cursor-pointer font-mono ${relation.ja === r.ja ? 'bg-[#6c8fff22] border border-accent text-accent' : 'bg-surfalt border border-line text-fg'}`}>
                   {lang === 'ja' ? r.ja : (r.en || 'none')}
                 </button>
               ))}
@@ -150,8 +150,8 @@ export default function SceneComposeModal({ characters, lang, theme, onClose }) 
 
         {/* BREAK option */}
         {selected.length > 1 && (
-          <div className="flex items-center gap-[10px] mb-[14px] flex-wrap">
-            <label className="flex items-center gap-[6px] cursor-pointer text-fg text-[11px]">
+          <div className="flex items-center gap-2.5 mb-3.5 flex-wrap">
+            <label className="flex items-center gap-1.5 cursor-pointer text-fg text-[0.6875rem]">
               <input type="checkbox" checked={useBreak} onChange={e => setUseBreak(e.target.checked)} style={{ accentColor: '#6c8fff' }} />
               {lang === 'ja' ? 'BREAK で区切る（色移り対策・NovelAI/SD推奨）' : 'Separate with BREAK'}
             </label>
@@ -159,17 +159,17 @@ export default function SceneComposeModal({ characters, lang, theme, onClose }) 
         )}
 
         {/* Global quality */}
-        <div className="text-muted text-[10px] font-mono mb-[6px] tracking-[0.07em]">{lang === 'ja' ? '共通品質タグ' : 'Global quality'}</div>
+        <div className="text-muted text-[0.625rem] font-mono mb-1.5 tracking-[0.07em]">{lang === 'ja' ? '共通品質タグ' : 'Global quality'}</div>
         <input
           value={globalQuality}
           onChange={e => setGlobalQuality(e.target.value)}
-          className="w-full bg-inputbg border border-line rounded-[7px] text-fg text-[11px] px-[10px] py-[7px] outline-none font-mono box-border mb-[14px]"
+          className="w-full bg-inputbg border border-line rounded-[0.4375rem] text-fg text-[0.6875rem] px-2.5 py-[0.4375rem] outline-none font-mono box-border mb-3.5"
         />
 
         {/* Output */}
-        <div className="text-muted text-[10px] font-mono mb-[6px] tracking-[0.07em]">{lang === 'ja' ? '合成プロンプト' : 'Combined prompt'}</div>
+        <div className="text-muted text-[0.625rem] font-mono mb-1.5 tracking-[0.07em]">{lang === 'ja' ? '合成プロンプト' : 'Combined prompt'}</div>
         <div
-          className={`bg-inputbg border border-output-border rounded-[8px] px-3 py-[10px] text-[12px] font-mono min-h-[60px] max-h-[140px] overflow-y-auto leading-[1.6] break-all mb-3 select-all ${built ? 'text-prompt' : 'text-muted'}`}
+          className={`bg-inputbg border border-output-border rounded-lg px-3 py-2.5 text-xs font-mono min-h-[3.75rem] max-h-[8.75rem] overflow-y-auto leading-[1.6] break-all mb-3 select-all ${built ? 'text-prompt' : 'text-muted'}`}
         >
           {built || (lang === 'ja' ? 'キャラを選ぶと合成プロンプトが表示されます' : 'Select characters to build')}
         </div>
@@ -185,13 +185,13 @@ export default function SceneComposeModal({ characters, lang, theme, onClose }) 
               color: copied ? goodColor : built ? 'white' : 'rgb(var(--muted))',
             };
           })()}
-          className="w-full rounded-[9px] py-[11px] text-[13px] font-bold cursor-pointer disabled:cursor-default tracking-[0.03em]"
+          className="w-full rounded-[0.5625rem] py-[0.6875rem] text-[0.8125rem] font-bold cursor-pointer disabled:cursor-default tracking-[0.03em]"
         >
           {copied ? '✓ Copied!' : '📋 ' + (lang === 'ja' ? '合成プロンプトをコピー' : 'Copy combined prompt')}
         </button>
 
         {selected.length > 1 && !useBreak && (
-          <div className="text-warn text-[10px] font-mono text-center mt-2">
+          <div className="text-warn text-[0.625rem] font-mono text-center mt-2">
             ⚠️ {lang === 'ja' ? 'BREAK無しは色移りが起きやすいです' : 'Without BREAK, color bleeding is likely'}
           </div>
         )}

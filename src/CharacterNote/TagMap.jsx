@@ -79,62 +79,62 @@ export default function TagMap({ char, lang, onUpdate, blocks }) {
 
   return (
     <div>
-      <div className="flex items-center gap-[8px] mb-[11px]">
-        <span className="text-fg text-[12px] font-bold">🔗 {lang === 'ja' ? 'タグ対応表' : 'Tag Map'}</span>
-        <span className="text-muted text-[10px] font-mono font-semibold">{tagMap.length}{lang === 'ja' ? '件' : ' rows'}</span>
+      <div className="flex items-center gap-2 mb-[0.6875rem]">
+        <span className="text-fg text-xs font-bold">🔗 {lang === 'ja' ? 'タグ対応表' : 'Tag Map'}</span>
+        <span className="text-muted text-[0.625rem] font-mono font-semibold">{tagMap.length}{lang === 'ja' ? '件' : ' rows'}</span>
         <div className="flex-1" />
         <button onClick={() => setAdding(a => !a)}
           style={adding ? { background: char.color + '22', borderColor: char.color, color: char.color } : undefined}
-          className={`rounded-[6px] px-[10px] py-[4px] text-[10px] font-mono cursor-pointer border ${adding ? 'font-bold' : 'border-dim text-muted'}`}>
+          className={`rounded-md px-2.5 py-1 text-[0.625rem] font-mono cursor-pointer border ${adding ? 'font-bold' : 'border-dim text-muted'}`}>
           {adding ? `✕ ${lang === 'ja' ? 'キャンセル' : 'Cancel'}` : `＋ ${lang === 'ja' ? '行を追加' : 'Add row'}`}
         </button>
       </div>
 
       {/* Add form */}
       {adding && (
-        <div className="mb-[12px] p-[12px] bg-bg border rounded-[8px]" style={{ borderColor: char.color + '40' }}>
-          <div className="grid grid-cols-2 gap-[8px] mb-[7px]">
+        <div className="mb-3 p-3 bg-bg border rounded-lg" style={{ borderColor: char.color + '40' }}>
+          <div className="grid grid-cols-2 gap-2 mb-[0.4375rem]">
             <div>
-              <div className="text-muted text-[10px] font-mono font-semibold mb-[3px]">{lang === 'ja' ? '設定（日本語）' : 'Setting label'}</div>
+              <div className="text-muted text-[0.625rem] font-mono font-semibold mb-[0.1875rem]">{lang === 'ja' ? '設定（日本語）' : 'Setting label'}</div>
               <input value={newLabel} onChange={e => setNewLabel(e.target.value)}
                 placeholder={lang === 'ja' ? '例: 銀黒の長髪' : 'e.g. silver black hair'}
-                className="w-full bg-surface border border-line rounded-[5px] text-[11px] px-[7px] py-[5px] font-mono text-fg outline-none" />
+                className="w-full bg-surface border border-line rounded-[0.3125rem] text-[0.6875rem] px-[0.4375rem] py-[0.3125rem] font-mono text-fg outline-none" />
             </div>
             <div>
-              <div className="text-muted text-[10px] font-mono font-semibold mb-[3px]">{lang === 'ja' ? 'プロンプトタグ' : 'Prompt tags'}</div>
+              <div className="text-muted text-[0.625rem] font-mono font-semibold mb-[0.1875rem]">{lang === 'ja' ? 'プロンプトタグ' : 'Prompt tags'}</div>
               <input value={newPrompt} onChange={e => setNewPrompt(e.target.value)}
                 placeholder="silver hair, long hair"
-                className="w-full bg-surface border border-line rounded-[5px] text-[11px] px-[7px] py-[5px] font-mono text-fg outline-none" />
+                className="w-full bg-surface border border-line rounded-[0.3125rem] text-[0.6875rem] px-[0.4375rem] py-[0.3125rem] font-mono text-fg outline-none" />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-[8px] mb-[9px]">
+          <div className="grid grid-cols-2 gap-2 mb-[0.5625rem]">
             <div>
-              <div className="text-muted text-[10px] font-mono font-semibold mb-[3px]">{lang === 'ja' ? '対象ブロック' : 'Target block'}</div>
+              <div className="text-muted text-[0.625rem] font-mono font-semibold mb-[0.1875rem]">{lang === 'ja' ? '対象ブロック' : 'Target block'}</div>
               <select value={newBlock} onChange={e => setNewBlock(e.target.value)}
-                className="w-full bg-surface border border-line rounded-[5px] text-[11px] px-[7px] py-[5px] font-mono text-fg outline-none cursor-pointer">
+                className="w-full bg-surface border border-line rounded-[0.3125rem] text-[0.6875rem] px-[0.4375rem] py-[0.3125rem] font-mono text-fg outline-none cursor-pointer">
                 {blockOptions.map(b => <option key={b.id} value={b.id}>{lang === 'ja' ? b.ja : b.en}</option>)}
               </select>
             </div>
             <div>
-              <div className="text-muted text-[10px] font-mono font-semibold mb-[3px]">{lang === 'ja' ? '備考' : 'Notes'}</div>
+              <div className="text-muted text-[0.625rem] font-mono font-semibold mb-[0.1875rem]">{lang === 'ja' ? '備考' : 'Notes'}</div>
               <input value={newNotes} onChange={e => setNewNotes(e.target.value)} placeholder="—"
-                className="w-full bg-surface border border-line rounded-[5px] text-[11px] px-[7px] py-[5px] font-mono text-fg outline-none" />
+                className="w-full bg-surface border border-line rounded-[0.3125rem] text-[0.6875rem] px-[0.4375rem] py-[0.3125rem] font-mono text-fg outline-none" />
             </div>
           </div>
           <button onClick={addRow}
             style={{ background: char.color, color: '#000' }}
-            className="border-none rounded-[6px] px-[14px] py-[5px] text-[11px] font-bold cursor-pointer">
+            className="border-none rounded-md px-3.5 py-[0.3125rem] text-[0.6875rem] font-bold cursor-pointer">
             {lang === 'ja' ? '追加' : 'Add'}
           </button>
         </div>
       )}
 
       {tagMap.length === 0 ? (
-        <div className="text-center py-[32px]">
-          <div className="text-muted text-[11px] font-mono mb-[6px]">
+        <div className="text-center py-8">
+          <div className="text-muted text-[0.6875rem] font-mono mb-1.5">
             {lang === 'ja' ? '（まだ行がありません）' : '(no rows yet)'}
           </div>
-          <div className="text-muted text-[10px] font-mono leading-[1.6]">
+          <div className="text-muted text-[0.625rem] font-mono leading-[1.6]">
             {lang === 'ja'
               ? '設定上の表現（日本語）とプロンプトタグ（英語）を対応づけて管理できます'
               : 'Map character settings to prompt tags'}
@@ -144,72 +144,72 @@ export default function TagMap({ char, lang, onUpdate, blocks }) {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-line text-muted text-[10px] font-mono font-bold uppercase tracking-[0.07em]">
-                <th className="text-left pb-[6px] w-[20px]" />
-                <th className="text-left pb-[6px] pr-[10px] min-w-[110px]">{lang === 'ja' ? '設定' : 'Setting'}</th>
-                <th className="text-left pb-[6px] pr-[10px] min-w-[160px]">{lang === 'ja' ? 'プロンプトタグ' : 'Prompt tags'}</th>
-                <th className="text-left pb-[6px] pr-[10px] min-w-[70px]">{lang === 'ja' ? 'ブロック' : 'Block'}</th>
-                <th className="text-left pb-[6px] pr-[10px]">{lang === 'ja' ? '備考' : 'Notes'}</th>
-                <th className="pb-[6px] w-[60px]" />
+              <tr className="border-b border-line text-muted text-[0.625rem] font-mono font-bold uppercase tracking-[0.07em]">
+                <th className="text-left pb-1.5 w-5" />
+                <th className="text-left pb-1.5 pr-2.5 min-w-[6.875rem]">{lang === 'ja' ? '設定' : 'Setting'}</th>
+                <th className="text-left pb-1.5 pr-2.5 min-w-[10rem]">{lang === 'ja' ? 'プロンプトタグ' : 'Prompt tags'}</th>
+                <th className="text-left pb-1.5 pr-2.5 min-w-[4.375rem]">{lang === 'ja' ? 'ブロック' : 'Block'}</th>
+                <th className="text-left pb-1.5 pr-2.5">{lang === 'ja' ? '備考' : 'Notes'}</th>
+                <th className="pb-1.5 w-[3.75rem]" />
               </tr>
             </thead>
             <tbody>
               {sorted.map(row => (
                 <tr key={row.id} className="border-b border-line/40 group hover:bg-surfalt/50 transition-colors">
-                  <td className="py-[5px] pr-[4px]">
+                  <td className="py-[0.3125rem] pr-1">
                     <button onClick={() => updateRow(row.id, { pinned: !row.pinned })}
-                      className={`bg-transparent border-none cursor-pointer text-[11px] transition-opacity ${row.pinned ? 'text-warn' : 'text-dim opacity-0 group-hover:opacity-100'}`}>
+                      className={`bg-transparent border-none cursor-pointer text-[0.6875rem] transition-opacity ${row.pinned ? 'text-warn' : 'text-dim opacity-0 group-hover:opacity-100'}`}>
                       ★
                     </button>
                   </td>
-                  <td className="py-[5px] pr-[10px]">
+                  <td className="py-[0.3125rem] pr-2.5">
                     <input value={row.label} onChange={e => updateRow(row.id, { label: e.target.value })}
-                      className="bg-transparent border-none outline-none text-fg text-[11px] font-mono w-full" />
+                      className="bg-transparent border-none outline-none text-fg text-[0.6875rem] font-mono w-full" />
                   </td>
-                  <td className="py-[5px] pr-[10px]">
+                  <td className="py-[0.3125rem] pr-2.5">
                     <input value={row.promptTags} onChange={e => updateRow(row.id, { promptTags: e.target.value })}
-                      className="bg-transparent border-none outline-none text-prompt text-[11px] font-mono w-full" />
+                      className="bg-transparent border-none outline-none text-prompt text-[0.6875rem] font-mono w-full" />
                   </td>
-                  <td className="py-[5px] pr-[10px]">
-                    <div className="flex items-center gap-[3px]">
+                  <td className="py-[0.3125rem] pr-2.5">
+                    <div className="flex items-center gap-[0.1875rem]">
                       {!charBlockIds.has(row.targetBlock) && (
-                        <span title={lang === 'ja' ? 'このブロックは現在存在しません' : 'Block no longer exists'} className="text-[10px] flex-shrink-0">⚠️</span>
+                        <span title={lang === 'ja' ? 'このブロックは現在存在しません' : 'Block no longer exists'} className="text-[0.625rem] flex-shrink-0">⚠️</span>
                       )}
                       <select value={row.targetBlock} onChange={e => updateRow(row.id, { targetBlock: e.target.value })}
-                        className="bg-transparent border-none outline-none text-muted text-[10px] font-mono cursor-pointer min-w-0">
+                        className="bg-transparent border-none outline-none text-muted text-[0.625rem] font-mono cursor-pointer min-w-0">
                         {blockOptions.map(b => <option key={b.id} value={b.id}>{lang === 'ja' ? b.ja : b.en}</option>)}
                       </select>
                     </div>
                   </td>
-                  <td className="py-[5px] pr-[10px]">
+                  <td className="py-[0.3125rem] pr-2.5">
                     <input value={row.notes} onChange={e => updateRow(row.id, { notes: e.target.value })}
                       placeholder="—"
-                      className="bg-transparent border-none outline-none text-muted text-[10px] font-mono w-full" />
+                      className="bg-transparent border-none outline-none text-muted text-[0.625rem] font-mono w-full" />
                   </td>
-                  <td className="py-[5px]">
-                    <div className="flex gap-[4px] items-center justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                  <td className="py-[0.3125rem]">
+                    <div className="flex gap-1 items-center justify-end opacity-0 group-hover:opacity-100 transition-opacity">
                       <button onClick={() => insertToBlock(row)}
                         disabled={!charBlockIds.has(row.targetBlock)}
                         style={charBlockIds.has(row.targetBlock) ? { borderColor: char.color + '60', color: char.color } : undefined}
                         title={!charBlockIds.has(row.targetBlock)
                           ? (lang === 'ja' ? 'ブロックが存在しません' : 'Block no longer exists')
                           : (lang === 'ja' ? `「${blockLabel(row.targetBlock)}」ブロックに追加` : `Add to ${blockLabel(row.targetBlock)} block`)}
-                        className="border border-dim rounded-[4px] px-[6px] py-[2px] text-[10px] bg-transparent font-mono font-semibold disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer text-dim">
+                        className="border border-dim rounded px-1.5 py-0.5 text-[0.625rem] bg-transparent font-mono font-semibold disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer text-dim">
                         {insertedRow === row.id ? '✓' : '→'}
                       </button>
                       <button onClick={() => copyTags(row)}
                         style={{ borderColor: char.color + '60', color: char.color }}
                         title={lang === 'ja' ? 'タグをコピー' : 'Copy tags'}
-                        className="border rounded-[4px] px-[6px] py-[2px] text-[10px] cursor-pointer bg-transparent font-mono">📋</button>
+                        className="border rounded px-1.5 py-0.5 text-[0.625rem] cursor-pointer bg-transparent font-mono">📋</button>
                       <button onClick={() => deleteRow(row.id)}
-                        className="border border-dim rounded-[4px] px-[6px] py-[2px] text-[10px] cursor-pointer bg-transparent text-muted font-mono">✕</button>
+                        className="border border-dim rounded px-1.5 py-0.5 text-[0.625rem] cursor-pointer bg-transparent text-muted font-mono">✕</button>
                     </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <div className="text-muted text-[10px] font-mono mt-[8px]">
+          <div className="text-muted text-[0.625rem] font-mono mt-2">
             {lang === 'ja' ? '💡 行をクリックして直接編集。→でブロックに追加、📋でコピー、★でピン固定' : '💡 Click to edit inline. → inserts into block, 📋 copies, ★ pins to top'}
           </div>
         </div>

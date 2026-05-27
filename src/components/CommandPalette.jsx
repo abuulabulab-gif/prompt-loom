@@ -46,33 +46,33 @@ export default function CommandPalette({ commands, lang, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/75 z-[400] flex items-start justify-center pt-[12vh]" onClick={onClose}>
       <div onClick={e => e.stopPropagation()}
-        className="bg-surface border border-linebright rounded-[14px] w-full max-w-[540px] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.7)]">
+        className="bg-surface border border-linebright rounded-[0.875rem] w-full max-w-[33.75rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.7)]">
 
         {/* Search input */}
-        <div className="flex items-center gap-2 px-[14px] py-[11px] border-b border-line">
-          <span className="text-muted text-[14px]">⌘</span>
+        <div className="flex items-center gap-2 px-3.5 py-[0.6875rem] border-b border-line">
+          <span className="text-muted text-sm">⌘</span>
           <input
             ref={inputRef}
             value={query}
             onChange={e => setQuery(e.target.value)}
             onKeyDown={onKeyDown}
             placeholder={lang === 'ja' ? 'コマンドを検索...' : 'Search commands...'}
-            className="flex-1 bg-transparent text-fg text-[13px] outline-none placeholder:text-dim font-mono"
+            className="flex-1 bg-transparent text-fg text-[0.8125rem] outline-none placeholder:text-dim font-mono"
           />
-          <kbd className="text-dim text-[10px] font-mono border border-dim rounded px-[5px] py-[2px]">Esc</kbd>
+          <kbd className="text-dim text-[0.625rem] font-mono border border-dim rounded px-[0.3125rem] py-0.5">Esc</kbd>
         </div>
 
         {/* Results */}
-        <div ref={listRef} className="max-h-[360px] overflow-y-auto py-[6px]">
+        <div ref={listRef} className="max-h-[22.5rem] overflow-y-auto py-1.5">
           {filtered.length === 0 ? (
-            <div className="text-muted text-[12px] font-mono text-center py-8">
+            <div className="text-muted text-xs font-mono text-center py-8">
               {lang === 'ja' ? '見つかりません' : 'No results'}
             </div>
           ) : groups.map(group => {
             const items = filtered.filter(c => c.group === group);
             return (
               <div key={group}>
-                <div className="text-muted text-[10px] font-mono font-semibold tracking-[0.10em] uppercase px-[14px] pt-[8px] pb-[4px]">
+                <div className="text-muted text-[0.625rem] font-mono font-semibold tracking-[0.10em] uppercase px-3.5 pt-2 pb-1">
                   {group}
                 </div>
                 {items.map(cmd => {
@@ -85,19 +85,19 @@ export default function CommandPalette({ commands, lang, onClose }) {
                       onClick={() => run(cmd)}
                       onMouseEnter={() => setCursor(idx)}
                       style={active ? { background: 'rgb(var(--tint-accent))' } : undefined}
-                      className="flex items-center gap-3 px-[14px] py-[8px] cursor-pointer transition-colors duration-75"
+                      className="flex items-center gap-3 px-3.5 py-2 cursor-pointer transition-colors duration-75"
                     >
-                      <span className="text-[16px] flex-shrink-0 w-[22px] text-center">{cmd.icon}</span>
+                      <span className="text-base flex-shrink-0 w-[1.375rem] text-center">{cmd.icon}</span>
                       <div className="flex-1 min-w-0">
-                        <div className={`text-[12px] font-semibold ${active ? 'text-accent' : 'text-fg'}`}>
+                        <div className={`text-xs font-semibold ${active ? 'text-accent' : 'text-fg'}`}>
                           {lang === 'ja' && cmd.labelJa ? cmd.labelJa : cmd.label}
                         </div>
                         {cmd.description && (
-                          <div className="text-muted text-[10px] font-mono truncate">{cmd.description}</div>
+                          <div className="text-muted text-[0.625rem] font-mono truncate">{cmd.description}</div>
                         )}
                       </div>
                       {cmd.shortcut && (
-                        <kbd className="text-muted text-[10px] font-mono border border-dim rounded px-[5px] py-[2px] flex-shrink-0">
+                        <kbd className="text-muted text-[0.625rem] font-mono border border-dim rounded px-[0.3125rem] py-0.5 flex-shrink-0">
                           {cmd.shortcut}
                         </kbd>
                       )}
@@ -109,10 +109,10 @@ export default function CommandPalette({ commands, lang, onClose }) {
           })}
         </div>
 
-        <div className="border-t border-line px-[14px] py-[7px] flex gap-4 items-center">
-          <span className="text-dim text-[10px] font-mono">↑↓ {lang === 'ja' ? '移動' : 'navigate'}</span>
-          <span className="text-dim text-[10px] font-mono">↵ {lang === 'ja' ? '実行' : 'run'}</span>
-          <span className="text-dim text-[10px] font-mono">Esc {lang === 'ja' ? '閉じる' : 'close'}</span>
+        <div className="border-t border-line px-3.5 py-[0.4375rem] flex gap-4 items-center">
+          <span className="text-dim text-[0.625rem] font-mono">↑↓ {lang === 'ja' ? '移動' : 'navigate'}</span>
+          <span className="text-dim text-[0.625rem] font-mono">↵ {lang === 'ja' ? '実行' : 'run'}</span>
+          <span className="text-dim text-[0.625rem] font-mono">Esc {lang === 'ja' ? '閉じる' : 'close'}</span>
         </div>
       </div>
     </div>

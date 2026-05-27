@@ -28,7 +28,7 @@ export default function AuthButton({ user, loading, onSignIn, onSignOut, syncSta
     return (
       <button
         onClick={onSignIn}
-        className="rounded-[6px] px-[9px] py-1 cursor-pointer text-[10px] font-mono whitespace-nowrap flex items-center gap-[5px] border transition-all duration-150"
+        className="rounded-md px-[0.5625rem] py-1 cursor-pointer text-[0.625rem] font-mono whitespace-nowrap flex items-center gap-[0.3125rem] border transition-all duration-150"
         style={{ borderColor: 'rgb(var(--c-blue) / 0.45)', color: 'rgb(var(--c-blue))', background: 'rgb(var(--c-blue) / 0.08)' }}
         title={lang === 'ja' ? 'Googleでログイン — デバイス間でデータを自動同期' : 'Sign in with Google — auto-sync data across devices'}
       >
@@ -55,13 +55,13 @@ export default function AuthButton({ user, loading, onSignIn, onSignOut, syncSta
       <button
         onClick={handleToggle}
         style={{ borderColor: open ? 'rgb(var(--c-blue) / 0.5)' : '' }}
-        className="bg-transparent border border-dim rounded-[6px] px-[7px] py-1 cursor-pointer text-[10px] font-mono whitespace-nowrap flex items-center gap-[5px] text-muted"
+        className="bg-transparent border border-dim rounded-md px-[0.4375rem] py-1 cursor-pointer text-[0.625rem] font-mono whitespace-nowrap flex items-center gap-[0.3125rem] text-muted"
         title={user.displayName ?? user.email}
       >
         {user.photoURL ? (
-          <img src={user.photoURL} className="w-[14px] h-[14px] rounded-full" alt="" referrerPolicy="no-referrer" />
+          <img src={user.photoURL} className="w-3.5 h-3.5 rounded-full" alt="" referrerPolicy="no-referrer" />
         ) : (
-          <span className="w-[14px] h-[14px] rounded-full bg-accent text-white flex items-center justify-center text-[8px] font-bold">{initial}</span>
+          <span className="w-3.5 h-3.5 rounded-full bg-accent text-white flex items-center justify-center text-[0.5rem] font-bold">{initial}</span>
         )}
         <span style={{ color: syncStatus === 'error' ? 'rgb(var(--c-red))' : syncStatus === 'synced' ? 'rgb(var(--c-teal))' : '' }}>
           {syncLabel}
@@ -69,26 +69,26 @@ export default function AuthButton({ user, loading, onSignIn, onSignOut, syncSta
       </button>
 
       {open && (
-        <div className="fixed bg-surface border border-line rounded-[8px] shadow-lg z-[400] overflow-hidden" style={dropPos}>
-          <div className="px-[12px] py-[10px] border-b border-line">
+        <div className="fixed bg-surface border border-line rounded-lg shadow-lg z-[400] overflow-hidden" style={dropPos}>
+          <div className="px-3 py-2.5 border-b border-line">
             {user.photoURL && (
-              <img src={user.photoURL} className="w-[28px] h-[28px] rounded-full mb-[6px]" alt="" referrerPolicy="no-referrer" />
+              <img src={user.photoURL} className="w-7 h-7 rounded-full mb-1.5" alt="" referrerPolicy="no-referrer" />
             )}
-            <div className="text-[11px] font-semibold text-fg leading-tight">{user.displayName}</div>
-            <div className="text-[10px] text-muted mt-[2px]">{user.email}</div>
+            <div className="text-[0.6875rem] font-semibold text-fg leading-tight">{user.displayName}</div>
+            <div className="text-[0.625rem] text-muted mt-0.5">{user.email}</div>
           </div>
-          <div className="px-[12px] py-[8px] border-b border-line">
-            <div className="text-[10px] text-muted font-mono">
+          <div className="px-3 py-2 border-b border-line">
+            <div className="text-[0.625rem] text-muted font-mono">
               {syncStatus === 'syncing' && <span className="text-accent">↻ {lang === 'ja' ? '同期中…' : 'Syncing…'}</span>}
               {syncStatus === 'synced'  && <span className="text-teal">✓ {lang === 'ja' ? 'クラウドに保存済み' : 'Saved to cloud'}</span>}
               {syncStatus === 'error'   && <span className="text-red">✗ {lang === 'ja' ? '同期に失敗しました' : 'Sync failed'}</span>}
               {!syncStatus              && <span>{lang === 'ja' ? 'クラウド同期 有効' : 'Cloud sync enabled'}</span>}
             </div>
           </div>
-          <div className="px-[12px] py-[8px]">
+          <div className="px-3 py-2">
             <button
               onClick={() => { setOpen(false); onSignOut(); }}
-              className="w-full text-left text-[11px] font-mono text-muted cursor-pointer py-[2px] hover:text-fg transition-colors"
+              className="w-full text-left text-[0.6875rem] font-mono text-muted cursor-pointer py-0.5 hover:text-fg transition-colors"
             >
               {lang === 'ja' ? 'ログアウト' : 'Sign out'}
             </button>

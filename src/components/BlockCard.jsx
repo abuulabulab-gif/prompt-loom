@@ -158,29 +158,29 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
         transition,
       }}
       {...attributes}
-      className={`bg-surface border border-line border-l-[3px] rounded-card overflow-hidden mb-[6px] transition-opacity duration-200${block.enabled === false ? ' opacity-45' : ''}${isDragging ? ' shadow-2xl opacity-60 z-[999]' : ''}`}
+      className={`bg-surface border border-line border-l-[3px] rounded-card overflow-hidden mb-1.5 transition-opacity duration-200${block.enabled === false ? ' opacity-45' : ''}${isDragging ? ' shadow-2xl opacity-60 z-[999]' : ''}`}
     >
       {/* ── Header ─────────────────────────────────────────── */}
       <div
-        className={`flex flex-wrap items-start gap-x-[6px] gap-y-[4px] px-3 ${focusMode ? 'py-[13px]' : 'py-[9px]'}${block.collapsed ? '' : ' bg-surfalt border-b border-line'}`}
+        className={`flex flex-wrap items-start gap-x-1.5 gap-y-1 px-3 ${focusMode ? 'py-[0.8125rem]' : 'py-[0.5625rem]'}${block.collapsed ? '' : ' bg-surfalt border-b border-line'}`}
       >
         {/* LEFT: drag + move + toggle + badge + icon + name — takes all available space */}
-        <div className="flex items-start gap-[6px] flex-1 min-w-[130px]">
+        <div className="flex items-start gap-1.5 flex-1 min-w-[8.125rem]">
         {/* Drag handle */}
         <button
           {...listeners}
           title={lang === 'ja' ? 'ドラッグで並べ替え' : 'Drag to reorder'}
-          className="bg-transparent border-none text-dim cursor-grab active:cursor-grabbing px-[4px] py-[2px] flex-shrink-0 text-[14px] leading-none select-none touch-none"
+          className="bg-transparent border-none text-dim cursor-grab active:cursor-grabbing px-1 py-0.5 flex-shrink-0 text-sm leading-none select-none touch-none"
         >⠿</button>
 
         {/* Move buttons — hidden on mobile (drag to reorder) */}
         {!isMobile && (
-          <div className="flex flex-col gap-[1px] flex-shrink-0">
+          <div className="flex flex-col gap-[0.0625rem] flex-shrink-0">
             {['▲', '▼'].map((a, i) => (
               <button key={a}
                 onClick={() => onMove(i === 0 ? -1 : 1)}
                 disabled={i === 0 ? isFirst : isLast}
-                className={`bg-transparent border-none px-[2px] text-[10px] leading-[1.2] cursor-pointer disabled:cursor-default ${(i === 0 ? isFirst : isLast) ? 'text-dim' : 'text-muted'}`}
+                className={`bg-transparent border-none px-0.5 text-[0.625rem] leading-[1.2] cursor-pointer disabled:cursor-default ${(i === 0 ? isFirst : isLast) ? 'text-dim' : 'text-muted'}`}
               >{a}</button>
             ))}
           </div>
@@ -192,19 +192,19 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           style={block.enabled !== false ? { background: blockColor } : undefined}
           className={`w-7 h-4 rounded-full relative cursor-pointer flex-shrink-0 transition-colors duration-200${block.enabled !== false ? '' : ' bg-dim'}`}
         >
-          <div className={`absolute top-[2px] w-3 h-3 rounded-full bg-white transition-[left] duration-200 ${block.enabled !== false ? 'left-[14px]' : 'left-[2px]'}`} />
+          <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-[left] duration-200 ${block.enabled !== false ? 'left-3.5' : 'left-0.5'}`} />
         </div>
 
         {/* Order badge */}
         {orderNum && (
           <span
             style={{ background: blockColor + '22', border: `1px solid ${blockColor}60`, color: blockColor }}
-            className="flex-shrink-0 min-w-[18px] h-[18px] rounded-full text-[10px] font-bold font-mono flex items-center justify-center"
+            className="flex-shrink-0 min-w-[1.125rem] h-[1.125rem] rounded-full text-[0.625rem] font-bold font-mono flex items-center justify-center"
           >{orderNum}</span>
         )}
 
         <span
-          className={`text-[14px] flex-shrink-0${block.isCustomBlock && onHide ? ' cursor-pointer select-none' : ''}`}
+          className={`text-sm flex-shrink-0${block.isCustomBlock && onHide ? ' cursor-pointer select-none' : ''}`}
           onDoubleClick={block.isCustomBlock && onHide ? hideConfirm : undefined}
           onTouchStart={block.isCustomBlock && onHide ? handleDoubleTap : undefined}
           title={block.isCustomBlock && onHide ? (lang === 'ja' ? 'ダブルタップで非表示' : 'Double-tap to hide') : undefined}
@@ -229,36 +229,36 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               autoFocus
               onClick={e => e.stopPropagation()}
               style={{ border: `1px solid ${blockColor}80` }}
-              className="text-[13px] font-bold bg-bg rounded-[5px] px-[6px] py-[1px] outline-none text-fg flex-1 min-w-0 font-mono"
+              className="text-[0.8125rem] font-bold bg-bg rounded-[0.3125rem] px-1.5 py-[0.0625rem] outline-none text-fg flex-1 min-w-0 font-mono"
             />
           ) : (
             <span
               onClick={() => { setNameInput(block.name); setEditingName(true); }}
               title={lang === 'ja' ? 'クリックで名前を変更' : 'Click to rename'}
-              className={`${focusMode ? 'text-[16px]' : 'text-[13px]'} font-bold flex-1 min-w-0 leading-snug cursor-text group ${isLocked ? 'text-muted' : 'text-fg'}`}
+              className={`${focusMode ? 'text-base' : 'text-[0.8125rem]'} font-bold flex-1 min-w-0 leading-snug cursor-text group ${isLocked ? 'text-muted' : 'text-fg'}`}
             >
               {lang === 'ja' ? block.name : block.nameEn}
-              <span className="ml-[4px] text-[10px] text-dim opacity-0 group-hover:opacity-100 transition-opacity">✎</span>
+              <span className="ml-1 text-[0.625rem] text-dim opacity-0 group-hover:opacity-100 transition-opacity">✎</span>
             </span>
           )
         ) : (
           <span
-            className={`${focusMode ? 'text-[16px]' : 'text-[13px]'} font-bold flex-1 min-w-0 leading-snug ${isLocked ? 'text-muted' : 'text-fg'}${onHide ? ' cursor-pointer select-none' : ''}`}
+            className={`${focusMode ? 'text-base' : 'text-[0.8125rem]'} font-bold flex-1 min-w-0 leading-snug ${isLocked ? 'text-muted' : 'text-fg'}${onHide ? ' cursor-pointer select-none' : ''}`}
             onDoubleClick={onHide ? hideConfirm : undefined}
             onTouchStart={onHide ? handleDoubleTap : undefined}
             title={onHide ? (lang === 'ja' ? 'ダブルタップで非表示' : 'Double-tap to hide') : undefined}
           >
             {lang === 'ja' ? block.name : block.nameEn}
-            {isLocked && <span className="ml-[6px] text-[11px]">🔒</span>}
+            {isLocked && <span className="ml-1.5 text-[0.6875rem]">🔒</span>}
           </span>
         )}
         </div>{/* END LEFT group */}
 
         {/* RIGHT: action buttons — never shrink, align to top */}
-        <div className="flex items-start gap-[6px] flex-shrink-0">
+        <div className="flex items-start gap-1.5 flex-shrink-0">
         {/* Analyze match badge */}
         {analyzedCount > 0 && (
-          <span className="text-[9px] font-mono font-bold px-[5px] py-[2px] rounded-[4px] flex-shrink-0"
+          <span className="text-[0.5625rem] font-mono font-bold px-[0.3125rem] py-0.5 rounded flex-shrink-0"
             style={{ background: 'rgb(var(--c-teal) / 0.1)', border: '1px solid rgb(var(--c-teal) / 0.32)', color: 'rgb(var(--c-teal))' }}>
             ◎ {analyzedCount}
           </span>
@@ -268,7 +268,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
         <button
           onClick={() => onUpdate({ locked: !block.locked })}
           style={isLocked ? { border: `1px solid ${blockColor}`, color: blockColor } : undefined}
-          className={`bg-transparent rounded-[5px] ${focusMode ? 'px-[9px] py-[4px] text-[13px]' : 'px-[6px] py-[2px] text-[10px]'} cursor-pointer flex-shrink-0${isLocked ? '' : ' border border-dim text-dim'}`}
+          className={`bg-transparent rounded-[0.3125rem] ${focusMode ? 'px-[0.5625rem] py-1 text-[0.8125rem]' : 'px-1.5 py-0.5 text-[0.625rem]'} cursor-pointer flex-shrink-0${isLocked ? '' : ' border border-dim text-dim'}`}
         >{isLocked ? '🔒' : '🔓'}</button>
 
         {/* Preset save */}
@@ -280,7 +280,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               border: `1px solid ${saving ? blockColor : 'rgb(var(--dim))'}`,
               color: saving ? blockColor : 'rgb(var(--muted))',
             }}
-            className="rounded-[5px] px-[7px] py-[2px] text-[10px] cursor-pointer"
+            className="rounded-[0.3125rem] px-[0.4375rem] py-0.5 text-[0.625rem] cursor-pointer"
           >💾{!isMobile && (lang === 'ja' ? '保存' : ' Save')}</button>
         )}
 
@@ -288,7 +288,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
         {block.text && (
           <span
             style={{ background: blockColor + '20', border: `1px solid ${blockColor}70`, color: blockColor }}
-            className={`inline-flex items-center font-mono font-bold rounded-[4px] flex-shrink-0 ${focusMode ? 'text-[13px] px-[8px] py-[3px] h-[30px]' : 'text-[10px] px-[5px] py-[2px] h-[22px]'}`}
+            className={`inline-flex items-center font-mono font-bold rounded flex-shrink-0 ${focusMode ? 'text-[0.8125rem] px-2 py-[0.1875rem] h-[1.875rem]' : 'text-[0.625rem] px-[0.3125rem] py-0.5 h-[1.375rem]'}`}
           >
             {countTags(block.text)}{lang === 'ja' ? 'タグ' : 't'}
           </span>
@@ -299,7 +299,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           <button
             onClick={onUndoBackup}
             title={lang === 'ja' ? 'テンプレート適用前に戻す' : 'Revert this block'}
-            className={`bg-transparent border border-dim rounded-[5px] text-dim cursor-pointer flex-shrink-0 ${focusMode ? 'px-[9px] py-[4px] text-[13px]' : 'px-[6px] py-[2px] text-[10px]'}`}
+            className={`bg-transparent border border-dim rounded-[0.3125rem] text-dim cursor-pointer flex-shrink-0 ${focusMode ? 'px-[0.5625rem] py-1 text-[0.8125rem]' : 'px-1.5 py-0.5 text-[0.625rem]'}`}
           >↩</button>
         )}
 
@@ -313,7 +313,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               border: `1px solid ${focused ? blockColor : 'rgb(var(--dim))'}`,
               color: focused ? blockColor : 'rgb(var(--muted))',
             }}
-            className={`rounded-[5px] cursor-pointer flex-shrink-0 ${focusMode ? 'px-[9px] py-[4px] text-[13px]' : 'px-[6px] py-[2px] text-[10px]'}`}
+            className={`rounded-[0.3125rem] cursor-pointer flex-shrink-0 ${focusMode ? 'px-[0.5625rem] py-1 text-[0.8125rem]' : 'px-1.5 py-0.5 text-[0.625rem]'}`}
           >{focused ? '⊗' : '⊕'}</button>
         )}
 
@@ -323,13 +323,13 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             <button
               onClick={() => setTransferOpen(o => !o)}
               title={lang === 'ja' ? '他のキャラへ転送' : 'Transfer to character'}
-              className="bg-transparent border border-dim rounded-[5px] px-[5px] py-[2px] text-dim text-[10px] cursor-pointer"
+              className="bg-transparent border border-dim rounded-[0.3125rem] px-[0.3125rem] py-0.5 text-dim text-[0.625rem] cursor-pointer"
             >→</button>
             {transferOpen && (
-              <div className="absolute right-0 top-full mt-1 z-50 bg-surface border border-linebright rounded-[8px] overflow-hidden shadow-lg min-w-[120px]">
+              <div className="absolute right-0 top-full mt-1 z-50 bg-surface border border-linebright rounded-lg overflow-hidden shadow-lg min-w-[7.5rem]">
                 {otherChars.map(c => (
                   <button key={c.id} onClick={() => { onTransfer?.(block.id, c.id); setTransferOpen(false); }}
-                    className="w-full text-left px-[10px] py-[6px] text-[11px] text-fg cursor-pointer flex items-center gap-1"
+                    className="w-full text-left px-2.5 py-1.5 text-[0.6875rem] text-fg cursor-pointer flex items-center gap-1"
                     onMouseOver={e => e.currentTarget.style.background = 'rgb(var(--surface-alt))'}
                     onMouseOut={e => e.currentTarget.style.background = ''}>
                     <span>{c.emoji}</span><span style={{ color: c.color }}>{c.name}</span>
@@ -345,7 +345,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           <button
             onClick={() => { if (!window.confirm(lang === 'ja' ? 'このカスタムブロックを削除しますか？' : 'Remove this custom block?')) return; onRemove(); }}
             title={lang === 'ja' ? 'ブロックを削除' : 'Remove block'}
-            className="bg-transparent border border-dim rounded-[4px] text-[10px] px-[5px] py-[2px] cursor-pointer text-muted"
+            className="bg-transparent border border-dim rounded text-[0.625rem] px-[0.3125rem] py-0.5 cursor-pointer text-muted"
           >🗑</button>
         )}
 
@@ -357,22 +357,22 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           }}
           disabled={isLocked}
           title={lang === 'ja' ? 'テキストをクリア' : 'Clear text'}
-          className={`bg-transparent border border-dim rounded-[5px] cursor-pointer disabled:cursor-default disabled:opacity-30 ${focusMode ? 'text-[13px] px-[10px] py-[4px]' : 'text-[10px] px-[6px] py-[2px]'} ${isLocked ? 'text-dim' : 'text-muted'}`}
+          className={`bg-transparent border border-dim rounded-[0.3125rem] cursor-pointer disabled:cursor-default disabled:opacity-30 ${focusMode ? 'text-[0.8125rem] px-2.5 py-1' : 'text-[0.625rem] px-1.5 py-0.5'} ${isLocked ? 'text-dim' : 'text-muted'}`}
         >✕</button>
 
         {/* Collapse block */}
         <button
           onClick={() => onUpdate({ collapsed: !block.collapsed })}
           title={lang === 'ja' ? (block.collapsed ? '展開' : '折りたたむ') : (block.collapsed ? 'Expand' : 'Collapse')}
-          className={`bg-transparent border border-dim rounded-[5px] cursor-pointer text-muted ${focusMode ? 'text-[13px] px-[10px] py-[4px]' : 'text-[10px] px-[6px] py-[2px]'}`}
+          className={`bg-transparent border border-dim rounded-[0.3125rem] cursor-pointer text-muted ${focusMode ? 'text-[0.8125rem] px-2.5 py-1' : 'text-[0.625rem] px-1.5 py-0.5'}`}
         >{block.collapsed ? '▼' : '▲'}</button>
         </div>{/* END RIGHT group */}
       </div>
 
       {/* ── Preset save row ────────────────────────────────── */}
       {saving && (
-        <div className="flex gap-[6px] items-center px-3 py-[7px] bg-bg border-b border-line">
-          <span style={{ color: blockColor }} className="text-[11px] flex-shrink-0">
+        <div className="flex gap-1.5 items-center px-3 py-[0.4375rem] bg-bg border-b border-line">
+          <span style={{ color: blockColor }} className="text-[0.6875rem] flex-shrink-0">
             {lang === 'ja' ? 'プリセット名:' : 'Name:'}
           </span>
           <input
@@ -382,16 +382,16 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             onKeyDown={e => { if (e.key === 'Enter') doSave(); if (e.key === 'Escape') { setSaving(false); setPName(''); } }}
             placeholder={lang === 'ja' ? '例: 夏服' : 'e.g. summer outfit'}
             style={{ border: `1px solid ${blockColor}60` }}
-            className="flex-1 rounded-[5px] text-[12px] px-[9px] py-1 outline-none font-mono bg-bg text-fg"
+            className="flex-1 rounded-[0.3125rem] text-xs px-[0.5625rem] py-1 outline-none font-mono bg-bg text-fg"
           />
           <button
             onClick={doSave}
             style={{ background: blockColor }}
-            className="border-none rounded-[5px] text-black px-3 py-1 text-[11px] cursor-pointer font-bold"
+            className="border-none rounded-[0.3125rem] text-black px-3 py-1 text-[0.6875rem] cursor-pointer font-bold"
           >{lang === 'ja' ? '保存' : 'Save'}</button>
           <button
             onClick={() => { setSaving(false); setPName(''); }}
-            className="bg-transparent rounded-[5px] px-2 py-1 text-[11px] cursor-pointer border border-dim text-muted"
+            className="bg-transparent rounded-[0.3125rem] px-2 py-1 text-[0.6875rem] cursor-pointer border border-dim text-muted"
           >×</button>
         </div>
       )}
@@ -402,11 +402,11 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
 
           {/* Negative suggestions — negative block only */}
           {block.id === 'negative' && (
-            <div className="mb-[10px]">
-              <div className="text-muted text-[10px] font-mono font-semibold tracking-[0.08em] mb-[5px] uppercase">
+            <div className="mb-2.5">
+              <div className="text-muted text-[0.625rem] font-mono font-semibold tracking-[0.08em] mb-[0.3125rem] uppercase">
                 {lang === 'ja' ? '🚫 クイック追加' : '🚫 Quick Add'}
               </div>
-              <div className="flex gap-[4px] flex-wrap">
+              <div className="flex gap-1 flex-wrap">
                 {NEG_PRESETS.map(preset => (
                   <button
                     key={preset.id}
@@ -420,7 +420,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                     }}
                     disabled={isLocked}
                     title={preset.tags.slice(0, 4).join(', ') + '...'}
-                    className="rounded-[6px] px-[7px] py-[3px] text-[11px] cursor-pointer disabled:cursor-default border border-dim text-muted font-mono transition-all duration-[120ms]"
+                    className="rounded-md px-[0.4375rem] py-[0.1875rem] text-[0.6875rem] cursor-pointer disabled:cursor-default border border-dim text-muted font-mono transition-all duration-[120ms]"
                     onMouseOver={e => { e.currentTarget.style.borderColor = 'rgb(var(--c-red))'; e.currentTarget.style.color = 'rgb(var(--c-red))'; }}
                     onMouseOut={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.color = ''; }}
                   >
@@ -452,11 +452,11 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             const activePreset = EXPRESSION_PRESETS.find(p => p.tags.every(tag => hasTag(block.text, tag)));
             const hasAny = EXPRESSION_PRESETS.some(p => p.tags.some(tag => hasTag(block.text, tag)));
             return (
-              <div className="mb-[10px]">
-                <div className="text-muted text-[10px] font-mono font-semibold tracking-[0.08em] mb-[5px] uppercase">
+              <div className="mb-2.5">
+                <div className="text-muted text-[0.625rem] font-mono font-semibold tracking-[0.08em] mb-[0.3125rem] uppercase">
                   {lang === 'ja' ? '😊 表情プリセット' : '😊 Expression'}
                 </div>
-                <div className="flex gap-[4px] flex-wrap">
+                <div className="flex gap-1 flex-wrap">
                   {EXPRESSION_PRESETS.map(preset => {
                     const active = activePreset?.id === preset.id;
                     return (
@@ -466,7 +466,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                         disabled={isLocked}
                         title={preset.tags.join(', ')}
                         style={active ? { background: blockColor + '22', border: `1px solid ${blockColor}`, color: blockColor } : undefined}
-                        className={`rounded-[6px] px-[7px] py-[3px] text-[11px] cursor-pointer disabled:cursor-default transition-all duration-[120ms] font-mono ${active ? 'font-bold' : 'border border-dim text-muted font-normal'}`}
+                        className={`rounded-md px-[0.4375rem] py-[0.1875rem] text-[0.6875rem] cursor-pointer disabled:cursor-default transition-all duration-[120ms] font-mono ${active ? 'font-bold' : 'border border-dim text-muted font-normal'}`}
                       >
                         {preset.icon} {lang === 'ja' ? preset.ja : preset.en}
                       </button>
@@ -477,7 +477,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                       onClick={clearExpr}
                       disabled={isLocked}
                       title={lang === 'ja' ? '表情タグをすべて削除' : 'Remove all expression tags'}
-                      className="rounded-[6px] px-[7px] py-[3px] text-[10px] cursor-pointer disabled:cursor-default border border-dim text-dim font-mono"
+                      className="rounded-md px-[0.4375rem] py-[0.1875rem] text-[0.625rem] cursor-pointer disabled:cursor-default border border-dim text-dim font-mono"
                     >✕ {lang === 'ja' ? 'クリア' : 'clear'}</button>
                   )}
                 </div>
@@ -496,7 +496,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                 ? (lang === 'ja' ? 'カスタムプロンプトを入力' : 'Enter custom prompt')
                 : (lang === 'ja' ? `${block.name}のプロンプト` : `${block.nameEn} prompt`)}
             style={{ color: block.text ? 'rgb(var(--prompt-text))' : undefined }}
-            className={`w-full ${focusMode ? 'min-h-[80px] max-h-[160px] text-[14px]' : 'min-h-[54px] max-h-[120px] text-[12px]'} rounded-[7px] px-[11px] py-[9px] font-mono resize-y box-border outline-none leading-[1.65] bg-bg ${block.text ? '' : 'text-muted'} ${isLocked ? 'border border-dim opacity-50' : 'border border-linebright'}`}
+            className={`w-full ${focusMode ? 'min-h-[5rem] max-h-[10rem] text-sm' : 'min-h-[3.375rem] max-h-[7.5rem] text-xs'} rounded-[0.4375rem] px-[0.6875rem] py-[0.5625rem] font-mono resize-y box-border outline-none leading-[1.65] bg-bg ${block.text ? '' : 'text-muted'} ${isLocked ? 'border border-dim opacity-50' : 'border border-linebright'}`}
             onFocus={e => { if (!isLocked) e.target.style.borderColor = blockColor + '80'; }}
             onBlur={e => { e.target.style.borderColor = ''; }}
           />
@@ -508,7 +508,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             if (activeTags.length === 0) return null;
             const randomEnSet = new Set((block.lastRandomPicks || []).map(t => t.en.toLowerCase()));
             return (
-              <div className="mt-[6px] mb-[4px] flex flex-wrap gap-[4px] items-center">
+              <div className="mt-1.5 mb-1 flex flex-wrap gap-1 items-center">
                 {activeTags.map((raw, i) => {
                   // Strip weight syntax for lookup: (tag:1.2) → tag
                   const bare = raw.replace(/^\((.+?)(?::\d[\d.]*)?[\)]+$/, '$1').trim();
@@ -519,9 +519,9 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                       style={isRandom
                         ? { background: blockColor + '15', border: `1px dashed ${blockColor}80`, color: blockColor }
                         : { background: 'rgb(var(--surface-alt))', border: `1px solid ${blockColor}50`, color: blockColor }}
-                      className={`inline-flex items-center gap-[3px] rounded-[4px] font-mono ${focusMode ? 'px-[8px] py-[3px] text-[12px]' : 'px-[5px] py-[1px] text-[9px]'}`}
+                      className={`inline-flex items-center gap-[0.1875rem] rounded font-mono ${focusMode ? 'px-2 py-[0.1875rem] text-xs' : 'px-[0.3125rem] py-[0.0625rem] text-[0.5625rem]'}`}
                     >
-                      <span className="opacity-60 text-[8px]">{isRandom ? '🎲' : '👤'}</span>
+                      <span className="opacity-60 text-[0.5rem]">{isRandom ? '🎲' : '👤'}</span>
                       {bare}
                     </span>
                   );
@@ -531,9 +531,9 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           })()}
 
           {/* Strength + controls row */}
-          <div className="my-[9px] mb-[11px]">
-            <div className={`flex items-center flex-wrap ${isCompact ? 'gap-[3px]' : 'gap-[5px]'}`}>
-              <span className={`${focusMode ? 'text-[13px]' : 'text-[10px]'} font-mono font-semibold text-muted`}>{lang === 'ja' ? '強度:' : 'Str:'}</span>
+          <div className="my-[0.5625rem] mb-[0.6875rem]">
+            <div className={`flex items-center flex-wrap ${isCompact ? 'gap-[0.1875rem]' : 'gap-[0.3125rem]'}`}>
+              <span className={`${focusMode ? 'text-[0.8125rem]' : 'text-[0.625rem]'} font-mono font-semibold text-muted`}>{lang === 'ja' ? '強度:' : 'Str:'}</span>
 
               {(isMobile ? STRENGTHS.filter(s => s.v === '1.0' || s.v === '1.2') : STRENGTHS).map(s => (
                 <button key={s.v}
@@ -541,23 +541,23 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   onClick={() => onUpdate({ strength: s.v })}
                   title={s.v}
                   style={block.strength === s.v ? { background: blockColor + '22', border: `1px solid ${blockColor}`, color: blockColor } : undefined}
-                  className={`rounded-[5px] cursor-pointer disabled:cursor-default font-mono whitespace-nowrap transition-all duration-[120ms] ${focusMode ? 'py-[5px] text-[13px]' : 'py-[2px] text-[10px]'} ${isCompact ? 'px-[4px]' : (focusMode ? 'px-[10px]' : 'px-[6px]')} ${block.strength === s.v ? 'font-bold' : 'font-normal border border-dim text-muted'}`}
+                  className={`rounded-[0.3125rem] cursor-pointer disabled:cursor-default font-mono whitespace-nowrap transition-all duration-[120ms] ${focusMode ? 'py-[0.3125rem] text-[0.8125rem]' : 'py-0.5 text-[0.625rem]'} ${isCompact ? 'px-1' : (focusMode ? 'px-2.5' : 'px-1.5')} ${block.strength === s.v ? 'font-bold' : 'font-normal border border-dim text-muted'}`}
                 >
                   {lang === 'ja' ? s.l : s.le}
-                  {!isCompact && <span className="opacity-50 ml-[3px] text-[9px]">{s.v}</span>}
+                  {!isCompact && <span className="opacity-50 ml-[0.1875rem] text-[0.5625rem]">{s.v}</span>}
                 </button>
               ))}
 
               {/* ±0.05 fine adjust */}
-              <div className="flex items-center gap-[2px] ml-[2px]">
+              <div className="flex items-center gap-0.5 ml-0.5">
                 <button disabled={isLocked} onClick={() => adjustWeight(-0.05)} title="-0.05"
-                  className={`bg-transparent border border-dim text-muted rounded-[5px_0_0_5px] cursor-pointer disabled:cursor-default font-mono ${focusMode ? 'px-[9px] py-[5px] text-[14px]' : 'px-[6px] py-[2px] text-[11px]'}`}>−</button>
+                  className={`bg-transparent border border-dim text-muted rounded-[5px_0_0_5px] cursor-pointer disabled:cursor-default font-mono ${focusMode ? 'px-[0.5625rem] py-[0.3125rem] text-sm' : 'px-1.5 py-0.5 text-[0.6875rem]'}`}>−</button>
                 <span
                   style={block.strength !== '1.0' ? { color: blockColor } : undefined}
-                  className={`font-mono text-center px-0 bg-bg border-t border-b border-dim${block.strength !== '1.0' ? '' : ' text-muted'} ${focusMode ? 'text-[13px] min-w-[40px] py-[5px]' : 'text-[10px] min-w-[30px] py-[2px]'}`}
+                  className={`font-mono text-center px-0 bg-bg border-t border-b border-dim${block.strength !== '1.0' ? '' : ' text-muted'} ${focusMode ? 'text-[0.8125rem] min-w-10 py-[0.3125rem]' : 'text-[0.625rem] min-w-[1.875rem] py-0.5'}`}
                 >{block.strength}</span>
                 <button disabled={isLocked} onClick={() => adjustWeight(0.05)} title="+0.05"
-                  className={`bg-transparent border border-dim text-muted rounded-[0_5px_5px_0] cursor-pointer disabled:cursor-default font-mono ${focusMode ? 'px-[9px] py-[5px] text-[14px]' : 'px-[6px] py-[2px] text-[11px]'}`}>＋</button>
+                  className={`bg-transparent border border-dim text-muted rounded-[0_5px_5px_0] cursor-pointer disabled:cursor-default font-mono ${focusMode ? 'px-[0.5625rem] py-[0.3125rem] text-sm' : 'px-1.5 py-0.5 text-[0.6875rem]'}`}>＋</button>
               </div>
 
               {/* Select/group mode */}
@@ -570,7 +570,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   border: `1px solid ${selectMode ? blockColor : 'rgb(var(--dim))'}`,
                   color: selectMode ? blockColor : 'rgb(var(--muted))',
                 }}
-                className={`rounded-[5px] cursor-pointer disabled:cursor-default font-mono ${focusMode ? 'px-[10px] py-[5px] text-[13px]' : 'px-2 py-[2px] text-[10px]'}`}
+                className={`rounded-[0.3125rem] cursor-pointer disabled:cursor-default font-mono ${focusMode ? 'px-2.5 py-[0.3125rem] text-[0.8125rem]' : 'px-2 py-0.5 text-[0.625rem]'}`}
               >{selectMode ? (lang === 'ja' ? '選択中' : 'Selecting') : (lang === 'ja' ? '⊞まとめ' : '⊞Group')}</button>
 
               {/* Random inspiration */}
@@ -650,37 +650,37 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   }}
                   title={lang === 'ja' ? (displayPicks.length > 0 ? '再抽選' : 'ランダムでタグ追加') : (displayPicks.length > 0 ? 'Re-roll' : 'Add random tags')}
                   style={displayPicks.length > 0 ? { borderColor: blockColor, color: blockColor } : undefined}
-                  className={`border border-dim text-muted rounded-[5px] cursor-pointer font-mono ${focusMode ? 'px-[9px] py-[5px] text-[14px]' : 'px-[5px] py-[2px] text-[11px]'}`}
+                  className={`border border-dim text-muted rounded-[0.3125rem] cursor-pointer font-mono ${focusMode ? 'px-[0.5625rem] py-[0.3125rem] text-sm' : 'px-[0.3125rem] py-0.5 text-[0.6875rem]'}`}
                 >🎲{displayPicks.length > 0 ? ' ↻' : ''}</button>
               )}
             </div>
 
             {/* Search — always on its own row for clean layout */}
-            <div className="flex items-center gap-1 rounded-[6px] px-2 py-[3px] mt-[6px] bg-bg border border-line/50">
-              <span className="text-[10px] text-muted">🔍</span>
+            <div className="flex items-center gap-1 rounded-md px-2 py-[0.1875rem] mt-1.5 bg-bg border border-line/50">
+              <span className="text-[0.625rem] text-muted">🔍</span>
               <input
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder={lang === 'ja' ? 'タグ検索...' : 'Search tags...'}
-                className={`bg-transparent border-none outline-none flex-1 font-mono text-fg ${focusMode ? 'text-[14px]' : 'text-[11px]'}`}
+                className={`bg-transparent border-none outline-none flex-1 font-mono text-fg ${focusMode ? 'text-sm' : 'text-[0.6875rem]'}`}
               />
               {search && (
-                <span onClick={() => setSearch('')} className="cursor-pointer text-[10px] text-muted">×</span>
+                <span onClick={() => setSearch('')} className="cursor-pointer text-[0.625rem] text-muted">×</span>
               )}
             </div>
           </div>
 
           {/* Last random picks indicator — auto-hides when tags are removed from text */}
           {displayPicks.length > 0 && (
-            <div className="flex items-center gap-[5px] flex-wrap mb-[8px]">
-              <span className="text-muted text-[10px] font-mono font-semibold">{lang === 'ja' ? '🎲 追加:' : '🎲 added:'}</span>
+            <div className="flex items-center gap-[0.3125rem] flex-wrap mb-2">
+              <span className="text-muted text-[0.625rem] font-mono font-semibold">{lang === 'ja' ? '🎲 追加:' : '🎲 added:'}</span>
               {displayPicks.map(t => (
                 <span key={t.en}
                   style={{ background: blockColor + '22', border: `1px solid ${blockColor}60`, color: blockColor }}
-                  className="text-[10px] font-mono px-[6px] py-[1px] rounded-[4px] font-semibold"
+                  className="text-[0.625rem] font-mono px-1.5 py-[0.0625rem] rounded font-semibold"
                 >{lang === 'ja' ? t.ja : t.en}</span>
               ))}
-              <button onClick={() => onUpdate({ lastRandomPicks: [] })} className="text-dim text-[9px] cursor-pointer ml-[2px]">×</button>
+              <button onClick={() => onUpdate({ lastRandomPicks: [] })} className="text-dim text-[0.5625rem] cursor-pointer ml-0.5">×</button>
             </div>
           )}
 
@@ -688,13 +688,13 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           {selectMode && (
             <div
               style={{ background: blockColor + '12', border: `1px dashed ${blockColor}60` }}
-              className="flex items-center gap-2 flex-wrap mb-[10px] px-[10px] py-2 rounded-[7px]"
+              className="flex items-center gap-2 flex-wrap mb-2.5 px-2.5 py-2 rounded-[0.4375rem]"
             >
-              <span style={{ color: blockColor }} className="text-[10px] font-mono">
+              <span style={{ color: blockColor }} className="text-[0.625rem] font-mono">
                 {lang === 'ja' ? `⊞ ${selectedTags.length}個選択中` : `⊞ ${selectedTags.length} selected`}
               </span>
               {selectedTags.length >= 2 && (
-                <code className="text-[10px] font-mono px-[6px] py-[2px] rounded text-accent bg-bg">
+                <code className="text-[0.625rem] font-mono px-1.5 py-0.5 rounded text-accent bg-bg">
                   {block.strength === '1.0' ? `(${selectedTags.join(', ')})` : `(${selectedTags.join(', ')}:${block.strength})`}
                 </code>
               )}
@@ -703,19 +703,19 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                 disabled={selectedTags.length < 2}
                 onClick={applyGroup}
                 style={selectedTags.length >= 2 ? { background: blockColor } : undefined}
-                className={`border-none rounded-[5px] px-3 py-1 text-[10px] cursor-pointer disabled:cursor-default font-bold ${selectedTags.length >= 2 ? 'text-black' : 'bg-dim text-muted'}`}
+                className={`border-none rounded-[0.3125rem] px-3 py-1 text-[0.625rem] cursor-pointer disabled:cursor-default font-bold ${selectedTags.length >= 2 ? 'text-black' : 'bg-dim text-muted'}`}
               >{lang === 'ja' ? '括弧でまとめて追加' : 'Group & add'}</button>
               <button
                 onClick={() => { setSelectMode(false); setSelectedTags([]); }}
-                className="bg-transparent rounded-[5px] px-2 py-1 text-[10px] cursor-pointer border border-dim text-muted"
+                className="bg-transparent rounded-[0.3125rem] px-2 py-1 text-[0.625rem] cursor-pointer border border-dim text-muted"
               >{lang === 'ja' ? 'やめる' : 'Cancel'}</button>
             </div>
           )}
 
           {/* ⭐ Favorites — always on top, not collapsible (案C) */}
           {block.favTags?.length > 0 && !search && (
-            <div className="mb-[10px] px-[10px] py-[8px] rounded-[7px] bg-tint-warn border border-warn/20">
-              <div className="text-[10px] font-mono mb-[5px] text-warn-text">
+            <div className="mb-2.5 px-2.5 py-2 rounded-[0.4375rem] bg-tint-warn border border-warn/20">
+              <div className="text-[0.625rem] font-mono mb-[0.3125rem] text-warn-text">
                 ⭐ {lang === 'ja' ? 'お気に入り' : 'Favorites'}
               </div>
               <div className="flex flex-wrap gap-1">
@@ -736,8 +736,8 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
 
           {/* Search results */}
           {search && (
-            <div className="mb-[10px]">
-              <div className="text-[10px] font-mono mb-[5px] text-accent">
+            <div className="mb-2.5">
+              <div className="text-[0.625rem] font-mono mb-[0.3125rem] text-accent">
                 🔍 {lang === 'ja' ? `${searchResults.length}件` : `${searchResults.length} results`}
               </div>
               {searchResults.length > 0 ? (
@@ -754,7 +754,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   ))}
                 </div>
               ) : (
-                <div className="text-[11px] font-mono p-1 text-muted">
+                <div className="text-[0.6875rem] font-mono p-1 text-muted">
                   {lang === 'ja' ? '見つかりません' : 'Not found'}
                 </div>
               )}
@@ -768,19 +768,19 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               <div key={cat.n}>
                 <button
                   onClick={() => toggleCat(cat)}
-                  className="w-full flex items-center gap-[6px] py-[4px] bg-transparent border-none cursor-pointer text-left select-none"
+                  className="w-full flex items-center gap-1.5 py-1 bg-transparent border-none cursor-pointer text-left select-none"
                 >
-                  <span style={isOpen ? { color: blockColor } : undefined} className={`text-[10px] flex-shrink-0 font-bold${isOpen ? '' : ' text-muted'}`}>
+                  <span style={isOpen ? { color: blockColor } : undefined} className={`text-[0.625rem] flex-shrink-0 font-bold${isOpen ? '' : ' text-muted'}`}>
                     {isOpen ? '▼' : '▶'}
                   </span>
-                  <span className={`${focusMode ? 'text-[13px]' : 'text-[11px]'} font-mono font-medium ${isOpen ? 'text-fg' : 'text-muted'}`}>
+                  <span className={`${focusMode ? 'text-[0.8125rem]' : 'text-[0.6875rem]'} font-mono font-medium ${isOpen ? 'text-fg' : 'text-muted'}`}>
                     {lang === 'ja' ? cat.n : cat.nEn}
                   </span>
-                  <span className="text-[10px] font-mono text-muted">({[...new Map(cat.t.map(t => [t.en, t])).values()].length})</span>
+                  <span className="text-[0.625rem] font-mono text-muted">({[...new Map(cat.t.map(t => [t.en, t])).values()].length})</span>
                   <div className="flex-1 h-px bg-line" />
                 </button>
                 {isOpen && (
-                  <div className="flex flex-wrap gap-1 pt-[3px] pb-[8px]">
+                  <div className="flex flex-wrap gap-1 pt-[0.1875rem] pb-2">
                     {(sceneActive && cat.n === '性別・人数'
                       ? cat.t.filter(tag => !SCENE_MANAGED_TAGS.has(tag.en))
                       : cat.t
@@ -796,7 +796,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                         onInsert={() => onTagClick(tag.en)} onToggleFav={() => toggleFav(tag.en)} />
                     ))}
                     {sceneActive && cat.n === '性別・人数' && (
-                      <span className="text-[10px] font-mono text-muted self-center px-[4px]">
+                      <span className="text-[0.625rem] font-mono text-muted self-center px-1">
                         {lang === 'ja' ? '複数人数はシーン合成で設定' : 'Multi-person: use Scene Compose'}
                       </span>
                     )}
@@ -808,8 +808,8 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
 
           {/* Custom tags */}
           {!search && (block.customTags || []).length > 0 && (
-            <div className="mb-2 p-2 rounded-[7px] bg-bg" style={{ border: `1px solid ${blockColor}30` }}>
-              <div style={{ color: blockColor }} className="text-[10px] font-mono mb-[5px]">
+            <div className="mb-2 p-2 rounded-[0.4375rem] bg-bg" style={{ border: `1px solid ${blockColor}30` }}>
+              <div style={{ color: blockColor }} className="text-[0.625rem] font-mono mb-[0.3125rem]">
                 ✏️ {lang === 'ja' ? 'カスタム' : 'Custom'}
               </div>
               <div className="flex flex-wrap gap-1">
@@ -820,13 +820,13 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                       background: hasTag(block.text, ct.text) ? blockColor + '22' : 'rgb(var(--surface-alt))',
                       border: `1px solid ${hasTag(block.text, ct.text) ? blockColor + '90' : blockColor + '40'}`,
                     }}
-                    className="inline-flex items-center rounded-[5px] overflow-hidden"
+                    className="inline-flex items-center rounded-[0.3125rem] overflow-hidden"
                   >
                     <button
                       disabled={isLocked}
                       onClick={() => onUpdate({ text: toggleTag(block.text, ct.text, block.strength) })}
                       style={{ color: blockColor }}
-                      className={`bg-transparent border-none px-2 py-[3px] text-[11px] cursor-pointer disabled:cursor-default font-mono ${hasTag(block.text, ct.text) ? 'font-bold' : 'font-normal'}`}
+                      className={`bg-transparent border-none px-2 py-[0.1875rem] text-[0.6875rem] cursor-pointer disabled:cursor-default font-mono ${hasTag(block.text, ct.text) ? 'font-bold' : 'font-normal'}`}
                     >{hasTag(block.text, ct.text) ? '✓ ' : ''}{ct.text}</button>
                     <button
                       onClick={() => {
@@ -835,7 +835,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                       }}
                       onMouseOver={e => e.target.style.color = '#f87171'}
                       onMouseOut={e => e.target.style.color = ''}
-                      className="bg-transparent border-l border-line text-dim px-[5px] py-[3px] cursor-pointer text-[9px]"
+                      className="bg-transparent border-l border-line text-dim px-[0.3125rem] py-[0.1875rem] cursor-pointer text-[0.5625rem]"
                     >✕</button>
                   </div>
                 ))}
@@ -846,7 +846,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           {/* Add custom tag */}
           {!search && (
             addingCustom ? (
-              <div className="flex gap-[6px] items-center mt-1">
+              <div className="flex gap-1.5 items-center mt-1">
                 <input
                   value={customInput}
                   onChange={e => setCustomInput(e.target.value)}
@@ -854,14 +854,14 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   onKeyDown={e => { if (e.key === 'Enter') handleAddCustom(); if (e.key === 'Escape') { setAddingCustom(false); setCustomInput(''); } }}
                   placeholder={lang === 'ja' ? 'タグを入力（英語推奨）...' : 'Enter tag text...'}
                   style={{ border: `1px solid ${blockColor}60` }}
-                  className="flex-1 rounded-[5px] text-[11px] px-[9px] py-1 outline-none font-mono bg-bg text-fg"
+                  className="flex-1 rounded-[0.3125rem] text-[0.6875rem] px-[0.5625rem] py-1 outline-none font-mono bg-bg text-fg"
                 />
                 <button onClick={handleAddCustom} style={{ background: blockColor }}
-                  className="border-none rounded-[5px] text-black px-[10px] py-1 text-[11px] cursor-pointer font-bold">
+                  className="border-none rounded-[0.3125rem] text-black px-2.5 py-1 text-[0.6875rem] cursor-pointer font-bold">
                   {lang === 'ja' ? '追加' : 'Add'}
                 </button>
                 <button onClick={() => { setAddingCustom(false); setCustomInput(''); }}
-                  className="bg-transparent rounded-[5px] px-[7px] py-1 text-[11px] cursor-pointer border border-dim text-muted">×</button>
+                  className="bg-transparent rounded-[0.3125rem] px-[0.4375rem] py-1 text-[0.6875rem] cursor-pointer border border-dim text-muted">×</button>
               </div>
             ) : (
               <button
@@ -873,7 +873,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   border: `1px dashed ${isLocked ? 'rgb(var(--dim))' : blockColor + '60'}`,
                   color: isLocked ? 'rgb(var(--muted))' : blockColor,
                 }}
-                className="bg-transparent rounded-[5px] px-[10px] py-[3px] text-[10px] cursor-pointer disabled:cursor-default font-mono mt-1"
+                className="bg-transparent rounded-[0.3125rem] px-2.5 py-[0.1875rem] text-[0.625rem] cursor-pointer disabled:cursor-default font-mono mt-1"
               >+ {lang === 'ja' ? 'カスタムタグ追加' : 'Add custom tag'}</button>
             )
           )}

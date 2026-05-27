@@ -111,36 +111,36 @@ export default function GlobalTagSearch({ open, onClose, blocks, lang, onToggleT
   };
 
   return (
-    <div className="fixed inset-0 z-[300] flex items-start justify-center pt-[80px] px-4"
+    <div className="fixed inset-0 z-[300] flex items-start justify-center pt-[5rem] px-4"
       style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="bg-surface border border-line rounded-[12px] shadow-[0_8px_40px_rgba(0,0,0,0.6)] w-full max-w-[560px] flex flex-col max-h-[70vh]">
+      <div className="bg-surface border border-line rounded-xl shadow-[0_8px_40px_rgba(0,0,0,0.6)] w-full max-w-[35rem] flex flex-col max-h-[70vh]">
 
         {/* Search input */}
         <div className="flex items-center gap-2 px-4 py-3 border-b border-line flex-shrink-0">
-          <span className="text-muted text-[14px]">🔍</span>
+          <span className="text-muted text-sm">🔍</span>
           <input
             ref={inputRef}
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder={lang === 'ja' ? 'タグを検索（全ブロック横断）' : 'Search tags across all blocks'}
-            className="flex-1 bg-transparent border-none outline-none text-[13px] font-mono text-fg placeholder:text-dim"
+            className="flex-1 bg-transparent border-none outline-none text-[0.8125rem] font-mono text-fg placeholder:text-dim"
           />
           {query && (
-            <button onClick={() => setQuery('')} className="text-muted text-[11px] cursor-pointer bg-transparent border-none px-1">✕</button>
+            <button onClick={() => setQuery('')} className="text-muted text-[0.6875rem] cursor-pointer bg-transparent border-none px-1">✕</button>
           )}
-          <button onClick={onClose} className="text-muted text-[11px] cursor-pointer bg-transparent border-none px-1 ml-1">Esc</button>
+          <button onClick={onClose} className="text-muted text-[0.6875rem] cursor-pointer bg-transparent border-none px-1 ml-1">Esc</button>
         </div>
 
         {/* Results */}
         <div className="overflow-y-auto flex-1 p-3">
           {query.trim().length < 1 ? (
-            <div className="text-center text-muted text-[11px] font-mono py-8">
+            <div className="text-center text-muted text-[0.6875rem] font-mono py-8">
               {lang === 'ja' ? '1文字以上入力してください' : 'Type to search'}
             </div>
           ) : results.length === 0 ? (
-            <div className="text-center text-muted text-[11px] font-mono py-8">
+            <div className="text-center text-muted text-[0.6875rem] font-mono py-8">
               {lang === 'ja' ? '見つかりません' : 'No results'}
             </div>
           ) : (
@@ -148,15 +148,15 @@ export default function GlobalTagSearch({ open, onClose, blocks, lang, onToggleT
               <div key={block.id} className="mb-4">
                 <button
                   onClick={() => scrollToBlock(block.id)}
-                  className="flex items-center gap-[6px] mb-[6px] text-[10px] font-mono font-bold cursor-pointer bg-transparent border-none p-0 hover:opacity-80 transition-opacity"
+                  className="flex items-center gap-1.5 mb-1.5 text-[0.625rem] font-mono font-bold cursor-pointer bg-transparent border-none p-0 hover:opacity-80 transition-opacity"
                   style={{ color: block.color }}
                 >
                   <span>{block.icon}</span>
                   <span>{lang === 'ja' ? block.name : block.nameEn}</span>
                   <span className="font-normal text-muted">({items.length})</span>
-                  <span className="text-[9px] text-dim">↗</span>
+                  <span className="text-[0.5625rem] text-dim">↗</span>
                 </button>
-                <div className="flex flex-wrap gap-1 pl-[18px]">
+                <div className="flex flex-wrap gap-1 pl-[1.125rem]">
                   {items.map(({ tag }) => {
                     const isActive = hasTag(block.text, tag.en);
                     return (
@@ -164,7 +164,7 @@ export default function GlobalTagSearch({ open, onClose, blocks, lang, onToggleT
                         key={tag.en}
                         onClick={() => { onToggleTag(block.id, tag.en); scrollToBlock(block.id); }}
                         title={isActive ? tag.en : (lang === 'ja' ? tag.en : tag.ja)}
-                        className="rounded-[5px] px-[8px] py-[3px] text-[11px] font-mono cursor-pointer transition-all duration-100 border"
+                        className="rounded-[0.3125rem] px-2 py-[0.1875rem] text-[0.6875rem] font-mono cursor-pointer transition-all duration-100 border"
                         style={{
                           background: isActive ? block.color + '22' : 'rgb(var(--surface-alt))',
                           borderColor: isActive ? block.color + '90' : 'rgb(var(--border))',
@@ -183,7 +183,7 @@ export default function GlobalTagSearch({ open, onClose, blocks, lang, onToggleT
         </div>
 
         {results.length > 0 && (
-          <div className="flex-shrink-0 px-4 py-2 border-t border-line text-[10px] font-mono text-muted">
+          <div className="flex-shrink-0 px-4 py-2 border-t border-line text-[0.625rem] font-mono text-muted">
             {lang === 'ja' ? `${results.length}件` : `${results.length} tags`}
             {lang === 'ja' ? '・クリックでON/OFF・ブロック名をクリックでスクロール' : ' · click to toggle · click block name to scroll'}
           </div>

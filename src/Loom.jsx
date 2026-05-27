@@ -1024,12 +1024,12 @@ export default function Loom() {
 
       {/* ── HEADER ── */}
       <div className="bg-surface border-b border-line sticky top-0 z-50">
-        <div className="max-w-[58.33rem] mx-auto px-[14px] py-[9px] flex items-center gap-[7px] flex-wrap">
+        <div className="max-w-[58.33rem] mx-auto px-3.5 py-[0.5625rem] flex items-center gap-[0.4375rem] flex-wrap">
         <div className="flex items-center gap-2">
           <div
             onClick={isMobile ? () => setJumpOpen(p => !p) : undefined}
             title={isMobile ? (lang === 'ja' ? 'ブロック一覧を開く' : 'Open block list') : undefined}
-            className={`w-[30px] h-[30px] rounded-[8px] flex items-center justify-center flex-shrink-0 bg-[linear-gradient(135deg,#5a7fff,#b06fff)]${isMobile ? ' cursor-pointer active:opacity-70 select-none' : ''}`}
+            className={`w-[1.875rem] h-[1.875rem] rounded-lg flex items-center justify-center flex-shrink-0 bg-[linear-gradient(135deg,#5a7fff,#b06fff)]${isMobile ? ' cursor-pointer active:opacity-70 select-none' : ''}`}
           >
             <svg width="15" height="15" viewBox="0 0 15 15" fill="white">
               <circle cx="2.5" cy="2.5" r="1.5"/><circle cx="7.5" cy="2.5" r="1.5"/><circle cx="12.5" cy="2.5" r="1.5"/>
@@ -1038,66 +1038,66 @@ export default function Loom() {
             </svg>
           </div>
           <div>
-            <div className="text-[20px] font-black tracking-[0.22em] leading-none" style={{ fontFamily: "'Century Gothic', 'AppleGothic', 'Gill Sans', sans-serif" }}>LOOM</div>
-            <div className="text-[9px] text-muted tracking-[0.08em]">The Prompt Weaving Studio</div>
+            <div className="text-xl font-black tracking-[0.22em] leading-none" style={{ fontFamily: "'Century Gothic', 'AppleGothic', 'Gill Sans', sans-serif" }}>LOOM</div>
+            <div className="text-[0.5625rem] text-muted tracking-[0.08em]">The Prompt Weaving Studio</div>
           </div>
         </div>
         <div className="flex-1" />
         {/* ☕ Donate */}
         <a href={DONATE_URL} target="_blank" rel="noopener noreferrer"
           title={lang === 'ja' ? '開発を支援する（Buy Me a Coffee）' : 'Support development'}
-          className="bg-[#fbbf2412] border border-[#fbbf2440] rounded-[6px] px-[9px] py-1 text-warn text-[11px] font-mono no-underline flex-shrink-0 cursor-pointer">☕</a>
+          className="bg-[#fbbf2412] border border-[#fbbf2440] rounded-md px-[0.5625rem] py-1 text-warn text-[0.6875rem] font-mono no-underline flex-shrink-0 cursor-pointer">☕</a>
         {/* ✦ ツール dropdown: Template / Color / Scene / +Custom(Expert) / Reset order */}
         <div className="relative flex-shrink-0">
           <button onClick={() => setQuickOpen(p => !p)}
             title={lang === 'ja' ? 'テンプレート・カラー・シーン' : 'Template / Color / Scene'}
-            className="flex items-center gap-[4px] rounded-[6px] px-[9px] py-1 cursor-pointer text-[10px] font-mono font-bold transition-colors duration-[120ms] whitespace-nowrap border text-accent"
+            className="flex items-center gap-1 rounded-md px-[0.5625rem] py-1 cursor-pointer text-[0.625rem] font-mono font-bold transition-colors duration-[120ms] whitespace-nowrap border text-accent"
             style={{ background: quickOpen ? 'rgb(var(--c-blue) / 0.19)' : 'rgb(var(--c-blue) / 0.08)', borderColor: quickOpen ? 'rgb(var(--c-blue) / 0.5)' : 'rgb(var(--c-blue) / 0.31)' }}>
-            ✦{!isMobile && ` ${lang === 'ja' ? 'ツール' : 'Tools'}`} <span className="text-[8px] opacity-60">▾</span>
+            ✦{!isMobile && ` ${lang === 'ja' ? 'ツール' : 'Tools'}`} <span className="text-[0.5rem] opacity-60">▾</span>
           </button>
           {quickOpen && (
             <>
               <div className="fixed inset-0 z-[199]" onClick={() => setQuickOpen(false)} />
-              <div className="absolute right-0 top-full mt-[4px] z-[200] bg-surface border border-line rounded-[9px] shadow-xl py-[4px] min-w-[170px]">
+              <div className="absolute right-0 top-full mt-1 z-[200] bg-surface border border-line rounded-[0.5625rem] shadow-xl py-1 min-w-[10.625rem]">
                 <button onClick={() => { setTemplateOpen(true); setQuickOpen(false); }}
-                  className="w-full text-left px-[12px] py-[7px] text-[11px] font-mono cursor-pointer hover:bg-surfalt text-accent flex items-center gap-2">
+                  className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt text-accent flex items-center gap-2">
                   ✦ {lang === 'ja' ? 'テンプレート' : 'Template'}
                 </button>
                 {apiConfig.apiKey && (
                   <button onClick={() => { setNaturalToTagsTab('text'); setNaturalToTagsOpen(true); setQuickOpen(false); }}
-                    className="w-full text-left px-[12px] py-[7px] text-[11px] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
+                    className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
                     style={{ color: 'rgb(var(--c-blue))' }}>
                     ✍️ {lang === 'ja' ? '自然文からタグ生成' : 'Text to Tags'}
                   </button>
                 )}
                 {apiConfig.apiKey && (
                   <button onClick={() => { setNaturalToTagsTab('image'); setNaturalToTagsOpen(true); setQuickOpen(false); }}
-                    className="w-full text-left px-[12px] py-[7px] text-[11px] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
+                    className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
                     style={{ color: 'rgb(var(--c-purple))' }}>
                     🖼 {lang === 'ja' ? '画像からタグ生成' : 'Image to Tags'}
                   </button>
                 )}
                 <button onClick={() => { setColorPickerOpen(true); setQuickOpen(false); }}
-                  className="w-full text-left px-[12px] py-[7px] text-[11px] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
+                  className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
                   style={{ color: 'rgb(var(--c-purple))' }}>
                   🎨 {lang === 'ja' ? 'カラー' : 'Color'}
                 </button>
                 {characters.length > 1 && (
                   <button onClick={() => { setSceneOpen(true); setQuickOpen(false); }}
-                    className="w-full text-left px-[12px] py-[7px] text-[11px] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
+                    className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
                     style={{ color: 'rgb(var(--c-green))' }}>
                     🎬 {lang === 'ja' ? 'シーン合成' : 'Scene'}
                   </button>
                 )}
                 {expertMode && (
                   <button onClick={() => { addCustomBlock(); setQuickOpen(false); }}
-                    className="w-full text-left px-[12px] py-[7px] text-[11px] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
+                    className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
                     ✏️ {lang === 'ja' ? '+カスタムブロック' : '+Custom block'}
                   </button>
                 )}
-                <div className="border-t border-line mx-2 my-[3px]" />
+                <div className="border-t border-line mx-2 my-[0.1875rem]" />
                 <button onClick={() => { resetBlockOrder(); setQuickOpen(false); }}
-                  className="w-full text-left px-[12px] py-[7px] text-[11px] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
+                  className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
                   ↺ {lang === 'ja' ? 'ブロック順をリセット' : 'Reset block order'}
                 </button>
               </div>
@@ -1109,7 +1109,7 @@ export default function Loom() {
           <button
             onClick={() => { setLayout(l => l === '1col' ? '2col' : l === '2col' ? '3col' : '1col'); setFocusBlockId(null); }}
             title={lang === 'ja' ? '列数切替 (1→2→3)' : 'Cycle columns (1→2→3)'}
-            className={`rounded-[5px] px-[9px] py-1 cursor-pointer text-[10px] font-mono flex-shrink-0 ${layout !== '1col' ? 'border' : 'bg-transparent border border-dim text-muted'}`}
+            className={`rounded-[0.3125rem] px-[0.5625rem] py-1 cursor-pointer text-[0.625rem] font-mono flex-shrink-0 ${layout !== '1col' ? 'border' : 'bg-transparent border border-dim text-muted'}`}
             style={layout !== '1col' ? { background: 'rgb(var(--c-green) / 0.13)', borderColor: 'rgb(var(--c-green) / 0.38)', color: 'rgb(var(--c-green))' } : undefined}>
             {layout === '3col' ? `▦ ${lang === 'ja' ? '3列' : '3col'}` : layout === '2col' ? `▥ ${lang === 'ja' ? '2列' : '2col'}` : `▢ ${lang === 'ja' ? '1列' : '1col'}`}
           </button>
@@ -1117,43 +1117,43 @@ export default function Loom() {
         {/* 🕐 履歴 */}
         <button onClick={() => setHistoryOpen(true)}
           title={lang === 'ja' ? 'プロンプト履歴 (H)' : 'Prompt history (H)'}
-          className={`bg-transparent rounded-[6px] px-[9px] py-1 cursor-pointer text-[10px] font-mono whitespace-nowrap flex-shrink-0 border ${history.length > 0 ? 'text-accent' : 'border-dim text-muted'}`}
+          className={`bg-transparent rounded-md px-[0.5625rem] py-1 cursor-pointer text-[0.625rem] font-mono whitespace-nowrap flex-shrink-0 border ${history.length > 0 ? 'text-accent' : 'border-dim text-muted'}`}
           style={history.length > 0 ? { borderColor: 'rgb(var(--c-blue) / 0.5)' } : undefined}>
           🕐 {isMobile ? history.length : `${lang === 'ja' ? '履歴' : 'Hist.'}${history.length > 0 ? ` · ${history.length}` : ''}`}
         </button>
         {/* 🔍 検索 / ⌘K (PC only) */}
-        {!isMobile && <button onClick={() => setGlobalSearchOpen(true)} title={lang === 'ja' ? 'タグ全体検索 (G / Ctrl+F)' : 'Global tag search (G / Ctrl+F)'} className="bg-transparent border border-dim rounded-[6px] px-[9px] py-1 text-muted cursor-pointer text-[10px] font-mono whitespace-nowrap">🔍 {lang === 'ja' ? '検索' : 'Search'}</button>}
-        {!isMobile && <button onClick={() => setPaletteOpen(true)} title={lang === 'ja' ? 'コマンドパレット (Ctrl+K)' : 'Command Palette (Ctrl+K)'} className="bg-transparent border border-dim rounded-[6px] px-[9px] py-1 text-muted cursor-pointer text-[10px] font-mono">⌘K</button>}
+        {!isMobile && <button onClick={() => setGlobalSearchOpen(true)} title={lang === 'ja' ? 'タグ全体検索 (G / Ctrl+F)' : 'Global tag search (G / Ctrl+F)'} className="bg-transparent border border-dim rounded-md px-[0.5625rem] py-1 text-muted cursor-pointer text-[0.625rem] font-mono whitespace-nowrap">🔍 {lang === 'ja' ? '検索' : 'Search'}</button>}
+        {!isMobile && <button onClick={() => setPaletteOpen(true)} title={lang === 'ja' ? 'コマンドパレット (Ctrl+K)' : 'Command Palette (Ctrl+K)'} className="bg-transparent border border-dim rounded-md px-[0.5625rem] py-1 text-muted cursor-pointer text-[0.625rem] font-mono">⌘K</button>}
         {/* 💾 データ */}
         <div className="relative flex-shrink-0 flex items-center">
           <button onClick={() => setDataMenuOpen(p => !p)}
             title={lang === 'ja' ? 'キャラのバックアップ・復元' : 'Backup / Restore character'}
-            className={`bg-transparent border rounded-[6px] px-[9px] py-1 text-muted cursor-pointer text-[10px] font-mono whitespace-nowrap ${dataMenuOpen ? 'border-accent/50 text-accent' : 'border-dim'}`}>
+            className={`bg-transparent border rounded-md px-[0.5625rem] py-1 text-muted cursor-pointer text-[0.625rem] font-mono whitespace-nowrap ${dataMenuOpen ? 'border-accent/50 text-accent' : 'border-dim'}`}>
             💾{!isMobile && ` ${lang === 'ja' ? 'バックアップ' : 'Backup'}`} ▾
           </button>
           {dataMenuOpen && (
             <>
               <div className="fixed inset-0 z-[199]" onClick={() => setDataMenuOpen(false)} />
-              <div className="absolute right-0 top-full mt-[4px] z-[200] bg-surface border border-line rounded-[9px] shadow-xl py-[4px] min-w-[210px]">
-                <div className="px-[10px] py-[4px] text-[9px] font-mono text-muted uppercase tracking-wider">
+              <div className="absolute right-0 top-full mt-1 z-[200] bg-surface border border-line rounded-[0.5625rem] shadow-xl py-1 min-w-[13.125rem]">
+                <div className="px-2.5 py-1 text-[0.5625rem] font-mono text-muted uppercase tracking-wider">
                   {lang === 'ja' ? `選択中: ${activeChar?.name}` : `Selected: ${activeChar?.name}`}
                 </div>
                 <button onClick={() => { handleExport(); setDataMenuOpen(false); }}
-                  className="w-full text-left px-[12px] py-[6px] text-[11px] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
+                  className="w-full text-left px-3 py-1.5 text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
                   <span className="text-dim">↓</span>{lang === 'ja' ? 'キャラをバックアップ' : 'Backup character'}
                 </button>
                 <button onClick={() => { fileRef.current?.click(); setDataMenuOpen(false); }}
-                  className="w-full text-left px-[12px] py-[6px] text-[11px] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
+                  className="w-full text-left px-3 py-1.5 text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
                   <span className="text-dim">↑</span>{lang === 'ja' ? 'バックアップから復元' : 'Restore from backup'}
                 </button>
-                <div className="border-t border-line mx-2 my-[4px]" />
-                <div className="px-[10px] py-[4px] text-[9px] font-mono text-muted uppercase tracking-wider">{lang === 'ja' ? 'プリセット' : 'Presets'}</div>
+                <div className="border-t border-line mx-2 my-1" />
+                <div className="px-2.5 py-1 text-[0.5625rem] font-mono text-muted uppercase tracking-wider">{lang === 'ja' ? 'プリセット' : 'Presets'}</div>
                 <button onClick={() => { handlePresetExport(); setDataMenuOpen(false); }}
-                  className="w-full text-left px-[12px] py-[6px] text-[11px] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
+                  className="w-full text-left px-3 py-1.5 text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
                   <span className="text-dim">↓</span>{lang === 'ja' ? '衣装・構図プリセット書き出し' : 'Export costume & shot presets'}
                 </button>
                 <button onClick={() => { presetFileRef.current?.click(); setDataMenuOpen(false); }}
-                  className="w-full text-left px-[12px] py-[6px] text-[11px] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
+                  className="w-full text-left px-3 py-1.5 text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
                   <span className="text-dim">↑</span>{lang === 'ja' ? 'プリセットを追加読み込み' : 'Add presets from file'}
                 </button>
               </div>
@@ -1171,7 +1171,7 @@ export default function Loom() {
         />
         {/* ⚙️ 設定 */}
         <button onClick={() => setSettingsOpen(true)} title={lang === 'ja' ? 'テーマ・言語・表示モード・ショートカット (?)' : 'Theme / Language / View mode / Shortcuts (?)'}
-          className="bg-transparent border border-dim rounded-[6px] px-[9px] py-1 text-muted cursor-pointer text-[10px] font-mono whitespace-nowrap">
+          className="bg-transparent border border-dim rounded-md px-[0.5625rem] py-1 text-muted cursor-pointer text-[0.625rem] font-mono whitespace-nowrap">
           ⚙️{!isMobile && ` ${lang === 'ja' ? '設定' : 'Settings'}`}
         </button>
         <input ref={fileRef} type="file" accept=".json,.loom" onChange={handleImport} className="hidden" />
@@ -1181,7 +1181,7 @@ export default function Loom() {
 
       {/* ── CHARACTER BAR ── */}
       <div className="bg-surface border-b border-line">
-        <div className="max-w-[58.33rem] mx-auto px-[14px] py-[7px] flex items-center gap-[5px] overflow-x-auto">
+        <div className="max-w-[58.33rem] mx-auto px-3.5 py-[0.4375rem] flex items-center gap-[0.3125rem] overflow-x-auto">
         {characters.filter(c => !c.archived || c.id === activeCharId).map(c => (
           <div key={c.id} className="relative flex-shrink-0">
             {isMobile ? (
@@ -1189,50 +1189,50 @@ export default function Loom() {
                 onClick={() => { setActiveCharId(c.id); setCharPanelOpen(true); setCompareCharId(null); }}
                 title={c.name}
                 style={{ background: c.color, outline: activeCharId === c.id ? `2px solid white` : `2px solid transparent`, outlineOffset: '2px' }}
-                className="w-[22px] h-[22px] rounded-full cursor-pointer transition-all duration-150 flex-shrink-0"
+                className="w-[1.375rem] h-[1.375rem] rounded-full cursor-pointer transition-all duration-150 flex-shrink-0"
               />
             ) : (
               <div onClick={() => { setActiveCharId(c.id); setCharPanelOpen(true); setCompareCharId(null); }}
                 style={{ background: activeCharId === c.id ? c.color + '22' : 'rgb(var(--surface-alt))', border: `1px solid ${activeCharId === c.id ? c.color + '70' : 'rgb(var(--border))'}` }}
-                className="flex items-center gap-1 rounded-[20px] px-[9px] py-1 cursor-pointer transition-all duration-150">
-                <span style={{ background: c.color }} className="w-[7px] h-[7px] rounded-full flex-shrink-0" />
-                <span className="text-[12px]">{c.emoji}</span>
-                <span style={{ color: activeCharId === c.id ? charColor(c.color) : 'rgb(var(--text))' }} className="text-[12px] font-semibold whitespace-nowrap">{c.name}</span>
+                className="flex items-center gap-1 rounded-[1.25rem] px-[0.5625rem] py-1 cursor-pointer transition-all duration-150">
+                <span style={{ background: c.color }} className="w-[0.4375rem] h-[0.4375rem] rounded-full flex-shrink-0" />
+                <span className="text-xs">{c.emoji}</span>
+                <span style={{ color: activeCharId === c.id ? charColor(c.color) : 'rgb(var(--text))' }} className="text-xs font-semibold whitespace-nowrap">{c.name}</span>
                 <span onClick={e => { e.stopPropagation(); duplicateCharacter(c.id); }} title={lang === 'ja' ? '複製' : 'Dup'}
-                  className="text-dim text-[10px] cursor-pointer px-px leading-none"
+                  className="text-dim text-[0.625rem] cursor-pointer px-px leading-none"
                   onMouseOver={e => e.target.style.color = charColor(c.color)} onMouseOut={e => e.target.style.color = 'rgb(var(--dim))'}>⊕</span>
                 {characters.length > 1 && <span onClick={e => { e.stopPropagation(); deleteCharacter(c.id); }}
-                  className="text-dim text-[10px] cursor-pointer px-px leading-none"
+                  className="text-dim text-[0.625rem] cursor-pointer px-px leading-none"
                   onMouseOver={e => e.target.style.color = '#f87171'} onMouseOut={e => e.target.style.color = 'rgb(var(--dim))'}>✕</span>}
               </div>
             )}
           </div>
         ))}
-        <button onClick={addCharacter} className="bg-transparent border border-dashed border-muted/60 rounded-[20px] px-[11px] py-1 text-fg/65 cursor-pointer text-[11px] flex-shrink-0 whitespace-nowrap">+ {lang === 'ja' ? '新キャラ' : 'New'}</button>
+        <button onClick={addCharacter} className="bg-transparent border border-dashed border-muted/60 rounded-[1.25rem] px-[0.6875rem] py-1 text-fg/65 cursor-pointer text-[0.6875rem] flex-shrink-0 whitespace-nowrap">+ {lang === 'ja' ? '新キャラ' : 'New'}</button>
         <button onClick={() => setLibraryOpen(true)}
           title={lang === 'ja' ? 'キャラクター格納庫' : 'Character Library'}
-          className="bg-transparent border border-dim rounded-[20px] px-[9px] py-1 text-muted cursor-pointer text-[11px] flex-shrink-0 whitespace-nowrap">
+          className="bg-transparent border border-dim rounded-[1.25rem] px-[0.5625rem] py-1 text-muted cursor-pointer text-[0.6875rem] flex-shrink-0 whitespace-nowrap">
           📚{characters.some(c => c.archived) ? ` ${characters.filter(c => c.archived).length}` : ''}
         </button>
         <div className="flex-1" />
         {characters.length > 1 && (
           <select value={compareCharId || ''} onChange={e => setCompareCharId(e.target.value || null)}
             style={{ border: `1px solid ${compareCharId ? warnColor + '60' : 'rgb(var(--dim))'}`, color: compareCharId ? warnColor : 'rgb(var(--muted))' }}
-            className="bg-surfalt rounded-[6px] px-[7px] py-1 text-[10px] cursor-pointer font-mono outline-none flex-shrink-0">
+            className="bg-surfalt rounded-md px-[0.4375rem] py-1 text-[0.625rem] cursor-pointer font-mono outline-none flex-shrink-0">
             <option value="">{lang === 'ja' ? '🆚 比較' : '🆚 Compare'}</option>
             {characters.filter(c => c.id !== activeCharId).map(c => <option key={c.id} value={c.id}>{c.emoji} {c.name}</option>)}
           </select>
         )}
-        {isMobile && <button onClick={() => setCharPanelOpen(p => !p)} className="bg-transparent border border-dim rounded-[5px] text-muted cursor-pointer text-[11px] px-[9px] py-1 flex-shrink-0 whitespace-nowrap">{charPanelOpen ? '▲' : '▼'} {lang === 'ja' ? '詳細' : 'Info'}</button>}
-        <div className="flex gap-[4px] flex-shrink-0">
+        {isMobile && <button onClick={() => setCharPanelOpen(p => !p)} className="bg-transparent border border-dim rounded-[0.3125rem] text-muted cursor-pointer text-[0.6875rem] px-[0.5625rem] py-1 flex-shrink-0 whitespace-nowrap">{charPanelOpen ? '▲' : '▼'} {lang === 'ja' ? '詳細' : 'Info'}</button>}
+        <div className="flex gap-1 flex-shrink-0">
           <button onClick={() => setMainTab('editor')}
             style={mainTab === 'editor' ? { background: activeChar?.color + '22', borderColor: activeChar?.color, color: charColor(activeChar?.color) } : undefined}
-            className={`rounded-[5px] px-[9px] py-1 text-[10px] font-mono cursor-pointer transition-all duration-[120ms] ${mainTab === 'editor' ? 'border font-bold' : 'border border-dim text-muted'}`}>
+            className={`rounded-[0.3125rem] px-[0.5625rem] py-1 text-[0.625rem] font-mono cursor-pointer transition-all duration-[120ms] ${mainTab === 'editor' ? 'border font-bold' : 'border border-dim text-muted'}`}>
             🧩{isMobile ? '' : (' ' + (lang === 'ja' ? 'エディタ' : 'Editor'))}
           </button>
           <button onClick={() => setMainTab('note')}
             style={mainTab === 'note' ? { background: activeChar?.color + '22', borderColor: activeChar?.color, color: charColor(activeChar?.color) } : undefined}
-            className={`rounded-[5px] px-[9px] py-1 text-[10px] font-mono cursor-pointer transition-all duration-[120ms] ${mainTab === 'note' ? 'border font-bold' : 'border border-dim text-muted'}`}>
+            className={`rounded-[0.3125rem] px-[0.5625rem] py-1 text-[0.625rem] font-mono cursor-pointer transition-all duration-[120ms] ${mainTab === 'note' ? 'border font-bold' : 'border border-dim text-muted'}`}>
             📖{isMobile ? '' : (' ' + (lang === 'ja' ? 'キャラノート' : 'Note'))}
           </button>
         </div>
@@ -1244,42 +1244,42 @@ export default function Loom() {
 
       {/* ── CHARACTER PANEL (mobile: toggle, PC: compact strip always) ── */}
       {activeChar && isMobile && charPanelOpen && (
-        <div className="bg-panel border-b border-line px-[14px] py-[11px]">
+        <div className="bg-panel border-b border-line px-3.5 py-[0.6875rem]">
           <div style={{ maxWidth: contentMax }} className="mx-auto">
-            <div className="flex flex-col gap-[6px] mb-[9px]">
-              <div className="flex items-center gap-[6px]">
+            <div className="flex flex-col gap-1.5 mb-[0.5625rem]">
+              <div className="flex items-center gap-1.5">
                 <input value={activeChar.name} onChange={e => updateChar(activeChar.id, { name: e.target.value })}
                   style={{ background: 'rgb(var(--bg))', border: `1px solid ${activeChar.color}60`, color: 'rgb(var(--text))' }}
-                  className="rounded-[7px] text-[13px] font-bold px-[10px] py-[5px] outline-none flex-1 min-w-0" />
+                  className="rounded-[0.4375rem] text-[0.8125rem] font-bold px-2.5 py-[0.3125rem] outline-none flex-1 min-w-0" />
                 <button onClick={() => duplicateCharacter(activeChar.id)}
                   title={lang === 'ja' ? '複製' : 'Duplicate'}
-                  className="flex-shrink-0 rounded-[6px] px-[9px] py-[5px] text-[11px] cursor-pointer font-mono border border-dim text-muted bg-transparent">⊕</button>
+                  className="flex-shrink-0 rounded-md px-[0.5625rem] py-[0.3125rem] text-[0.6875rem] cursor-pointer font-mono border border-dim text-muted bg-transparent">⊕</button>
                 {characters.length > 1 && (
                   <button onClick={() => deleteCharacter(activeChar.id)}
                     title={lang === 'ja' ? '削除' : 'Delete'}
-                    className="flex-shrink-0 rounded-[6px] px-[9px] py-[5px] text-[11px] cursor-pointer font-mono border border-dim text-muted bg-transparent">✕</button>
+                    className="flex-shrink-0 rounded-md px-[0.5625rem] py-[0.3125rem] text-[0.6875rem] cursor-pointer font-mono border border-dim text-muted bg-transparent">✕</button>
                 )}
               </div>
-              <div className="flex items-center gap-[6px]">
-                <div className="flex gap-[3px] items-center flex-shrink-0">
+              <div className="flex items-center gap-1.5">
+                <div className="flex gap-[0.1875rem] items-center flex-shrink-0">
                   {CHAR_COLORS.map(col => <div key={col} onClick={() => updateChar(activeChar.id, { color: col })}
                     style={{ background: col, border: `2px solid ${activeChar.color === col ? 'white' : 'rgba(0,0,0,0.18)'}` }}
-                    className="w-[15px] h-[15px] rounded-full cursor-pointer box-border transition-all duration-[120ms]" />)}
+                    className="w-[0.9375rem] h-[0.9375rem] rounded-full cursor-pointer box-border transition-all duration-[120ms]" />)}
                 </div>
               </div>
             </div>
-            <div className="mb-[9px]">
-              <div className="flex items-center justify-between mb-[3px]">
-                <div className="text-muted text-[10px] font-mono tracking-[0.07em]">📝 {lang === 'ja' ? 'キャラクターメモ（LoRA・設定・コツなど）' : 'Character Memo'}</div>
-                <div className="flex items-center gap-[4px]">
+            <div className="mb-[0.5625rem]">
+              <div className="flex items-center justify-between mb-[0.1875rem]">
+                <div className="text-muted text-[0.625rem] font-mono tracking-[0.07em]">📝 {lang === 'ja' ? 'キャラクターメモ（LoRA・設定・コツなど）' : 'Character Memo'}</div>
+                <div className="flex items-center gap-1">
                   <button onClick={() => setRandomMode(m => { const n = m === 'chardesign' ? 'illust' : 'chardesign'; localStorage.setItem('loom_randomMode', n); return n; })}
                     title={randomMode === 'chardesign' ? (lang === 'ja' ? 'キャラデザモード（クリックで切替）' : 'Char.Design mode (click to switch)') : (lang === 'ja' ? 'イラストモード（クリックで切替）' : 'Illust mode (click to switch)')}
-                    className="flex-shrink-0 border border-dashed rounded-[5px] px-[6px] py-[2px] cursor-pointer text-[10px] font-mono bg-transparent"
+                    className="flex-shrink-0 border border-dashed rounded-[0.3125rem] px-1.5 py-0.5 cursor-pointer text-[0.625rem] font-mono bg-transparent"
                     style={{ borderColor: 'rgb(var(--c-purple) / 0.35)', color: 'rgb(var(--muted))' }}>
                     {randomMode === 'chardesign' ? '🧍' : '🖼️'}
                   </button>
                   <button onClick={generateRandomChar}
-                    className="flex-shrink-0 border border-dashed rounded-[5px] px-[7px] py-[2px] cursor-pointer text-[10px] font-mono bg-transparent"
+                    className="flex-shrink-0 border border-dashed rounded-[0.3125rem] px-[0.4375rem] py-0.5 cursor-pointer text-[0.625rem] font-mono bg-transparent"
                     style={{ borderColor: 'rgb(var(--c-purple) / 0.5)', color: 'rgb(var(--c-purple))' }}>
                     🎲 {lang === 'ja' ? 'おまかせ' : 'Random'}
                   </button>
@@ -1288,20 +1288,20 @@ export default function Loom() {
               <textarea value={activeChar.memo} onChange={e => updateChar(activeChar.id, { memo: e.target.value })}
                 placeholder={lang === 'ja' ? 'LoRA名、使用モデル、生成のコツなど自由にメモ...' : 'LoRA names, model, tips...'}
                 style={{ background: 'rgb(var(--bg))', border: `1px solid ${activeChar.color}40`, color: 'rgb(var(--text))' }}
-                className="w-full min-h-[46px] rounded-[7px] text-[12px] px-[10px] py-[7px] font-mono resize-y box-border outline-none leading-[1.6]"
+                className="w-full min-h-[2.875rem] rounded-[0.4375rem] text-xs px-2.5 py-[0.4375rem] font-mono resize-y box-border outline-none leading-[1.6]"
                 onFocus={e => e.target.style.borderColor = activeChar.color + '80'}
                 onBlur={e => e.target.style.borderColor = activeChar.color + '40'} />
             </div>
-            <div className="flex gap-0 mb-[5px] min-h-[28px]">
+            <div className="flex gap-0 mb-[0.3125rem] min-h-7">
               {[
                 { key: 'costumePresets', label: lang === 'ja' ? '🎀 衣装' : '🎀 Costume', blockId: 'outfit' },
                 { key: 'shotPresets',    label: lang === 'ja' ? '📐 構図' : '📐 Shot',    blockId: 'composition' },
               ].map(({ key, label, blockId }, i) => (
-                <div key={key} className={`flex-1 flex flex-col gap-[4px] min-w-0 ${i === 0 ? 'pr-[8px]' : 'pl-[8px] border-l border-dim'}`}>
-                  <span className="text-muted text-[10px] font-mono flex-shrink-0">{label}:</span>
-                  <div className="flex flex-wrap gap-[4px]">
+                <div key={key} className={`flex-1 flex flex-col gap-1 min-w-0 ${i === 0 ? 'pr-2' : 'pl-2 border-l border-dim'}`}>
+                  <span className="text-muted text-[0.625rem] font-mono flex-shrink-0">{label}:</span>
+                  <div className="flex flex-wrap gap-1">
                     {(activeChar[key] || []).length === 0
-                      ? <span className="text-muted text-[10px] font-mono">{lang === 'ja' ? '（💾で保存）' : '(use 💾)'}</span>
+                      ? <span className="text-muted text-[0.625rem] font-mono">{lang === 'ja' ? '（💾で保存）' : '(use 💾)'}</span>
                       : (activeChar[key] || []).map(p => (
                           <PresetChip key={p.id} preset={p} color={activeChar.color} lang={lang}
                             otherChars={characters.filter(c => c.id !== activeCharId)}
@@ -1312,52 +1312,52 @@ export default function Loom() {
                 </div>
               ))}
             </div>
-            <div className="mb-[9px]">
-              <div className="flex items-center gap-2 mb-[5px]">
-                <span className="text-muted text-[10px] font-mono">🔗 LoRA</span>
+            <div className="mb-[0.5625rem]">
+              <div className="flex items-center gap-2 mb-[0.3125rem]">
+                <span className="text-muted text-[0.625rem] font-mono">🔗 LoRA</span>
                 {(activeTool === 'sd' || activeTool === 'nai') && (activeChar.loras || []).some(l => l.name.trim()) && (
-                  <span className="text-muted text-[10px] font-mono">{lang === 'ja' ? '→ 出力に自動追加中' : '→ auto-appended'}</span>
+                  <span className="text-muted text-[0.625rem] font-mono">{lang === 'ja' ? '→ 出力に自動追加中' : '→ auto-appended'}</span>
                 )}
-                <button onClick={addLora} style={{ color: charColor(activeChar.color), borderColor: activeChar.color + '60' }} className="ml-auto border rounded-[5px] px-[7px] py-[2px] text-[10px] cursor-pointer font-mono bg-transparent">+ LoRA</button>
+                <button onClick={addLora} style={{ color: charColor(activeChar.color), borderColor: activeChar.color + '60' }} className="ml-auto border rounded-[0.3125rem] px-[0.4375rem] py-0.5 text-[0.625rem] cursor-pointer font-mono bg-transparent">+ LoRA</button>
               </div>
               {(activeChar.loras || []).length === 0
-                ? <span className="text-muted text-[11px] font-mono">{lang === 'ja' ? '（SD/NAI使用時は出力に自動追加されます）' : '(auto-added to output for SD/NAI)'}</span>
+                ? <span className="text-muted text-[0.6875rem] font-mono">{lang === 'ja' ? '（SD/NAI使用時は出力に自動追加されます）' : '(auto-added to output for SD/NAI)'}</span>
                 : (activeChar.loras || []).map(l => (
-                  <div key={l.id} className="flex gap-[5px] items-center mb-[3px]">
+                  <div key={l.id} className="flex gap-[0.3125rem] items-center mb-[0.1875rem]">
                     <input value={l.name} onChange={e => updateLora(l.id, { name: e.target.value })}
                       placeholder={lang === 'ja' ? 'LoRA名' : 'LoRA name'}
                       style={{ border: `1px solid ${activeChar.color}40` }}
-                      className="flex-1 bg-bg rounded-[5px] text-[11px] px-[7px] py-[3px] outline-none font-mono text-fg" />
+                      className="flex-1 bg-bg rounded-[0.3125rem] text-[0.6875rem] px-[0.4375rem] py-[0.1875rem] outline-none font-mono text-fg" />
                     <input value={l.weight} onChange={e => updateLora(l.id, { weight: e.target.value })}
                       type="number" step="0.05" min="0.1" max="1.5"
                       style={{ border: `1px solid ${activeChar.color}40` }}
-                      className="w-[54px] bg-bg rounded-[5px] text-[11px] px-[5px] py-[3px] outline-none font-mono text-fg" />
-                    <button onClick={() => deleteLora(l.id)} className="text-muted text-[11px] cursor-pointer px-1">✕</button>
+                      className="w-[3.375rem] bg-bg rounded-[0.3125rem] text-[0.6875rem] px-[0.3125rem] py-[0.1875rem] outline-none font-mono text-fg" />
+                    <button onClick={() => deleteLora(l.id)} className="text-muted text-[0.6875rem] cursor-pointer px-1">✕</button>
                   </div>
                 ))
               }
             </div>
             <CharVersions activeChar={activeChar} lang={lang} onSave={saveVersion} onRestore={restoreVersion} onDelete={deleteVersion} color={activeChar.color} />
             <div>
-              <div className="flex items-center justify-between mb-[6px]">
-                <span className="text-muted text-[10px] font-mono">🖼 {lang === 'ja' ? `サムネイル (${(thumbs[activeCharId] || []).length}/4)` : `Images (${(thumbs[activeCharId] || []).length}/4)`}</span>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-muted text-[0.625rem] font-mono">🖼 {lang === 'ja' ? `サムネイル (${(thumbs[activeCharId] || []).length}/4)` : `Images (${(thumbs[activeCharId] || []).length}/4)`}</span>
                 <button onClick={copyShareUrl}
                   style={shared ? { borderColor: goodColor + '60', color: goodColor } : undefined}
-                  className="border border-dim rounded-[5px] px-[7px] py-[2px] text-muted text-[10px] cursor-pointer font-mono">
+                  className="border border-dim rounded-[0.3125rem] px-[0.4375rem] py-0.5 text-muted text-[0.625rem] cursor-pointer font-mono">
                   {shared ? `✓ ${lang === 'ja' ? 'コピー済み' : 'Copied!'}` : `🔗 ${lang === 'ja' ? 'プロンプトをシェア' : 'Share prompt'}`}
                 </button>
               </div>
-              <div className="flex items-center gap-[6px] flex-wrap">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 {(thumbs[activeCharId] || []).map((img, i) => (
                   <div key={i} className="relative flex-shrink-0">
-                    <img src={img} alt={`thumb-${i}`} onClick={() => setThumbPreview(img)} className="w-[52px] h-[52px] rounded-[6px] object-cover border border-line cursor-pointer hover:opacity-85 transition-opacity" />
+                    <img src={img} alt={`thumb-${i}`} onClick={() => setThumbPreview(img)} className="w-[3.25rem] h-[3.25rem] rounded-md object-cover border border-line cursor-pointer hover:opacity-85 transition-opacity" />
                     <button onClick={() => removeThumbAt(i)}
-                      className="absolute -top-[5px] -right-[5px] bg-surface border border-dim rounded-full w-[15px] h-[15px] text-[8px] flex items-center justify-center cursor-pointer text-muted leading-none">✕</button>
+                      className="absolute -top-[0.3125rem] -right-[0.3125rem] bg-surface border border-dim rounded-full w-[0.9375rem] h-[0.9375rem] text-[0.5rem] flex items-center justify-center cursor-pointer text-muted leading-none">✕</button>
                   </div>
                 ))}
                 {(thumbs[activeCharId] || []).length < 4 && (
                   <label style={{ borderColor: activeChar.color + '50', color: charColor(activeChar.color) }}
-                    className="w-[52px] h-[52px] border border-dashed rounded-[6px] flex items-center justify-center text-[18px] cursor-pointer flex-shrink-0">
+                    className="w-[3.25rem] h-[3.25rem] border border-dashed rounded-md flex items-center justify-center text-lg cursor-pointer flex-shrink-0">
                     +
                     <input type="file" accept=".jpg,.jpeg,.png" onChange={handleThumbUpload} className="hidden" />
                   </label>
@@ -1370,66 +1370,66 @@ export default function Loom() {
 
       {/* ── CHARACTER PANEL (PC: compact strip always + collapsible detail) ── */}
       {activeChar && !isMobile && (
-        <div className="bg-panel border-b border-line py-[7px]">
-          <div style={{ maxWidth: contentMax }} className="mx-auto px-[14px]">
+        <div className="bg-panel border-b border-line py-[0.4375rem]">
+          <div style={{ maxWidth: contentMax }} className="mx-auto px-3.5">
             {/* Compact 1-line strip */}
-            <div className="flex items-center gap-[9px]">
+            <div className="flex items-center gap-[0.5625rem]">
               <input value={activeChar.name} onChange={e => updateChar(activeChar.id, { name: e.target.value })}
                 style={{ background: 'rgb(var(--bg))', border: `1px solid ${activeChar.color}60`, color: 'rgb(var(--text))' }}
-                className="rounded-[7px] text-[13px] font-bold px-[10px] py-[4px] outline-none min-w-[90px] max-w-[150px]" />
-              <div className="flex gap-[3px] items-center flex-shrink-0">
+                className="rounded-[0.4375rem] text-[0.8125rem] font-bold px-2.5 py-1 outline-none min-w-[5.625rem] max-w-[9.375rem]" />
+              <div className="flex gap-[0.1875rem] items-center flex-shrink-0">
                 {CHAR_COLORS.map(col => <div key={col} onClick={() => updateChar(activeChar.id, { color: col })}
                   style={{ background: col, border: `2px solid ${activeChar.color === col ? 'white' : 'rgba(0,0,0,0.18)'}` }}
-                  className="w-[14px] h-[14px] rounded-full cursor-pointer box-border transition-all duration-[120ms]" />)}
+                  className="w-3.5 h-3.5 rounded-full cursor-pointer box-border transition-all duration-[120ms]" />)}
               </div>
-              <div className="w-px h-[12px] bg-dim flex-shrink-0" />
+              <div className="w-px h-3 bg-dim flex-shrink-0" />
               <div style={{ display:'grid', gridTemplateColumns:'repeat(11, auto)', gap:'2px' }}>
                 {CHAR_EMOJIS.map(em => <span key={em} onClick={() => updateChar(activeChar.id, { emoji: em })}
                   style={{ background: activeChar.emoji === em ? activeChar.color + '30' : 'transparent' }}
-                  className="text-[12px] cursor-pointer p-[1px] leading-none rounded-[3px] text-center">{em}</span>)}
+                  className="text-xs cursor-pointer p-[0.0625rem] leading-none rounded-[0.1875rem] text-center">{em}</span>)}
               </div>
               <div className="flex-1" />
               <button onClick={() => setRandomMode(m => { const n = m === 'chardesign' ? 'illust' : 'chardesign'; localStorage.setItem('loom_randomMode', n); return n; })}
                 title={randomMode === 'chardesign' ? (lang === 'ja' ? 'キャラデザモード（クリックでイラストモードへ）' : 'Char.Design mode (click for Illust)') : (lang === 'ja' ? 'イラストモード（クリックでキャラデザモードへ）' : 'Illust mode (click for Char.Design)')}
-                className="flex-shrink-0 border border-dashed rounded-[5px] px-[7px] py-[3px] cursor-pointer text-[10px] font-mono bg-transparent"
+                className="flex-shrink-0 border border-dashed rounded-[0.3125rem] px-[0.4375rem] py-[0.1875rem] cursor-pointer text-[0.625rem] font-mono bg-transparent"
                 style={{ borderColor: 'rgb(var(--c-purple) / 0.35)', color: 'rgb(var(--muted))' }}>
                 {randomMode === 'chardesign' ? '🧍' : '🖼️'}
               </button>
               <button onClick={generateRandomChar} title={lang === 'ja' ? (randomMode === 'chardesign' ? 'キャラデザモードでランダム生成' : 'イラストモードでランダム生成') : (randomMode === 'chardesign' ? 'Random (Char.Design)' : 'Random (Illust)')}
-                className="flex-shrink-0 border border-dashed rounded-[5px] px-[8px] py-[3px] cursor-pointer text-[10px] font-mono bg-transparent"
+                className="flex-shrink-0 border border-dashed rounded-[0.3125rem] px-2 py-[0.1875rem] cursor-pointer text-[0.625rem] font-mono bg-transparent"
                 style={{ borderColor: 'rgb(var(--c-purple) / 0.5)', color: 'rgb(var(--c-purple))' }}>
                 🎲 {lang === 'ja' ? 'おまかせ' : 'Random'}
               </button>
               <button onClick={() => setCharPanelOpen(p => !p)}
-                className="flex-shrink-0 border border-dim rounded-[5px] px-[8px] py-[3px] text-muted cursor-pointer text-[10px] font-mono whitespace-nowrap">
+                className="flex-shrink-0 border border-dim rounded-[0.3125rem] px-2 py-[0.1875rem] text-muted cursor-pointer text-[0.625rem] font-mono whitespace-nowrap">
                 {charPanelOpen ? `▲ ${lang === 'ja' ? '閉じる' : 'Close'}` : `⚙ ${lang === 'ja' ? '詳細' : 'Details'}`}
               </button>
             </div>
 
             {/* Detail section */}
             {charPanelOpen && (
-              <div className="mt-[10px] pt-[10px] border-t border-line">
+              <div className="mt-2.5 pt-2.5 border-t border-line">
                 {/* Memo */}
-                <div className="mb-[9px]">
-                  <div className="text-muted text-[10px] font-mono tracking-[0.07em] mb-[3px]">📝 {lang === 'ja' ? 'キャラクターメモ（LoRA・設定・コツなど）' : 'Character Memo'}</div>
+                <div className="mb-[0.5625rem]">
+                  <div className="text-muted text-[0.625rem] font-mono tracking-[0.07em] mb-[0.1875rem]">📝 {lang === 'ja' ? 'キャラクターメモ（LoRA・設定・コツなど）' : 'Character Memo'}</div>
                   <textarea value={activeChar.memo} onChange={e => updateChar(activeChar.id, { memo: e.target.value })}
                     placeholder={lang === 'ja' ? 'LoRA名、使用モデル、生成のコツなど自由にメモ...' : 'LoRA names, model, tips...'}
                     style={{ background: 'rgb(var(--bg))', border: `1px solid ${activeChar.color}40`, color: 'rgb(var(--text))' }}
-                    className="w-full min-h-[38px] rounded-[7px] text-[12px] px-[10px] py-[6px] font-mono resize-y box-border outline-none leading-[1.6]"
+                    className="w-full min-h-[2.375rem] rounded-[0.4375rem] text-xs px-2.5 py-1.5 font-mono resize-y box-border outline-none leading-[1.6]"
                     onFocus={e => e.target.style.borderColor = activeChar.color + '80'}
                     onBlur={e => e.target.style.borderColor = activeChar.color + '40'} />
                 </div>
                 {/* Preset row */}
-                <div className="flex gap-0 mb-[9px] min-h-[28px]">
+                <div className="flex gap-0 mb-[0.5625rem] min-h-7">
                   {[
                     { key: 'costumePresets', label: lang === 'ja' ? '🎀 衣装' : '🎀 Costume', blockId: 'outfit' },
                     { key: 'shotPresets',    label: lang === 'ja' ? '📐 構図' : '📐 Shot',    blockId: 'composition' },
                   ].map(({ key, label, blockId }, i) => (
-                    <div key={key} className={`flex-1 flex flex-col gap-[4px] min-w-0 ${i === 0 ? 'pr-[8px]' : 'pl-[8px] border-l border-dim'}`}>
-                      <span className="text-muted text-[10px] font-mono flex-shrink-0">{label}:</span>
-                      <div className="flex flex-wrap gap-[4px]">
+                    <div key={key} className={`flex-1 flex flex-col gap-1 min-w-0 ${i === 0 ? 'pr-2' : 'pl-2 border-l border-dim'}`}>
+                      <span className="text-muted text-[0.625rem] font-mono flex-shrink-0">{label}:</span>
+                      <div className="flex flex-wrap gap-1">
                         {(activeChar[key] || []).length === 0
-                          ? <span className="text-muted text-[10px] font-mono">{lang === 'ja' ? '（💾で保存）' : '(use 💾)'}</span>
+                          ? <span className="text-muted text-[0.625rem] font-mono">{lang === 'ja' ? '（💾で保存）' : '(use 💾)'}</span>
                           : (activeChar[key] || []).map(p => (
                               <PresetChip key={p.id} preset={p} color={activeChar.color} lang={lang}
                                 otherChars={characters.filter(c => c.id !== activeCharId)}
@@ -1441,28 +1441,28 @@ export default function Loom() {
                   ))}
                 </div>
                 {/* LoRA / Versions / Thumbnails in 3-col grid */}
-                <div className="grid grid-cols-3 gap-[16px]">
+                <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <div className="flex items-center gap-2 mb-[5px]">
-                      <span className="text-muted text-[10px] font-mono">🔗 LoRA</span>
+                    <div className="flex items-center gap-2 mb-[0.3125rem]">
+                      <span className="text-muted text-[0.625rem] font-mono">🔗 LoRA</span>
                       {(activeTool === 'sd' || activeTool === 'nai') && (activeChar.loras || []).some(l => l.name.trim()) && (
-                        <span className="text-muted text-[9px] font-mono">{lang === 'ja' ? '→ 出力追加中' : '→ appended'}</span>
+                        <span className="text-muted text-[0.5625rem] font-mono">{lang === 'ja' ? '→ 出力追加中' : '→ appended'}</span>
                       )}
-                      <button onClick={addLora} style={{ color: charColor(activeChar.color), borderColor: activeChar.color + '60' }} className="ml-auto border rounded-[5px] px-[7px] py-[2px] text-[10px] cursor-pointer font-mono bg-transparent">+ LoRA</button>
+                      <button onClick={addLora} style={{ color: charColor(activeChar.color), borderColor: activeChar.color + '60' }} className="ml-auto border rounded-[0.3125rem] px-[0.4375rem] py-0.5 text-[0.625rem] cursor-pointer font-mono bg-transparent">+ LoRA</button>
                     </div>
                     {(activeChar.loras || []).length === 0
-                      ? <span className="text-muted text-[10px] font-mono">{lang === 'ja' ? 'SD/NAI用（出力に自動追加）' : 'SD/NAI: auto-appended'}</span>
+                      ? <span className="text-muted text-[0.625rem] font-mono">{lang === 'ja' ? 'SD/NAI用（出力に自動追加）' : 'SD/NAI: auto-appended'}</span>
                       : (activeChar.loras || []).map(l => (
-                        <div key={l.id} className="flex gap-[5px] items-center mb-[3px]">
+                        <div key={l.id} className="flex gap-[0.3125rem] items-center mb-[0.1875rem]">
                           <input value={l.name} onChange={e => updateLora(l.id, { name: e.target.value })}
                             placeholder={lang === 'ja' ? 'LoRA名' : 'LoRA name'}
                             style={{ border: `1px solid ${activeChar.color}40` }}
-                            className="flex-1 bg-bg rounded-[5px] text-[11px] px-[7px] py-[3px] outline-none font-mono text-fg min-w-0" />
+                            className="flex-1 bg-bg rounded-[0.3125rem] text-[0.6875rem] px-[0.4375rem] py-[0.1875rem] outline-none font-mono text-fg min-w-0" />
                           <input value={l.weight} onChange={e => updateLora(l.id, { weight: e.target.value })}
                             type="number" step="0.05" min="0.1" max="1.5"
                             style={{ border: `1px solid ${activeChar.color}40` }}
-                            className="w-[54px] bg-bg rounded-[5px] text-[11px] px-[5px] py-[3px] outline-none font-mono text-fg flex-shrink-0" />
-                          <button onClick={() => deleteLora(l.id)} className="text-muted text-[11px] cursor-pointer px-1 flex-shrink-0">✕</button>
+                            className="w-[3.375rem] bg-bg rounded-[0.3125rem] text-[0.6875rem] px-[0.3125rem] py-[0.1875rem] outline-none font-mono text-fg flex-shrink-0" />
+                          <button onClick={() => deleteLora(l.id)} className="text-muted text-[0.6875rem] cursor-pointer px-1 flex-shrink-0">✕</button>
                         </div>
                       ))
                     }
@@ -1471,11 +1471,11 @@ export default function Loom() {
                     <CharVersions activeChar={activeChar} lang={lang} onSave={saveVersion} onRestore={restoreVersion} onDelete={deleteVersion} color={activeChar.color} />
                   </div>
                   <div>
-                    <div className="flex items-center justify-between mb-[5px]">
-                      <span className="text-muted text-[10px] font-mono">🖼 {lang === 'ja' ? `サムネイル (${(thumbs[activeCharId] || []).length}/4)` : `Images (${(thumbs[activeCharId] || []).length}/4)`}</span>
+                    <div className="flex items-center justify-between mb-[0.3125rem]">
+                      <span className="text-muted text-[0.625rem] font-mono">🖼 {lang === 'ja' ? `サムネイル (${(thumbs[activeCharId] || []).length}/4)` : `Images (${(thumbs[activeCharId] || []).length}/4)`}</span>
                       <button onClick={copyShareUrl}
                         style={shared ? { borderColor: goodColor + '60', color: goodColor } : undefined}
-                        className="border border-dim rounded-[5px] px-[7px] py-[2px] text-muted text-[10px] cursor-pointer font-mono">
+                        className="border border-dim rounded-[0.3125rem] px-[0.4375rem] py-0.5 text-muted text-[0.625rem] cursor-pointer font-mono">
                         {shared ? `✓ ${lang === 'ja' ? 'コピー済み' : 'Copied!'}` : `🔗 ${lang === 'ja' ? 'プロンプトをシェア' : 'Share prompt'}`}
                       </button>
                     </div>
@@ -1483,7 +1483,7 @@ export default function Loom() {
                       const thumbCount = (thumbs[activeCharId] || []).length;
                       return (
                         <div
-                          className="flex items-center gap-[5px] flex-wrap rounded-[7px] transition-all duration-150"
+                          className="flex items-center gap-[0.3125rem] flex-wrap rounded-[0.4375rem] transition-all duration-150"
                           style={thumbDragOver && thumbCount < 4 ? { outline: `2px dashed ${activeChar.color}90`, background: activeChar.color + '0d', padding: '4px', margin: '-4px' } : undefined}
                           onDragOver={thumbCount < 4 ? e => { e.preventDefault(); setThumbDragOver(true); } : undefined}
                           onDragLeave={() => setThumbDragOver(false)}
@@ -1491,9 +1491,9 @@ export default function Loom() {
                         >
                           {(thumbs[activeCharId] || []).map((img, i) => (
                             <div key={i} className="relative flex-shrink-0">
-                              <img src={img} alt={`thumb-${i}`} onClick={() => setThumbPreview(img)} className="w-[48px] h-[48px] rounded-[6px] object-cover border border-line cursor-pointer hover:opacity-85 transition-opacity" />
+                              <img src={img} alt={`thumb-${i}`} onClick={() => setThumbPreview(img)} className="w-12 h-12 rounded-md object-cover border border-line cursor-pointer hover:opacity-85 transition-opacity" />
                               <button onClick={() => removeThumbAt(i)}
-                                className="absolute -top-[5px] -right-[5px] bg-surface border border-dim rounded-full w-[15px] h-[15px] text-[8px] flex items-center justify-center cursor-pointer text-muted leading-none">✕</button>
+                                className="absolute -top-[0.3125rem] -right-[0.3125rem] bg-surface border border-dim rounded-full w-[0.9375rem] h-[0.9375rem] text-[0.5rem] flex items-center justify-center cursor-pointer text-muted leading-none">✕</button>
                             </div>
                           ))}
                           {thumbCount < 4 && (
@@ -1504,7 +1504,7 @@ export default function Loom() {
                                 background: thumbDragOver ? activeChar.color + '18' : undefined,
                               }}
                               title={lang === 'ja' ? '画像をドラッグ＆ドロップ、またはクリックして選択（JPG/PNG）' : 'Drag & drop or click to select (JPG/PNG)'}
-                              className="w-[48px] h-[48px] border border-dashed rounded-[6px] flex items-center justify-center text-[20px] cursor-pointer flex-shrink-0 transition-all duration-150"
+                              className="w-12 h-12 border border-dashed rounded-md flex items-center justify-center text-xl cursor-pointer flex-shrink-0 transition-all duration-150"
                             >
                               {thumbDragOver ? '↓' : '+'}
                               <input type="file" accept=".jpg,.jpeg,.png" onChange={handleThumbUpload} className="hidden" />
@@ -1579,23 +1579,23 @@ export default function Loom() {
                 return (
                   <>
                     {/* Backdrop */}
-                    <div className="fixed inset-0 z-[248] bg-black/70 backdrop-blur-[3px]" onClick={() => setFocusBlockId(null)} />
+                    <div className="fixed inset-0 z-[248] bg-black/70 backdrop-blur-[0.1875rem]" onClick={() => setFocusBlockId(null)} />
                     {/* Centered canvas */}
-                    <div className="fixed inset-0 z-[249] flex items-center justify-center p-[40px] pointer-events-none">
+                    <div className="fixed inset-0 z-[249] flex items-center justify-center p-10 pointer-events-none">
                       <div className="w-full max-w-[58rem] flex gap-4 items-stretch pointer-events-auto" style={{ height: 'calc(100vh - 80px)', maxHeight: '90vh' }}>
 
                         {/* Editor canvas */}
-                        <div className="flex-1 min-w-0 flex flex-col overflow-hidden rounded-[16px]"
+                        <div className="flex-1 min-w-0 flex flex-col overflow-hidden rounded-2xl"
                           style={{ background: 'rgb(var(--surface))', border: `1.5px solid ${focusBlock.color}55`, boxShadow: `0 0 40px ${focusBlock.color}18` }}>
                           {/* Canvas header */}
-                          <div className="flex items-center gap-2 flex-shrink-0 px-[14px] py-[10px]"
+                          <div className="flex items-center gap-2 flex-shrink-0 px-3.5 py-2.5"
                             style={{ borderBottom: `1px solid ${focusBlock.color}30` }}>
-                            <span style={{ background: focusBlock.color + '22', border: `1px solid ${focusBlock.color}80`, color: focusBlock.color, textShadow: '0 0 8px currentColor' }} className="text-[12px] font-mono font-bold px-[10px] py-[3px] rounded-full tracking-[0.08em]">
+                            <span style={{ background: focusBlock.color + '22', border: `1px solid ${focusBlock.color}80`, color: focusBlock.color, textShadow: '0 0 8px currentColor' }} className="text-xs font-mono font-bold px-2.5 py-[0.1875rem] rounded-full tracking-[0.08em]">
                               🔍 {lang === 'ja' ? '集中編集モード' : 'FOCUS MODE'}
                             </span>
                             <button onClick={() => setFocusBlockId(null)}
                               style={{ borderColor: focusBlock.color + '60', color: focusBlock.color }}
-                              className="ml-auto border rounded-[5px] px-[9px] py-[3px] text-[11px] font-mono font-semibold cursor-pointer bg-transparent">
+                              className="ml-auto border rounded-[0.3125rem] px-[0.5625rem] py-[0.1875rem] text-[0.6875rem] font-mono font-semibold cursor-pointer bg-transparent">
                               {lang === 'ja' ? '閉じる' : 'Close'} ✕
                             </button>
                           </div>
@@ -1603,23 +1603,23 @@ export default function Loom() {
                         </div>
 
                         {/* Tool palette */}
-                        <div className="w-[175px] flex-shrink-0 flex flex-col gap-3 overflow-y-auto">
+                        <div className="w-[10.9375rem] flex-shrink-0 flex flex-col gap-3 overflow-y-auto">
 
                           {/* TagMap section */}
                           {focusTagMapRows.length > 0 && (
-                            <div className="bg-surface border border-line rounded-[12px] p-[12px] flex flex-col flex-shrink-0">
-                              <div className="text-muted text-[9px] font-mono mb-[8px] tracking-[0.06em]">
+                            <div className="bg-surface border border-line rounded-xl p-3 flex flex-col flex-shrink-0">
+                              <div className="text-muted text-[0.5625rem] font-mono mb-2 tracking-[0.06em]">
                                 🔗 {lang === 'ja' ? 'タグ対応表' : 'Tag Map'}
                               </div>
-                              <div className="flex flex-col gap-[6px] overflow-y-auto" style={{ maxHeight: '280px' }}>
+                              <div className="flex flex-col gap-1.5 overflow-y-auto" style={{ maxHeight: '280px' }}>
                                 {focusTagMapRows.map(row => (
-                                  <div key={row.id} className="bg-panel border border-dim rounded-[7px] px-[9px] py-[7px]">
-                                    <div className="text-fg text-[10px] font-mono font-semibold mb-[3px] truncate">{row.label}</div>
-                                    <div className="text-prompt text-[9px] font-mono break-all leading-[1.4] mb-[5px] opacity-80">{row.promptTags}</div>
-                                    {row.notes && <div className="text-muted text-[9px] font-mono mb-[4px] leading-tight">{row.notes}</div>}
+                                  <div key={row.id} className="bg-panel border border-dim rounded-[0.4375rem] px-[0.5625rem] py-[0.4375rem]">
+                                    <div className="text-fg text-[0.625rem] font-mono font-semibold mb-[0.1875rem] truncate">{row.label}</div>
+                                    <div className="text-prompt text-[0.5625rem] font-mono break-all leading-[1.4] mb-[0.3125rem] opacity-80">{row.promptTags}</div>
+                                    {row.notes && <div className="text-muted text-[0.5625rem] font-mono mb-1 leading-tight">{row.notes}</div>}
                                     <button onClick={() => insertTagMapRow(row)}
                                       style={{ borderColor: activeChar.color + '60', color: charColor(activeChar.color) }}
-                                      className="border rounded-[4px] px-[7px] py-[2px] text-[9px] font-mono font-bold cursor-pointer bg-transparent">
+                                      className="border rounded px-[0.4375rem] py-0.5 text-[0.5625rem] font-mono font-bold cursor-pointer bg-transparent">
                                       → {lang === 'ja' ? '挿入' : 'Insert'}
                                     </button>
                                   </div>
@@ -1629,23 +1629,23 @@ export default function Loom() {
                           )}
 
                           {/* Block navigation section */}
-                          <div className="bg-surface border border-line rounded-[12px] p-[12px] flex flex-col flex-1 min-h-0">
-                            <div className="text-muted text-[9px] font-mono mb-[8px] tracking-[0.06em] flex-shrink-0">
+                          <div className="bg-surface border border-line rounded-xl p-3 flex flex-col flex-1 min-h-0">
+                            <div className="text-muted text-[0.5625rem] font-mono mb-2 tracking-[0.06em] flex-shrink-0">
                               {lang === 'ja' ? '他のブロック' : 'Other blocks'}
                             </div>
-                            <div className="flex flex-col gap-[6px] overflow-y-auto flex-1">
+                            <div className="flex flex-col gap-1.5 overflow-y-auto flex-1">
                               {visibleBlocks.filter(b => b.id !== focusBlockId).map(b => {
                                 const num = visibleBlocks.findIndex(x => x.id === b.id) + 1;
                                 return (
                                   <div key={b.id} onClick={() => setFocusBlockId(b.id)}
                                     style={{ borderLeft: `3px solid ${b.enabled !== false ? b.color : 'rgb(var(--dim))'}`, opacity: b.enabled === false ? 0.5 : 1 }}
-                                    className="bg-panel border border-dim flex items-center gap-[6px] rounded-[6px] px-[7px] py-[5px] cursor-pointer transition-all duration-[120ms]"
+                                    className="bg-panel border border-dim flex items-center gap-1.5 rounded-md px-[0.4375rem] py-[0.3125rem] cursor-pointer transition-all duration-[120ms]"
                                     onMouseOver={e => e.currentTarget.style.background = 'rgb(var(--surface-alt))'}
                                     onMouseOut={e => e.currentTarget.style.background = 'rgb(var(--panel))'}>
-                                    <span style={{ background: b.color + '22', border: `1px solid ${b.color}60`, color: b.color }} className="min-w-[16px] h-[16px] rounded-full text-[9px] font-bold flex items-center justify-center font-mono flex-shrink-0">{num}</span>
-                                    <span className="text-[11px]">{b.icon}</span>
-                                    <span className="text-fg text-[10px] font-semibold truncate flex-1">{lang === 'ja' ? b.name : b.nameEn}</span>
-                                    {b.text && <span style={{ color: b.color + '99' }} className="text-[9px] font-mono flex-shrink-0">{countTags(b.text)}</span>}
+                                    <span style={{ background: b.color + '22', border: `1px solid ${b.color}60`, color: b.color }} className="min-w-4 h-4 rounded-full text-[0.5625rem] font-bold flex items-center justify-center font-mono flex-shrink-0">{num}</span>
+                                    <span className="text-[0.6875rem]">{b.icon}</span>
+                                    <span className="text-fg text-[0.625rem] font-semibold truncate flex-1">{lang === 'ja' ? b.name : b.nameEn}</span>
+                                    {b.text && <span style={{ color: b.color + '99' }} className="text-[0.5625rem] font-mono flex-shrink-0">{countTags(b.text)}</span>}
                                   </div>
                                 );
                               })}
@@ -1663,7 +1663,7 @@ export default function Loom() {
                 const cols = [[], [], []];
                 visibleBlocks.forEach((b, i) => cols[i % 3].push([b, i]));
                 return (
-                  <div className="max-w-[58.33rem] mx-auto px-[14px] py-[13px] flex gap-3 items-start">
+                  <div className="max-w-[58.33rem] mx-auto px-3.5 py-[0.8125rem] flex gap-3 items-start">
                     {cols.map((col, ci) => (
                       <div key={ci} className="flex-1 min-w-0">{col.map(([b, i]) => renderCard(b, i))}</div>
                     ))}
@@ -1675,7 +1675,7 @@ export default function Loom() {
                 const col1 = [], col2 = [];
                 visibleBlocks.forEach((b, i) => (i % 2 === 0 ? col1 : col2).push([b, i]));
                 return (
-                  <div className="max-w-[58.33rem] mx-auto px-[14px] py-[13px] flex gap-3 items-start">
+                  <div className="max-w-[58.33rem] mx-auto px-3.5 py-[0.8125rem] flex gap-3 items-start">
                     <div className="flex-1 min-w-0">{col1.map(([b, i]) => renderCard(b, i))}</div>
                     <div className="flex-1 min-w-0">{col2.map(([b, i]) => renderCard(b, i))}</div>
                   </div>
@@ -1683,7 +1683,7 @@ export default function Loom() {
               }
 
               return (
-                <div className="max-w-[58.33rem] mx-auto px-[14px] py-[13px]">
+                <div className="max-w-[58.33rem] mx-auto px-3.5 py-[0.8125rem]">
                   {visibleBlocks.map((b, i) => renderCard(b, i))}
                 </div>
               );
@@ -1699,12 +1699,12 @@ export default function Loom() {
         const mFocusIdx = visibleBlocks.findIndex(b => b.id === focusBlockId);
         return (
           <div className="fixed inset-0 z-[260] bg-bg overflow-y-auto">
-            <div className="px-[14px] py-[12px]">
+            <div className="px-3.5 py-3">
               <div className="flex items-center gap-2 mb-3 flex-shrink-0">
-                <span className="text-fg text-[12px] font-bold font-mono">🔍 {lang === 'ja' ? '集中編集' : 'Focus'}</span>
-                <span className="text-muted text-[10px] font-mono">{mFocusBlock.icon} {lang === 'ja' ? mFocusBlock.name : mFocusBlock.nameEn}</span>
+                <span className="text-fg text-xs font-bold font-mono">🔍 {lang === 'ja' ? '集中編集' : 'Focus'}</span>
+                <span className="text-muted text-[0.625rem] font-mono">{mFocusBlock.icon} {lang === 'ja' ? mFocusBlock.name : mFocusBlock.nameEn}</span>
                 <button onClick={() => setFocusBlockId(null)}
-                  className="ml-auto bg-transparent border border-dim rounded-[6px] px-[10px] py-[4px] text-[11px] font-mono text-muted cursor-pointer">
+                  className="ml-auto bg-transparent border border-dim rounded-md px-2.5 py-1 text-[0.6875rem] font-mono text-muted cursor-pointer">
                   ✕ {lang === 'ja' ? '閉じる' : 'Close'}
                 </button>
               </div>
@@ -1735,12 +1735,12 @@ export default function Loom() {
       {isMobile && jumpOpen && (
         <>
           <div className="fixed inset-0 z-[200] bg-black/50" onClick={() => setJumpOpen(false)} />
-          <div className="fixed left-0 top-0 bottom-0 z-[201] w-[220px] bg-surface border-r border-line flex flex-col shadow-2xl">
+          <div className="fixed left-0 top-0 bottom-0 z-[201] w-[13.75rem] bg-surface border-r border-line flex flex-col shadow-2xl">
             <div className="flex items-center justify-between px-4 py-3 border-b border-line flex-shrink-0">
-              <span className="text-[12px] font-bold text-fg font-mono">
+              <span className="text-xs font-bold text-fg font-mono">
                 {lang === 'ja' ? 'ブロック一覧' : 'Blocks'}
               </span>
-              <button onClick={() => setJumpOpen(false)} className="text-muted text-[18px] cursor-pointer bg-transparent border-none leading-none">✕</button>
+              <button onClick={() => setJumpOpen(false)} className="text-muted text-lg cursor-pointer bg-transparent border-none leading-none">✕</button>
             </div>
             <div className="flex-1 overflow-y-auto">
               {visibleBlocks.map(b => {
@@ -1778,21 +1778,21 @@ export default function Loom() {
                     <button
                       key={b.id}
                       onClick={handleCustomTap}
-                      className="w-full flex items-center gap-[8px] px-3 py-[10px] text-left cursor-pointer bg-transparent border-b border-line last:border-b-0"
+                      className="w-full flex items-center gap-2 px-3 py-2.5 text-left cursor-pointer bg-transparent border-b border-line last:border-b-0"
                       style={{ borderLeftWidth: '3px', borderLeftStyle: 'solid', borderLeftColor: b.enabled !== false ? b.color : 'rgb(var(--dim))' }}
                     >
-                      <span className="text-[14px] flex-shrink-0">{b.icon}</span>
+                      <span className="text-sm flex-shrink-0">{b.icon}</span>
                       <div className="flex-1 min-w-0 flex flex-col">
-                        <span className="text-[11px] font-mono truncate" style={{ color: b.enabled !== false ? 'rgb(var(--text))' : 'rgb(var(--muted))' }}>
+                        <span className="text-[0.6875rem] font-mono truncate" style={{ color: b.enabled !== false ? 'rgb(var(--text))' : 'rgb(var(--muted))' }}>
                           {b.name}
                         </span>
-                        <span className="text-[9px] font-mono text-muted leading-none mt-[2px]">
+                        <span className="text-[0.5625rem] font-mono text-muted leading-none mt-0.5">
                           {lang === 'ja' ? 'タップ:名前変更 · 2回:非表示' : 'Tap:rename · 2×:hide'}
                         </span>
                       </div>
-                      <span className="text-[9px] font-mono text-muted flex-shrink-0">✎</span>
+                      <span className="text-[0.5625rem] font-mono text-muted flex-shrink-0">✎</span>
                       {b.text && (
-                        <span className="text-[9px] font-mono font-bold flex-shrink-0" style={{ color: b.color }}>
+                        <span className="text-[0.5625rem] font-mono font-bold flex-shrink-0" style={{ color: b.color }}>
                           {countTags(b.text)}t
                         </span>
                       )}
@@ -1806,15 +1806,15 @@ export default function Loom() {
                       document.getElementById(`block-${b.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                       setJumpOpen(false);
                     }}
-                    className="w-full flex items-center gap-[8px] px-3 py-[10px] text-left cursor-pointer bg-transparent border-b border-line last:border-b-0"
+                    className="w-full flex items-center gap-2 px-3 py-2.5 text-left cursor-pointer bg-transparent border-b border-line last:border-b-0"
                     style={{ borderLeftWidth: '3px', borderLeftStyle: 'solid', borderLeftColor: b.enabled !== false ? b.color : 'rgb(var(--dim))' }}
                   >
-                    <span className="text-[14px] flex-shrink-0">{b.icon}</span>
-                    <span className="text-[11px] font-mono flex-1 truncate" style={{ color: b.enabled !== false ? 'rgb(var(--text))' : 'rgb(var(--muted))' }}>
+                    <span className="text-sm flex-shrink-0">{b.icon}</span>
+                    <span className="text-[0.6875rem] font-mono flex-1 truncate" style={{ color: b.enabled !== false ? 'rgb(var(--text))' : 'rgb(var(--muted))' }}>
                       {lang === 'ja' ? b.name : b.nameEn}
                     </span>
                     {b.text && (
-                      <span className="text-[9px] font-mono font-bold flex-shrink-0" style={{ color: b.color }}>
+                      <span className="text-[0.5625rem] font-mono font-bold flex-shrink-0" style={{ color: b.color }}>
                         {countTags(b.text)}t
                       </span>
                     )}
@@ -1827,7 +1827,7 @@ export default function Loom() {
               <div className="flex-shrink-0 border-t border-line p-2">
                 <button
                   onClick={() => { addCustomBlock(); setJumpOpen(false); }}
-                  className="w-full rounded-[7px] py-[8px] text-[11px] font-mono cursor-pointer border border-dashed flex items-center justify-center gap-[5px]"
+                  className="w-full rounded-[0.4375rem] py-2 text-[0.6875rem] font-mono cursor-pointer border border-dashed flex items-center justify-center gap-[0.3125rem]"
                   style={{ borderColor: 'rgb(var(--dim))', color: 'rgb(var(--muted))', background: 'transparent' }}
                 >
                   ＋ {lang === 'ja' ? 'カスタムブロック追加' : 'Add custom block'}
@@ -1849,35 +1849,35 @@ export default function Loom() {
           <div
             onMouseDown={startOutputDrag}
             onTouchStart={startOutputDrag}
-            className="flex-shrink-0 h-[14px] flex items-center justify-center cursor-ns-resize group select-none"
+            className="flex-shrink-0 h-3.5 flex items-center justify-center cursor-ns-resize group select-none"
             style={{ touchAction: 'none' }}
             title={lang === 'ja' ? 'ドラッグで高さ調整' : 'Drag to resize'}
           >
-            <div className="w-10 h-[3px] rounded-full bg-dim group-hover:bg-muted transition-colors duration-150" />
+            <div className="w-10 h-[0.1875rem] rounded-full bg-dim group-hover:bg-muted transition-colors duration-150" />
           </div>
         )}
-        <div style={{ maxWidth: contentMax }} className="mx-auto px-[14px] pb-2 pt-1 flex flex-col flex-1 min-h-0 w-full overflow-hidden">
+        <div style={{ maxWidth: contentMax }} className="mx-auto px-3.5 pb-2 pt-1 flex flex-col flex-1 min-h-0 w-full overflow-hidden">
 
           {/* ── Output controls: Tool + Tabs + Actions ── */}
           {isMobile ? (
             <>
               {/* Mobile Row 1: Tool picker + Tab buttons */}
-              <div className="flex-shrink-0 flex items-center gap-[5px] mb-[5px]">
+              <div className="flex-shrink-0 flex items-center gap-[0.3125rem] mb-[0.3125rem]">
                 <div className="relative flex-shrink-0">
                   <button onClick={() => setToolPickerOpen(p => !p)} title={lang === 'ja' ? tool.note : tool.noteEn}
-                    className="flex items-center gap-[4px] rounded-[6px] px-[8px] py-[4px] text-[11px] font-mono font-bold cursor-pointer whitespace-nowrap"
+                    className="flex items-center gap-1 rounded-md px-2 py-1 text-[0.6875rem] font-mono font-bold cursor-pointer whitespace-nowrap"
                     style={{ background: 'rgb(var(--tint-accent))', border: '1px solid rgb(var(--c-blue) / 0.35)', color: 'rgb(var(--c-blue-s))' }}>
-                    {tool.icon} {lang === 'ja' ? tool.name : tool.nameEn}<span className="text-[9px] opacity-40 ml-[2px]">▾</span>
+                    {tool.icon} {lang === 'ja' ? tool.name : tool.nameEn}<span className="text-[0.5625rem] opacity-40 ml-0.5">▾</span>
                   </button>
                   {toolPickerOpen && (
                     <>
                       <div className="fixed inset-0 z-[149]" onClick={() => setToolPickerOpen(false)} />
-                      <div className="absolute left-0 top-full mt-[4px] z-[150] bg-surface border border-line rounded-[9px] shadow-xl py-[4px] min-w-[220px]">
+                      <div className="absolute left-0 top-full mt-1 z-[150] bg-surface border border-line rounded-[0.5625rem] shadow-xl py-1 min-w-[13.75rem]">
                         {TOOLS.map(t => (
                           <button key={t.id} onClick={() => { setActiveTool(t.id); setEditingSuffix(false); setToolPickerOpen(false); }}
-                            className="w-full text-left px-[12px] py-[7px] text-[11px] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
+                            className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
                             style={{ color: activeTool === t.id ? 'rgb(var(--c-blue-s))' : 'rgb(var(--text) / 0.8)' }}>
-                            <span className="w-4 text-center text-[10px]">{activeTool === t.id ? '✓' : ''}</span>
+                            <span className="w-4 text-center text-[0.625rem]">{activeTool === t.id ? '✓' : ''}</span>
                             <span className="flex-1">{t.icon} {t.name}</span>
                           </button>
                         ))}
@@ -1888,49 +1888,49 @@ export default function Loom() {
                 {[{ id: 'positive', label: '✦ Pos', col: 'rgb(var(--c-blue))', bg: 'rgb(var(--c-blue) / 0.12)', bd: 'rgb(var(--c-blue) / 0.5)' }, { id: 'negative', label: '✕ Neg', col: 'rgb(var(--c-red))', bg: 'rgb(var(--c-red) / 0.12)', bd: 'rgb(var(--c-red) / 0.5)' }, { id: 'natural', label: lang === 'ja' ? '✎ 文' : '✎ Nat', col: 'rgb(var(--c-green))', bg: 'rgb(var(--c-green) / 0.12)', bd: 'rgb(var(--c-green) / 0.5)' }].map(tab => (
                   <button key={tab.id} onClick={() => { setOutputTab(tab.id); setOutputEditMode(false); }}
                     style={{ background: outputTab === tab.id ? tab.bg : 'transparent', border: `1px solid ${outputTab === tab.id ? tab.bd : 'rgb(var(--dim))'}`, color: outputTab === tab.id ? tab.col : 'rgb(var(--muted))', fontWeight: outputTab === tab.id ? 700 : 400 }}
-                    className="rounded-[6px] px-[9px] py-[3px] text-[11px] cursor-pointer font-mono transition-all duration-[120ms] flex-shrink-0 whitespace-nowrap">
+                    className="rounded-md px-[0.5625rem] py-[0.1875rem] text-[0.6875rem] cursor-pointer font-mono transition-all duration-[120ms] flex-shrink-0 whitespace-nowrap">
                     {tab.label}
                   </button>
                 ))}
                 {outputTab === 'natural' && (
                   <>
                     <button onClick={() => setNaturalLang(l => l === 'ja' ? 'en' : 'ja')}
-                      className="rounded-[6px] px-[6px] py-[3px] text-[10px] font-mono cursor-pointer flex-shrink-0"
+                      className="rounded-md px-1.5 py-[0.1875rem] text-[0.625rem] font-mono cursor-pointer flex-shrink-0"
                       style={{ background: 'rgb(var(--c-green) / 0.1)', border: '1px solid rgb(var(--c-green) / 0.35)', color: 'rgb(var(--c-green))' }}>
                       {naturalLang === 'ja' ? 'JA' : 'EN'}
                     </button>
                     {apiConfig.apiKey && (
                       aiBusy
-                        ? <span className="text-[10px] font-mono text-muted flex-shrink-0">✨...</span>
+                        ? <span className="text-[0.625rem] font-mono text-muted flex-shrink-0">✨...</span>
                         : <button onClick={handleAiPolish} disabled={!naturalText}
-                            className="rounded-[6px] px-[7px] py-[3px] text-[10px] font-mono cursor-pointer flex-shrink-0 disabled:opacity-40"
+                            className="rounded-md px-[0.4375rem] py-[0.1875rem] text-[0.625rem] font-mono cursor-pointer flex-shrink-0 disabled:opacity-40"
                             style={{ background: 'rgb(var(--c-purple) / 0.1)', border: '1px solid rgb(var(--c-purple) / 0.4)', color: 'rgb(var(--c-purple))' }}
                             title={lang === 'ja' ? '再生成' : 'Regenerate'}>🔄</button>
                     )}
                     {aiResult && (
                       <button onClick={() => setAiResult('')}
-                        className="rounded-[6px] px-[6px] py-[3px] text-[10px] font-mono cursor-pointer flex-shrink-0 text-muted border border-dim bg-transparent"
+                        className="rounded-md px-1.5 py-[0.1875rem] text-[0.625rem] font-mono cursor-pointer flex-shrink-0 text-muted border border-dim bg-transparent"
                         title={lang === 'ja' ? 'AIテキストをクリア' : 'Clear AI text'}>✕</button>
                     )}
                   </>
                 )}
               </div>
               {/* Mobile Row 2: Action buttons — PC order: ▼ 📸 🗑 ✏️ | flex-1 | token | COPY */}
-              <div className={`flex-shrink-0 flex items-center gap-[5px] ${outputExpanded ? 'mb-[6px]' : 'mb-0'}`}>
+              <div className={`flex-shrink-0 flex items-center gap-[0.3125rem] ${outputExpanded ? 'mb-1.5' : 'mb-0'}`}>
                 <button onClick={() => setOutputExpanded(p => !p)}
-                  className="bg-transparent border border-dim rounded-[6px] text-muted cursor-pointer text-[11px] px-[7px] py-[5px]">{outputExpanded ? '▼' : '▲'}</button>
+                  className="bg-transparent border border-dim rounded-md text-muted cursor-pointer text-[0.6875rem] px-[0.4375rem] py-[0.3125rem]">{outputExpanded ? '▼' : '▲'}</button>
                 <button onClick={handleSnapshot} disabled={!posText} title={lang === 'ja' ? 'スナップショット（履歴に手動保存）' : 'Snapshot'}
                   style={{ background: snapped ? warnColor + '22' : 'none', border: `1px solid ${snapped ? warnColor + '60' : 'rgb(var(--dim))'}` }}
-                  className={`rounded-[6px] px-[9px] py-[5px] text-[12px] inline-flex items-center justify-center leading-none transition-all duration-200 ${snapped ? 'text-warn' : 'text-muted'} ${posText ? 'cursor-pointer' : 'cursor-default'}`}>📸</button>
+                  className={`rounded-md px-[0.5625rem] py-[0.3125rem] text-xs inline-flex items-center justify-center leading-none transition-all duration-200 ${snapped ? 'text-warn' : 'text-muted'} ${posText ? 'cursor-pointer' : 'cursor-default'}`}>📸</button>
                 <button onClick={handleResetAll} title={lang === 'ja' ? 'プロンプトをすべてリセット' : 'Reset all'}
-                  className="rounded-[6px] px-[9px] py-[5px] text-[11px] cursor-pointer font-mono border border-dim text-muted"
+                  className="rounded-md px-[0.5625rem] py-[0.3125rem] text-[0.6875rem] cursor-pointer font-mono border border-dim text-muted"
                   onMouseOver={e => { e.currentTarget.style.borderColor = dangerColor + '80'; e.currentTarget.style.color = dangerColor; }}
                   onMouseOut={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.color = ''; }}>🗑</button>
                 {outputTab !== 'natural' && (
                   <button onClick={() => { if (!outputEditMode) { if (!outputEditText) setOutputEditText(currentText); setOutputEditMode(true); setOutputExpanded(true); } else { setOutputEditMode(false); } }}
                     disabled={!currentText} title={lang === 'ja' ? 'コピー前に手直し' : 'Edit before copy'}
                     style={{ background: outputEditMode ? warnColor + '22' : 'none', border: `1px solid ${outputEditMode ? warnColor + '60' : 'rgb(var(--dim))'}`, color: outputEditMode ? warnColor : 'rgb(var(--muted))' }}
-                    className="rounded-[6px] px-[9px] py-[5px] text-[11px] transition-all duration-200 cursor-pointer disabled:cursor-default font-mono">✏️</button>
+                    className="rounded-md px-[0.5625rem] py-[0.3125rem] text-[0.6875rem] transition-all duration-200 cursor-pointer disabled:cursor-default font-mono">✏️</button>
                 )}
                 {/* Mobile MJ AR chips */}
                 {activeTool === 'mj' && outputTab !== 'natural' && (() => {
@@ -1942,10 +1942,10 @@ export default function Loom() {
                     setToolSuffixes(prev => ({ ...prev, [activeTool]: next }));
                   };
                   return (
-                    <div className="flex flex-shrink-0 rounded-[6px] overflow-hidden border border-dim">
+                    <div className="flex flex-shrink-0 rounded-md overflow-hidden border border-dim">
                       {['1:1', '3:2', '16:9', '9:16'].map(r => (
                         <button key={r} onClick={() => applyAr(r)}
-                          className="bg-transparent border-r border-dim last:border-r-0 px-[6px] py-[3px] text-[9px] font-mono cursor-pointer whitespace-nowrap transition-colors duration-100"
+                          className="bg-transparent border-r border-dim last:border-r-0 px-1.5 py-[0.1875rem] text-[0.5625rem] font-mono cursor-pointer whitespace-nowrap transition-colors duration-100"
                           style={{ background: currentAr === r ? 'rgb(var(--c-blue) / 0.15)' : 'transparent', color: currentAr === r ? 'rgb(var(--c-blue))' : 'rgb(var(--muted))' }}>
                           {r}
                         </button>
@@ -1956,54 +1956,54 @@ export default function Loom() {
                 <div className="flex-1" />
                 {outputTab !== 'natural' && tagCount > 0 && (
                   <span style={{ color: tokenColor, background: tokenColor + '15', border: `1px solid ${tokenColor}40` }}
-                    className="text-[10px] font-mono px-[6px] py-[3px] rounded-[4px] whitespace-nowrap">
+                    className="text-[0.625rem] font-mono px-1.5 py-[0.1875rem] rounded whitespace-nowrap">
                     {tagCount}t·{textToCopy.length}
                   </span>
                 )}
                 <button onClick={handleCopy} disabled={!textToCopy}
                   style={{ background: copied ? goodColor + '20' : textToCopy ? 'linear-gradient(135deg,#4a6fff,#8a4fff)' : 'rgb(var(--dim))', border: `1px solid ${copied ? goodColor + '60' : 'transparent'}`, color: copied ? goodColor : textToCopy ? 'white' : 'rgb(var(--muted))', cursor: textToCopy ? 'pointer' : 'default', letterSpacing: '0.04em' }}
-                  className="rounded-[8px] px-[16px] py-[6px] text-[12px] font-bold transition-all duration-200 min-w-[76px]">
+                  className="rounded-lg px-4 py-1.5 text-xs font-bold transition-all duration-200 min-w-[4.75rem]">
                   {copied ? '✓' : '📋 COPY'}
                 </button>
               </div>
             </>
           ) : (
             /* PC: 2-row layout */
-            <div className="flex-shrink-0 flex flex-col gap-[5px]">
+            <div className="flex-shrink-0 flex flex-col gap-[0.3125rem]">
               {/* Row 1: Tool | │ | ポジティブ ネガティブ 自然文 [JA/EN] | flex-1 | 🎲バリエ | ◎解析 */}
-              <div className="flex items-center gap-[6px]">
+              <div className="flex items-center gap-1.5">
                 {/* Tool picker */}
                 <div className="relative flex-shrink-0">
                   <button onClick={() => setToolPickerOpen(p => !p)} title={lang === 'ja' ? tool.note : tool.noteEn}
-                    className="flex items-center gap-[5px] rounded-[6px] px-[9px] py-[4px] text-[11px] font-mono font-bold cursor-pointer whitespace-nowrap"
+                    className="flex items-center gap-[0.3125rem] rounded-md px-[0.5625rem] py-1 text-[0.6875rem] font-mono font-bold cursor-pointer whitespace-nowrap"
                     style={{ background: 'rgb(var(--tint-accent))', border: '1px solid rgb(var(--c-blue) / 0.35)', color: 'rgb(var(--c-blue-s))' }}>
                     {tool.icon} {lang === 'ja' ? tool.name : tool.nameEn}
-                    {tool.stripWeights && <span className="text-[9px] text-warn font-normal">w-off</span>}
-                    <span className="text-[9px] opacity-40">▾</span>
+                    {tool.stripWeights && <span className="text-[0.5625rem] text-warn font-normal">w-off</span>}
+                    <span className="text-[0.5625rem] opacity-40">▾</span>
                   </button>
                   {toolPickerOpen && (
                     <>
                       <div className="fixed inset-0 z-[149]" onClick={() => setToolPickerOpen(false)} />
-                      <div className="absolute left-0 top-full mt-[4px] z-[150] bg-surface border border-line rounded-[9px] shadow-xl py-[4px] min-w-[240px]">
+                      <div className="absolute left-0 top-full mt-1 z-[150] bg-surface border border-line rounded-[0.5625rem] shadow-xl py-1 min-w-[15rem]">
                         {TOOLS.map(t => (
                           <button key={t.id} onClick={() => { setActiveTool(t.id); setEditingSuffix(false); setToolPickerOpen(false); }}
-                            className="w-full text-left px-[12px] py-[7px] text-[11px] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
+                            className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
                             style={{ color: activeTool === t.id ? 'rgb(var(--c-blue-s))' : 'rgb(var(--text) / 0.8)' }}>
-                            <span className="w-4 text-center text-[10px]">{activeTool === t.id ? '✓' : ''}</span>
+                            <span className="w-4 text-center text-[0.625rem]">{activeTool === t.id ? '✓' : ''}</span>
                             <span className="flex-1">{t.icon} {t.name}</span>
-                            <span className="text-[10px] text-muted">{lang === 'ja' ? t.note : t.noteEn}</span>
+                            <span className="text-[0.625rem] text-muted">{lang === 'ja' ? t.note : t.noteEn}</span>
                           </button>
                         ))}
                       </div>
                     </>
                   )}
                 </div>
-                <span className="text-dim flex-shrink-0 select-none text-[11px]">│</span>
+                <span className="text-dim flex-shrink-0 select-none text-[0.6875rem]">│</span>
                 {/* Tabs */}
                 {[{ id: 'positive', label: lang === 'ja' ? '✦ ポジティブ' : '✦ Positive', col: 'rgb(var(--c-blue))', bg: 'rgb(var(--c-blue) / 0.12)', bd: 'rgb(var(--c-blue) / 0.5)' }, { id: 'negative', label: lang === 'ja' ? '✕ ネガティブ' : '✕ Negative', col: 'rgb(var(--c-red))', bg: 'rgb(var(--c-red) / 0.12)', bd: 'rgb(var(--c-red) / 0.5)' }, { id: 'natural', label: lang === 'ja' ? '✎ 自然文' : '✎ Natural', col: 'rgb(var(--c-green))', bg: 'rgb(var(--c-green) / 0.12)', bd: 'rgb(var(--c-green) / 0.5)' }].map(tab => (
                   <button key={tab.id} onClick={() => { setOutputTab(tab.id); setOutputEditMode(false); }}
                     style={{ background: outputTab === tab.id ? tab.bg : 'transparent', border: `1px solid ${outputTab === tab.id ? tab.bd : 'rgb(var(--dim))'}`, color: outputTab === tab.id ? tab.col : 'rgb(var(--muted))', fontWeight: outputTab === tab.id ? 700 : 400 }}
-                    className="rounded-[6px] px-[10px] py-1 text-[11px] cursor-pointer font-mono transition-all duration-[120ms] flex-shrink-0">
+                    className="rounded-md px-2.5 py-1 text-[0.6875rem] cursor-pointer font-mono transition-all duration-[120ms] flex-shrink-0">
                     {tab.label}
                   </button>
                 ))}
@@ -2011,64 +2011,64 @@ export default function Loom() {
                   <>
                     <button onClick={() => setNaturalLang(l => l === 'ja' ? 'en' : 'ja')}
                       title={lang === 'ja' ? '日本語/英語を切替' : 'Toggle Japanese / English'}
-                      className="rounded-[6px] px-[8px] py-1 text-[10px] font-mono cursor-pointer flex-shrink-0"
+                      className="rounded-md px-2 py-1 text-[0.625rem] font-mono cursor-pointer flex-shrink-0"
                       style={{ background: 'rgb(var(--c-green) / 0.1)', border: '1px solid rgb(var(--c-green) / 0.35)', color: 'rgb(var(--c-green))' }}>
                       {naturalLang === 'ja' ? '日本語' : 'EN'}
                     </button>
                     {apiConfig.apiKey && (
                       aiBusy
-                        ? <span className="text-[10px] font-mono text-muted flex-shrink-0">✨...</span>
+                        ? <span className="text-[0.625rem] font-mono text-muted flex-shrink-0">✨...</span>
                         : <button onClick={handleAiPolish} disabled={!naturalText}
-                            className="rounded-[6px] px-[8px] py-1 text-[10px] font-mono cursor-pointer flex-shrink-0 disabled:opacity-40"
+                            className="rounded-md px-2 py-1 text-[0.625rem] font-mono cursor-pointer flex-shrink-0 disabled:opacity-40"
                             style={{ background: 'rgb(var(--c-purple) / 0.1)', border: '1px solid rgb(var(--c-purple) / 0.4)', color: 'rgb(var(--c-purple))' }}
                             title={lang === 'ja' ? '再生成' : 'Regenerate'}>🔄</button>
                     )}
                     {aiResult && (
                       <button onClick={() => setAiResult('')}
-                        className="rounded-[6px] px-[7px] py-1 text-[10px] font-mono cursor-pointer flex-shrink-0 text-muted border border-dim bg-transparent"
+                        className="rounded-md px-[0.4375rem] py-1 text-[0.625rem] font-mono cursor-pointer flex-shrink-0 text-muted border border-dim bg-transparent"
                         title={lang === 'ja' ? 'AIテキストをクリア' : 'Clear AI text'}>✕</button>
                     )}
                   </>
                 )}
-                <span className="text-dim flex-shrink-0 select-none text-[11px] mx-[2px]">│</span>
+                <span className="text-dim flex-shrink-0 select-none text-[0.6875rem] mx-0.5">│</span>
                 {/* バリエ + 解析 */}
                 <button onClick={startVariations} disabled={!posText}
                   title={lang === 'ja' ? 'バリエーションを3種類生成' : 'Generate 3 variations'}
                   style={{ background: variationsOpen ? 'rgb(var(--tint-accent))' : 'none', border: `1px solid ${variationsOpen ? 'rgb(var(--c-blue) / 0.5)' : 'rgb(var(--dim))'}`, color: variationsOpen ? 'rgb(var(--c-blue-s))' : 'rgb(var(--muted))' }}
-                  className="rounded-[6px] px-[9px] py-[4px] text-[11px] cursor-pointer disabled:cursor-default font-mono flex-shrink-0">
+                  className="rounded-md px-[0.5625rem] py-1 text-[0.6875rem] cursor-pointer disabled:cursor-default font-mono flex-shrink-0">
                   🎲 {lang === 'ja' ? 'バリエ' : 'Vary'}
                 </button>
                 <button onClick={() => { setAnalyzeOpen(p => { if (p) setAnalyzeText(''); return !p; }); setOutputExpanded(true); }}
                   title={lang === 'ja' ? 'プロンプト逆解析 — 貼り付けたプロンプトのタグをハイライト (A)' : 'Analyze prompt — highlight matching tags (A)'}
                   style={{ background: analyzeOpen ? 'rgb(var(--c-teal) / 0.13)' : 'none', border: `1px solid ${analyzeOpen ? 'rgb(var(--c-teal) / 0.4)' : 'rgb(var(--dim))'}`, color: analyzeOpen ? 'rgb(var(--c-teal))' : 'rgb(var(--muted))' }}
-                  className="rounded-[6px] px-[9px] py-[4px] text-[11px] cursor-pointer font-mono flex-shrink-0">
+                  className="rounded-md px-[0.5625rem] py-1 text-[0.6875rem] cursor-pointer font-mono flex-shrink-0">
                   ◎ {lang === 'ja' ? '解析' : 'Analyze'}
                 </button>
               </div>
               {/* Row 2: ▼ 📸 🗑 ✏️ [sfx] | flex-1 | [token] [COPY] */}
-              <div className={`flex items-center gap-[6px] ${outputExpanded ? 'mb-[2px]' : 'mb-0'}`}>
+              <div className={`flex items-center gap-1.5 ${outputExpanded ? 'mb-0.5' : 'mb-0'}`}>
                 {/* Left: collapse + snapshot + reset + edit */}
                 <button onClick={() => setOutputExpanded(p => !p)} title={lang === 'ja' ? '出力エリアを折りたたむ/展開' : 'Collapse/expand output'}
-                  className="bg-transparent border border-dim rounded-[6px] text-muted cursor-pointer text-[11px] px-[7px] py-[4px] flex-shrink-0">{outputExpanded ? '▼' : '▲'}</button>
+                  className="bg-transparent border border-dim rounded-md text-muted cursor-pointer text-[0.6875rem] px-[0.4375rem] py-1 flex-shrink-0">{outputExpanded ? '▼' : '▲'}</button>
                 <button onClick={handleSnapshot} disabled={!posText} title={lang === 'ja' ? 'スナップショット（履歴に手動保存）' : 'Snapshot'}
                   style={{ background: snapped ? warnColor + '22' : 'none', border: `1px solid ${snapped ? warnColor + '60' : 'rgb(var(--dim))'}` }}
-                  className={`rounded-[6px] px-[9px] py-[4px] text-[12px] inline-flex items-center justify-center leading-none transition-all duration-200 flex-shrink-0 ${snapped ? 'text-warn' : 'text-muted'} ${posText ? 'cursor-pointer' : 'cursor-default'}`}>📸</button>
+                  className={`rounded-md px-[0.5625rem] py-1 text-xs inline-flex items-center justify-center leading-none transition-all duration-200 flex-shrink-0 ${snapped ? 'text-warn' : 'text-muted'} ${posText ? 'cursor-pointer' : 'cursor-default'}`}>📸</button>
                 <button onClick={handleResetAll} title={lang === 'ja' ? 'プロンプトをすべてリセット' : 'Reset all prompts'}
-                  className="rounded-[6px] px-[9px] py-[4px] text-[11px] cursor-pointer font-mono border border-dim text-muted transition-all duration-200 flex-shrink-0"
+                  className="rounded-md px-[0.5625rem] py-1 text-[0.6875rem] cursor-pointer font-mono border border-dim text-muted transition-all duration-200 flex-shrink-0"
                   onMouseOver={e => { e.currentTarget.style.borderColor = dangerColor + '80'; e.currentTarget.style.color = dangerColor; }}
                   onMouseOut={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.color = ''; }}>🗑</button>
                 {outputTab !== 'natural' && (
                   <button onClick={() => { if (!outputEditMode) { if (!outputEditText) setOutputEditText(currentText); setOutputEditMode(true); setOutputExpanded(true); } else { setOutputEditMode(false); } }}
                     disabled={!currentText} title={lang === 'ja' ? 'コピー前に手直し' : 'Edit before copy'}
                     style={{ background: outputEditMode ? warnColor + '22' : 'none', border: `1px solid ${outputEditMode ? warnColor + '60' : 'rgb(var(--dim))'}`, color: outputEditMode ? warnColor : 'rgb(var(--muted))' }}
-                    className="rounded-[6px] px-[9px] py-[4px] text-[11px] transition-all duration-200 cursor-pointer disabled:cursor-default font-mono flex-shrink-0">✏️</button>
+                    className="rounded-md px-[0.5625rem] py-1 text-[0.6875rem] transition-all duration-200 cursor-pointer disabled:cursor-default font-mono flex-shrink-0">✏️</button>
                 )}
                 {apiConfig.apiKey && outputTab === 'positive' && (
                   <button onClick={() => { if (tagSuggestOpen) { setTagSuggestOpen(false); } else { handleTagSuggest(); setOutputExpanded(true); } }}
                     disabled={tagSuggestBusy || !posText}
                     title={lang === 'ja' ? 'AIタグ提案' : 'AI tag suggestions'}
                     style={{ background: tagSuggestOpen ? 'rgb(var(--c-green) / 0.13)' : 'none', border: `1px solid ${tagSuggestOpen ? 'rgb(var(--c-green) / 0.5)' : 'rgb(var(--dim))'}`, color: tagSuggestOpen ? 'rgb(var(--c-green))' : 'rgb(var(--muted))' }}
-                    className="rounded-[6px] px-[9px] py-[4px] text-[11px] cursor-pointer disabled:opacity-40 disabled:cursor-default font-mono flex-shrink-0 transition-all duration-150">
+                    className="rounded-md px-[0.5625rem] py-1 text-[0.6875rem] cursor-pointer disabled:opacity-40 disabled:cursor-default font-mono flex-shrink-0 transition-all duration-150">
                     {tagSuggestBusy ? '🤖...' : `🤖 ${lang === 'ja' ? '提案' : 'Suggest'}`}
                   </button>
                 )}
@@ -2089,25 +2089,25 @@ export default function Loom() {
                             onChange={e => setToolSuffixes(prev => ({ ...prev, [activeTool]: e.target.value }))}
                             onKeyDown={e => { if (e.key === 'Enter' || e.key === 'Escape') setEditingSuffix(false); }}
                             placeholder="e.g. --ar 16:9 --v 8"
-                            className="bg-bg rounded-[5px] text-fg text-[11px] px-[9px] py-[3px] outline-none font-mono flex-shrink-0"
+                            className="bg-bg rounded-[0.3125rem] text-fg text-[0.6875rem] px-[0.5625rem] py-[0.1875rem] outline-none font-mono flex-shrink-0"
                             style={{ border: '1px solid rgb(var(--c-blue) / 0.4)', width: '150px' }}
                           />
                           <button onClick={() => setEditingSuffix(false)}
-                            className="bg-transparent border border-dim rounded-[6px] text-muted px-[7px] py-[4px] text-[11px] cursor-pointer flex-shrink-0">✓</button>
+                            className="bg-transparent border border-dim rounded-md text-muted px-[0.4375rem] py-1 text-[0.6875rem] cursor-pointer flex-shrink-0">✓</button>
                         </>
                       ) : (
                         <button onClick={() => setEditingSuffix(s => !s)} title={lang === 'ja' ? 'suffixを編集' : 'Edit suffix'}
-                          className="rounded-[6px] px-[7px] py-[4px] text-[10px] font-mono cursor-pointer whitespace-nowrap flex-shrink-0"
+                          className="rounded-md px-[0.4375rem] py-1 text-[0.625rem] font-mono cursor-pointer whitespace-nowrap flex-shrink-0"
                           style={{ background: sfxVal ? 'rgb(var(--tint-accent))' : 'transparent', border: `1px solid ${sfxVal ? 'rgb(var(--c-blue) / 0.4)' : 'rgb(var(--dim))'}`, color: sfxVal ? 'rgb(var(--c-blue))' : 'rgb(var(--muted))' }}>
                           {sfxVal ? (sfxVal.length > 16 ? sfxVal.slice(0, 16) + '…' : sfxVal) : '+ sfx'}
                         </button>
                       )}
                       {/* AR ratio quick chips — shown alongside sfx */}
                       {!editingSuffix && (
-                        <div className="flex flex-shrink-0 rounded-[6px] overflow-hidden border border-dim">
+                        <div className="flex flex-shrink-0 rounded-md overflow-hidden border border-dim">
                           {['1:1', '3:2', '16:9', '9:16'].map(r => (
                             <button key={r} onClick={() => applyAr(r)}
-                              className="bg-transparent border-r border-dim last:border-r-0 px-[6px] py-[3px] text-[9px] font-mono cursor-pointer whitespace-nowrap transition-colors duration-100"
+                              className="bg-transparent border-r border-dim last:border-r-0 px-1.5 py-[0.1875rem] text-[0.5625rem] font-mono cursor-pointer whitespace-nowrap transition-colors duration-100"
                               style={{ background: currentAr === r ? 'rgb(var(--c-blue) / 0.15)' : 'transparent', color: currentAr === r ? 'rgb(var(--c-blue))' : 'rgb(var(--muted))' }}>
                               {r}
                             </button>
@@ -2121,13 +2121,13 @@ export default function Loom() {
                 {/* Right: token count + COPY */}
                 {outputTab !== 'natural' && tagCount > 0 && (
                   <span style={{ color: tokenColor, background: tokenColor + '15', border: `1px solid ${tokenColor}40` }}
-                    className="text-[10px] font-mono px-2 py-[3px] rounded-[4px] whitespace-nowrap flex-shrink-0">
+                    className="text-[0.625rem] font-mono px-2 py-[0.1875rem] rounded whitespace-nowrap flex-shrink-0">
                     {tagCount}{lang === 'ja' ? 'タグ' : 't'} · {textToCopy.length}{lang === 'ja' ? '字' : 'ch'}{textToCopy.length > WARN_LEN && ' ⚠️'}
                   </span>
                 )}
                 <button onClick={handleCopy} disabled={!textToCopy}
                   style={{ background: copied ? goodColor + '20' : textToCopy ? 'linear-gradient(135deg,#4a6fff,#8a4fff)' : 'rgb(var(--dim))', border: `1px solid ${copied ? goodColor + '60' : 'transparent'}`, color: copied ? goodColor : textToCopy ? 'white' : 'rgb(var(--muted))', cursor: textToCopy ? 'pointer' : 'default', letterSpacing: '0.04em' }}
-                  className="rounded-[8px] px-[20px] py-[6px] text-[13px] font-bold transition-all duration-200 min-w-[90px] flex-shrink-0">
+                  className="rounded-lg px-5 py-1.5 text-[0.8125rem] font-bold transition-all duration-200 min-w-[5.625rem] flex-shrink-0">
                   {copied ? '✓ Copied!' : '📋 COPY'}
                 </button>
               </div>
@@ -2136,27 +2136,27 @@ export default function Loom() {
 
           {/* Tag suggest panel */}
           {outputExpanded && tagSuggestOpen && (
-            <div className="flex-shrink-0 mb-[6px] p-[10px] rounded-[8px]"
+            <div className="flex-shrink-0 mb-1.5 p-2.5 rounded-lg"
               style={{ background: 'rgb(var(--c-green) / 0.04)', border: '1px solid rgb(var(--c-green) / 0.2)' }}>
-              <div className="flex items-center justify-between mb-[8px]">
-                <span className="text-[10px] font-mono font-bold" style={{ color: 'rgb(var(--c-green))' }}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[0.625rem] font-mono font-bold" style={{ color: 'rgb(var(--c-green))' }}>
                   🤖 {lang === 'ja' ? 'AIタグ提案' : 'AI Tag Suggestions'}
                 </span>
                 <button onClick={() => setTagSuggestOpen(false)}
-                  className="text-[10px] font-mono text-muted cursor-pointer bg-transparent border-none">✕</button>
+                  className="text-[0.625rem] font-mono text-muted cursor-pointer bg-transparent border-none">✕</button>
               </div>
               {tagSuggestError && (
-                <div className="text-[11px] font-mono text-red-400 mb-[6px]">{tagSuggestError}</div>
+                <div className="text-[0.6875rem] font-mono text-red-400 mb-1.5">{tagSuggestError}</div>
               )}
-              <div className="flex flex-col gap-[5px]">
+              <div className="flex flex-col gap-[0.3125rem]">
                 {tagSuggestions.map((s, i) => {
                   const block = blocks.find(b => b.id === s.block);
                   return (
-                    <div key={i} className="flex items-center gap-[8px] bg-surface rounded-[6px] px-[10px] py-[7px]">
+                    <div key={i} className="flex items-center gap-2 bg-surface rounded-md px-2.5 py-[0.4375rem]">
                       <div className="flex-1 min-w-0">
-                        <span className="text-[11px] font-mono text-fg font-bold">{s.tag}</span>
-                        <span className="text-[10px] font-mono text-dim ml-[7px]">→ {block?.name ?? s.block}</span>
-                        <div className="text-[10px] font-mono text-muted mt-[1px]">{s.reason}</div>
+                        <span className="text-[0.6875rem] font-mono text-fg font-bold">{s.tag}</span>
+                        <span className="text-[0.625rem] font-mono text-dim ml-[0.4375rem]">→ {block?.name ?? s.block}</span>
+                        <div className="text-[0.625rem] font-mono text-muted mt-[0.0625rem]">{s.reason}</div>
                       </div>
                       <button
                         onClick={() => {
@@ -2165,7 +2165,7 @@ export default function Loom() {
                           setTagSuggestions(prev => prev.filter((_, j) => j !== i));
                         }}
                         disabled={!block}
-                        className="rounded-[5px] px-[9px] py-[4px] text-[10px] font-mono cursor-pointer disabled:opacity-40 flex-shrink-0 border-none text-white"
+                        className="rounded-[0.3125rem] px-[0.5625rem] py-1 text-[0.625rem] font-mono cursor-pointer disabled:opacity-40 flex-shrink-0 border-none text-white"
                         style={{ background: 'rgb(var(--c-green) / 0.8)' }}>
                         + {lang === 'ja' ? '追加' : 'Add'}
                       </button>
@@ -2173,7 +2173,7 @@ export default function Loom() {
                   );
                 })}
                 {tagSuggestions.length === 0 && !tagSuggestError && (
-                  <div className="text-[11px] font-mono text-muted text-center py-[4px]">
+                  <div className="text-[0.6875rem] font-mono text-muted text-center py-1">
                     {lang === 'ja' ? 'すべて追加しました' : 'All suggestions added'}
                   </div>
                 )}
@@ -2183,23 +2183,23 @@ export default function Loom() {
 
           {/* Analyze panel */}
           {outputExpanded && analyzeOpen && (
-            <div className="flex-shrink-0 mb-[6px] p-[8px] rounded-[7px]"
+            <div className="flex-shrink-0 mb-1.5 p-2 rounded-[0.4375rem]"
               style={{ background: 'rgb(var(--c-teal) / 0.05)', border: '1px solid rgb(var(--c-teal) / 0.2)' }}>
-              <div className="flex items-center gap-2 mb-[5px]">
-                <span className="text-[10px] font-mono font-bold" style={{ color: 'rgb(var(--c-teal))' }}>◎ {lang === 'ja' ? 'プロンプト逆解析' : 'Prompt Analyze'}</span>
+              <div className="flex items-center gap-2 mb-[0.3125rem]">
+                <span className="text-[0.625rem] font-mono font-bold" style={{ color: 'rgb(var(--c-teal))' }}>◎ {lang === 'ja' ? 'プロンプト逆解析' : 'Prompt Analyze'}</span>
                 {analyzeText && (
-                  <span className="text-[10px] font-mono text-muted">
+                  <span className="text-[0.625rem] font-mono text-muted">
                     — {blocks.reduce((s, b) => s + b.cats.flatMap(c => c.t).filter(t => { try { return analyzeText && analyzeText.split(',').some(seg => seg.trim().replace(/^\([^:]+:|[\d.]+\)$/g, '').trim().toLowerCase() === t.en.toLowerCase()); } catch { return false; } }).length, 0)}{lang === 'ja' ? '件一致' : ' matched'}
                   </span>
                 )}
                 <button onClick={() => { setAnalyzeText(''); setAnalyzeOpen(false); }}
-                  className="ml-auto text-[10px] text-muted cursor-pointer bg-transparent border-none">✕ {lang === 'ja' ? '閉じる' : 'Close'}</button>
+                  className="ml-auto text-[0.625rem] text-muted cursor-pointer bg-transparent border-none">✕ {lang === 'ja' ? '閉じる' : 'Close'}</button>
               </div>
               <textarea
                 value={analyzeText}
                 onChange={e => setAnalyzeText(e.target.value)}
                 placeholder={lang === 'ja' ? 'プロンプトをここに貼り付け → 一致するタグが緑でハイライトされます' : 'Paste a prompt here → matching tags are highlighted green in the blocks above'}
-                className="w-full bg-bg border border-dim rounded-[5px] text-fg text-[11px] font-mono px-[9px] py-[6px] outline-none resize-none"
+                className="w-full bg-bg border border-dim rounded-[0.3125rem] text-fg text-[0.6875rem] font-mono px-[0.5625rem] py-1.5 outline-none resize-none"
                 style={{ minHeight: '54px' }}
               />
             </div>
@@ -2207,17 +2207,17 @@ export default function Loom() {
 
           {/* Balance Meter */}
           {outputExpanded && totalTags > 0 && outputTab === 'positive' && (
-            <div className="flex-shrink-0 mb-[6px]">
-              <div className="flex h-[6px] rounded-full overflow-hidden gap-[1px]" title={lang === 'ja' ? 'ブロック別タグ配分' : 'Tag distribution by block'}>
+            <div className="flex-shrink-0 mb-1.5">
+              <div className="flex h-1.5 rounded-full overflow-hidden gap-[0.0625rem]" title={lang === 'ja' ? 'ブロック別タグ配分' : 'Tag distribution by block'}>
                 {balanceBlocks.map(b => (
                   <div key={b.id} style={{ background: b.color, flex: countTags(b.text) / totalTags }}
                     title={`${lang === 'ja' ? b.name : b.nameEn}: ${countTags(b.text)}${lang === 'ja' ? 'タグ' : 't'}`}
-                    className="h-full min-w-[3px] opacity-80" />
+                    className="h-full min-w-[0.1875rem] opacity-80" />
                 ))}
               </div>
-              <div className="flex gap-[6px] flex-wrap mt-[3px]">
+              <div className="flex gap-1.5 flex-wrap mt-[0.1875rem]">
                 {balanceBlocks.map(b => (
-                  <span key={b.id} style={{ color: blockTextColor(b) }} className="text-[10px] font-mono font-semibold">
+                  <span key={b.id} style={{ color: blockTextColor(b) }} className="text-[0.625rem] font-mono font-semibold">
                     {b.icon}{countTags(b.text)}
                   </span>
                 ))}
@@ -2226,10 +2226,10 @@ export default function Loom() {
           )}
 
           {outputExpanded && conflicts.length > 0 && outputTab === 'positive' && (
-            <div className="flex-shrink-0 mb-[6px] px-[10px] py-[6px] bg-tint-warn border border-warn/30 rounded-[7px] flex items-center gap-2 flex-wrap">
-              <span className="text-warn-text text-[10px] font-bold flex-shrink-0">⚠️ {lang === 'ja' ? '矛盾の可能性' : 'Possible conflict'}</span>
+            <div className="flex-shrink-0 mb-1.5 px-2.5 py-1.5 bg-tint-warn border border-warn/30 rounded-[0.4375rem] flex items-center gap-2 flex-wrap">
+              <span className="text-warn-text text-[0.625rem] font-bold flex-shrink-0">⚠️ {lang === 'ja' ? '矛盾の可能性' : 'Possible conflict'}</span>
               {conflicts.map((c, i) => (
-                <span key={i} className="text-warn-text/80 text-[10px] font-mono bg-tint-warn-tag px-[7px] py-[2px] rounded-[4px]">
+                <span key={i} className="text-warn-text/80 text-[0.625rem] font-mono bg-tint-warn-tag px-[0.4375rem] py-0.5 rounded">
                   {lang === 'ja' ? c.ja : c.en}
                 </span>
               ))}
@@ -2237,54 +2237,54 @@ export default function Loom() {
           )}
           {/* Variation panel */}
           {outputExpanded && variationsOpen && variations.length > 0 && outputTab === 'positive' && (
-            <div className="flex-shrink-0 mb-[6px] bg-bg border border-linebright rounded-[8px] overflow-hidden">
-              <div className="flex items-center justify-between px-3 py-[6px] border-b border-line">
-                <div className="flex items-center gap-[6px]">
-                  <span className="text-[10px] font-mono text-muted">🎲 {lang === 'ja' ? `バリエーション (${variations.length}種)` : `Variations (${variations.length})`}</span>
+            <div className="flex-shrink-0 mb-1.5 bg-bg border border-linebright rounded-lg overflow-hidden">
+              <div className="flex items-center justify-between px-3 py-1.5 border-b border-line">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[0.625rem] font-mono text-muted">🎲 {lang === 'ja' ? `バリエーション (${variations.length}種)` : `Variations (${variations.length})`}</span>
                   {/* Source indicator */}
-                  <span className="text-[9px] font-mono px-[5px] py-[1px] rounded-[3px]"
+                  <span className="text-[0.5625rem] font-mono px-[0.3125rem] py-[0.0625rem] rounded-[0.1875rem]"
                     style={varSource === 'original'
                       ? { background: 'rgb(var(--surface-alt))', color: 'rgb(var(--muted))' }
                       : { background: 'rgb(var(--c-blue) / 0.15)', color: 'rgb(var(--c-blue))' }}>
                     {varSource === 'original' ? `🏠 ${lang === 'ja' ? 'オリジナル' : 'Original'}` : `🎲${parseInt(varSource.slice(3)) + 1} ${lang === 'ja' ? '編集中' : 'Editing'}`}
                   </span>
                 </div>
-                <div className="flex gap-[6px] items-center">
+                <div className="flex gap-1.5 items-center">
                   {varSource !== 'original' && varBuffers.original && (
                     <button onClick={restoreOriginal}
-                      className="text-[9px] font-mono cursor-pointer border border-dim rounded-[4px] px-[6px] py-[1px] text-muted">
+                      className="text-[0.5625rem] font-mono cursor-pointer border border-dim rounded px-1.5 py-[0.0625rem] text-muted">
                       🏠 {lang === 'ja' ? '戻す' : 'Restore'}
                     </button>
                   )}
-                  <button onClick={startVariations} className="text-accent text-[10px] font-mono cursor-pointer border border-[#4a6fff50] rounded-[4px] px-[7px] py-[1px]">↻ {lang === 'ja' ? '再生成' : 'Re-roll'}</button>
-                  <button onClick={() => setVariationsOpen(false)} className="text-muted text-[10px] cursor-pointer">✕</button>
+                  <button onClick={startVariations} className="text-accent text-[0.625rem] font-mono cursor-pointer border border-[#4a6fff50] rounded px-[0.4375rem] py-[0.0625rem]">↻ {lang === 'ja' ? '再生成' : 'Re-roll'}</button>
+                  <button onClick={() => setVariationsOpen(false)} className="text-muted text-[0.625rem] cursor-pointer">✕</button>
                 </div>
               </div>
-              <div className="divide-y divide-line max-h-[240px] overflow-y-auto">
+              <div className="divide-y divide-line max-h-[15rem] overflow-y-auto">
                 {variations.map((v, i) => {
                   const isNat = varNatSet.has(i);
                   const natText = naturalLang === 'ja' ? toNaturalJa(v.blocks) : toNaturalEn(v.blocks);
                   const natColor = theme === 'dark' ? '#34d399' : '#0a7a4a';
                   const isActive = varSource === `var${i}`;
                   return (
-                    <div key={i} className="flex gap-2 items-start px-3 py-[7px]"
+                    <div key={i} className="flex gap-2 items-start px-3 py-[0.4375rem]"
                       style={isActive ? { background: 'rgb(var(--c-blue) / 0.06)' } : undefined}>
-                      <span className="text-muted text-[10px] font-mono font-semibold flex-shrink-0 mt-[2px]">{i + 1}</span>
-                      <span className={`text-[11px] flex-1 break-words leading-[1.6] select-all ${isNat ? 'font-sans' : 'font-mono break-all text-prompt'}`}
+                      <span className="text-muted text-[0.625rem] font-mono font-semibold flex-shrink-0 mt-0.5">{i + 1}</span>
+                      <span className={`text-[0.6875rem] flex-1 break-words leading-[1.6] select-all ${isNat ? 'font-sans' : 'font-mono break-all text-prompt'}`}
                         style={isNat ? { color: natColor } : undefined}>
                         {isNat ? natText : v.prompt}
                       </span>
-                      <div className="flex gap-[5px] flex-shrink-0 items-center">
+                      <div className="flex gap-[0.3125rem] flex-shrink-0 items-center">
                         {/* Apply to main */}
                         <button onClick={() => applyVariation(i)}
-                          className="rounded-[4px] px-[6px] py-[2px] text-[9px] font-mono cursor-pointer border"
+                          className="rounded px-1.5 py-0.5 text-[0.5625rem] font-mono cursor-pointer border"
                           style={isActive
                             ? { background: 'rgb(var(--c-blue) / 0.15)', borderColor: 'rgb(var(--c-blue) / 0.5)', color: 'rgb(var(--c-blue))' }
                             : { background: 'transparent', borderColor: 'rgb(var(--dim))', color: 'rgb(var(--muted))' }}>
                           {isActive ? (lang === 'ja' ? '✏️ 編集中' : '✏️ Editing') : (lang === 'ja' ? '→ 適用' : '→ Apply')}
                         </button>
                         <button onClick={() => toggleVarNat(i)}
-                          className="rounded-[4px] px-[6px] py-[2px] text-[9px] font-mono cursor-pointer border"
+                          className="rounded px-1.5 py-0.5 text-[0.5625rem] font-mono cursor-pointer border"
                           style={isNat
                             ? { background: natColor + '20', borderColor: natColor + '60', color: natColor }
                             : { background: 'transparent', borderColor: 'rgb(var(--dim))', color: 'rgb(var(--muted))' }}>
@@ -2292,7 +2292,7 @@ export default function Loom() {
                         </button>
                         <button onClick={() => copyVariation(v.prompt, i)}
                           style={{ background: varCopied === i ? goodColor + '20' : 'linear-gradient(135deg,#4a6fff,#8a4fff)', color: varCopied === i ? goodColor : 'white' }}
-                          className="rounded-[5px] px-[8px] py-[2px] text-[10px] font-bold cursor-pointer border-none">
+                          className="rounded-[0.3125rem] px-2 py-0.5 text-[0.625rem] font-bold cursor-pointer border-none">
                           {varCopied === i ? '✓' : '📋'}
                         </button>
                       </div>
@@ -2304,7 +2304,7 @@ export default function Loom() {
           )}
 
           {outputExpanded && aiError && outputTab === 'natural' && (
-            <div className="flex-shrink-0 mb-[5px] px-[10px] py-[6px] rounded-[7px] text-[11px] font-mono text-red-400 bg-red-400/10 border border-red-400/30">
+            <div className="flex-shrink-0 mb-[0.3125rem] px-2.5 py-1.5 rounded-[0.4375rem] text-[0.6875rem] font-mono text-red-400 bg-red-400/10 border border-red-400/30">
               ⚠ {aiError}
             </div>
           )}
@@ -2313,7 +2313,7 @@ export default function Loom() {
               value={outputEditText}
               onChange={e => setOutputEditText(e.target.value)}
               style={{ border: `2px solid ${warnColor}60` }}
-              className="flex-1 min-h-[42px] bg-bg rounded-[8px] px-3 py-[9px] text-[12px] font-mono leading-[1.65] break-all text-prompt outline-none resize-none"
+              className="flex-1 min-h-[2.625rem] bg-bg rounded-lg px-3 py-[0.5625rem] text-xs font-mono leading-[1.65] break-all text-prompt outline-none resize-none"
               autoFocus
               placeholder={lang === 'ja' ? 'テキストを手直ししてからコピー...' : 'Edit text then copy...'}
             />
@@ -2322,7 +2322,7 @@ export default function Loom() {
                 border: `1px solid ${outputTab === 'natural' ? (theme === 'dark' ? '#34d39940' : '#0a7a4a40') : outputTab === 'positive' ? 'rgb(var(--output-border))' : 'rgb(var(--tint-danger))'}`,
                 color: outputTab === 'natural' ? (theme === 'dark' ? '#34d399' : '#0a7a4a') : undefined,
               }}
-              className={`flex-1 min-h-[42px] overflow-y-auto bg-bg rounded-[8px] px-3 py-[9px] leading-[1.75] break-words select-all ${outputTab === 'natural' ? 'text-[13px] font-sans' : 'text-[12px] font-mono break-all'} ${currentText ? outputTab === 'positive' ? 'text-prompt' : outputTab === 'natural' ? '' : 'text-danger' : 'text-muted'}`}>
+              className={`flex-1 min-h-[2.625rem] overflow-y-auto bg-bg rounded-lg px-3 py-[0.5625rem] leading-[1.75] break-words select-all ${outputTab === 'natural' ? 'text-[0.8125rem] font-sans' : 'text-xs font-mono break-all'} ${currentText ? outputTab === 'positive' ? 'text-prompt' : outputTab === 'natural' ? '' : 'text-danger' : 'text-muted'}`}>
               {currentText || (outputTab === 'positive' ? (lang === 'ja' ? '← ブロックを有効にしてタグをクリック' : '← Enable blocks and click tags') : outputTab === 'natural' ? (lang === 'ja' ? '← ブロックにタグを追加すると自然文が生成されます' : '← Add tags to blocks to generate natural language') : (lang === 'ja' ? '← ネガティブブロックにタグを追加' : '← Add tags to Negative block'))}
             </div>
           ))}
@@ -2361,19 +2361,19 @@ export default function Loom() {
           <img
             src={thumbPreview}
             alt="preview"
-            className="max-w-[90vw] max-h-[88vh] rounded-[12px] shadow-2xl object-contain"
+            className="max-w-[90vw] max-h-[88vh] rounded-xl shadow-2xl object-contain"
           />
           <button
             onClick={() => setThumbPreview(null)}
-            className="absolute top-[16px] right-[16px] bg-surface border border-dim rounded-full w-[32px] h-[32px] flex items-center justify-center text-muted cursor-pointer text-[14px] leading-none"
+            className="absolute top-4 right-4 bg-surface border border-dim rounded-full w-8 h-8 flex items-center justify-center text-muted cursor-pointer text-sm leading-none"
           >✕</button>
         </div>
       )}
 
       {/* ── SAVE TOAST ── */}
       {(saveStatus === 'saved' || saveStatus === 'err') && (
-        <div className="fixed top-[68px] left-0 right-0 flex justify-center z-[500] pointer-events-none">
-          <div className="flex items-center gap-[6px] px-[14px] py-[7px] rounded-[20px] text-[12px] font-mono font-semibold shadow-lg"
+        <div className="fixed top-[4.25rem] left-0 right-0 flex justify-center z-[500] pointer-events-none">
+          <div className="flex items-center gap-1.5 px-3.5 py-[0.4375rem] rounded-[1.25rem] text-xs font-mono font-semibold shadow-lg"
             style={{
               animation: 'loom-toast-full 2.6s ease-out forwards',
               background: saveStatus === 'saved' ? goodColor + '20' : 'rgb(var(--c-red) / 0.15)',
@@ -2388,24 +2388,24 @@ export default function Loom() {
 
       {/* ── Stacked toast container (bottom-right) ── */}
       <div
-        className="fixed z-[500] right-4 flex flex-col-reverse gap-[8px]"
+        className="fixed z-[500] right-4 flex flex-col-reverse gap-2"
         style={{ bottom: (outputExpanded ? outputHeight : 80) + 12 }}
       >
         {/* Template undo snackbar */}
         {templateUndoBuf && (
-          <div className="bg-surface border border-accent/40 rounded-[10px] shadow-xl px-4 py-3 text-[11px] font-mono max-w-[280px]">
+          <div className="bg-surface border border-accent/40 rounded-[0.625rem] shadow-xl px-4 py-3 text-[0.6875rem] font-mono max-w-[17.5rem]">
             <div className="flex items-center gap-3">
               <span className="text-fg flex-1">{lang === 'ja' ? '✦ テンプレートを適用しました' : '✦ Template applied'}</span>
               <button
                 onClick={undoTemplate}
-                className="border border-accent/60 rounded-[6px] px-[10px] py-[4px] text-accent text-[10px] font-bold cursor-pointer bg-transparent whitespace-nowrap"
+                className="border border-accent/60 rounded-md px-2.5 py-1 text-accent text-[0.625rem] font-bold cursor-pointer bg-transparent whitespace-nowrap"
               >
                 {lang === 'ja' ? '元に戻す' : 'Undo'}
               </button>
-              <button onClick={() => { clearTimeout(templateUndoTimerRef.current); setTemplateUndoBuf(null); }} className="text-muted cursor-pointer bg-transparent border-none text-[11px] leading-none p-0">×</button>
+              <button onClick={() => { clearTimeout(templateUndoTimerRef.current); setTemplateUndoBuf(null); }} className="text-muted cursor-pointer bg-transparent border-none text-[0.6875rem] leading-none p-0">×</button>
             </div>
             {(lang === 'ja' ? templateUndoBuf.negHintJa : templateUndoBuf.negHintEn) && (
-              <div className="mt-[6px] text-[9px] font-mono leading-[1.5] px-[6px] py-[3px] rounded-[4px]"
+              <div className="mt-1.5 text-[0.5625rem] font-mono leading-[1.5] px-1.5 py-[0.1875rem] rounded"
                 style={{ background: 'rgb(var(--c-blue) / 0.08)', color: 'rgb(var(--c-blue))', border: '1px solid rgb(var(--c-blue) / 0.25)' }}>
                 💡 {lang === 'ja' ? `ネガ推奨: ${templateUndoBuf.negHintJa}` : `Neg hint: ${templateUndoBuf.negHintEn}`}
               </div>
@@ -2416,7 +2416,7 @@ export default function Loom() {
         {/* Data size warning toast */}
         {dataSizeToast && (
           <div
-            className="bg-surface border rounded-[10px] shadow-xl px-4 py-3 text-[11px] font-mono max-w-[280px]"
+            className="bg-surface border rounded-[0.625rem] shadow-xl px-4 py-3 text-[0.6875rem] font-mono max-w-[17.5rem]"
             style={{ borderColor: 'rgb(var(--c-orange, var(--c-warn)) / 0.5)' }}
           >
             <div className="font-bold mb-1" style={{ color: 'rgb(var(--warn-text, var(--c-orange)))' }}>
@@ -2433,7 +2433,7 @@ export default function Loom() {
         {/* Auto-log toast */}
         {autoLogToast && (
           <div
-            className="bg-surface border rounded-[10px] shadow-xl px-4 py-3 text-[11px] font-mono max-w-[280px]"
+            className="bg-surface border rounded-[0.625rem] shadow-xl px-4 py-3 text-[0.6875rem] font-mono max-w-[17.5rem]"
             style={{ borderColor: autoLogToast === 'full' ? 'rgb(var(--c-red) / 0.4)' : 'rgb(var(--c-blue) / 0.4)' }}
           >
             <div className="font-bold" style={{ color: autoLogToast === 'full' ? 'rgb(var(--c-red))' : 'rgb(var(--c-blue))' }}>
@@ -2447,7 +2447,7 @@ export default function Loom() {
         {/* Import success toast */}
         {importToast && (
           <div
-            className="bg-surface border rounded-[10px] shadow-xl px-4 py-3 text-[11px] font-mono max-w-[260px]"
+            className="bg-surface border rounded-[0.625rem] shadow-xl px-4 py-3 text-[0.6875rem] font-mono max-w-[16.25rem]"
             style={{ borderColor: 'rgb(var(--c-teal) / 0.5)' }}
           >
             <div className="font-bold" style={{ color: 'rgb(var(--c-teal))' }}>
@@ -2458,7 +2458,7 @@ export default function Loom() {
 
         {/* Sync error toast */}
         {syncErrToast && user && (
-          <div className="bg-surface border border-red-400/50 rounded-[10px] shadow-xl px-4 py-3 text-[11px] font-mono max-w-[240px]">
+          <div className="bg-surface border border-red-400/50 rounded-[0.625rem] shadow-xl px-4 py-3 text-[0.6875rem] font-mono max-w-[15rem]">
             <div className="font-bold mb-1" style={{ color: 'rgb(var(--c-red))' }}>
               ⚠ {lang === 'ja' ? '同期に失敗しました' : 'Sync failed'}
             </div>
@@ -2469,7 +2469,7 @@ export default function Loom() {
             </div>
             <button
               onClick={() => setSyncErrToast(false)}
-              className="mt-2 text-muted cursor-pointer bg-transparent border-none text-[10px] p-0"
+              className="mt-2 text-muted cursor-pointer bg-transparent border-none text-[0.625rem] p-0"
             >
               {lang === 'ja' ? '閉じる' : 'Dismiss'}
             </button>

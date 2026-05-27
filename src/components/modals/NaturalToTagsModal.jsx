@@ -123,22 +123,22 @@ export default function NaturalToTagsModal({ lang, apiConfig, blocks, onAddTags,
   return (
     <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/80"
       onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="bg-surface border border-linebright rounded-[14px] w-full max-w-[480px] max-h-[86vh] flex flex-col shadow-2xl">
+      <div className="bg-surface border border-linebright rounded-[0.875rem] w-full max-w-[30rem] max-h-[86vh] flex flex-col shadow-2xl">
 
         {/* Header */}
-        <div className="px-[18px] py-[13px] border-b border-line flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center gap-[10px]">
+        <div className="px-[1.125rem] py-[0.8125rem] border-b border-line flex items-center justify-between flex-shrink-0">
+          <div className="flex items-center gap-2.5">
             {/* Mode tabs */}
-            <div className="flex rounded-[6px] overflow-hidden border border-line text-[10px] font-mono">
+            <div className="flex rounded-md overflow-hidden border border-line text-[0.625rem] font-mono">
               <button onClick={() => switchMode('text')}
-                className="px-[10px] py-[4px] cursor-pointer transition-colors duration-100"
+                className="px-2.5 py-1 cursor-pointer transition-colors duration-100"
                 style={mode === 'text'
                   ? { background: 'rgb(var(--c-blue) / 0.15)', color: 'rgb(var(--c-blue))', fontWeight: 700 }
                   : { background: 'transparent', color: 'rgb(var(--muted))' }}>
                 ✍️ {lang === 'ja' ? 'テキスト' : 'Text'}
               </button>
               <button onClick={() => switchMode('image')}
-                className="px-[10px] py-[4px] cursor-pointer transition-colors duration-100 border-l border-line"
+                className="px-2.5 py-1 cursor-pointer transition-colors duration-100 border-l border-line"
                 style={mode === 'image'
                   ? { background: 'rgb(var(--c-purple) / 0.15)', color: 'rgb(var(--c-purple))', fontWeight: 700 }
                   : { background: 'transparent', color: 'rgb(var(--muted))' }}>
@@ -146,17 +146,17 @@ export default function NaturalToTagsModal({ lang, apiConfig, blocks, onAddTags,
               </button>
             </div>
           </div>
-          <button onClick={onClose} className="bg-transparent border border-dim rounded-[6px] px-[10px] py-1 text-muted cursor-pointer text-[12px]">
+          <button onClick={onClose} className="bg-transparent border border-dim rounded-md px-2.5 py-1 text-muted cursor-pointer text-xs">
             {lang === 'ja' ? '閉じる' : 'Close'}
           </button>
         </div>
 
-        <div className="overflow-y-auto flex-1 min-h-0 px-[18px] py-[16px] space-y-[14px]">
+        <div className="overflow-y-auto flex-1 min-h-0 px-[1.125rem] py-4 space-y-3.5">
 
           {/* ── Text mode ── */}
           {mode === 'text' && (
-            <div className="space-y-[8px]">
-              <div className="text-dim text-[10px] font-mono font-bold tracking-widest uppercase">
+            <div className="space-y-2">
+              <div className="text-dim text-[0.625rem] font-mono font-bold tracking-widest uppercase">
                 {lang === 'ja' ? 'キャラクターの説明を入力' : 'Describe your character'}
               </div>
               <textarea
@@ -165,16 +165,16 @@ export default function NaturalToTagsModal({ lang, apiConfig, blocks, onAddTags,
                 placeholder={lang === 'ja'
                   ? '例: 銀髪ロングの女の子。青い目でエルフの耳を持つ。白いドレスを着て、魔法の杖を持っている。背景は幻想的な森。'
                   : 'e.g. A girl with long silver hair and blue eyes, pointed elf ears, wearing a white dress and holding a magic staff in a fantasy forest.'}
-                className="w-full rounded-[9px] px-[12px] py-[10px] text-[12px] font-mono outline-none border border-line bg-bg text-fg resize-none leading-[1.7]"
+                className="w-full rounded-[0.5625rem] px-3 py-2.5 text-xs font-mono outline-none border border-line bg-bg text-fg resize-none leading-[1.7]"
                 rows={4}
                 onKeyDown={e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleConvertText(); }}
               />
               <div className="flex items-center justify-between">
-                <span className="text-dim text-[10px] font-mono">
+                <span className="text-dim text-[0.625rem] font-mono">
                   {lang === 'ja' ? 'Ctrl+Enter で変換' : 'Ctrl+Enter to convert'}
                 </span>
                 <button onClick={handleConvertText} disabled={busy || !input.trim()}
-                  className="rounded-[8px] px-[16px] py-[7px] text-[12px] font-bold cursor-pointer border-none text-white transition-all duration-150 disabled:opacity-40 disabled:cursor-default"
+                  className="rounded-lg px-4 py-[0.4375rem] text-xs font-bold cursor-pointer border-none text-white transition-all duration-150 disabled:opacity-40 disabled:cursor-default"
                   style={{ background: 'linear-gradient(135deg,#4a6fff,#8a4fff)' }}>
                   {busy ? (lang === 'ja' ? '変換中...' : 'Converting...') : (lang === 'ja' ? '▶ タグに変換' : '▶ Convert')}
                 </button>
@@ -184,8 +184,8 @@ export default function NaturalToTagsModal({ lang, apiConfig, blocks, onAddTags,
 
           {/* ── Image mode ── */}
           {mode === 'image' && (
-            <div className="space-y-[10px]">
-              <div className="text-dim text-[10px] font-mono font-bold tracking-widest uppercase">
+            <div className="space-y-2.5">
+              <div className="text-dim text-[0.625rem] font-mono font-bold tracking-widest uppercase">
                 {lang === 'ja' ? '画像をアップロード' : 'Upload an image'}
               </div>
 
@@ -194,7 +194,7 @@ export default function NaturalToTagsModal({ lang, apiConfig, blocks, onAddTags,
                 onDrop={handleDrop}
                 onDragOver={e => e.preventDefault()}
                 onClick={() => fileRef.current?.click()}
-                className="rounded-[10px] border-2 border-dashed cursor-pointer flex flex-col items-center justify-center gap-[8px] transition-colors duration-150 relative overflow-hidden"
+                className="rounded-[0.625rem] border-2 border-dashed cursor-pointer flex flex-col items-center justify-center gap-2 transition-colors duration-150 relative overflow-hidden"
                 style={{
                   borderColor: imagePreview ? 'rgb(var(--c-purple) / 0.5)' : 'rgb(var(--dim))',
                   minHeight: imagePreview ? '0' : '120px',
@@ -203,11 +203,11 @@ export default function NaturalToTagsModal({ lang, apiConfig, blocks, onAddTags,
               >
                 {imagePreview ? (
                   <img src={imagePreview} alt="preview"
-                    className="w-full rounded-[8px] object-contain max-h-[200px]" />
+                    className="w-full rounded-lg object-contain max-h-[12.5rem]" />
                 ) : (
                   <>
-                    <span className="text-[28px]">🖼</span>
-                    <span className="text-muted text-[11px] font-mono text-center px-4">
+                    <span className="text-[1.75rem]">🖼</span>
+                    <span className="text-muted text-[0.6875rem] font-mono text-center px-4">
                       {lang === 'ja'
                         ? 'クリックまたはドラッグ＆ドロップ\nJPG・PNG・WebP対応'
                         : 'Click or drag & drop\nJPG, PNG, WebP'}
@@ -221,18 +221,18 @@ export default function NaturalToTagsModal({ lang, apiConfig, blocks, onAddTags,
               <div className="flex items-center justify-between">
                 {imagePreview ? (
                   <button onClick={() => { setImagePreview(null); setImageData(null); setResult(null); setSelected({}); }}
-                    className="text-[10px] font-mono text-muted cursor-pointer bg-transparent border-none underline">
+                    className="text-[0.625rem] font-mono text-muted cursor-pointer bg-transparent border-none underline">
                     {lang === 'ja' ? '画像を変更' : 'Change image'}
                   </button>
                 ) : <span />}
                 <button onClick={handleConvertImage} disabled={busy || !imageData}
-                  className="rounded-[8px] px-[16px] py-[7px] text-[12px] font-bold cursor-pointer border-none text-white transition-all duration-150 disabled:opacity-40 disabled:cursor-default"
+                  className="rounded-lg px-4 py-[0.4375rem] text-xs font-bold cursor-pointer border-none text-white transition-all duration-150 disabled:opacity-40 disabled:cursor-default"
                   style={{ background: 'linear-gradient(135deg,#7a4fff,#b44fff)' }}>
                   {busy ? (lang === 'ja' ? '解析中...' : 'Analyzing...') : (lang === 'ja' ? '▶ タグを抽出' : '▶ Extract tags')}
                 </button>
               </div>
 
-              <p className="text-dim text-[10px] font-mono leading-[1.6]">
+              <p className="text-dim text-[0.625rem] font-mono leading-[1.6]">
                 {lang === 'ja'
                   ? 'AIが画像からキャラの特徴（髪・目・衣装・背景など）を読み取りタグに変換します。APIキーが必要です。'
                   : 'AI reads character features from the image (hair, eyes, outfit, background, etc.) and converts them to tags. Requires an API key.'}
@@ -242,39 +242,39 @@ export default function NaturalToTagsModal({ lang, apiConfig, blocks, onAddTags,
 
           {/* Error */}
           {error && (
-            <div className="rounded-[8px] px-[12px] py-[9px] text-[11px] font-mono text-red-400 bg-red-400/10 border border-red-400/30">
+            <div className="rounded-lg px-3 py-[0.5625rem] text-[0.6875rem] font-mono text-red-400 bg-red-400/10 border border-red-400/30">
               {error}
             </div>
           )}
 
           {/* Results — shared between both modes */}
           {result && resultBlocks.length > 0 && (
-            <div className="space-y-[10px]">
+            <div className="space-y-2.5">
               <div className="flex items-center justify-between">
-                <div className="text-dim text-[10px] font-mono font-bold tracking-widest uppercase">
+                <div className="text-dim text-[0.625rem] font-mono font-bold tracking-widest uppercase">
                   {lang === 'ja' ? '生成されたタグ（クリックで選択）' : 'Generated tags (click to select)'}
                 </div>
                 <button onClick={() => {
                   const all = {};
                   resultBlocks.forEach(b => result[b].forEach(t => { all[`${b}::${t}`] = true; }));
                   setSelected(all);
-                }} className="text-[10px] font-mono text-muted cursor-pointer underline">
+                }} className="text-[0.625rem] font-mono text-muted cursor-pointer underline">
                   {lang === 'ja' ? 'すべて選択' : 'Select all'}
                 </button>
               </div>
 
               {resultBlocks.map(block => (
-                <div key={block} className="bg-surfalt rounded-[9px] px-[12px] py-[10px]">
-                  <div className="text-[10px] font-mono font-bold text-muted mb-[7px]">
+                <div key={block} className="bg-surfalt rounded-[0.5625rem] px-3 py-2.5">
+                  <div className="text-[0.625rem] font-mono font-bold text-muted mb-[0.4375rem]">
                     {BLOCK_LABELS[block]?.[lang] ?? block}
                   </div>
-                  <div className="flex flex-wrap gap-[5px]">
+                  <div className="flex flex-wrap gap-[0.3125rem]">
                     {result[block].map(tag => {
                       const k = `${block}::${tag}`;
                       const on = selected[k];
                       return (
                         <button key={tag} onClick={() => toggleTag(block, tag)}
-                          className="rounded-[6px] px-[9px] py-[4px] text-[11px] font-mono cursor-pointer transition-all duration-100 border"
+                          className="rounded-md px-[0.5625rem] py-1 text-[0.6875rem] font-mono cursor-pointer transition-all duration-100 border"
                           style={on
                             ? { background: 'rgb(var(--c-blue) / 0.15)', color: 'rgb(var(--c-blue))', borderColor: 'rgb(var(--c-blue) / 0.5)' }
                             : { background: 'transparent', color: 'rgb(var(--muted))', borderColor: 'rgb(var(--dim))' }}>
@@ -291,12 +291,12 @@ export default function NaturalToTagsModal({ lang, apiConfig, blocks, onAddTags,
 
         {/* Footer */}
         {result && (
-          <div className="px-[18px] py-[12px] border-t border-line flex-shrink-0 flex items-center justify-between gap-[10px]">
-            <span className="text-muted text-[11px] font-mono">
+          <div className="px-[1.125rem] py-3 border-t border-line flex-shrink-0 flex items-center justify-between gap-2.5">
+            <span className="text-muted text-[0.6875rem] font-mono">
               {selectedCount}{lang === 'ja' ? ' 件選択中' : ' selected'}
             </span>
             <button onClick={handleAdd} disabled={selectedCount === 0}
-              className="rounded-[8px] px-[20px] py-[8px] text-[12px] font-bold cursor-pointer border-none text-white disabled:opacity-40 disabled:cursor-default"
+              className="rounded-lg px-5 py-2 text-xs font-bold cursor-pointer border-none text-white disabled:opacity-40 disabled:cursor-default"
               style={{ background: 'linear-gradient(135deg,#4a6fff,#8a4fff)' }}>
               {lang === 'ja' ? `${selectedCount} 件を追加` : `Add ${selectedCount} tags`}
             </button>

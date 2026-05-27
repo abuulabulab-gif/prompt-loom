@@ -277,47 +277,47 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
   return (
     <div className="fixed inset-0 bg-black/80 z-[300] flex items-start justify-center px-4 pt-[6dvh] pb-4" onClick={onClose}>
       <div onClick={e => e.stopPropagation()}
-        className="bg-surface border border-linebright rounded-[14px] w-full max-w-[540px] overflow-hidden flex flex-col h-[80dvh]">
+        className="bg-surface border border-linebright rounded-[0.875rem] w-full max-w-[33.75rem] overflow-hidden flex flex-col h-[80dvh]">
 
         {/* Header */}
-        <div className="px-[18px] py-[13px] border-b border-line flex items-center justify-between flex-shrink-0">
-          <span className="text-fg text-[14px] font-bold">⚙️ {lang === 'ja' ? '設定' : 'Settings'}</span>
+        <div className="px-[1.125rem] py-[0.8125rem] border-b border-line flex items-center justify-between flex-shrink-0">
+          <span className="text-fg text-sm font-bold">⚙️ {lang === 'ja' ? '設定' : 'Settings'}</span>
           <button onClick={onClose}
-            className="bg-transparent border border-dim rounded-[6px] px-[10px] py-1 text-muted cursor-pointer text-[12px]">
+            className="bg-transparent border border-dim rounded-md px-2.5 py-1 text-muted cursor-pointer text-xs">
             {lang === 'ja' ? '閉じる' : 'Close'}
           </button>
         </div>
 
         {/* ── Display settings — always visible ── */}
-        <div className="px-[14px] py-[10px] border-b border-line flex-shrink-0 flex flex-wrap gap-x-[16px] gap-y-[8px] items-center">
+        <div className="px-3.5 py-2.5 border-b border-line flex-shrink-0 flex flex-wrap gap-x-4 gap-y-2 items-center">
           {/* Theme */}
-          <div className="flex items-center gap-[7px]">
-            <span className="text-muted text-[10px] font-mono whitespace-nowrap">{lang === 'ja' ? 'テーマ' : 'Theme'}</span>
+          <div className="flex items-center gap-[0.4375rem]">
+            <span className="text-muted text-[0.625rem] font-mono whitespace-nowrap">{lang === 'ja' ? 'テーマ' : 'Theme'}</span>
             <button onClick={onToggleTheme}
-              className="flex items-center gap-[5px] rounded-[5px] px-[9px] py-[4px] text-[11px] font-mono font-bold cursor-pointer border transition-all duration-150 bg-surfalt border-line text-fg">
+              className="flex items-center gap-[0.3125rem] rounded-[0.3125rem] px-[0.5625rem] py-1 text-[0.6875rem] font-mono font-bold cursor-pointer border transition-all duration-150 bg-surfalt border-line text-fg">
               {theme === 'dark' ? '🌙' : '☀️'}
               <span>{theme === 'dark' ? (lang === 'ja' ? 'ダーク' : 'Dark') : (lang === 'ja' ? 'ライト' : 'Light')}</span>
             </button>
           </div>
           {/* Language */}
-          <div className="flex items-center gap-[7px]">
-            <span className="text-muted text-[10px] font-mono whitespace-nowrap">{lang === 'ja' ? '言語' : 'Language'}</span>
+          <div className="flex items-center gap-[0.4375rem]">
+            <span className="text-muted text-[0.625rem] font-mono whitespace-nowrap">{lang === 'ja' ? '言語' : 'Language'}</span>
             <button onClick={onToggleLang}
-              className="rounded-[5px] px-[9px] py-[4px] text-[11px] font-mono font-bold cursor-pointer border bg-surfalt border-line text-fg">
+              className="rounded-[0.3125rem] px-[0.5625rem] py-1 text-[0.6875rem] font-mono font-bold cursor-pointer border bg-surfalt border-line text-fg">
               {lang === 'ja' ? '🇯🇵 日本語' : '🇺🇸 English'}
             </button>
           </div>
           {/* View mode */}
-          <div className="flex items-center gap-[7px]">
-            <span className="text-muted text-[10px] font-mono whitespace-nowrap">{lang === 'ja' ? '表示モード' : 'View mode'}</span>
-            <div className="flex rounded-[5px] overflow-hidden border border-line">
+          <div className="flex items-center gap-[0.4375rem]">
+            <span className="text-muted text-[0.625rem] font-mono whitespace-nowrap">{lang === 'ja' ? '表示モード' : 'View mode'}</span>
+            <div className="flex rounded-[0.3125rem] overflow-hidden border border-line">
               {([
                 ['simple', '📋', lang === 'ja' ? 'シンプル' : 'Simple',  'rgb(var(--warn-text))', 'rgb(var(--warn-text) / 0.13)', 'rgb(var(--warn-text) / 0.38)'],
                 ['normal', '🗂',  lang === 'ja' ? 'ノーマル' : 'Normal',  'rgb(var(--c-blue))',    'rgb(var(--tint-accent))',       'rgb(var(--c-blue) / 0.38)'],
                 ['expert', '🔧', lang === 'ja' ? 'エキスパート' : 'Expert', 'rgb(var(--c-purple))', 'rgb(var(--c-purple) / 0.13)', 'rgb(var(--c-purple) / 0.38)'],
               ]).map(([mode, icon, label, col, bg, border]) => (
                 <button key={mode} onClick={() => onSetViewMode(mode)}
-                  className="px-[9px] py-[4px] text-[10px] font-mono cursor-pointer border-r border-line last:border-r-0 transition-all duration-100 whitespace-nowrap"
+                  className="px-[0.5625rem] py-1 text-[0.625rem] font-mono cursor-pointer border-r border-line last:border-r-0 transition-all duration-100 whitespace-nowrap"
                   style={viewMode === mode
                     ? { background: bg, color: col, borderColor: border }
                     : { background: 'transparent', color: 'rgb(var(--muted))' }}>
@@ -330,7 +330,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
           {onShowWelcome && (
             <button
               onClick={onShowWelcome}
-              className="flex items-center gap-[5px] rounded-[5px] px-[9px] py-[4px] text-[11px] font-mono cursor-pointer border bg-surfalt border-line text-muted transition-colors duration-150"
+              className="flex items-center gap-[0.3125rem] rounded-[0.3125rem] px-[0.5625rem] py-1 text-[0.6875rem] font-mono cursor-pointer border bg-surfalt border-line text-muted transition-colors duration-150"
               onMouseOver={e => { e.currentTarget.style.borderColor = 'rgb(var(--c-blue) / 0.5)'; e.currentTarget.style.color = 'rgb(var(--c-blue))'; }}
               onMouseOut={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.color = ''; }}
             >
@@ -343,7 +343,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
         <div className="flex border-b border-line flex-shrink-0">
           {TABS.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex-1 py-[9px] text-[10px] font-mono font-semibold cursor-pointer transition-colors duration-150 ${
+              className={`flex-1 py-[0.5625rem] text-[0.625rem] font-mono font-semibold cursor-pointer transition-colors duration-150 ${
                 tab === t.id
                   ? 'bg-tint-accent text-accent border-b-2 border-accent'
                   : 'bg-transparent text-muted'
@@ -358,49 +358,49 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
 
           {/* ── Shortcuts / Mobile Tips tab ── */}
           {tab === 'shortcuts' && (
-            <div className="px-[18px] py-[14px] space-y-[18px]">
+            <div className="px-[1.125rem] py-3.5 space-y-[1.125rem]">
               {isMobile ? (
                 <>
-                  <p className="text-muted text-[11px] font-mono bg-surfalt rounded-[7px] px-3 py-2">
+                  <p className="text-muted text-[0.6875rem] font-mono bg-surfalt rounded-[0.4375rem] px-3 py-2">
                     📱 {lang === 'ja' ? 'スマホでの便利な使い方' : 'Tips for using LOOM on mobile'}
                   </p>
-                  <div className="space-y-[10px]">
+                  <div className="space-y-2.5">
                     {MOBILE_TIPS(lang).map((tip, i) => (
-                      <div key={i} className="flex gap-[10px] items-start bg-surfalt rounded-[8px] px-[12px] py-[9px]">
-                        <span className="text-[18px] flex-shrink-0 leading-none mt-[1px]">{tip.icon}</span>
-                        <span className="text-fg text-[12px] leading-[1.65]">{tip.text}</span>
+                      <div key={i} className="flex gap-2.5 items-start bg-surfalt rounded-lg px-3 py-[0.5625rem]">
+                        <span className="text-lg flex-shrink-0 leading-none mt-[0.0625rem]">{tip.icon}</span>
+                        <span className="text-fg text-xs leading-[1.65]">{tip.text}</span>
                       </div>
                     ))}
                   </div>
                 </>
               ) : (
                 <>
-                  <p className="text-muted text-[11px] font-mono bg-surfalt rounded-[7px] px-3 py-2">
+                  <p className="text-muted text-[0.6875rem] font-mono bg-surfalt rounded-[0.4375rem] px-3 py-2">
                     {lang === 'ja'
                       ? '⚠️ テキスト入力中（input / textarea フォーカス時）は無効です'
                       : '⚠️ Shortcuts are inactive while typing in input / textarea fields'}
                   </p>
                   {SHORTCUTS(lang).map(group => (
                     <div key={group.group}>
-                      <div className="text-muted text-[10px] font-mono font-bold tracking-[0.1em] uppercase mb-[8px]">
+                      <div className="text-muted text-[0.625rem] font-mono font-bold tracking-[0.1em] uppercase mb-2">
                         {group.group}
                       </div>
-                      <div className="space-y-[6px]">
+                      <div className="space-y-1.5">
                         {group.items.map(item => (
                           <div key={item.keys.join('+')} className="flex items-center gap-3">
                             <div className="flex items-center gap-1 flex-shrink-0">
                               {item.keys.map((k, i) => (
                                 <span key={k}>
-                                  <kbd className="inline-flex items-center justify-center bg-surfalt border border-linebright rounded-[5px] px-[8px] py-[3px] text-[11px] font-mono text-fg min-w-[28px]">
+                                  <kbd className="inline-flex items-center justify-center bg-surfalt border border-linebright rounded-[0.3125rem] px-2 py-[0.1875rem] text-[0.6875rem] font-mono text-fg min-w-7">
                                     {k}
                                   </kbd>
                                   {i < item.keys.length - 1 && (
-                                    <span className="text-muted text-[10px] mx-[2px]">+</span>
+                                    <span className="text-muted text-[0.625rem] mx-0.5">+</span>
                                   )}
                                 </span>
                               ))}
                             </div>
-                            <span className="text-fg text-[12px] flex-1">{item.action}</span>
+                            <span className="text-fg text-xs flex-1">{item.action}</span>
                           </div>
                         ))}
                       </div>
@@ -412,17 +412,17 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
               {/* Hidden blocks section — shared between mobile and PC */}
               {hiddenBlocks.length > 0 && (
                 <div>
-                  <div className="text-muted text-[10px] font-mono font-bold tracking-[0.1em] uppercase mb-[8px]">
+                  <div className="text-muted text-[0.625rem] font-mono font-bold tracking-[0.1em] uppercase mb-2">
                     🚫 {lang === 'ja' ? '非表示中のブロック' : 'Hidden blocks'}
                   </div>
-                  <div className="space-y-[5px]">
+                  <div className="space-y-[0.3125rem]">
                     {hiddenBlocks.map(b => (
-                      <div key={b.id} className="flex items-center gap-[8px] bg-surfalt rounded-[7px] px-[10px] py-[6px]">
-                        <span className="text-[13px]">{b.icon}</span>
-                        <span className="text-fg text-[12px] font-semibold flex-1">{lang === 'ja' ? b.name : b.nameEn}</span>
+                      <div key={b.id} className="flex items-center gap-2 bg-surfalt rounded-[0.4375rem] px-2.5 py-1.5">
+                        <span className="text-[0.8125rem]">{b.icon}</span>
+                        <span className="text-fg text-xs font-semibold flex-1">{lang === 'ja' ? b.name : b.nameEn}</span>
                         <button onClick={() => onRestoreBlock(b.id)}
                           style={{ borderColor: b.color + '60', color: b.color }}
-                          className="border rounded-[5px] px-[8px] py-[3px] text-[10px] font-mono font-semibold cursor-pointer bg-transparent">
+                          className="border rounded-[0.3125rem] px-2 py-[0.1875rem] text-[0.625rem] font-mono font-semibold cursor-pointer bg-transparent">
                           👁 {lang === 'ja' ? '表示に戻す' : 'Restore'}
                         </button>
                       </div>
@@ -430,7 +430,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                     {hiddenBlocks.length > 1 && (
                       <button
                         onClick={onRestoreAllBlocks}
-                        className="w-full text-center border border-dim rounded-[6px] py-[5px] text-[10px] font-mono text-muted cursor-pointer bg-transparent mt-[4px]">
+                        className="w-full text-center border border-dim rounded-md py-[0.3125rem] text-[0.625rem] font-mono text-muted cursor-pointer bg-transparent mt-1">
                         {lang === 'ja' ? `すべて表示に戻す (${hiddenBlocks.length}件)` : `Restore all (${hiddenBlocks.length})`}
                       </button>
                     )}
@@ -442,8 +442,8 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
 
           {/* ── Guide tab ── */}
           {tab === 'guide' && (
-            <div className="px-[18px] py-[14px] space-y-[10px]">
-              <p className="text-muted text-[11px] font-mono bg-surfalt rounded-[7px] px-3 py-[7px]">
+            <div className="px-[1.125rem] py-3.5 space-y-2.5">
+              <p className="text-muted text-[0.6875rem] font-mono bg-surfalt rounded-[0.4375rem] px-3 py-[0.4375rem]">
                 {lang === 'ja'
                   ? '💡 LOOMの主要機能を習熟度別に紹介します。クリックで展開'
                   : '💡 LOOM features organized by experience level. Click to expand'}
@@ -452,29 +452,29 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
               {GUIDE(lang).map(section => {
                 const isOpen = openSections.has(section.icon);
                 return (
-                  <div key={section.icon} className="rounded-[10px] overflow-hidden border border-line">
+                  <div key={section.icon} className="rounded-[0.625rem] overflow-hidden border border-line">
                     <button
                       onClick={() => toggleSection(section.icon)}
-                      className="w-full flex items-center gap-[10px] px-[14px] py-[11px] bg-surfalt border-none cursor-pointer text-left"
+                      className="w-full flex items-center gap-2.5 px-3.5 py-[0.6875rem] bg-surfalt border-none cursor-pointer text-left"
                     >
-                      <span className="text-[18px]">{section.icon}</span>
-                      <span style={{ color: section.color }} className="text-[12px] font-bold flex-1">
+                      <span className="text-lg">{section.icon}</span>
+                      <span style={{ color: section.color }} className="text-xs font-bold flex-1">
                         {section.label}
                       </span>
-                      <span className="text-muted text-[11px]">{isOpen ? '▲' : '▼'}</span>
+                      <span className="text-muted text-[0.6875rem]">{isOpen ? '▲' : '▼'}</span>
                     </button>
 
                     {isOpen && (
-                      <div className="px-[14px] py-[10px] space-y-[8px]">
+                      <div className="px-3.5 py-2.5 space-y-2">
                         {section.items.map((item, i) => (
-                          <div key={i} className="flex gap-[10px] items-start">
+                          <div key={i} className="flex gap-2.5 items-start">
                             <span
                               style={{ background: section.iconBg || (section.color + '18'), color: section.color, border: `1px solid ${section.iconBd || (section.color + '40')}` }}
-                              className="text-[9px] font-mono font-bold px-[5px] py-[2px] rounded-[4px] flex-shrink-0 mt-[1px] min-w-[36px] text-center leading-tight whitespace-nowrap"
+                              className="text-[0.5625rem] font-mono font-bold px-[0.3125rem] py-0.5 rounded flex-shrink-0 mt-[0.0625rem] min-w-9 text-center leading-tight whitespace-nowrap"
                             >
                               {item.icon}
                             </span>
-                            <span className="text-fg text-[12px] leading-[1.65] flex-1">
+                            <span className="text-fg text-xs leading-[1.65] flex-1">
                               {item.text}
                             </span>
                           </div>
@@ -485,7 +485,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                 );
               })}
 
-              <div className="text-center text-muted text-[10px] font-mono pt-[4px] pb-[2px]">
+              <div className="text-center text-muted text-[0.625rem] font-mono pt-1 pb-0.5">
                 {lang === 'ja' ? '機能は随時追加予定 · prompt-loom.com' : 'More features coming · prompt-loom.com'}
               </div>
             </div>
@@ -493,8 +493,8 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
 
           {/* ── Platform comparison tab ── */}
           {tab === 'platform' && (
-            <div className="px-[18px] py-[14px] space-y-[16px]">
-              <p className="text-muted text-[11px] font-mono bg-surfalt rounded-[7px] px-3 py-[7px]">
+            <div className="px-[1.125rem] py-3.5 space-y-4">
+              <p className="text-muted text-[0.6875rem] font-mono bg-surfalt rounded-[0.4375rem] px-3 py-[0.4375rem]">
                 {lang === 'ja'
                   ? '📱 スマホ版と 💻 PC版（600px以上）の主な機能差異をまとめています'
                   : '📱 Mobile (below 600 px) vs 💻 PC — key feature differences at a glance'}
@@ -502,31 +502,31 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
 
               {PLATFORM_DIFF(lang).map(section => (
                 <div key={section.category}>
-                  <div className="text-muted text-[10px] font-mono font-bold tracking-[0.1em] uppercase mb-[8px]">
+                  <div className="text-muted text-[0.625rem] font-mono font-bold tracking-[0.1em] uppercase mb-2">
                     {section.category}
                   </div>
-                  <div className="rounded-[10px] overflow-hidden border border-line">
+                  <div className="rounded-[0.625rem] overflow-hidden border border-line">
                     {/* Header row */}
                     <div className="grid grid-cols-[1fr_1fr_1fr] bg-surfalt border-b border-line">
-                      <div className="px-[10px] py-[6px] text-[9px] font-mono text-muted uppercase tracking-[0.08em]">
+                      <div className="px-2.5 py-1.5 text-[0.5625rem] font-mono text-muted uppercase tracking-[0.08em]">
                         {lang === 'ja' ? '機能' : 'Feature'}
                       </div>
-                      <div className="px-[10px] py-[6px] text-[9px] font-mono text-muted uppercase tracking-[0.08em] border-l border-line">
+                      <div className="px-2.5 py-1.5 text-[0.5625rem] font-mono text-muted uppercase tracking-[0.08em] border-l border-line">
                         📱 {lang === 'ja' ? 'スマホ' : 'Mobile'}
                       </div>
-                      <div className="px-[10px] py-[6px] text-[9px] font-mono text-muted uppercase tracking-[0.08em] border-l border-line">
+                      <div className="px-2.5 py-1.5 text-[0.5625rem] font-mono text-muted uppercase tracking-[0.08em] border-l border-line">
                         💻 PC
                       </div>
                     </div>
                     {section.rows.map((row, i) => (
                       <div key={i} className={`grid grid-cols-[1fr_1fr_1fr] ${i < section.rows.length - 1 ? 'border-b border-line' : ''}`}>
-                        <div className="px-[10px] py-[8px] text-[11px] text-muted font-mono">
+                        <div className="px-2.5 py-2 text-[0.6875rem] text-muted font-mono">
                           {row.feature}
                         </div>
-                        <div className={`px-[10px] py-[8px] text-[11px] border-l border-line leading-snug ${row.mobileNa ? 'text-dim' : 'text-fg'}`}>
+                        <div className={`px-2.5 py-2 text-[0.6875rem] border-l border-line leading-snug ${row.mobileNa ? 'text-dim' : 'text-fg'}`}>
                           {row.mobile}
                         </div>
-                        <div className={`px-[10px] py-[8px] text-[11px] border-l border-line leading-snug ${row.pcNa ? 'text-dim' : 'text-fg'}`}>
+                        <div className={`px-2.5 py-2 text-[0.6875rem] border-l border-line leading-snug ${row.pcNa ? 'text-dim' : 'text-fg'}`}>
                           {row.pc}
                         </div>
                       </div>
@@ -535,7 +535,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                 </div>
               ))}
 
-              <p className="text-muted text-[10px] font-mono text-center pt-[2px]">
+              <p className="text-muted text-[0.625rem] font-mono text-center pt-0.5">
                 {lang === 'ja' ? '画面幅 600px 以上で PC版レイアウトに切替わります' : 'PC layout activates at viewport width ≥ 600 px'}
               </p>
             </div>
@@ -543,41 +543,41 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
 
           {/* ── API tab ── */}
           {tab === 'api' && (
-            <div className="px-[18px] py-[18px] space-y-[20px]">
-              <p className="text-muted text-[11px] font-mono bg-surfalt rounded-[7px] px-3 py-2 leading-[1.7]">
+            <div className="px-[1.125rem] py-[1.125rem] space-y-5">
+              <p className="text-muted text-[0.6875rem] font-mono bg-surfalt rounded-[0.4375rem] px-3 py-2 leading-[1.7]">
                 {lang === 'ja'
                   ? 'APIキーを設定すると3つのAI機能が有効になります。①自然文タブでAIが散文を整形、②✦ツールの「自然文からタグ生成」でキャラ説明をタグに変換、③出力バーの🤖提案で改善タグを提案。キーはこの端末のみに保存されます。'
                   : 'Setting an API key enables 3 AI features: ① AI polish in the Natural Text tab, ② "Text to Tags" in ✦ Tools to convert character descriptions to tags, ③ 🤖 Suggest in the output bar for tag recommendations. Keys are stored on this device only.'}
               </p>
 
               {/* API key acquisition links */}
-              <div className="rounded-[8px] border border-line bg-surfalt px-[14px] py-[11px] space-y-[8px]">
-                <div className="text-muted text-[10px] font-mono font-bold tracking-widest uppercase mb-[4px]">
+              <div className="rounded-lg border border-line bg-surfalt px-3.5 py-[0.6875rem] space-y-2">
+                <div className="text-muted text-[0.625rem] font-mono font-bold tracking-widest uppercase mb-1">
                   {lang === 'ja' ? 'APIキーの取得先' : 'Where to get API keys'}
                 </div>
-                <div className="flex items-center gap-[10px]">
-                  <span className="text-[11px] font-mono text-fg min-w-[110px]">OpenAI (GPT-4o mini)</span>
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[0.6875rem] font-mono text-fg min-w-[6.875rem]">OpenAI (GPT-4o mini)</span>
                   <a
                     href="https://platform.openai.com/api-keys"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-accent text-[11px] font-mono underline underline-offset-2 hover:opacity-80 transition-opacity"
+                    className="text-accent text-[0.6875rem] font-mono underline underline-offset-2 hover:opacity-80 transition-opacity"
                   >
                     platform.openai.com/api-keys →
                   </a>
                 </div>
-                <div className="flex items-center gap-[10px]">
-                  <span className="text-[11px] font-mono text-fg min-w-[110px]">Claude (Haiku)</span>
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[0.6875rem] font-mono text-fg min-w-[6.875rem]">Claude (Haiku)</span>
                   <a
                     href="https://console.anthropic.com/settings/keys"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-accent text-[11px] font-mono underline underline-offset-2 hover:opacity-80 transition-opacity"
+                    className="text-accent text-[0.6875rem] font-mono underline underline-offset-2 hover:opacity-80 transition-opacity"
                   >
                     console.anthropic.com →
                   </a>
                 </div>
-                <p className="text-muted text-[10px] font-mono leading-[1.6] pt-[2px]">
+                <p className="text-muted text-[0.625rem] font-mono leading-[1.6] pt-0.5">
                   {lang === 'ja'
                     ? '無料枠あり。どちらも登録後すぐにキーを発行できます。利用料金はご自身のアカウントで発生します。'
                     : 'Both have free tiers. Keys can be issued immediately after registration. Usage fees apply to your own account.'}
@@ -593,30 +593,30 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                 const isLocked = !!(apiConfig?.apiKey?.trim()) && apiConfig?.provider !== v;
                 const inputVal = localInput[v] ?? '';
                 return (
-                  <div key={v} className={`space-y-[6px] transition-opacity duration-150 ${isLocked ? 'opacity-30 pointer-events-none select-none' : ''}`}>
-                    <div className="text-muted text-[10px] font-mono font-bold tracking-widest uppercase">
+                  <div key={v} className={`space-y-1.5 transition-opacity duration-150 ${isLocked ? 'opacity-30 pointer-events-none select-none' : ''}`}>
+                    <div className="text-muted text-[0.625rem] font-mono font-bold tracking-widest uppercase">
                       {label}
                     </div>
-                    <div className="flex gap-[6px]">
+                    <div className="flex gap-1.5">
                       <input
                         type={isSaved && !apiKeyVisible ? 'password' : 'text'}
                         value={isSaved ? apiConfig.apiKey : inputVal}
                         readOnly={isSaved}
                         onChange={e => !isSaved && setLocalInput(prev => ({ ...prev, [v]: e.target.value }))}
                         placeholder={placeholder}
-                        className="flex-1 rounded-[7px] px-[10px] py-[7px] text-[12px] font-mono outline-none border bg-bg text-fg"
+                        className="flex-1 rounded-[0.4375rem] px-2.5 py-[0.4375rem] text-xs font-mono outline-none border bg-bg text-fg"
                         style={isSaved ? { borderColor: 'rgb(var(--c-green) / 0.5)', opacity: 0.75 } : { borderColor: 'rgb(var(--border))' }}
                         spellCheck={false}
                       />
                       {isSaved ? (
                         <>
                           <button onClick={() => setApiKeyVisible(x => !x)}
-                            className="rounded-[7px] px-[10px] py-[7px] text-[11px] border border-line bg-surfalt text-muted cursor-pointer shrink-0">
+                            className="rounded-[0.4375rem] px-2.5 py-[0.4375rem] text-[0.6875rem] border border-line bg-surfalt text-muted cursor-pointer shrink-0">
                             {apiKeyVisible ? '🙈' : '👁'}
                           </button>
                           <button
                             onClick={() => { onSaveApiConfig?.({ provider: v, apiKey: '' }); }}
-                            className="rounded-[7px] px-[10px] py-[7px] text-[11px] font-mono border border-dim bg-surfalt text-muted cursor-pointer shrink-0">
+                            className="rounded-[0.4375rem] px-2.5 py-[0.4375rem] text-[0.6875rem] font-mono border border-dim bg-surfalt text-muted cursor-pointer shrink-0">
                             {lang === 'ja' ? '削除' : 'Delete'}
                           </button>
                         </>
@@ -624,7 +624,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                         <button
                           onClick={() => { if (!inputVal.trim()) return; onSaveApiConfig?.({ provider: v, apiKey: inputVal }); setApiSaved(v); setTimeout(() => setApiSaved(false), 2000); }}
                           disabled={!inputVal.trim()}
-                          className="rounded-[7px] px-[14px] py-[7px] text-[11px] font-bold cursor-pointer border-none text-white transition-all duration-150 disabled:opacity-40 disabled:cursor-default shrink-0"
+                          className="rounded-[0.4375rem] px-3.5 py-[0.4375rem] text-[0.6875rem] font-bold cursor-pointer border-none text-white transition-all duration-150 disabled:opacity-40 disabled:cursor-default shrink-0"
                           style={{ background: apiSaved === v ? 'rgb(var(--c-green))' : 'rgb(var(--c-blue))' }}
                         >
                           {apiSaved === v ? '✓' : (lang === 'ja' ? '保存' : 'Save')}
@@ -639,33 +639,33 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
 
           {/* ── About tab ── */}
           {tab === 'about' && (
-            <div className="px-[18px] py-[18px] space-y-[20px]">
+            <div className="px-[1.125rem] py-[1.125rem] space-y-5">
 
               {/* App identity */}
-              <div className="text-center pt-[8px] pb-[4px]">
-                <img src="/logo.png" alt="LOOM" className="w-[260px] h-[100px] object-contain mx-auto mb-[6px]" />
-                <div className="text-muted text-[12px] font-mono mb-[6px]">The Prompt Weaving Studio</div>
-                <div className="inline-flex items-center gap-[6px] bg-tint-accent border border-accent/30 rounded-full px-[12px] py-[4px]">
-                  <span className="text-accent text-[11px] font-mono font-bold">{APP_VERSION}</span>
+              <div className="text-center pt-2 pb-1">
+                <img src="/logo.png" alt="LOOM" className="w-[16.25rem] h-[6.25rem] object-contain mx-auto mb-1.5" />
+                <div className="text-muted text-xs font-mono mb-1.5">The Prompt Weaving Studio</div>
+                <div className="inline-flex items-center gap-1.5 bg-tint-accent border border-accent/30 rounded-full px-3 py-1">
+                  <span className="text-accent text-[0.6875rem] font-mono font-bold">{APP_VERSION}</span>
                 </div>
               </div>
 
               {/* Description */}
-              <div className="bg-surfalt rounded-[10px] px-[14px] py-[12px]">
-                <div className="text-muted text-[10px] font-mono font-semibold uppercase tracking-[0.08em] mb-[6px]">
+              <div className="bg-surfalt rounded-[0.625rem] px-3.5 py-3">
+                <div className="text-muted text-[0.625rem] font-mono font-semibold uppercase tracking-[0.08em] mb-1.5">
                   {lang === 'ja' ? 'このアプリについて' : 'About'}
                 </div>
-                <p className="text-fg text-[12px] leading-[1.7]">
+                <p className="text-fg text-xs leading-[1.7]">
                   {lang === 'ja'
                     ? 'LOOMは、AIイラスト生成ツール（Midjourney・NovelAI・Stable Diffusion・Flux・DALL-Eなど）向けのプロンプトを、タグ単位でビジュアルに管理・構築するためのブラウザアプリです。'
                     : 'LOOM is a browser-based app for visually building and managing prompts for AI image tools like Midjourney, NovelAI, Stable Diffusion, Flux, and DALL-E.'}
                 </p>
-                <p className="text-muted text-[11px] leading-[1.7] mt-[8px]">
+                <p className="text-muted text-[0.6875rem] leading-[1.7] mt-2">
                   {lang === 'ja'
                     ? 'すべてのデータはお使いのブラウザ内（IndexedDB）に保存されます。外部サーバーへの送信はありません。'
                     : 'All data is stored locally in your browser (IndexedDB). Nothing is sent to external servers.'}
                 </p>
-                <p className="text-muted text-[11px] leading-[1.7] mt-[6px]">
+                <p className="text-muted text-[0.6875rem] leading-[1.7] mt-1.5">
                   {lang === 'ja' ? '公式X（Twitter）: ' : 'Official X (Twitter): '}
                   <a href="https://x.com/prompt_loom" target="_blank" rel="noopener noreferrer"
                     className="text-accent underline underline-offset-2">
@@ -677,12 +677,12 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
 
               {/* Tech stack */}
               <div>
-                <div className="text-muted text-[10px] font-mono font-semibold uppercase tracking-[0.08em] mb-[8px]">
+                <div className="text-muted text-[0.625rem] font-mono font-semibold uppercase tracking-[0.08em] mb-2">
                   {lang === 'ja' ? '技術スタック' : 'Built with'}
                 </div>
-                <div className="flex flex-wrap gap-[6px]">
+                <div className="flex flex-wrap gap-1.5">
                   {['React 18', 'Vite', 'Tailwind CSS', 'IndexedDB (Dexie)', 'PWA', '@dnd-kit'].map(tech => (
-                    <span key={tech} className="bg-surfalt border border-line rounded-[5px] px-[8px] py-[3px] text-muted text-[10px] font-mono">
+                    <span key={tech} className="bg-surfalt border border-line rounded-[0.3125rem] px-2 py-[0.1875rem] text-muted text-[0.625rem] font-mono">
                       {tech}
                     </span>
                   ))}
@@ -691,10 +691,10 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
 
               {/* Version history */}
               <div>
-                <div className="text-muted text-[10px] font-mono font-semibold uppercase tracking-[0.08em] mb-[8px]">
+                <div className="text-muted text-[0.625rem] font-mono font-semibold uppercase tracking-[0.08em] mb-2">
                   {lang === 'ja' ? 'バージョン履歴（主要マイルストーン）' : 'Version milestones'}
                 </div>
-                <div className="space-y-[5px]">
+                <div className="space-y-[0.3125rem]">
                   {[
                     { v: 'v1.9', note: lang === 'ja' ? '極限クローズアップテンプレート追加（口元・目・魚眼）。テンプレートにネガ推奨タグ（negHint）表示。全テンプレートタグをブロックで個別選択可能に統一。ブロック別テンプレート適用取り消し（↩）ボタン追加。キャラノート設定シートにAIタグフィールド・TSVエクスポート・エディタからのインポートを統合。プロンプトログの重複自動記録防止・タグ対応表の挿入時重複スキップ。ランダム生成から特定タグを除外するexcludeFromRandomフラグ追加。競合ルール・タグ辞書拡充' : 'New extreme close-up templates (lip focus, eye focus, fisheye). Templates show negHint suggestions. All template tags now individually selectable in blocks. Per-block template undo (↩) button. Character note profile sheet gains per-field AI tag rows, TSV export, and editor import. Prompt log dedup on COPY, tag map insert dedup. excludeFromRandom flag to prevent extreme tags in random generation. Expanded conflict rules and tag dictionary.' },
                     { v: 'v1.8', note: lang === 'ja' ? 'コードアーキテクチャ刷新：クラウド同期ロジックをuseCloudSync・ランダム生成ロジックをuseRandomGenフックに分離。新追加種族タグ（catgirl・dark elf・dragon girl・android・slime girl等）・artstyleタグ（retro artstyle・tarot card）・髪型タグ（layered hair）対応。競合ルール追加（レトロアニメ/タロットカード×リアル・3D、レイヤードヘア×ショート）。タグ辞書・破綻チェック全面監査' : 'Architecture refactor: cloud sync extracted to useCloudSync hook, random generation to useRandomGen hook. New species tags (catgirl, dark elf, dragon girl, android, slime girl, etc.), artstyle tags (retro artstyle, tarot card), hairstyle tag (layered hair). New conflict rules (retro artstyle/tarot card vs realistic/3D, layered hair vs short). Full tag dictionary & conflict audit.' },
@@ -715,8 +715,8 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                     { v: 'v0.3', note: lang === 'ja' ? '複数キャラ管理・履歴・スナップショット・PWA対応' : 'Multi-character, history, snapshot, PWA support' },
                     { v: 'v0.1–0.2', note: lang === 'ja' ? '基本ブロックエディタ・タグシステム・LoRA管理' : 'Basic block editor, tag system, LoRA management' },
                   ].map(({ v, note }) => (
-                    <div key={v} className="flex gap-[10px] items-start text-[11px]">
-                      <span className="font-mono font-bold text-accent flex-shrink-0 w-[42px]">{v}</span>
+                    <div key={v} className="flex gap-2.5 items-start text-[0.6875rem]">
+                      <span className="font-mono font-bold text-accent flex-shrink-0 w-[2.625rem]">{v}</span>
                       <span className="text-muted leading-[1.5]">{note}</span>
                     </div>
                   ))}
@@ -724,11 +724,11 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
               </div>
 
               {/* Disclaimer */}
-              <div className="bg-surfalt rounded-[10px] px-[14px] py-[12px]">
-                <div className="text-muted text-[10px] font-mono font-semibold uppercase tracking-[0.08em] mb-[6px]">
+              <div className="bg-surfalt rounded-[0.625rem] px-3.5 py-3">
+                <div className="text-muted text-[0.625rem] font-mono font-semibold uppercase tracking-[0.08em] mb-1.5">
                   {lang === 'ja' ? '免責事項' : 'Disclaimer'}
                 </div>
-                <ul className="space-y-[5px]">
+                <ul className="space-y-[0.3125rem]">
                   {(lang === 'ja' ? [
                     '本アプリは現状のまま（as-is）提供されます。動作・出力内容に関して、開発者は明示・黙示を問わず一切の保証を行いません。',
                     'ブラウザのデータクリア・キャッシュ削除等によるデータ消失について、開発者は責任を負いません。定期的にJSONバックアップをご利用ください。',
@@ -740,8 +740,8 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                     'Use of prompts and content generated by this app is subject to each AI service\'s terms of use (Midjourney, NovelAI, etc.). The developer bears no responsibility for such content.',
                     'The developer shall not be liable for any damages arising from use of this app, including data loss or issues related to generated content.',
                   ]).map((text, i) => (
-                    <li key={i} className="flex gap-[6px] items-start text-muted text-[10px] leading-[1.6]">
-                      <span className="flex-shrink-0 mt-[2px]">·</span>
+                    <li key={i} className="flex gap-1.5 items-start text-muted text-[0.625rem] leading-[1.6]">
+                      <span className="flex-shrink-0 mt-0.5">·</span>
                       <span>{text}</span>
                     </li>
                   ))}
@@ -749,11 +749,11 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
               </div>
 
               {/* Copyright */}
-              <div className="border-t border-line pt-[14px] text-center space-y-[4px]">
-                <div className="text-fg text-[11px] font-mono font-semibold">
+              <div className="border-t border-line pt-3.5 text-center space-y-1">
+                <div className="text-fg text-[0.6875rem] font-mono font-semibold">
                   © {APP_YEAR} LOOM Project
                 </div>
-                <div className="text-muted text-[10px] font-mono">
+                <div className="text-muted text-[0.625rem] font-mono">
                   <a href="https://prompt-loom.com" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">prompt-loom.com</a>
                   {' · '}
                   <a href="https://x.com/prompt_loom" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">@prompt_loom</a>

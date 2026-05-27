@@ -85,7 +85,7 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
       onTouchEnd={IS_TOUCH ? handleTouchEnd : undefined}
       onTouchMove={IS_TOUCH ? handleTouchMove : undefined}
       style={{ background: bg, border: `1px solid ${bd}`, opacity: disabled ? 0.4 : 1, boxShadow: active && !selectMode ? `0 0 0 1px ${color}40` : 'none' }}
-      className="inline-flex items-center rounded-[5px] overflow-hidden transition-all duration-100"
+      className="inline-flex items-center rounded-[0.3125rem] overflow-hidden transition-all duration-100"
     >
       {/* Tooltip — position:fixed escapes parent overflow:hidden */}
       {showTip && (
@@ -124,7 +124,7 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
         }}
         title={conflict ? (lang === 'ja' ? `⚠ 競合タグ: ${tag.en}` : `⚠ Conflicting tag: ${tag.en}`) : (lang === 'ja' ? tag.en : tag.ja)}
         style={{ color: fg }}
-        className={`bg-transparent border-none cursor-pointer font-mono tracking-tight ${large ? 'px-[10px] py-[6px] text-[15px]' : 'px-[7px] py-[3px] text-[12px]'} ${(active || selected) ? 'font-bold' : 'font-normal'}`}
+        className={`bg-transparent border-none cursor-pointer font-mono tracking-tight ${large ? 'px-2.5 py-1.5 text-[0.9375rem]' : 'px-[0.4375rem] py-[0.1875rem] text-xs'} ${(active || selected) ? 'font-bold' : 'font-normal'}`}
       >
         {conflict ? '⚠ ' : (active && !selectMode) ? '✓ ' : (analyzed && !active && !selectMode) ? '◎ ' : ''}
         {selectMode && selected ? '☑ ' : selectMode ? '☐ ' : ''}
@@ -133,7 +133,7 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
       {onToggleFav && !selectMode && ((active && h) || isFav) && (
         <button
           onClick={e => { e.stopPropagation(); onToggleFav(); }}
-          className={`bg-transparent border-l border-dim cursor-pointer leading-none ${large ? 'px-[7px] py-[6px] text-[13px]' : 'px-[5px] py-[3px] text-[10px]'} ${isFav ? 'text-warn' : 'text-muted'}`}
+          className={`bg-transparent border-l border-dim cursor-pointer leading-none ${large ? 'px-[0.4375rem] py-1.5 text-[0.8125rem]' : 'px-[0.3125rem] py-[0.1875rem] text-[0.625rem]'} ${isFav ? 'text-warn' : 'text-muted'}`}
         >★</button>
       )}
     </div>

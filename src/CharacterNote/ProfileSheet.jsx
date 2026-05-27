@@ -144,21 +144,21 @@ function TagRow({ ft, color, blockOptions, charBlockIds, lang, onChange, onInser
   const canInsert = tags.trim() && blockOk;
 
   return (
-    <div className="flex gap-[8px] items-center mb-[7px]">
-      <span className="w-[120px] flex-shrink-0" />
-      <div className="flex-1 flex gap-[5px] items-center min-w-0">
+    <div className="flex gap-2 items-center mb-[0.4375rem]">
+      <span className="w-[7.5rem] flex-shrink-0" />
+      <div className="flex-1 flex gap-[0.3125rem] items-center min-w-0">
         <input
           value={tags}
           onChange={e => onChange({ block: blockId, tags: e.target.value })}
           placeholder={lang === 'ja' ? 'AIタグ（例: silver hair, long hair）' : 'AI tags (e.g. silver hair, long hair)'}
-          className="flex-1 min-w-0 bg-bg border border-dashed rounded-[5px] text-[11px] px-[7px] py-[3px] font-mono text-prompt outline-none"
+          className="flex-1 min-w-0 bg-bg border border-dashed rounded-[0.3125rem] text-[0.6875rem] px-[0.4375rem] py-[0.1875rem] font-mono text-prompt outline-none"
           style={{ borderColor: tags ? color + '55' : 'rgb(var(--dim))' }}
         />
         <select
           value={blockId}
           onChange={e => onChange({ tags, block: e.target.value })}
           title={!blockOk ? (lang === 'ja' ? 'このブロックは存在しません' : 'Block not found') : undefined}
-          className="bg-bg border rounded-[4px] text-[10px] px-[4px] py-[3px] font-mono text-muted outline-none cursor-pointer flex-shrink-0"
+          className="bg-bg border rounded text-[0.625rem] px-1 py-[0.1875rem] font-mono text-muted outline-none cursor-pointer flex-shrink-0"
           style={{ borderColor: blockOk ? 'rgb(var(--dim))' : 'rgb(var(--c-warn, 234 179 8) / 0.6)', maxWidth: '88px' }}
         >
           {blockOptions.map(b => <option key={b.id} value={b.id}>{b.label}</option>)}
@@ -177,7 +177,7 @@ function TagRow({ ft, color, blockOptions, charBlockIds, lang, onChange, onInser
                              (lang === 'ja' ? 'ブロックに挿入（重複スキップ）' : 'Insert to block (dedup)')
           }
           style={canInsert ? { borderColor: color + '60', color } : undefined}
-          className="border border-dim rounded-[4px] px-[6px] py-[2px] text-[10px] font-mono cursor-pointer bg-transparent flex-shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="border border-dim rounded px-1.5 py-0.5 text-[0.625rem] font-mono cursor-pointer bg-transparent flex-shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
         >
           {inserted ? '✓' : '→'}
         </button>
@@ -188,15 +188,15 @@ function TagRow({ ft, color, blockOptions, charBlockIds, lang, onChange, onInser
 
 // ── FieldRow ───────────────────────────────────────────────────────────────
 function FieldRow({ label, value, onChange, color, multi }) {
-  const base = "flex-1 bg-bg border border-line rounded-[5px] text-[12px] px-[8px] py-[5px] font-mono text-fg outline-none";
+  const base = "flex-1 bg-bg border border-line rounded-[0.3125rem] text-xs px-2 py-[0.3125rem] font-mono text-fg outline-none";
   const onFocus = e => { e.target.style.borderColor = color + '80'; };
   const onBlur  = e => { e.target.style.borderColor = ''; };
   return (
-    <div className="flex gap-[8px] mb-[5px] items-start">
-      <span className="text-muted text-[10px] font-mono w-[120px] flex-shrink-0 pt-[6px] leading-tight break-keep">{label}</span>
+    <div className="flex gap-2 mb-[0.3125rem] items-start">
+      <span className="text-muted text-[0.625rem] font-mono w-[7.5rem] flex-shrink-0 pt-1.5 leading-tight break-keep">{label}</span>
       {multi ? (
         <textarea value={value} onChange={e => onChange(e.target.value)} placeholder="—"
-          className={`${base} resize-y min-h-[48px] leading-[1.65]`}
+          className={`${base} resize-y min-h-12 leading-[1.65]`}
           onFocus={onFocus} onBlur={onBlur} />
       ) : (
         <input value={value} onChange={e => onChange(e.target.value)} placeholder="—"
@@ -402,24 +402,24 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
   const SecHeader = ({ sec }) => (
     <button
       onClick={() => setOpenSecs(prev => ({ ...prev, [sec.id]: !prev[sec.id] }))}
-      className="w-full flex items-center gap-[6px] text-[11px] font-bold font-mono mb-[7px] mt-[14px] cursor-pointer bg-transparent border-none p-0 text-left group"
+      className="w-full flex items-center gap-1.5 text-[0.6875rem] font-bold font-mono mb-[0.4375rem] mt-3.5 cursor-pointer bg-transparent border-none p-0 text-left group"
     >
       <span style={{ color: char.color }}>{sec.icon} {lang === 'ja' ? sec.ja : sec.en}</span>
-      <span className="flex-1 border-b border-line mx-[4px]" />
-      <span className="text-dim text-[10px]">{openSecs[sec.id] ? '▲' : '▼'}</span>
+      <span className="flex-1 border-b border-line mx-1" />
+      <span className="text-dim text-[0.625rem]">{openSecs[sec.id] ? '▲' : '▼'}</span>
     </button>
   );
 
   return (
     <div>
       {/* ── Toolbar ── */}
-      <div className="flex gap-[5px] flex-wrap items-center mb-[12px]">
+      <div className="flex gap-[0.3125rem] flex-wrap items-center mb-3">
         <button
           onClick={toggleShowTag}
           style={showTagFields
             ? { background: char.color + '18', borderColor: char.color + '60', color: char.color }
             : undefined}
-          className={`rounded-[6px] px-[9px] py-[4px] text-[10px] font-mono cursor-pointer border transition-all ${showTagFields ? 'font-bold' : 'border-dim text-muted'}`}
+          className={`rounded-md px-[0.5625rem] py-1 text-[0.625rem] font-mono cursor-pointer border transition-all ${showTagFields ? 'font-bold' : 'border-dim text-muted'}`}
           title={lang === 'ja' ? '全フィールドのAIタグ入力欄を表示/非表示' : 'Show / hide AI tag rows for all fields'}
         >
           🏷 {lang === 'ja' ? (showTagFields ? 'タグ欄 ON' : 'タグ欄') : (showTagFields ? 'Tags ON' : 'Tags')}
@@ -427,7 +427,7 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
 
         <button
           onClick={importFromEditor}
-          className="border border-dim rounded-[6px] px-[9px] py-[4px] text-[10px] font-mono cursor-pointer bg-transparent text-muted"
+          className="border border-dim rounded-md px-[0.5625rem] py-1 text-[0.625rem] font-mono cursor-pointer bg-transparent text-muted"
           title={lang === 'ja' ? 'エディタの各ブロック内容でタグ欄を上書き（ブロック設定済み欄のみ）' : 'Overwrite tag rows from current editor blocks (only rows with a block set)'}
         >
           🔄 {lang === 'ja' ? 'エディタから取り込む' : 'Import from editor'}
@@ -438,7 +438,7 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
         <button
           onClick={copyProfile}
           style={copied === 'text' ? { borderColor: char.color + '60', color: char.color } : undefined}
-          className="border border-dim rounded-[6px] px-[9px] py-[4px] text-[10px] font-mono cursor-pointer bg-transparent text-muted"
+          className="border border-dim rounded-md px-[0.5625rem] py-1 text-[0.625rem] font-mono cursor-pointer bg-transparent text-muted"
         >
           {copied === 'text'
             ? `✓ ${lang === 'ja' ? 'コピー済み' : 'Copied!'}`
@@ -448,7 +448,7 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
         <button
           onClick={copyTSV}
           style={copied === 'tsv' ? { borderColor: char.color + '60', color: char.color } : undefined}
-          className="border border-dim rounded-[6px] px-[9px] py-[4px] text-[10px] font-mono cursor-pointer bg-transparent text-muted"
+          className="border border-dim rounded-md px-[0.5625rem] py-1 text-[0.625rem] font-mono cursor-pointer bg-transparent text-muted"
           title={lang === 'ja' ? 'Google Sheetsなどにそのままペーストできるタブ区切り形式でコピー' : 'Copy as TSV — paste directly into Google Sheets etc.'}
         >
           {copied === 'tsv'
@@ -497,11 +497,11 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
       {/* ── Custom fields ── */}
       <button
         onClick={() => setOpenSecs(prev => ({ ...prev, _custom: !prev._custom }))}
-        className="w-full flex items-center gap-[6px] text-[11px] font-bold font-mono mb-[7px] mt-[14px] cursor-pointer bg-transparent border-none p-0 text-left group"
+        className="w-full flex items-center gap-1.5 text-[0.6875rem] font-bold font-mono mb-[0.4375rem] mt-3.5 cursor-pointer bg-transparent border-none p-0 text-left group"
       >
         <span style={{ color: char.color }}>✏️ {lang === 'ja' ? 'カスタム項目' : 'Custom Fields'}</span>
-        <span className="flex-1 border-b border-line mx-[4px]" />
-        <span className="text-dim text-[10px]">{openSecs._custom ? '▲' : '▼'}</span>
+        <span className="flex-1 border-b border-line mx-1" />
+        <span className="text-dim text-[0.625rem]">{openSecs._custom ? '▲' : '▼'}</span>
       </button>
       {openSecs._custom && (
         <>
@@ -511,25 +511,25 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
             const showTag = showTagFields || !!ft?.tags;
             return (
               <div key={f.id}>
-                <div className="flex gap-[8px] mb-[5px] items-start group">
-                  <span className="text-muted text-[10px] font-mono w-[120px] flex-shrink-0 pt-[6px] leading-tight flex items-start gap-[2px]">
+                <div className="flex gap-2 mb-[0.3125rem] items-start group">
+                  <span className="text-muted text-[0.625rem] font-mono w-[7.5rem] flex-shrink-0 pt-1.5 leading-tight flex items-start gap-0.5">
                     <span className="break-all flex-1 leading-tight">{f.label}</span>
                     <button onClick={() => removeCustomField(f.id)}
-                      className="opacity-0 group-hover:opacity-100 text-[11px] cursor-pointer bg-transparent border-none text-dim hover:text-red-400 flex-shrink-0 leading-none">✕</button>
+                      className="opacity-0 group-hover:opacity-100 text-[0.6875rem] cursor-pointer bg-transparent border-none text-dim hover:text-red-400 flex-shrink-0 leading-none">✕</button>
                   </span>
                   {f.multi ? (
                     <textarea value={f.value} onChange={e => updateCustomField(f.id, 'value', e.target.value)} placeholder="—"
-                      className="flex-1 bg-bg border border-line rounded-[5px] text-[12px] px-[8px] py-[5px] font-mono text-fg outline-none resize-y min-h-[48px] leading-[1.65]"
+                      className="flex-1 bg-bg border border-line rounded-[0.3125rem] text-xs px-2 py-[0.3125rem] font-mono text-fg outline-none resize-y min-h-12 leading-[1.65]"
                       onFocus={e => e.target.style.borderColor = char.color + '80'} onBlur={e => e.target.style.borderColor = ''} />
                   ) : (
                     <input value={f.value} onChange={e => updateCustomField(f.id, 'value', e.target.value)} placeholder="—"
-                      className="flex-1 bg-bg border border-line rounded-[5px] text-[12px] px-[8px] py-[5px] font-mono text-fg outline-none"
+                      className="flex-1 bg-bg border border-line rounded-[0.3125rem] text-xs px-2 py-[0.3125rem] font-mono text-fg outline-none"
                       onFocus={e => e.target.style.borderColor = char.color + '80'} onBlur={e => e.target.style.borderColor = ''} />
                   )}
                   <button
                     onClick={() => updateCustomField(f.id, 'multi', !f.multi)}
                     title={lang === 'ja' ? '1行 / 複数行を切替' : 'Toggle single / multi-line'}
-                    className="text-[9px] font-mono cursor-pointer bg-transparent border border-dim rounded-[4px] px-[5px] py-[4px] text-muted flex-shrink-0 mt-[2px] whitespace-nowrap">
+                    className="text-[0.5625rem] font-mono cursor-pointer bg-transparent border border-dim rounded px-[0.3125rem] py-1 text-muted flex-shrink-0 mt-0.5 whitespace-nowrap">
                     {f.multi ? '1L' : '多L'}
                   </button>
                 </div>
@@ -548,7 +548,7 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
             );
           })}
           <button onClick={addCustomField}
-            className="w-full rounded-[7px] py-[7px] text-[11px] font-mono cursor-pointer border border-dashed mt-[4px] flex items-center justify-center gap-[5px]"
+            className="w-full rounded-[0.4375rem] py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer border border-dashed mt-1 flex items-center justify-center gap-[0.3125rem]"
             style={{ borderColor: 'rgb(var(--dim))', color: 'rgb(var(--muted))', background: 'transparent' }}>
             ＋ {lang === 'ja' ? '項目を追加' : 'Add custom field'}
           </button>
