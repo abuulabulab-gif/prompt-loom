@@ -1366,8 +1366,8 @@ export default function Loom() {
 
       {/* ── CHARACTER PANEL (PC: compact strip always + collapsible detail) ── */}
       {activeChar && !isMobile && (
-        <div className="bg-panel border-b border-line px-[14px] py-[7px]">
-          <div style={{ maxWidth: contentMax }} className="mx-auto">
+        <div className="bg-panel border-b border-line py-[7px]">
+          <div style={{ maxWidth: contentMax }} className="mx-auto px-[14px]">
             {/* Compact 1-line strip */}
             <div className="flex items-center gap-[9px]">
               <input value={activeChar.name} onChange={e => updateChar(activeChar.id, { name: e.target.value })}
@@ -1578,9 +1578,9 @@ export default function Loom() {
                     <div className="fixed inset-0 z-[248] bg-black/60 backdrop-blur-[2px]" onClick={() => setFocusBlockId(null)} />
                     {/* 3-pane modal */}
                     <div className="fixed inset-0 z-[249] flex items-start justify-center pt-[12px] px-4 pb-4 pointer-events-none">
-                      <div className="w-full max-w-[72rem] flex gap-3 items-start pointer-events-auto" style={{ maxHeight: 'calc(100vh - 24px)' }}>
+                      <div className="w-full max-w-[60rem] flex gap-3 items-stretch pointer-events-auto" style={{ height: 'calc(100vh - 28px)' }}>
                         {/* Left: BlockCard */}
-                        <div className="flex-1 min-w-0 flex flex-col overflow-hidden" style={{ maxHeight: 'calc(100vh - 24px)' }}>
+                        <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
                           <div className="mb-2 flex items-center gap-2 flex-shrink-0">
                             <span style={{ background: focusBlock.color + '22', border: `1px solid ${focusBlock.color}80`, color: focusBlock.color, textShadow: '0 0 8px currentColor' }} className="text-[12px] font-mono font-bold px-[10px] py-[3px] rounded-full tracking-[0.08em]">
                               🔍 {lang === 'ja' ? '集中編集モード' : 'FOCUS MODE'}
@@ -1596,7 +1596,7 @@ export default function Loom() {
 
                         {/* Center: mini TagMap for this block */}
                         {focusTagMapRows.length > 0 && (
-                          <div className="w-[210px] flex-shrink-0 flex flex-col" style={{ maxHeight: 'calc(100vh - 24px)' }}>
+                          <div className="w-[210px] flex-shrink-0 flex flex-col overflow-hidden">
                             <div className="text-muted text-[9px] font-mono mb-2 tracking-[0.06em] flex-shrink-0">
                               🔗 {lang === 'ja' ? 'タグ対応表' : 'Tag Map'}
                             </div>
@@ -1618,9 +1618,9 @@ export default function Loom() {
                         )}
 
                         {/* Right: block navigation */}
-                        <div className="w-[170px] flex-shrink-0 flex flex-col" style={{ maxHeight: 'calc(100vh - 24px)' }}>
+                        <div className="w-[170px] flex-shrink-0 flex flex-col overflow-hidden">
                           <div className="text-muted text-[9px] font-mono mb-2 tracking-[0.06em] flex-shrink-0">{lang === 'ja' ? '他のブロック' : 'Other blocks'}</div>
-                          <div className="flex-1 flex flex-col justify-between gap-[3px]">
+                          <div className="flex-1 flex flex-col justify-between gap-[3px] overflow-y-auto">
                             {visibleBlocks.filter(b => b.id !== focusBlockId).map(b => {
                               const num = visibleBlocks.findIndex(x => x.id === b.id) + 1;
                               return (
