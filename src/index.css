@@ -7,10 +7,10 @@
    raising root font-size scales the whole layout — NOT individual
    px-based Tailwind utilities. DO NOT remove or override these rules.
    ────────────────────────────────────────────────────────────── */
-html { font-size: 19.2px; }                                 /* base  < 1920px (1.2× original) */
-@media (min-width: 1920px) { html { font-size: 28.8px; } } /* FHD   1.5× */
-@media (min-width: 2560px) { html { font-size: 38.4px; } } /* WQHD  2×   */
-@media (min-width: 3840px) { html { font-size: 57.6px; } } /* 4K    3×   */
+html { font-size: 21.12px; }                                /* base  < 1920px (1.32× original) */
+@media (min-width: 1920px) { html { font-size: 31.68px; } }/* FHD   1.5× */
+@media (min-width: 2560px) { html { font-size: 42.24px; } }/* WQHD  2×   */
+@media (min-width: 3840px) { html { font-size: 63.36px; } }/* 4K    3×   */
 
 /* Prevent accidental text selection everywhere; allow it only in editable fields */
 * { -webkit-user-select: none; user-select: none; }
