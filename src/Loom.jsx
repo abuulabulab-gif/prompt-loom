@@ -16,7 +16,7 @@ import {
 } from "./data/constants.js";
 import { detectConflicts } from "./data/conflicts.js";
 import { TOOLS } from "./data/tools.js";
-import { buildColorTag, SHADES, COLOR_PALETTE, COLOR_TARGETS } from "./data/colors.js";
+import { buildColorTag, buildColorName, SHADES, COLOR_PALETTE, COLOR_TARGETS } from "./data/colors.js";
 import { makeCharacter, makeCustomBlock, BLOCKS_DEF } from "./data/blocks.js";
 import PresetChip from "./components/PresetChip.jsx";
 import BlockCard from "./components/BlockCard.jsx";
@@ -210,6 +210,7 @@ export default function Loom() {
   const [importToast, setImportToast] = useState(null); // null | { name: string }
   const [autoLogToast, setAutoLogToast] = useState(false);
   const [colorToast, setColorToast] = useState(null); // null | { msg }
+  const [colorPickerAllowedTargets, setColorPickerAllowedTargets] = useState(null);
   const [colorPickerDefaultTarget, setColorPickerDefaultTarget] = useState('hair');
   const [orderUpdatedAt, setOrderUpdatedAt] = useState(0);
   const [settingsUpdatedAt, setSettingsUpdatedAt] = useState(0);
@@ -317,14 +318,32 @@ export default function Loom() {
   }, [characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight, orderUpdatedAt, settingsUpdatedAt, loaded]);
 
   // ── Color picker apply ──
-  const TARGET_TO_BLOCK = { hair: 'face', eyes: 'face', skin: 'body', dress: 'outfit', shirt: 'outfit', skirt: 'outfit', jacket: 'outfit', ribbon: 'outfit', shoes: 'outfit', theme: 'artstyle' };
-  const BLOCK_TO_COLOR_TARGET = { face: 'hair', body: 'skin', outfit: 'dress', artstyle: 'theme' };
+  const TARGET_TO_BLOCK = { hair: 'face', inner_hair: 'face', eyes: 'face', heterochromia: 'face', skin: 'body', dress: 'outfit', shirt: 'outfit', skirt: 'outfit', jacket: 'outfit', ribbon: 'outfit', shoes: 'outfit', theme: 'artstyle' };
+  const BLOCK_TO_COLOR_TARGET   = { face: 'hair', body: 'skin', outfit: 'dress', artstyle: 'theme' };
+  const BLOCK_TO_ALLOWED_TARGETS = { face: ['hair','inner_hair','eyes','heterochromia'], body: ['skin'], outfit: ['dress','shirt','skirt','jacket','ribbon','shoes'], artstyle: ['theme'] };
 
-  const applyColorTag = (shadeEn, colorEn, targetEn, targetId) => {
+  const applyColorTag = (shadeEn, colorEn, targetEn, targetId, shade2En = '', color2En = '') => {
+    if (targetId === 'heterochromia') {
+      const name1 = buildColorName(shadeEn, colorEn);
+      const name2 = buildColorName(shade2En, color2En);
+      const tag1  = `${name1} and ${name2} eyes`;
+      const tag2  = 'heterochromia';
+      setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : {
+        ...c,
+        blocks: c.blocks.map(b => b.id !== 'face' ? b : {
+          ...b, text: appendTag(appendTag(b.text, tag1, '1.0'), tag2, '1.0'), enabled: true, collapsed: false,
+        }),
+      }));
+      const faceBlockName = blocks.find(b => b.id === 'face')?.[lang === 'ja' ? 'name' : 'nameEn'] ?? 'face';
+      const msg = lang === 'ja' ? `🎨 ${faceBlockName}に「オッドアイ」を追加` : `🎨 heterochromia added to ${faceBlockName}`;
+      setColorToast({ msg });
+      setTimeout(() => setColorToast(null), 3000);
+      return;
+    }
+
     const blockId = TARGET_TO_BLOCK[targetId] || 'outfit';
-    const tag = targetId === 'theme' ? `${shadeEn}${colorEn} theme`.trim() : buildColorTag(shadeEn, colorEn, targetEn);
+    const tag = buildColorTag(shadeEn, colorEn, targetEn);
 
-    // Build Japanese label for toast
     const colorJa   = COLOR_PALETTE.find(c => c.en === colorEn)?.ja ?? colorEn;
     const shadeObj  = SHADES.find(s => s.en === shadeEn);
     const targetObj = COLOR_TARGETS.find(t => t.id === targetId);
@@ -347,8 +366,9 @@ export default function Loom() {
     setTimeout(() => setColorToast(null), 3000);
   };
 
-  const openColorPicker = (defaultTarget = 'hair') => {
+  const openColorPicker = (defaultTarget = 'hair', allowedTargets = null) => {
     setColorPickerDefaultTarget(defaultTarget);
+    setColorPickerAllowedTargets(allowedTargets);
     setColorPickerOpen(true);
   };
 
@@ -1686,7 +1706,7 @@ export default function Loom() {
                   analyzeText={analyzeText}
                   allBlocks={blocks}
                   onUndoBackup={templateUndoBuf?.blockTexts[block.id] !== undefined ? () => undoSingleBlock(block.id) : undefined}
-                  onColorPicker={BLOCK_TO_COLOR_TARGET[block.id] ? () => openColorPicker(BLOCK_TO_COLOR_TARGET[block.id]) : undefined}
+                  onColorPicker={BLOCK_TO_COLOR_TARGET[block.id] ? () => openColorPicker(BLOCK_TO_COLOR_TARGET[block.id], BLOCK_TO_ALLOWED_TARGETS[block.id]) : undefined}
                   isLight={theme === 'light'} />
               );
 
@@ -2498,7 +2518,7 @@ export default function Loom() {
       {historyOpen && <HistoryModal history={history} lang={lang} onClose={() => setHistoryOpen(false)} onRestore={restoreFromHistory} onDelete={id => setHistory(prev => prev.filter(h => h.id !== id))} />}
       {naturalToTagsOpen && <NaturalToTagsModal lang={lang} apiConfig={apiConfig} blocks={blocks} onAddTags={handleAddTagsFromNatural} onClose={() => setNaturalToTagsOpen(false)} initialTab={naturalToTagsTab} />}
       {templateOpen && <TemplateModal lang={lang} isMobile={isMobile} onApply={applyTemplate} onClose={() => setTemplateOpen(false)} />}
-      {colorPickerOpen && <ColorPickerModal lang={lang} onApply={applyColorTag} onClose={() => setColorPickerOpen(false)} defaultTarget={colorPickerDefaultTarget} />}
+      {colorPickerOpen && <ColorPickerModal lang={lang} onApply={applyColorTag} onClose={() => setColorPickerOpen(false)} defaultTarget={colorPickerDefaultTarget} allowedTargets={colorPickerAllowedTargets} />}
       {sceneOpen && <SceneComposeModal characters={characters} lang={lang} activeTool={activeTool} theme={theme} onClose={() => setSceneOpen(false)} defaultQuality={blocks.find(b => b.id === 'quality')?.text || ''} />}
       {settingsOpen && <SettingsModal lang={lang} isMobile={isMobile} defaultTab={settingsTab} onClose={() => { setSettingsOpen(false); setSettingsTab('shortcuts'); }}
         hiddenBlockIds={hiddenBlockIds} allBlocks={blocks}

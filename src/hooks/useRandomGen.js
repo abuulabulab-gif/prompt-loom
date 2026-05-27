@@ -8,7 +8,7 @@ import {
 
 const RARE_OPT_CAT_PROB = 0.15; // rare optional cats: 15% vs standard 40%
 import { CONFLICT_MAP } from "../data/conflicts.js";
-import { COLOR_PALETTE, SHADES, COLOR_TARGETS, buildColorTag } from "../data/colors.js";
+import { COLOR_PALETTE, SHADES, COLOR_TARGETS, buildColorTag, buildColorName, HUE_GROUPS } from "../data/colors.js";
 
 const COLOR_CAT_IDS = new Set(['face_haircolor', 'face_eyecolor']);
 const COLOR_CAT_TARGET = { face_haircolor: 'hair', face_eyecolor: 'eyes' };
@@ -20,7 +20,34 @@ function pickWeightedShade() {
   return SHADES.find(s => s.id === 'dark');
 }
 
+function pickHeterochromiaPair() {
+  const groupIdx1 = Math.floor(Math.random() * HUE_GROUPS.length);
+  let groupIdx2;
+  do { groupIdx2 = Math.floor(Math.random() * HUE_GROUPS.length); } while (groupIdx2 === groupIdx1);
+  const colorEn1 = HUE_GROUPS[groupIdx1][Math.floor(Math.random() * HUE_GROUPS[groupIdx1].length)];
+  const colorEn2 = HUE_GROUPS[groupIdx2][Math.floor(Math.random() * HUE_GROUPS[groupIdx2].length)];
+  const shade1 = pickWeightedShade();
+  const shade2 = pickWeightedShade();
+  const name1  = buildColorName(shade1.en, colorEn1);
+  const name2  = buildColorName(shade2.en, colorEn2);
+  const col1Ja = COLOR_PALETTE.find(c => c.en === colorEn1)?.ja ?? colorEn1;
+  const col2Ja = COLOR_PALETTE.find(c => c.en === colorEn2)?.ja ?? colorEn2;
+  const ja1 = shade1.id !== 'normal' ? `${shade1.ja}${col1Ja}` : col1Ja;
+  const ja2 = shade2.id !== 'normal' ? `${shade2.ja}${col2Ja}` : col2Ja;
+  return { en: `${name1} and ${name2} eyes`, extraEn: 'heterochromia', ja: `${ja1}と${ja2}オッドアイ` };
+}
+
+function picksToText(picks, strength) {
+  let text = '';
+  for (const t of picks) {
+    text = appendTag(text, t.en, strength);
+    if (t.extraEn) text = appendTag(text, t.extraEn, strength);
+  }
+  return text;
+}
+
 function pickColorCatTag(catId) {
+  if (catId === 'face_eyecolor' && Math.random() < 0.10) return pickHeterochromiaPair();
   const targetId  = COLOR_CAT_TARGET[catId];
   const targetObj = COLOR_TARGETS.find(t => t.id === targetId);
   const color     = COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
@@ -232,29 +259,22 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
                 ),
             };
             const picks = pickBlockTags(filteredBlock, globalExcluded);
-            let text = '';
-            for (const t of picks) text = appendTag(text, t.en, block.strength);
-            newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: picks };
+            newBlock = { ...block, text: picksToText(picks, block.strength), enabled: true, collapsed: false, lastRandomPicks: picks };
           } else if (block.id === 'body') {
             const filteredBlock = { ...block, cats: block.cats.filter(c => !cfg.skipBodyCats.has(c.n)) };
             const picks = pickBlockTags(filteredBlock, globalExcluded);
-            let text = '';
-            for (const t of picks) text = appendTag(text, t.en, block.strength);
-            newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: picks };
+            newBlock = { ...block, text: picksToText(picks, block.strength), enabled: true, collapsed: false, lastRandomPicks: picks };
           } else if (block.id === 'feature') {
             const filteredBlock = { ...block, cats: block.cats.filter(c => !cfg.skipFeatureCats.has(c.n)) };
             const picks = pickBlockTags(filteredBlock, globalExcluded);
-            let text = '';
-            for (const t of picks) text = appendTag(text, t.en, block.strength);
-            newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: picks };
+            newBlock = { ...block, text: picksToText(picks, block.strength), enabled: true, collapsed: false, lastRandomPicks: picks };
           } else {
             const CHARDESIGN_SKIP_IDS = new Set(['effect', 'lighting', 'scene', 'mood']);
             if (CHARDESIGN_SKIP_IDS.has(block.id)) {
               newBlock = { ...block, text: '', enabled: true, collapsed: false, lastRandomPicks: [] };
             } else {
               const picks = pickBlockTags(block, globalExcluded);
-              let text = '';
-              for (const t of picks) text = appendTag(text, t.en, block.strength);
+              let text = picksToText(picks, block.strength);
               if (block.id === 'attribute') {
                 const speciesCat = block.cats.find(cat => cat.n === '種族');
                 text = buildSpeciesText(picks, block, speciesCat, text);
@@ -264,8 +284,7 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
           }
         } else {
           const picks = pickBlockTags(block, globalExcluded);
-          let text = '';
-          for (const t of picks) text = appendTag(text, t.en, block.strength);
+          let text = picksToText(picks, block.strength);
           if (block.id === 'attribute') {
             const speciesCat = block.cats.find(cat => cat.n === '種族');
             text = buildSpeciesText(picks, block, speciesCat, text);
