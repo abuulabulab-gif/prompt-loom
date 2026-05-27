@@ -1,10 +1,12 @@
 import { useState } from "react";
 import {
   appendTag, hasTag, removeTag, splitTags, bareTag,
-  OPTIONAL_CAT_NAMES, BLOCK_RANDOM_RULES, SPECIES_PARTS_MAP, RANDOM_EXCLUDE_TAGS,
+  OPTIONAL_CAT_NAMES, RARE_OPT_CAT_NAMES, BLOCK_RANDOM_RULES, SPECIES_PARTS_MAP, RANDOM_EXCLUDE_TAGS,
   TIER3_TAGS, TIER2_BLOCK_IDS, RANDOM_EXCLUSION_RULES, RANDOM_COMBO_RULES,
   CHARDESIGN_MODE_CONFIG, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS, KEMONOMIMI_PAIRS,
 } from "../data/constants.js";
+
+const RARE_OPT_CAT_PROB = 0.15; // rare optional cats: 15% vs standard 40%
 import { CONFLICT_MAP } from "../data/conflicts.js";
 import { COLOR_PALETTE, SHADES, COLOR_TARGETS, buildColorTag } from "../data/colors.js";
 
@@ -74,7 +76,16 @@ function pickBlockTags(block, globalExcluded) {
         && !globalExcluded.has(en);
     });
     if (validT.length === 0) return;
-    const pick = validT[Math.floor(Math.random() * validT.length)];
+    const normalT = validT.filter(t => !t.rareInRandom);
+    const rareT   = validT.filter(t =>  t.rareInRandom);
+    let pick;
+    if (normalT.length === 0) {
+      pick = rareT[Math.floor(Math.random() * rareT.length)];
+    } else if (rareT.length > 0 && Math.random() < 0.20) {
+      pick = rareT[Math.floor(Math.random() * rareT.length)];
+    } else {
+      pick = normalT[Math.floor(Math.random() * normalT.length)];
+    }
     if (WEAPON_TAGS.has(pick.en.toLowerCase()) && Math.random() > WEAPON_PICK_PROB) return;
     picks.push(pick);
     for (const ct of (CONFLICT_MAP.get(pick.en.toLowerCase()) || [])) globalExcluded.add(ct);
@@ -89,7 +100,8 @@ function pickBlockTags(block, globalExcluded) {
   const shuffledOpt = [...optCats].sort(() => Math.random() - 0.5);
   for (const cat of shuffledOpt) {
     if (picks.length >= maxPicks) break;
-    if (!skippedCats.has(cat.n) && Math.random() < 0.4) doPick(cat);
+    const prob = RARE_OPT_CAT_NAMES.has(cat.n) ? RARE_OPT_CAT_PROB : 0.4;
+    if (!skippedCats.has(cat.n) && Math.random() < prob) doPick(cat);
   }
   return picks;
 }

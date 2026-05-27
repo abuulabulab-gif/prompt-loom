@@ -28,13 +28,16 @@ export const LIMIT_LEN = 750;
 // ── Random-pick category priority ────────────────────────────
 // Categories in this set are "optional" for 🎲 (picked with ~45% chance).
 // Categories NOT in this set are "core" and always get a pick first.
+// Categories picked at reduced probability (~15%) — neither core nor standard optional
+export const RARE_OPT_CAT_NAMES = new Set(['肌質感', 'ピアス・刺青', '装備・ケア']);
+
 export const OPTIONAL_CAT_NAMES = new Set([
   // 顔
   'インナーカラー', '前髪', '目つき・形', '眉', '口・歯', '髪飾り・毛流れ', 'メイク・顔演出',
   // 属性
   '年齢感', '特殊パーツ',
-  // 体型
-  '肌色', '肌質感', '細部', 'ボディフォーカス', '状態', '足',
+  // 体型（肌色はコア化 → 常に1つ選ばれる）
+  '肌質感', '細部', 'ボディフォーカス', '状態', '足',
   // 衣装
   '素材・装飾', '装飾アクセ',
   // 特徴
@@ -149,8 +152,7 @@ export const TIER3_TAGS = new Set([
   'tarot card',
   // 種族専用パーツ（コンボルール経由でのみ付与）
   'ball joints','cybernetics','scale skin','translucent skin','liquid body','porcelain skin',
-  // レア肌色（コンボルール経由でのみ付与）
-  'red skin','blue skin','grey skin',
+  // レア肌色はコンボルール経由または rareInRandom で低確率付与（TIER3除外）
 ]);
 
 // ── Weapon tags (格上げ: Tier3 → 低確率枠) ──────────────────
@@ -244,6 +246,12 @@ export const RANDOM_EXCLUSION_RULES = new Map([
   ['monochrome',      new Set(['vibrant colors','colorful','neon colors','warm colors','cool colors','pastel colors','cel shading'])],
   // fighting stance（コンボで追加された際の事後クリーンアップ用）
   ['fighting stance', new Set(['lying on back','lying on stomach','all fours','seiza','sitting cross-legged','sleeping'])],
+  // 肌色の相互排他（コンボルール追加時に既存肌色をクリーンアップ）
+  ['porcelain skin',   new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','blue skin','grey skin','translucent skin'])],
+  ['translucent skin', new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','blue skin','grey skin','porcelain skin'])],
+  ['red skin',         new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','blue skin','grey skin','porcelain skin','translucent skin'])],
+  ['blue skin',        new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','grey skin','porcelain skin','translucent skin'])],
+  ['grey skin',        new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','blue skin','porcelain skin','translucent skin'])],
 ]);
 
 // ── Combo rules: trigger tag → add tag in another block ──────
@@ -280,8 +288,10 @@ export const RANDOM_COMBO_RULES = [
   { trigger: 'demon',          blockId: 'body',        tag: 'blue skin', prob: 0.25 },
   { trigger: 'dragon girl',    blockId: 'body',        tag: 'red skin',  prob: 0.10 },
   { trigger: 'monster girl',   blockId: 'body',        tag: 'red skin',  prob: 0.10 },
-  { trigger: 'elf',            blockId: 'body',        tag: 'grey skin', prob: 0.25 },
-  { trigger: 'dark elf',       blockId: 'body',        tag: 'grey skin', prob: 0.25 },
+  { trigger: 'elf',            blockId: 'body',        tag: 'grey skin',      prob: 0.25 },
+  { trigger: 'dark elf',       blockId: 'body',        tag: 'grey skin',      prob: 0.25 },
+  // 裸足のとき低確率でフットネイル付与
+  { trigger: 'barefoot',       blockId: 'body',        tag: 'toenail polish', prob: 0.25 },
 ];
 
 // ── キャラデザモード：設定資料特化の厳格ルール ────────────
@@ -308,7 +318,7 @@ export const CHARDESIGN_MODE_CONFIG = {
   skipFaceTags: new Set(['floating hair']),
 
   // 体型ブロック：抽選しないカテゴリ（状態・ボディフォーカス）
-  skipBodyCats: new Set(['状態', 'ボディフォーカス']),
+  skipBodyCats: new Set(['状態', 'ボディフォーカス', '肌質感']),
 
   // 特徴ブロック：抽選しないカテゴリ（武器・アクション小物）
   skipFeatureCats: new Set(['武器・小物']),
@@ -320,6 +330,7 @@ export const CHARDESIGN_MODE_CONFIG = {
 // ── Utilities ────────────────────────────────────────────────
 export const uid = () => Math.random().toString(36).slice(2, 8);
 export const tt  = (en, ja) => ({ en, ja });
+export const ttr = (en, ja) => ({ en, ja, rareInRandom: true }); // rare in random pick (~20% weight)
 
 export const fmtTag    = (en, str) => str === '1.0' ? en : `(${en}:${str})`;
 export const appendTag = (cur, en, str) => {

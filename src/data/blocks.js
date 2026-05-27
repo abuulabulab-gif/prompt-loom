@@ -1,4 +1,4 @@
-import { uid, tt, deep, CHAR_COLORS, CHAR_EMOJIS } from './constants.js';
+import { uid, tt, ttr, deep, CHAR_COLORS, CHAR_EMOJIS } from './constants.js';
 
 export const BLOCKS_DEF = [
   {id:'quality',name:'基本品質',nameEn:'Quality',icon:'⭐',color:'#fbbf24',colorLight:'#d97706',collapsed:false,strength:'1.0',text:'masterpiece, best quality',customTags:[],favTags:[],locked:false,cats:[
@@ -34,9 +34,9 @@ export const BLOCKS_DEF = [
   {id:'body',name:'キャラ・体型',nameEn:'Body',icon:'💫',color:'#fb923c',colorLight:'#ea580c',collapsed:true,strength:'1.0',text:'',customTags:[],favTags:[],locked:false,cats:[
     {n:'体型',nEn:'Body',id:'body_shape',t:[tt('slim','スリム'),tt('petite','小柄'),tt('athletic','運動的'),tt('tall','高身長'),tt('short stature','低身長'),tt('slender','細身'),tt('toned','引き締まり'),tt('muscular','筋肉質'),tt('curvy','グラマー'),tt('chubby','ぽっちゃり')]},
     {n:'胸のサイズ',nEn:'Bust',id:'body_bust',t:[tt('flat chest','ぺったん'),tt('small breasts','小さめ'),tt('medium breasts','普通'),tt('large breasts','大きめ'),tt('huge breasts','特大')]},
-    {n:'肌色',nEn:'Skin',id:'body_skin',t:[tt('fair skin','色白'),tt('pale skin','白肌'),tt('tan skin','日焼け肌'),tt('dark skin','浅黒肌'),tt('olive skin','オリーブ肌'),tt('red skin','赤肌'),tt('blue skin','青肌'),tt('grey skin','グレー肌'),tt('porcelain skin','磁器のような肌'),tt('translucent skin','透き通る肌')]},
+    {n:'肌色',nEn:'Skin',id:'body_skin',t:[tt('fair skin','色白'),tt('pale skin','白肌'),tt('tan skin','日焼け肌'),tt('dark skin','浅黒肌'),tt('olive skin','オリーブ肌'),ttr('red skin','赤肌'),ttr('blue skin','青肌'),ttr('grey skin','グレー肌'),tt('porcelain skin','磁器のような肌'),tt('translucent skin','透き通る肌')]},
     {n:'肌質感',nEn:'Skin Texture',id:'body_skintex',t:[tt('shiny skin','艶やかな肌'),tt('wet skin','濡れ肌')]},
-    {n:'細部',nEn:'Body Detail',id:'body_detail',t:[tt('mole','ほくろ'),tt('beauty mark','チャームポイント'),tt('scar','傷跡'),tt('birthmark','痣'),tt('long nails','長い爪'),tt('painted nails','ネイル'),tt('navel','へそ'),tt('collarbone','鎖骨'),tt('thigh gap','絶対領域')]},
+    {n:'細部',nEn:'Body Detail',id:'body_detail',t:[tt('mole','ほくろ'),tt('beauty mark','チャームポイント'),ttr('scar','傷跡'),ttr('birthmark','痣'),ttr('long nails','長い爪'),tt('painted nails','ネイル'),ttr('navel','へそ'),ttr('collarbone','鎖骨'),ttr('thigh gap','絶対領域')]},
     {n:'ボディフォーカス',nEn:'Body Focus',id:'body_focus',t:[tt('bare shoulders','肩出し'),tt('cleavage','谷間'),tt('sideboob','サイドバスト'),tt('underboob','アンダーバスト'),tt('bare back','素の背中'),tt('nape','うなじ'),tt('armpits','脇'),tt('armpit focus','脇フォーカス'),tt('midriff','お腹'),tt('midriff focus','お腹フォーカス'),tt('thighs','太もも'),tt('bare thighs','素の太もも'),tt('zettai ryouiki','絶対領域'),tt('wide hips','広めヒップ'),tt('leg focus','足フォーカス'),tt('hand focus','手フォーカス')]},
     {n:'状態',nEn:'Condition',id:'body_condition',t:[tt('wet','濡れた'),tt('wet clothes','濡れた服'),tt('wet hair','濡れ髪')]},
     {n:'足',nEn:'Feet',id:'body_feet',t:[tt('barefoot','裸足'),tt('soles','足裏'),tt('toes','足の指'),tt('foot focus','足アップ'),tt('pointed toes','つま先立ち'),tt('crossed legs','脚組み'),tt('toenail polish','フットネイル')]},
