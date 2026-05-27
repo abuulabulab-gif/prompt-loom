@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 
-export default function AuthButton({ user, loading, onSignIn, onSignOut, syncStatus, lang }) {
+export default function AuthButton({ user, loading, onSignIn, onSignOut, syncStatus, lang, onForcePull }) {
   const [open, setOpen] = useState(false);
   const [dropPos, setDropPos] = useState({ top: 0, right: 8, width: 220 });
   const ref = useRef(null);
@@ -84,6 +84,16 @@ export default function AuthButton({ user, loading, onSignIn, onSignOut, syncSta
               {syncStatus === 'error'   && <span className="text-red">✗ {lang === 'ja' ? '同期に失敗しました' : 'Sync failed'}</span>}
               {!syncStatus              && <span>{lang === 'ja' ? 'クラウド同期 有効' : 'Cloud sync enabled'}</span>}
             </div>
+          </div>
+          <div className="px-3 py-2 border-b border-line">
+            <button
+              disabled={syncStatus === 'syncing'}
+              onClick={() => { setOpen(false); onForcePull?.(); }}
+              className="w-full text-left text-[0.6875rem] font-mono cursor-pointer py-0.5 transition-colors disabled:opacity-40"
+              style={{ color: 'rgb(var(--c-blue))' }}
+            >
+              ↓ {lang === 'ja' ? '今すぐ同期' : 'Sync now'}
+            </button>
           </div>
           <div className="px-3 py-2">
             <button

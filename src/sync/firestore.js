@@ -1,6 +1,9 @@
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { fstore } from '../firebase';
 
+const MAX_CLOUD_VERSIONS   = 10;
+const MAX_CLOUD_PROMPT_LOG = 30;
+
 // Strip heavy per-block fields from version snapshots before cloud push.
 // `cats` is always rebuilt from BLOCKS_DEF via mergeCharacterBlocks on restore.
 // `lastRandomPicks` is ephemeral UI state, not needed in cloud storage.
@@ -12,11 +15,11 @@ const slimVersionBlock = (b) => {
 const toCloudChars = (chars) =>
   chars.map(c => {
     const { _thumbs, versions, promptLog, ...rest } = c;
-    const slimVersions = (versions || []).map(ver => ({
+    const slimVersions = (versions || []).slice(-MAX_CLOUD_VERSIONS).map(ver => ({
       ...ver,
       blocks: (ver.blocks || []).map(slimVersionBlock),
     }));
-    const slimPromptLog = (promptLog || []).map(entry => ({
+    const slimPromptLog = (promptLog || []).slice(-MAX_CLOUD_PROMPT_LOG).map(entry => ({
       ...entry,
       blocks: entry.blocks ? entry.blocks.map(slimVersionBlock) : undefined,
     }));

@@ -8,32 +8,33 @@ import { NEG_PRESETS } from "../data/negSuggestions.js";
 import TagBtn from "./TagBtn.jsx";
 import { TAG_DICT } from "../data/tagDictionary.js";
 
-// Categories that start collapsed; all others start open.
+// Category IDs that start collapsed; all others start open.
+// Uses cat.id (stable, defined in blocks.js) — not cat.n (Japanese name).
 const CATS_CLOSED = new Set([
   // 顔
-  'インナーカラー', '前髪', '目つき・形', '眉', '口・歯', '髪飾り・毛流れ', 'メイク・顔演出',
+  'face_innerhair', 'face_bangs', 'face_eyeshape', 'face_eyebrows', 'face_mouth', 'face_hairdetail', 'face_makeup',
   // 属性
-  '年齢感', '特殊パーツ',
+  'attr_age', 'attr_parts',
   // 体型
-  '肌色', '細部', 'ボディフォーカス', '足',
+  'body_skin', 'body_detail', 'body_focus', 'body_feet',
   // 衣装
-  'トップス', 'ボトムス', '素材・装飾', '装飾アクセ',
+  'outfit_tops', 'outfit_bottoms', 'outfit_fabric', 'outfit_accessories',
   // 特徴
-  'ピアス・刺青', '装備・ケア',
+  'feature_piercing', 'feature_equipment',
   // エフェクト
-  'パーティクル', '天候・自然', '演出フィルタ',
+  'effect_particles', 'effect_weather', 'effect_filter',
   // 構図
-  '手・指', '視線・演出', 'シチュ',
+  'comp_hands', 'comp_gaze', 'comp_situation',
   // 背景
-  '屋内', '時間・天気', '季節・雰囲気',
+  'bg_indoor', 'bg_time', 'bg_season',
   // ライティング
-  '照明スタイル',
+  'light_style',
   // 品質
-  '仕上がり', '顔の精細化',
+  'quality_finish', 'quality_face',
   // アートスタイル
-  '色調', 'レンダリング',
+  'style_color', 'style_render',
   // ネガティブ
-  'その他NG',
+  'neg_other',
 ]);
 
 const SCENE_MANAGED_TAGS = new Set(['2girls', '2boys', 'multiple girls', 'multiple boys', '1other']);
@@ -84,7 +85,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
     const targetCat = block.cats.find(cat => cat.t.some(t => t.en.toLowerCase() === bareLower));
     if (!targetCat) return;
     if (!isCatOpen(targetCat)) {
-      onUpdate({ catStates: { ...(block.catStates || {}), [targetCat.n]: true } });
+      onUpdate({ catStates: { ...(block.catStates || {}), [targetCat.id]: true } });
     }
     setPendingScrollTag(bareLower);
   };
@@ -121,9 +122,10 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
     ? allTags.filter(t => hasTag(analyzeText, t.en)).length
     : 0;
 
-  // Category accordion state — persisted in block.catStates via onUpdate
-  const isCatOpen = cat => block.catStates?.[cat.n] ?? !CATS_CLOSED.has(cat.n);
-  const toggleCat = cat => onUpdate({ catStates: { ...(block.catStates || {}), [cat.n]: !isCatOpen(cat) } });
+  // Category accordion state — persisted in block.catStates via onUpdate.
+  // Key is cat.id (stable), not cat.n (Japanese name that may change).
+  const isCatOpen = cat => block.catStates?.[cat.id] ?? !CATS_CLOSED.has(cat.id);
+  const toggleCat = cat => onUpdate({ catStates: { ...(block.catStates || {}), [cat.id]: !isCatOpen(cat) } });
 
   const handleAddCustom = () => {
     if (!customInput.trim()) return;
@@ -779,7 +781,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   return (
                     <TagBtn key={en} tag={tag} color={blockColor} lang={lang} isFav disabled={isLocked}
                       active={hasTag(block.text, en)} selectMode={selectMode} selected={selectedTags.includes(en)}
-                      conflict={conflictTags?.has(en.toLowerCase()) && hasTag(block.text, en)}
+                      conflict={conflictTags?.has(en.toLowerCase()) && hasTag(block.text, en) ? conflictTags.get(en.toLowerCase()) : false}
                       desc={TAG_DICT[en]} large={focusMode}
                       onInsert={() => onTagClick(en)} onToggleFav={() => toggleFav(en)} />
                   );
@@ -802,7 +804,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                       active={hasTag(block.text, tag.en)}
                       analyzed={!!analyzeText && hasTag(analyzeText, tag.en) && !hasTag(block.text, tag.en)}
                       selectMode={selectMode} selected={selectedTags.includes(tag.en)}
-                      conflict={conflictTags?.has(tag.en.toLowerCase()) && hasTag(block.text, tag.en)}
+                      conflict={conflictTags?.has(tag.en.toLowerCase()) && hasTag(block.text, tag.en) ? conflictTags.get(tag.en.toLowerCase()) : false}
                       desc={TAG_DICT[tag.en]} large={focusMode}
                       onInsert={() => onTagClick(tag.en)} onToggleFav={() => toggleFav(tag.en)} />
                   ))}
@@ -845,7 +847,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                         active={hasTag(block.text, tag.en)}
                         analyzed={!!analyzeText && hasTag(analyzeText, tag.en) && !hasTag(block.text, tag.en)}
                         selectMode={selectMode} selected={selectedTags.includes(tag.en)}
-                        conflict={conflictTags?.has(tag.en.toLowerCase()) && hasTag(block.text, tag.en)}
+                        conflict={conflictTags?.has(tag.en.toLowerCase()) && hasTag(block.text, tag.en) ? conflictTags.get(tag.en.toLowerCase()) : false}
                         desc={TAG_DICT[tag.en]} large={focusMode}
                         wrapperRef={el => { if (el) tagRefs.current[tag.en.toLowerCase()] = el; else delete tagRefs.current[tag.en.toLowerCase()]; }}
                         onInsert={() => onTagClick(tag.en)} onToggleFav={() => toggleFav(tag.en)} />

@@ -16,28 +16,32 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
   const longPressTimer = useRef(null);
   const longFired = useRef(false);
 
-  const warnColor    = 'rgb(var(--c-red))';
+  const errorColor   = 'rgb(var(--c-red))';
+  const softColor    = 'rgb(var(--warn-text))'; // amber — for level:'warn' conflicts
   const analyzeColor = 'rgb(var(--c-teal))';
-  const bg = selected  ? color + '33'
-    : conflict         ? 'rgb(var(--c-red) / 0.12)'
-    : active           ? color + '22'
-    : analyzed         ? 'rgb(var(--c-teal) / 0.1)'
-    : h                ? color + '1a'
-    : isFav            ? 'rgb(var(--warn-text) / 0.08)'
+  const bg = selected           ? color + '33'
+    : conflict === 'error'      ? 'rgb(var(--c-red) / 0.12)'
+    : conflict === 'warn'       ? 'rgb(var(--warn-text) / 0.08)'
+    : active                    ? color + '22'
+    : analyzed                  ? 'rgb(var(--c-teal) / 0.1)'
+    : h                         ? color + '1a'
+    : isFav                     ? 'rgb(var(--warn-text) / 0.08)'
     : 'rgb(var(--surface-alt))';
-  const bd = selected  ? color
-    : conflict         ? 'rgb(var(--c-red) / 0.4)'
-    : active           ? color + '90'
-    : analyzed         ? 'rgb(var(--c-teal) / 0.44)'
-    : h                ? color + '70'
-    : isFav            ? 'rgb(var(--warn-text) / 0.3)'
+  const bd = selected           ? color
+    : conflict === 'error'      ? 'rgb(var(--c-red) / 0.4)'
+    : conflict === 'warn'       ? 'rgb(var(--warn-text) / 0.35)'
+    : active                    ? color + '90'
+    : analyzed                  ? 'rgb(var(--c-teal) / 0.44)'
+    : h                         ? color + '70'
+    : isFav                     ? 'rgb(var(--warn-text) / 0.3)'
     : 'rgb(var(--border))';
-  const fg = selected  ? color
-    : conflict         ? warnColor
-    : active           ? color
-    : analyzed         ? analyzeColor
-    : h                ? color
-    : isFav            ? 'rgb(var(--warn-text))'
+  const fg = selected           ? color
+    : conflict === 'error'      ? errorColor
+    : conflict === 'warn'       ? softColor
+    : active                    ? color
+    : analyzed                  ? analyzeColor
+    : h                         ? color
+    : isFav                     ? 'rgb(var(--warn-text))'
     : 'rgb(var(--text) / 0.9)';
 
   const handleEnter = () => {
@@ -123,11 +127,15 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
           if (longFired.current) { e.preventDefault(); return; }
           onInsert(e);
         }}
-        title={conflict ? (lang === 'ja' ? `⚠ 競合タグ: ${tag.en}` : `⚠ Conflicting tag: ${tag.en}`) : (lang === 'ja' ? tag.en : tag.ja)}
+        title={
+          conflict === 'error' ? (lang === 'ja' ? `⚠ 競合タグ: ${tag.en}` : `⚠ Conflicting tag: ${tag.en}`) :
+          conflict === 'warn'  ? (lang === 'ja' ? `〜 不自然な組み合わせ: ${tag.en}` : `〜 Unusual combination: ${tag.en}`) :
+          (lang === 'ja' ? tag.en : tag.ja)
+        }
         style={{ color: fg }}
         className={`bg-transparent border-none cursor-pointer font-mono tracking-tight ${large ? 'px-2.5 py-1.5 text-[0.9375rem]' : 'px-[0.4375rem] py-[0.1875rem] text-xs'} ${(active || selected) ? 'font-bold' : 'font-normal'}`}
       >
-        {conflict ? '⚠ ' : (active && !selectMode) ? '✓ ' : (analyzed && !active && !selectMode) ? '◎ ' : ''}
+        {conflict === 'error' ? '⚠ ' : conflict === 'warn' ? '〜 ' : (active && !selectMode) ? '✓ ' : (analyzed && !active && !selectMode) ? '◎ ' : ''}
         {selectMode && selected ? '☑ ' : selectMode ? '☐ ' : ''}
         {lang === 'ja' ? tag.ja : tag.en}
       </button>

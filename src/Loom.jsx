@@ -11,7 +11,7 @@ import WelcomeHint from "./components/WelcomeHint.jsx";
 import LibraryModal from "./components/modals/LibraryModal.jsx";
 import {
   CHAR_COLORS, CHAR_COLORS_LIGHT, CHAR_EMOJIS, WARN_LEN, LIMIT_LEN,
-  uid, appendTag, splitTags, countTags, toggleTag, hasTag, removeTag,
+  uid, appendTag, splitTags, bareTag, countTags, toggleTag, hasTag, removeTag,
   deep, downloadJSON, stripWeights, toNaiWeights, SPECIES_PARTS_MAP,
 } from "./data/constants.js";
 import { detectConflicts } from "./data/conflicts.js";
@@ -37,6 +37,42 @@ import AuthButton from "./components/AuthButton.jsx";
 import { useCloudSync } from "./hooks/useCloudSync.js";
 import { useRandomGen } from "./hooks/useRandomGen.js";
 
+// Lazy alias map: tag alias (old en name) → current en name.
+// Built once from BLOCKS_DEF on first call. Add `aliases: ['old-name']` to any
+// tag definition in blocks.js to register a migration path.
+let _tagAliasMap = null;
+function getTagAliasMap() {
+  if (_tagAliasMap) return _tagAliasMap;
+  _tagAliasMap = new Map();
+  for (const def of BLOCKS_DEF) {
+    for (const cat of (def.cats || [])) {
+      for (const tag of cat.t) {
+        if (Array.isArray(tag.aliases)) {
+          for (const alias of tag.aliases) {
+            _tagAliasMap.set(alias.toLowerCase(), tag.en);
+          }
+        }
+      }
+    }
+  }
+  return _tagAliasMap;
+}
+
+// Replace any aliased (renamed) tags in a comma-separated tag string.
+function migrateAliasesInText(text) {
+  if (!text) return text;
+  const aliasMap = getTagAliasMap();
+  if (aliasMap.size === 0) return text;
+  return splitTags(text).map(seg => {
+    const bare = bareTag(seg.trim()).toLowerCase();
+    const newEn = aliasMap.get(bare);
+    if (!newEn) return seg;
+    // Replace just the tag name, preserving weight notation like (tag:1.2)
+    const escaped = bare.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return seg.trim().replace(new RegExp(escaped, 'i'), newEn);
+  }).join(', ');
+}
+
 // Merge saved blocks with current BLOCKS_DEF so newly added/removed tags
 // are always reflected in existing characters without wiping user data.
 function mergeCharacterBlocks(savedBlocks) {
@@ -50,7 +86,7 @@ function mergeCharacterBlocks(savedBlocks) {
     processedIds.add(saved.id);
     return {
       ...deep(def),
-      text:       saved.text       ?? def.text,
+      text:       migrateAliasesInText(saved.text       ?? def.text),
       enabled:    saved.enabled    !== false,
       strength:   saved.strength   ?? def.strength,
       locked:     saved.locked     ?? false,
@@ -188,7 +224,7 @@ export default function Loom() {
   const activeChar = characters.find(c => c.id === activeCharId) || characters[0];
   const blocks = activeChar?.blocks || [];
 
-  const { syncStatus, syncErrToast, setSyncErrToast, dataSizeToast, handleSignIn, markRemoteApply } = useCloudSync({
+  const { syncStatus, syncErrToast, setSyncErrToast, dataSizeToast, handleSignIn, handleForcePull, markRemoteApply } = useCloudSync({
     user, signInWithGoogle, loaded,
     characters, orderUpdatedAt, settingsUpdatedAt,
     setCharacters, setOrderUpdatedAt, setSettingsUpdatedAt,
@@ -705,7 +741,15 @@ export default function Loom() {
   const blockTextColor = (b) => theme === 'light' ? (b.colorLight ?? b.color) : b.color;
   const tokenColor = textToCopy.length > LIMIT_LEN ? dangerColor : textToCopy.length > WARN_LEN ? warnColor : goodColor;
   const conflicts = detectConflicts(posText);
-  const conflictingTagSet = new Set(conflicts.flatMap(r => r.tags).map(t => t.toLowerCase()));
+  // Map<tagLower, 'error'|'warn'> — 'error' wins if a tag appears in both levels
+  const conflictTagMap = new Map();
+  for (const c of conflicts) {
+    const lvl = c.level ?? 'error';
+    for (const t of c.tags) {
+      const key = t.toLowerCase();
+      if (!conflictTagMap.has(key) || lvl === 'error') conflictTagMap.set(key, lvl);
+    }
+  }
 
   // ── History ──
   const makeHistoryEntry = (isSnapshot = false) => {
@@ -1208,6 +1252,7 @@ export default function Loom() {
           onSignOut={signOut}
           syncStatus={syncStatus}
           lang={lang}
+          onForcePull={handleForcePull}
         />
         {/* ⚙️ 設定 */}
         <button onClick={() => setSettingsOpen(true)} title={lang === 'ja' ? 'テーマ・言語・表示モード・ショートカット (?)' : 'Theme / Language / View mode / Shortcuts (?)'}
@@ -1591,7 +1636,7 @@ export default function Loom() {
                   focused={focusBlockId === block.id}
                   otherChars={isMobile ? [] : otherChars}
                   onTransfer={(blockId, targetCharId) => transferBlock(blockId, targetCharId)}
-                  conflictTags={conflictingTagSet}
+                  conflictTags={conflictTagMap}
                   onRemove={block.isCustomBlock ? () => removeBlock(block.id) : undefined}
                   onHide={expertMode ? () => toggleHideBlock(block.id) : undefined}
                   isMobile={isMobile}
@@ -1756,7 +1801,7 @@ export default function Loom() {
                 focused={true}
                 otherChars={[]}
                 onTransfer={undefined}
-                conflictTags={conflictingTagSet}
+                conflictTags={conflictTagMap}
                 onRemove={mFocusBlock.isCustomBlock ? () => { removeBlock(mFocusBlock.id); setFocusBlockId(null); } : undefined}
                 onHide={undefined}
                 isMobile={true}
@@ -2303,8 +2348,8 @@ export default function Loom() {
             <div className="flex-shrink-0 mb-1.5 px-2.5 py-1.5 bg-tint-warn border border-warn/30 rounded-[0.4375rem] flex items-center gap-2 flex-wrap">
               <span className="text-warn-text text-[0.625rem] font-bold flex-shrink-0">⚠️ {lang === 'ja' ? '矛盾の可能性' : 'Possible conflict'}</span>
               {conflicts.map((c, i) => (
-                <span key={i} className="text-warn-text/80 text-[0.625rem] font-mono bg-tint-warn-tag px-[0.4375rem] py-0.5 rounded">
-                  {lang === 'ja' ? c.ja : c.en}
+                <span key={i} className={`text-[0.625rem] font-mono px-[0.4375rem] py-0.5 rounded ${(c.level ?? 'error') === 'warn' ? 'text-warn-text/50 bg-tint-warn-tag/50' : 'text-warn-text/80 bg-tint-warn-tag'}`}>
+                  {(c.level ?? 'error') === 'warn' ? '〜 ' : ''}{lang === 'ja' ? c.ja : c.en}
                 </span>
               ))}
             </div>

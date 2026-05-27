@@ -1,8 +1,9 @@
 import { splitTags, bareTag } from './constants.js';
 
 // Helper: generate multiple {tags,ja,en} pairs from one trigger → many targets
-function mk(a, bs, ja) {
-  return bs.map(b => ({ tags: [a, b], ja, en: `${a} + ${b}` }));
+// level: 'error' (default) = absolute conflict; 'warn' = unusual but not impossible
+function mk(a, bs, ja, level) {
+  return bs.map(b => ({ tags: [a, b], ja, en: `${a} + ${b}`, ...(level ? { level } : {}) }));
 }
 
 export const CONFLICT_RULES = [
@@ -115,10 +116,10 @@ export const CONFLICT_RULES = [
   { tags:['eye focus','full body'],            ja:'目フォーカスと全身が矛盾',               en:'eye focus + full body' },
   { tags:['eye focus','upper body'],           ja:'目フォーカスと上半身が矛盾',             en:'eye focus + upper body' },
 
-  // ── 魚眼・広角 × シンプル背景 ────────────────────────────────────
-  { tags:['fisheye lens','simple background'], ja:'魚眼レンズとシンプル背景が矛盾（歪み効果が消える）', en:'fisheye lens + simple background' },
-  { tags:['fisheye lens','white background'],  ja:'魚眼レンズと白背景が矛盾（歪み効果が消える）',      en:'fisheye lens + white background' },
-  { tags:['extreme perspective','simple background'], ja:'極端なパースとシンプル背景が矛盾', en:'extreme perspective + simple background' },
+  // ── 魚眼・広角 × シンプル背景（効果が減弱するが物理的に不可能ではない → warn）────
+  { tags:['fisheye lens','simple background'], level:'warn', ja:'魚眼レンズとシンプル背景（歪み効果が薄れる）', en:'fisheye lens + simple background (distortion reduced)' },
+  { tags:['fisheye lens','white background'],  level:'warn', ja:'魚眼レンズと白背景（歪み効果が薄れる）',      en:'fisheye lens + white background (distortion reduced)' },
+  { tags:['extreme perspective','simple background'], level:'warn', ja:'極端なパースとシンプル背景（パース効果が薄れる）', en:'extreme perspective + simple background (perspective reduced)' },
 
   // ── カメラ角度 ─────────────────────────────────────────────────
   { tags:['from above','from below'],          ja:'見上げと見下ろしが矛盾',          en:'from above + from below' },
@@ -338,13 +339,13 @@ export const CONFLICT_RULES = [
   // ══════════════════════════════════════════════════════════════════
   // ⑤ 環境×衣装・エフェクト
   // ══════════════════════════════════════════════════════════════════
-  // 冬・雪 × 水着・裸足
+  // 冬・雪 × 水着・裸足（ファンサービスなど意図的な組み合わせもあるため warn）
   ...mk('snowy',
     ['bikini','micro bikini','swimsuit','one-piece swimsuit','school swimsuit','barefoot'],
-    '雪の環境と夏向け衣装・裸足が矛盾'),
+    '雪の環境と夏向け衣装・裸足（ファンサービス系では意図的なこともある）', 'warn'),
   ...mk('snow',
     ['bikini','micro bikini','swimsuit','one-piece swimsuit','school swimsuit','barefoot'],
-    '雪の環境と夏向け衣装・裸足が矛盾'),
+    '雪の環境と夏向け衣装・裸足（ファンサービス系では意図的なこともある）', 'warn'),
   // 水中 × 使用不可アイテム・エフェクト
   ...mk('underwater',
     ['holding umbrella','fire','explosion','embers','electricity'],
@@ -376,8 +377,12 @@ export const detectConflicts = text => {
 };
 
 // Pre-built reverse lookup: tag → Set of conflicting tags (lowercase)
+// Skips: level:'warn' rules (unusual but not impossible — allow in random gen)
+//        rules with 3+ tags (complex multi-condition — would over-exclude in random gen)
 export const CONFLICT_MAP = new Map();
 for (const r of CONFLICT_RULES) {
+  if (r.level === 'warn') continue;
+  if (r.tags.length > 2) continue;
   for (let i = 0; i < r.tags.length; i++) {
     const key = r.tags[i].toLowerCase();
     if (!CONFLICT_MAP.has(key)) CONFLICT_MAP.set(key, new Set());
