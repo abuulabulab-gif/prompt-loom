@@ -538,35 +538,61 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             onBlur={e => { e.target.style.borderColor = ''; }}
           />
 
-          {/* ── Active-tag preview strip ──────────────────────── */}
+          {/* ── Unified active-tag panel ──────────────────────── */}
           {(() => {
             if (!block.text) return null;
-            const activeTags = block.text.split(',').map(s => s.trim()).filter(Boolean);
+            const activeTags = splitTags(block.text);
             if (activeTags.length === 0) return null;
-            const randomEnSet = new Set((block.lastRandomPicks || []).map(t => t.en.toLowerCase()));
+            const randomPickSet = new Set(
+              (block.lastRandomPicks || [])
+                .filter(t => hasTag(block.text, t.en))
+                .map(t => t.en.toLowerCase())
+            );
+            const randomTags = activeTags.filter(raw => randomPickSet.has(bareTag(raw).toLowerCase()));
+            const manualTags  = activeTags.filter(raw => !randomPickSet.has(bareTag(raw).toLowerCase()));
+            if (randomTags.length === 0 && manualTags.length === 0) return null;
+
+            const renderChip = (raw, idx) => {
+              const bare      = bareTag(raw);
+              const bareLower = bare.toLowerCase();
+              const isJumpable = enToJa.has(bareLower);
+              const label     = lang === 'ja' ? (enToJa.get(bareLower) ?? bare) : bare;
+              return (
+                <span
+                  key={idx}
+                  onClick={isJumpable ? () => handleChipJump(bare) : undefined}
+                  title={isJumpable ? (lang === 'ja' ? 'クリックでジャンプ' : 'Click to jump') : undefined}
+                  style={{ background: blockColor + '15', border: `1px solid ${blockColor}50`, color: blockColor }}
+                  className={`inline-flex items-center rounded font-mono ${focusMode ? 'px-2 py-[0.1875rem] text-xs' : 'px-[0.3125rem] py-[0.0625rem] text-[0.5625rem]'}${isJumpable ? ' cursor-pointer' : ''}`}
+                >
+                  {label}
+                </span>
+              );
+            };
+
             return (
-              <div className="mt-1.5 mb-1 flex flex-wrap gap-1 items-center">
-                {activeTags.map((raw, i) => {
-                  const bare = raw.replace(/^\((.+?)(?::\d[\d.]*)?[\)]+$/, '$1').trim();
-                  const isRandom = randomEnSet.has(bare.toLowerCase());
-                  const jaLabel = enToJa.get(bare.toLowerCase()) ?? bare;
-                  const isJumpable = enToJa.has(bare.toLowerCase());
-                  const label = lang === 'ja' ? jaLabel : bare;
-                  return (
-                    <span
-                      key={i}
-                      onClick={isJumpable ? () => handleChipJump(bare) : undefined}
-                      title={isJumpable ? (lang === 'ja' ? 'クリックでジャンプ' : 'Click to jump') : undefined}
-                      style={isRandom
-                        ? { background: blockColor + '15', border: `1px dashed ${blockColor}80`, color: blockColor }
-                        : { background: 'rgb(var(--surface-alt))', border: `1px solid ${blockColor}50`, color: blockColor }}
-                      className={`inline-flex items-center gap-[0.1875rem] rounded font-mono ${focusMode ? 'px-2 py-[0.1875rem] text-xs' : 'px-[0.3125rem] py-[0.0625rem] text-[0.5625rem]'}${isJumpable ? ' cursor-pointer' : ''}`}
-                    >
-                      <span className="opacity-60 text-[0.5rem]">{isRandom ? '🎲' : '👤'}</span>
-                      {label}
+              <div className="mt-1.5 mb-1 flex flex-col gap-[0.3125rem]">
+                {randomTags.length > 0 && (
+                  <div className="flex items-center flex-wrap gap-1">
+                    <span className={`text-muted font-mono font-semibold flex-shrink-0 ${focusMode ? 'text-[0.6875rem]' : 'text-[0.5625rem]'}`}>
+                      🎲 {lang === 'ja' ? '追加:' : 'added:'}
                     </span>
-                  );
-                })}
+                    {randomTags.map(renderChip)}
+                    <button
+                      onClick={() => onUpdate({ lastRandomPicks: [] })}
+                      title={lang === 'ja' ? 'ランダムマーカーを消去' : 'Clear random marker'}
+                      className="text-dim text-[0.5rem] cursor-pointer ml-0.5 flex-shrink-0 leading-none"
+                    >×</button>
+                  </div>
+                )}
+                {manualTags.length > 0 && (
+                  <div className="flex items-center flex-wrap gap-1">
+                    <span className={`text-muted font-mono font-semibold flex-shrink-0 ${focusMode ? 'text-[0.6875rem]' : 'text-[0.5625rem]'}`}>
+                      👤 {lang === 'ja' ? '追加:' : 'added:'}
+                    </span>
+                    {manualTags.map(renderChip)}
+                  </div>
+                )}
               </div>
             );
           })()}
@@ -711,19 +737,6 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             </div>
           </div>
 
-          {/* Last random picks indicator — auto-hides when tags are removed from text */}
-          {displayPicks.length > 0 && (
-            <div className="flex items-center gap-[0.3125rem] flex-wrap mb-2">
-              <span className="text-muted text-[0.625rem] font-mono font-semibold">{lang === 'ja' ? '🎲 追加:' : '🎲 added:'}</span>
-              {displayPicks.map(t => (
-                <span key={t.en}
-                  style={{ background: blockColor + '22', border: `1px solid ${blockColor}60`, color: blockColor }}
-                  className="text-[0.625rem] font-mono px-1.5 py-[0.0625rem] rounded font-semibold"
-                >{lang === 'ja' ? t.ja : t.en}</span>
-              ))}
-              <button onClick={() => onUpdate({ lastRandomPicks: [] })} className="text-dim text-[0.5625rem] cursor-pointer ml-0.5">×</button>
-            </div>
-          )}
 
           {/* Select mode bar */}
           {selectMode && (
