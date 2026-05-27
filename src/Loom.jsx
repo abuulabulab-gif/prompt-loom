@@ -417,9 +417,33 @@ export default function Loom() {
       const newBlocks = c.blocks.map(b => {
         const tags = tagsByBlock[b.id];
         if (!tags?.length) return b;
+        const knownEns = new Set(b.cats?.flatMap(cat => cat.t.map(t => t.en.toLowerCase())) || []);
         let text = b.text;
-        tags.forEach(t => { text = appendTag(text, t, '1.0'); });
-        return { ...b, text, enabled: true };
+        const newCustomTags = [...(b.customTags || [])];
+        tags.forEach(t => {
+          text = appendTag(text, t, '1.0');
+          // Unknown tag → also register in customTags so it's togglable in the UI
+          if (!knownEns.has(t.toLowerCase()) && !newCustomTags.some(ct => ct.text.toLowerCase() === t.toLowerCase())) {
+            newCustomTags.push({ id: uid(), text: t });
+          }
+        });
+        return { ...b, text, customTags: newCustomTags, enabled: true };
+      });
+      return { ...c, blocks: newBlocks };
+    }));
+  };
+
+  const applyAllAnalyzed = () => {
+    setCharacters(prev => prev.map(c => {
+      if (c.id !== activeCharId) return c;
+      const newBlocks = c.blocks.map(block => {
+        if (block.locked || block.id === 'negative' || !block.cats?.length) return block;
+        const matched = block.cats.flatMap(cat => cat.t)
+          .filter(t => hasTag(analyzeText, t.en) && !hasTag(block.text, t.en));
+        if (matched.length === 0) return block;
+        let text = block.text;
+        for (const t of matched) text = appendTag(text, t.en, block.strength);
+        return { ...block, text, enabled: true };
       });
       return { ...c, blocks: newBlocks };
     }));
@@ -2201,16 +2225,31 @@ export default function Loom() {
           {outputExpanded && analyzeOpen && (
             <div className="flex-shrink-0 mb-1.5 p-2 rounded-[0.4375rem]"
               style={{ background: 'rgb(var(--c-teal) / 0.05)', border: '1px solid rgb(var(--c-teal) / 0.2)' }}>
+              {/* Header row */}
               <div className="flex items-center gap-2 mb-[0.3125rem]">
                 <span className="text-[0.625rem] font-mono font-bold" style={{ color: 'rgb(var(--c-teal))' }}>◎ {lang === 'ja' ? 'プロンプト逆解析' : 'Prompt Analyze'}</span>
-                {analyzeText && (
-                  <span className="text-[0.625rem] font-mono text-muted">
-                    — {blocks.reduce((s, b) => s + b.cats.flatMap(c => c.t).filter(t => { try { return analyzeText && analyzeText.split(',').some(seg => seg.trim().replace(/^\([^:]+:|[\d.]+\)$/g, '').trim().toLowerCase() === t.en.toLowerCase()); } catch { return false; } }).length, 0)}{lang === 'ja' ? '件一致' : ' matched'}
-                  </span>
-                )}
+                {analyzeText && (() => {
+                  const newCount = blocks.filter(b => !b.locked && b.id !== 'negative').reduce(
+                    (s, b) => s + (b.cats?.flatMap(c => c.t).filter(t => hasTag(analyzeText, t.en) && !hasTag(b.text, t.en)).length || 0), 0
+                  );
+                  return (
+                    <>
+                      <span className="text-[0.625rem] font-mono text-muted">— {newCount}{lang === 'ja' ? '件を追加可能' : ' new'}</span>
+                      {newCount > 0 && (
+                        <button
+                          onClick={applyAllAnalyzed}
+                          style={{ background: 'rgb(var(--c-teal) / 0.15)', border: '1px solid rgb(var(--c-teal) / 0.4)', color: 'rgb(var(--c-teal))' }}
+                          className="text-[0.625rem] font-mono cursor-pointer rounded-md px-[0.4375rem] py-[0.1875rem]">
+                          ⊕ {lang === 'ja' ? '一括追加' : 'Apply all'}
+                        </button>
+                      )}
+                    </>
+                  );
+                })()}
                 <button onClick={() => { setAnalyzeText(''); setAnalyzeOpen(false); }}
                   className="ml-auto text-[0.625rem] text-muted cursor-pointer bg-transparent border-none">✕ {lang === 'ja' ? '閉じる' : 'Close'}</button>
               </div>
+              {/* Paste area */}
               <textarea
                 value={analyzeText}
                 onChange={e => setAnalyzeText(e.target.value)}
@@ -2218,6 +2257,25 @@ export default function Loom() {
                 className="w-full bg-bg border border-dim rounded-[0.3125rem] text-fg text-[0.6875rem] font-mono px-[0.5625rem] py-1.5 outline-none resize-none"
                 style={{ minHeight: '54px' }}
               />
+              {/* Unrecognized tags */}
+              {analyzeText && (() => {
+                const normSeg = s => s.trim().replace(/^\((.+?)(?::\d[\d.]*)?[\)]+$/, '$1').replace(/^\[(.+?)\]$/, '$1').trim().toLowerCase();
+                const allKnown = new Set(blocks.flatMap(b => b.cats?.flatMap(c => c.t.map(t => t.en.toLowerCase())) || []));
+                const unknown = [...new Set(analyzeText.split(',').map(normSeg).filter(e => e && !allKnown.has(e)))];
+                if (unknown.length === 0) return null;
+                return (
+                  <div className="mt-1.5">
+                    <span className="text-[0.5625rem] font-mono text-muted">
+                      {lang === 'ja' ? `未認識タグ: ${unknown.length}件` : `Unrecognized: ${unknown.length}`}
+                    </span>
+                    <div className="flex flex-wrap gap-1 mt-0.5">
+                      {unknown.map((t, i) => (
+                        <span key={i} className="text-[0.5625rem] font-mono px-1.5 py-[0.0625rem] rounded border border-dim text-muted">{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           )}
 

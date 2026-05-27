@@ -2,11 +2,10 @@ import { splitTags, bareTag } from '../data/constants.js';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function getTagLabels(blockText, cats) {
-  const active = splitTags(blockText).map(bareTag).map(t => t.toLowerCase());
+  const active = splitTags(blockText).map(bareTag).filter(Boolean);
   const allDefs = cats.flatMap(c => c.t);
-  return active
-    .map(en => allDefs.find(d => d.en.toLowerCase() === en))
-    .filter(Boolean);
+  // Unknown tags (custom / manually typed) fall back to {en, ja: en} so they're not silently dropped
+  return active.map(en => allDefs.find(d => d.en.toLowerCase() === en.toLowerCase()) || { en, ja: en });
 }
 
 function getBlock(blocks, id) {
@@ -116,6 +115,13 @@ export function toNaturalJa(blocks) {
     }
   }
 
+  // Custom blocks — append raw text as fallback
+  const customBlks = blocks.filter(b => b.isCustomBlock && b.text?.trim() && b.enabled !== false);
+  for (const b of customBlks) {
+    const t = b.text.trim();
+    parts.push(t.endsWith('。') ? t : t + '。');
+  }
+
   return parts.join('') || '（プロンプトが空です）';
 }
 
@@ -186,6 +192,13 @@ export function toNaturalEn(blocks) {
   // Effects
   if (effect.length) {
     sentences.push('Visual effects: ' + effect.map(t => t.en).join(', '));
+  }
+
+  // Custom blocks — append raw text as fallback
+  const customBlksEn = blocks.filter(b => b.isCustomBlock && b.text?.trim() && b.enabled !== false);
+  for (const b of customBlksEn) {
+    const t = b.text.trim();
+    sentences.push(t.endsWith('.') ? t : t + '.');
   }
 
   return sentences.join('. ') + (sentences.length ? '.' : '') || '(prompt is empty)';
