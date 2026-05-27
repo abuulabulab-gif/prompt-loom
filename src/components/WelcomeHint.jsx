@@ -93,8 +93,8 @@ export default function WelcomeHint({ lang, theme, onSetLang, onSetTheme, onDism
             ))}
           </div>
 
-          {/* ── Info chips: local / cloud / AI ── */}
-          <div className="grid grid-cols-3 gap-[0.3125rem] mb-4">
+          {/* ── Info chips: local / cloud / random / AI ── */}
+          <div className="grid grid-cols-2 gap-[0.3125rem] mb-4">
             {/* Local save */}
             <div className="flex flex-col items-center gap-[0.1875rem] bg-surfalt rounded-lg px-2 py-[0.5625rem] text-center">
               <span className="text-sm">🔒</span>
@@ -114,6 +114,17 @@ export default function WelcomeHint({ lang, theme, onSetLang, onSetTheme, onDism
               </span>
               <span className="text-[0.5625rem] text-muted font-mono leading-tight">
                 {L === 'ja' ? 'Googleログインで\nPC↔スマホ共有' : 'Sign in to sync\nacross devices'}
+              </span>
+            </div>
+
+            {/* Random gen */}
+            <div className="flex flex-col items-center gap-[0.1875rem] bg-surfalt rounded-lg px-2 py-[0.5625rem] text-center">
+              <span className="text-sm">🎲</span>
+              <span className="text-[0.625rem] font-bold text-fg leading-tight">
+                {L === 'ja' ? 'おまかせ生成' : 'Random gen'}
+              </span>
+              <span className="text-[0.5625rem] text-muted font-mono leading-tight">
+                {L === 'ja' ? '🎲ボタンで全ブロックを\n一括自動生成' : '🎲 button auto-fills\nall blocks at once'}
               </span>
             </div>
 

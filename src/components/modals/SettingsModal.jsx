@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const APP_VERSION = 'v1.9';
+const APP_VERSION = 'v2.0';
 const APP_YEAR = '2026';
 
 const SHORTCUTS = (lang) => [
@@ -94,6 +94,12 @@ const MOBILE_TIPS = (lang) => [
       : 'In Expert mode, double-tap a block name to hide it. Restore from the Hidden Blocks section in this panel',
   },
   {
+    icon: '⊕',
+    text: lang === 'ja'
+      ? 'ブロック右上の⊕ボタンでフルスクリーンの集中編集モードに切替。1ブロックだけを大きく表示して操作できます'
+      : 'Tap ⊕ in the block header to enter fullscreen focus mode — edit one block at a time with more space',
+  },
+  {
     icon: '▼',
     text: lang === 'ja'
       ? '画面下の出力バーは▼ボタンで折りたたみ可能。ドラッグハンドルで高さを自由に調整できます'
@@ -123,7 +129,7 @@ const GUIDE = (lang) => [
     items: [
       { icon: '🏷️', text: lang === 'ja' ? 'タグをクリックしてプロンプトに追加・削除。アクティブなタグは色付き表示される' : 'Click tags to add/remove from prompt. Active tags are color-highlighted' },
       { icon: '📋', text: lang === 'ja' ? 'COPYボタン（Ctrl+Enter）でプロンプトをクリップボードへコピー。AIツールに貼り付けて使用する' : 'COPY (Ctrl+Enter) copies the prompt. Paste into your AI tool to generate' },
-      { icon: '🎲', text: lang === 'ja' ? '「🎲おまかせ」ボタンでゼロからランダムキャラクターを自動生成。ネガティブ・ロック済みブロックは対象外' : '"🎲 Random" auto-generates a random character from scratch. Skips Negative and locked blocks' },
+      { icon: '🎲', text: lang === 'ja' ? '「🎲おまかせ」ボタンでゼロからランダムキャラクターを自動生成（🧍キャラデザ/🖼️イラストの2モード）。ネガティブ・ロック済みブロックは対象外' : '"🎲 Random" auto-generates a character from scratch — two modes: 🧍 Char.Design or 🖼️ Illust. Skips Negative and locked blocks' },
       { icon: '✦/✕', text: lang === 'ja' ? 'Positive（追加ワード）とNegative（除外ワード）タブで管理。タブ切替はP・Nキーでも可能' : 'Positive (include) and Negative (exclude) tabs. P / N keys also switch tabs' },
       { icon: '1〜6', text: lang === 'ja' ? 'AIツールボタンでMJ・NAI・SD・Flux・DALL-Eの出力形式を切替（1〜6キー）。ツールごとに出力が最適化される' : 'AI tool buttons switch output for MJ, NAI, SD, Flux, DALL-E (keys 1–6). Each tool has optimized output' },
       { icon: 'Simple', text: lang === 'ja' ? '⚙️ 設定の「表示モード」でシンプル/ノーマル/エキスパートを切替。シンプルは初心者向けブロックのみ表示。一部の高度な機能はExpertモードでのみ現れる' : '⚙️ Settings → View mode: Simple / Normal / Expert. Simple shows beginner blocks only; some advanced features appear only in Expert mode' },
@@ -142,6 +148,7 @@ const GUIDE = (lang) => [
     items: [
       { icon: '⚡', text: lang === 'ja' ? '強度ボタン（弱〜強）でタグの重みを調整。±ボタンで0.05刻みで微調整。Fluxツールでは重みが自動除去される' : 'Strength buttons set tag weight. ± fine-tunes by 0.05 steps. Flux auto-strips weight syntax' },
       { icon: '⭐', text: lang === 'ja' ? 'タグの★でお気に入り登録するとブロック上部に常時表示。よく使うタグへ素早くアクセスできる' : '★ marks tags as favorites and pins them to the top of the block for quick access' },
+      { icon: '🏷 Strip', text: lang === 'ja' ? 'ブロックヘッダーのアクティブタグ帯で現在選択中のタグを一覧表示。チップをクリックするとそのカテゴリにジャンプしてタグをハイライト' : 'Active tag strip in each block header lists all selected tags. Click a chip to jump to its category and highlight the tag' },
       { icon: '🎨', text: lang === 'ja' ? 'カラーピッカーで髪・目・肌・衣装の色をビジュアルで選択してタグ自動追加。RGB・16進数入力も可能' : 'Color picker visually selects colors for hair, eyes, skin, clothing — auto-adds the tag. RGB/hex input supported' },
       { icon: '💾', text: lang === 'ja' ? 'ブロック右上の💾でプリセット保存。衣装・構図を名前付きで保存してワンクリックで切替できる' : '💾 in block header saves named presets. Switch costumes or compositions instantly' },
       { icon: '🎲 Vary', text: lang === 'ja' ? '「🎲バリエ」で同じキャラの派生プロンプトを3パターン一括生成。各行の🗣/📝ボタンで自然文に切替可能。タグが1つ以上あるときに有効' : '"🎲 Vary" generates 3 derivatives. Toggle 🗣/📝 per row for natural text. Active when at least one tag is set' },
@@ -161,7 +168,7 @@ const GUIDE = (lang) => [
     items: [
       { icon: '🔧 Hide', text: lang === 'ja' ? '【Expertモード限定】ブロック名をダブルタップして非表示に。⚙️ 設定の非表示ブロック欄から再表示できる' : '[Expert mode only] Double-tap a block name to hide it. Restore from ⚙️ Settings → this tab' },
       { icon: '✏️ +Custom', text: lang === 'ja' ? '「✏️+カスタム」で自由記述ブロックを追加（PC5個・スマホ3個まで）。上限に達した状態で追加しようとすると警告が表示される' : '"✏️ +Custom" adds free-text blocks (up to 5 on PC, 3 on mobile). Attempting to exceed the limit shows a warning' },
-      { icon: '⊕', text: lang === 'ja' ? '【PC限定】ブロックの⊕で集中モード。そのブロックを拡大、他ブロックを横にサムネイル表示。Simple/Normal/Expertすべてで使用可能' : '[PC only] ⊕ enters focus mode — expands one block while others become thumbnail sidebars. Available in all view modes' },
+      { icon: '⊕', text: lang === 'ja' ? 'ブロックの⊕で集中モード。PCはブロック拡大＋サムネイルサイドバー表示、スマホはフルスクリーンオーバーレイ。Simple/Normal/Expertすべてで使用可能' : '⊕ enters focus mode — PC: block expands with thumbnail sidebar; Mobile: fullscreen overlay. Available in all view modes' },
       { icon: '⊞ Group', text: lang === 'ja' ? '⊞まとめモードで複数タグを選択して括弧グループ化。(tag1, tag2:1.2) の形式で一括追加。Simple/Normal/Expertすべてで使用可能' : '⊞ Group mode: select multiple tags to batch-add as (tag1, tag2:1.2). Available in all view modes (Simple/Normal/Expert)' },
       { icon: '✏️ Edit', text: lang === 'ja' ? 'COPY前に✏️編集ボタンで最終テキストを手直し。生成直前の微調整に便利' : '✏️ Edit-before-copy lets you tweak the final output text right before copying' },
       { icon: '🗑', text: lang === 'ja' ? '出力バー左側の🗑ボタンで全ブロックのテキストを一括リセット。展開/折りたたみ・📸・✏️と同じ行の左詰め側に並んでいる。確認ダイアログあり' : 'The 🗑 button in the output bar\'s left cluster resets all block text at once. A confirmation dialog appears' },
@@ -223,7 +230,7 @@ const PLATFORM_DIFF = (lang) => [
     category: lang === 'ja' ? 'レイアウト' : 'Layout',
     rows: [
       { feature: lang === 'ja' ? 'ブロック列数' : 'Block columns', mobile: lang === 'ja' ? '1列固定' : '1 column fixed', pc: lang === 'ja' ? '1/2/3列を切替（▢/▥/▦）' : '1/2/3 columns (▢/▥/▦)' },
-      { feature: lang === 'ja' ? '集中モード' : 'Focus mode', mobile: lang === 'ja' ? '非対応' : 'Not available', pc: lang === 'ja' ? '⊕でそのブロックを拡大表示' : '⊕ expands one block full-width', mobileNa: true },
+      { feature: lang === 'ja' ? '集中モード' : 'Focus mode', mobile: lang === 'ja' ? '対応（フルスクリーンオーバーレイ）' : 'Supported (fullscreen overlay)', pc: lang === 'ja' ? '⊕でブロック拡大＋サムネイルサイドバー' : '⊕ expands block + thumbnail sidebar' },
     ],
   },
   {
@@ -696,6 +703,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                 </div>
                 <div className="space-y-[0.3125rem]">
                   {[
+                    { v: 'v2.0', note: lang === 'ja' ? 'フォーカスモードをスマホに対応（フルスクリーンオーバーレイ）。アクティブタグストリップ追加（クリックでカテゴリジャンプ＆ハイライト）。高DPI/FHD向けremベース・レスポンシブフォント。ランダム生成を2モード再設計（🧍キャラデザ/🖼️イラスト）。逆解析に一括適用・未認識タグのカスタム登録。クラウド同期に「今すぐ同期」ボタン・オフライン復帰自動再Push・履歴オートスライス。競合タグ警告を2段階化（エラー/ソフト）。タグ名変更エイリアス・カテゴリ安定ID対応（データ移行堅牢化）' : 'Focus mode now on mobile (fullscreen overlay). Active tag strip — click chip to jump to its category with highlight. Responsive rem-based font for HiDPI/FHD. Random gen redesigned: 2 modes (🧍 Char.Design / 🖼️ Illust). Analyze: batch apply + custom-import for unknown tags. Cloud sync: "Sync now" force-pull, auto-retry on reconnect, history auto-slice. Conflict warnings now two-level (error / soft). Tag alias migration + stable category IDs for data robustness.' },
                     { v: 'v1.9', note: lang === 'ja' ? '極限クローズアップテンプレート追加（口元・目・魚眼）。テンプレートにネガ推奨タグ（negHint）表示。全テンプレートタグをブロックで個別選択可能に統一。ブロック別テンプレート適用取り消し（↩）ボタン追加。キャラノート設定シートにAIタグフィールド・TSVエクスポート・エディタからのインポートを統合。プロンプトログの重複自動記録防止・タグ対応表の挿入時重複スキップ。ランダム生成から特定タグを除外するexcludeFromRandomフラグ追加。競合ルール・タグ辞書拡充' : 'New extreme close-up templates (lip focus, eye focus, fisheye). Templates show negHint suggestions. All template tags now individually selectable in blocks. Per-block template undo (↩) button. Character note profile sheet gains per-field AI tag rows, TSV export, and editor import. Prompt log dedup on COPY, tag map insert dedup. excludeFromRandom flag to prevent extreme tags in random generation. Expanded conflict rules and tag dictionary.' },
                     { v: 'v1.8', note: lang === 'ja' ? 'コードアーキテクチャ刷新：クラウド同期ロジックをuseCloudSync・ランダム生成ロジックをuseRandomGenフックに分離。新追加種族タグ（catgirl・dark elf・dragon girl・android・slime girl等）・artstyleタグ（retro artstyle・tarot card）・髪型タグ（layered hair）対応。競合ルール追加（レトロアニメ/タロットカード×リアル・3D、レイヤードヘア×ショート）。タグ辞書・破綻チェック全面監査' : 'Architecture refactor: cloud sync extracted to useCloudSync hook, random generation to useRandomGen hook. New species tags (catgirl, dark elf, dragon girl, android, slime girl, etc.), artstyle tags (retro artstyle, tarot card), hairstyle tag (layered hair). New conflict rules (retro artstyle/tarot card vs realistic/3D, layered hair vs short). Full tag dictionary & conflict audit.' },
                     { v: 'v1.7', note: lang === 'ja' ? 'ランダム生成システム全面再構築。Tier3タグ分類・おまかせ2モード（🧍キャラデザ/🖼️イラスト）・排他ルール（フレーミング×下半身・環境×エフェクト・ポーズ・表情・スタイル矛盾）・コンボシステム（武器→fighting stance・人魚→underwater等）。バリエーション生成を固定ブロック（種族・顔・体型）＋再ロールブロック（衣装・構図・背景・エフェクト・照明）方式に変更。武器タグ低確率枠（約12%）で追加。モード設定をLocalStorageで記憶。タグ・辞書・競合ルール追加' : 'Random generation system overhaul: Tier3 tag classification, 2-mode random (🧍 Char.Design / 🖼️ Illust), exclusion rules (framing × lower-body, environment × effects, pose, expression, style conflicts), combo system (weapon→fighting stance, mermaid→underwater, etc.). Variations redesigned: fixed blocks (attribute/face/body) + reroll blocks (outfit/composition/background/effect/lighting). Weapon tags at ~12% probability. Mode saved to LocalStorage. New tags, dictionary entries, conflict rules.' },
