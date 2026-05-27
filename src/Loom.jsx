@@ -1586,15 +1586,15 @@ export default function Loom() {
 
                         {/* Editor canvas */}
                         <div className="flex-1 min-w-0 flex flex-col overflow-hidden rounded-2xl"
-                          style={{ background: 'rgb(var(--surface))', border: `1.5px solid ${focusBlock.color}55`, boxShadow: `0 0 40px ${focusBlock.color}18` }}>
+                          style={{ background: 'rgb(var(--surface))', border: `1.5px solid ${blockTextColor(focusBlock)}55`, boxShadow: `0 0 40px ${blockTextColor(focusBlock)}18` }}>
                           {/* Canvas header */}
                           <div className="flex items-center gap-2 flex-shrink-0 px-3.5 py-2.5"
-                            style={{ borderBottom: `1px solid ${focusBlock.color}30` }}>
-                            <span style={{ background: focusBlock.color + '22', border: `1px solid ${focusBlock.color}80`, color: focusBlock.color, textShadow: '0 0 8px currentColor' }} className="text-xs font-mono font-bold px-2.5 py-[0.1875rem] rounded-full tracking-[0.08em]">
+                            style={{ borderBottom: `1px solid ${blockTextColor(focusBlock)}30` }}>
+                            <span style={{ background: blockTextColor(focusBlock) + '22', border: `1px solid ${blockTextColor(focusBlock)}80`, color: blockTextColor(focusBlock), textShadow: '0 0 8px currentColor' }} className="text-xs font-mono font-bold px-2.5 py-[0.1875rem] rounded-full tracking-[0.08em]">
                               🔍 {lang === 'ja' ? '集中編集モード' : 'FOCUS MODE'}
                             </span>
                             <button onClick={() => setFocusBlockId(null)}
-                              style={{ borderColor: focusBlock.color + '60', color: focusBlock.color }}
+                              style={{ borderColor: blockTextColor(focusBlock) + '60', color: blockTextColor(focusBlock) }}
                               className="ml-auto border rounded-[0.3125rem] px-[0.5625rem] py-[0.1875rem] text-[0.6875rem] font-mono font-semibold cursor-pointer bg-transparent">
                               {lang === 'ja' ? '閉じる' : 'Close'} ✕
                             </button>
@@ -1638,14 +1638,14 @@ export default function Loom() {
                                 const num = visibleBlocks.findIndex(x => x.id === b.id) + 1;
                                 return (
                                   <div key={b.id} onClick={() => setFocusBlockId(b.id)}
-                                    style={{ borderLeft: `3px solid ${b.enabled !== false ? b.color : 'rgb(var(--dim))'}`, opacity: b.enabled === false ? 0.5 : 1 }}
+                                    style={{ borderLeft: `3px solid ${b.enabled !== false ? blockTextColor(b) : 'rgb(var(--dim))'}`, opacity: b.enabled === false ? 0.5 : 1 }}
                                     className="bg-panel border border-dim flex items-center gap-1.5 rounded-md px-[0.4375rem] py-[0.3125rem] cursor-pointer transition-all duration-[120ms]"
                                     onMouseOver={e => e.currentTarget.style.background = 'rgb(var(--surface-alt))'}
                                     onMouseOut={e => e.currentTarget.style.background = 'rgb(var(--panel))'}>
-                                    <span style={{ background: b.color + '22', border: `1px solid ${b.color}60`, color: b.color }} className="min-w-4 h-4 rounded-full text-[0.5625rem] font-bold flex items-center justify-center font-mono flex-shrink-0">{num}</span>
+                                    <span style={{ background: blockTextColor(b) + '22', border: `1px solid ${blockTextColor(b)}60`, color: blockTextColor(b) }} className="min-w-4 h-4 rounded-full text-[0.5625rem] font-bold flex items-center justify-center font-mono flex-shrink-0">{num}</span>
                                     <span className="text-[0.6875rem]">{b.icon}</span>
                                     <span className="text-fg text-[0.625rem] font-semibold truncate flex-1">{lang === 'ja' ? b.name : b.nameEn}</span>
-                                    {b.text && <span style={{ color: b.color + '99' }} className="text-[0.5625rem] font-mono flex-shrink-0">{countTags(b.text)}</span>}
+                                    {b.text && <span style={{ color: blockTextColor(b) + '99' }} className="text-[0.5625rem] font-mono flex-shrink-0">{countTags(b.text)}</span>}
                                   </div>
                                 );
                               })}
