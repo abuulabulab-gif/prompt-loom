@@ -7,11 +7,12 @@ const IS_TOUCH = typeof window !== 'undefined' && ('ontouchstart' in window || n
 
 const LONG_PRESS_MS = 420;
 
-export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disabled, selectMode, selected, conflict, desc, large, onInsert, onToggleFav }) {
+export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disabled, selectMode, selected, conflict, desc, large, onInsert, onToggleFav, wrapperRef }) {
   const [h, setH] = useState(false);
   const [tipPos, setTipPos] = useState(null);
   const [longTip, setLongTip] = useState(false); // touch long-press tooltip
   const wrapRef = useRef(null);
+  const setRef = el => { wrapRef.current = el; wrapperRef?.(el); };
   const longPressTimer = useRef(null);
   const longFired = useRef(false);
 
@@ -78,7 +79,7 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
 
   return (
     <div
-      ref={wrapRef}
+      ref={setRef}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
       onTouchStart={IS_TOUCH ? handleTouchStart : undefined}

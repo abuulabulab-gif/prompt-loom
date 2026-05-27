@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { STRENGTHS, uid, appendTag, countTags, hasTag, toggleTag, clampW, removeTag, splitTags, bareTag, OPTIONAL_CAT_NAMES, BLOCK_RANDOM_RULES, TIER3_TAGS, RANDOM_EXCLUSION_RULES, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS, TAG_PAIR_COMBOS, TAG_SPECIES_COMBOS } from "../data/constants.js";
@@ -51,6 +51,42 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
   const [nameInput, setNameInput] = useState(block.name);
 
   const blockColor = isLight ? (block.colorLight ?? block.color) : block.color;
+
+  // en→ja lookup for active tag chips
+  const enToJa = useMemo(() => {
+    const m = new Map();
+    for (const cat of block.cats) for (const t of cat.t) if (!m.has(t.en.toLowerCase())) m.set(t.en.toLowerCase(), t.ja);
+    return m;
+  }, [block.cats]);
+
+  // Refs to each TagBtn DOM node (keyed by en.toLowerCase()) for jump scroll
+  const tagRefs = useRef({});
+  const [pendingScrollTag, setPendingScrollTag] = useState(null);
+
+  // After accordion opens (catStates changes), scroll to pending tag
+  useEffect(() => {
+    if (!pendingScrollTag) return;
+    const raf = requestAnimationFrame(() => {
+      const el = tagRefs.current[pendingScrollTag];
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('tag-highlight');
+        setTimeout(() => el.classList.remove('tag-highlight'), 750);
+        setPendingScrollTag(null);
+      }
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [pendingScrollTag, block.catStates]);
+
+  const handleChipJump = (bare) => {
+    const bareLower = bare.toLowerCase();
+    const targetCat = block.cats.find(cat => cat.t.some(t => t.en.toLowerCase() === bareLower));
+    if (!targetCat) return;
+    if (!isCatOpen(targetCat)) {
+      onUpdate({ catStates: { ...(block.catStates || {}), [targetCat.n]: true } });
+    }
+    setPendingScrollTag(bareLower);
+  };
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: block.id });
 
@@ -510,19 +546,23 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             return (
               <div className="mt-1.5 mb-1 flex flex-wrap gap-1 items-center">
                 {activeTags.map((raw, i) => {
-                  // Strip weight syntax for lookup: (tag:1.2) → tag
                   const bare = raw.replace(/^\((.+?)(?::\d[\d.]*)?[\)]+$/, '$1').trim();
                   const isRandom = randomEnSet.has(bare.toLowerCase());
+                  const jaLabel = enToJa.get(bare.toLowerCase()) ?? bare;
+                  const isJumpable = enToJa.has(bare.toLowerCase());
+                  const label = lang === 'ja' ? jaLabel : bare;
                   return (
                     <span
                       key={i}
+                      onClick={isJumpable ? () => handleChipJump(bare) : undefined}
+                      title={isJumpable ? (lang === 'ja' ? 'クリックでジャンプ' : 'Click to jump') : undefined}
                       style={isRandom
                         ? { background: blockColor + '15', border: `1px dashed ${blockColor}80`, color: blockColor }
                         : { background: 'rgb(var(--surface-alt))', border: `1px solid ${blockColor}50`, color: blockColor }}
-                      className={`inline-flex items-center gap-[0.1875rem] rounded font-mono ${focusMode ? 'px-2 py-[0.1875rem] text-xs' : 'px-[0.3125rem] py-[0.0625rem] text-[0.5625rem]'}`}
+                      className={`inline-flex items-center gap-[0.1875rem] rounded font-mono ${focusMode ? 'px-2 py-[0.1875rem] text-xs' : 'px-[0.3125rem] py-[0.0625rem] text-[0.5625rem]'}${isJumpable ? ' cursor-pointer' : ''}`}
                     >
                       <span className="opacity-60 text-[0.5rem]">{isRandom ? '🎲' : '👤'}</span>
-                      {bare}
+                      {label}
                     </span>
                   );
                 })}
@@ -793,6 +833,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                         selectMode={selectMode} selected={selectedTags.includes(tag.en)}
                         conflict={conflictTags?.has(tag.en.toLowerCase()) && hasTag(block.text, tag.en)}
                         desc={TAG_DICT[tag.en]} large={focusMode}
+                        wrapperRef={el => { if (el) tagRefs.current[tag.en.toLowerCase()] = el; else delete tagRefs.current[tag.en.toLowerCase()]; }}
                         onInsert={() => onTagClick(tag.en)} onToggleFav={() => toggleFav(tag.en)} />
                     ))}
                     {sceneActive && cat.n === '性別・人数' && (
