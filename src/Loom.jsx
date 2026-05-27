@@ -1094,12 +1094,17 @@ export default function Loom() {
     { id: 'snapshot', group: lang === 'ja' ? 'アクション' : 'Actions', icon: '📸', label: 'Snapshot', labelJa: 'スナップショット保存', action: handleSnapshot },
     { id: 'fold', group: lang === 'ja' ? 'アクション' : 'Actions', icon: '⊟', label: 'Fold all blocks', labelJa: '全ブロックを折りたたむ', shortcut: '[', action: () => setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, blocks: c.blocks.map(b => ({ ...b, collapsed: true })) } : c)) },
     { id: 'expand', group: lang === 'ja' ? 'アクション' : 'Actions', icon: '⊞', label: 'Expand all blocks', labelJa: '全ブロックを展開', shortcut: ']', action: () => setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, blocks: c.blocks.map(b => ({ ...b, collapsed: false })) } : c)) },
+    { id: 'enable-all', group: lang === 'ja' ? 'アクション' : 'Actions', icon: '✓', label: 'Enable all blocks', labelJa: '全ブロックを有効化', action: () => setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, blocks: c.blocks.map(b => ({ ...b, enabled: true })) } : c)) },
+    { id: 'disable-all', group: lang === 'ja' ? 'アクション' : 'Actions', icon: '✗', label: 'Disable all blocks', labelJa: '全ブロックを無効化', action: () => setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, blocks: c.blocks.map(b => b.id === 'negative' ? b : { ...b, enabled: false }) } : c)) },
     { id: 'random-char', group: lang === 'ja' ? 'アクション' : 'Actions', icon: '🎲', label: 'Random character (all blocks)', labelJa: 'おまかせランダム生成（全ブロック）', action: generateRandomChar },
+    { id: 'variations', group: lang === 'ja' ? 'アクション' : 'Actions', icon: '✦', label: 'Generate variations', labelJa: 'バリエーション生成', description: lang === 'ja' ? '衣装・背景を3パターン振り直す' : 'Reroll outfit & scene (3 variants)', action: () => { generateVariations(); setOutputExpanded(true); } },
     { id: 'addchar', group: lang === 'ja' ? 'アクション' : 'Actions', icon: '👤', label: 'Add character', labelJa: '新キャラクターを追加', action: addCharacter },
     { id: 'dupchar', group: lang === 'ja' ? 'アクション' : 'Actions', icon: '⊕', label: 'Duplicate current character', labelJa: 'キャラクターを複製', action: () => duplicateCharacter(activeCharId) },
     // Panels
     { id: 'global-search', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🔍', label: 'Global tag search', labelJa: 'タグ全体検索', shortcut: 'G / Ctrl+F', action: () => setGlobalSearchOpen(true) },
     { id: 'analyze', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '◎', label: 'Analyze prompt', labelJa: 'プロンプト逆解析', shortcut: 'A', action: () => { setAnalyzeOpen(true); setOutputExpanded(true); } },
+    { id: 'text-to-tags', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '✎', label: 'Text → tags (AI)', labelJa: '文章からタグ生成（AI）', action: () => { setNaturalToTagsTab('text'); setNaturalToTagsOpen(true); } },
+    { id: 'image-to-tags', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🖼️', label: 'Image → tags (AI)', labelJa: '画像からタグ生成（AI）', action: () => { setNaturalToTagsTab('image'); setNaturalToTagsOpen(true); } },
     { id: 'open-history', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🕐', label: 'Open history', labelJa: '履歴を開く', shortcut: 'H', action: () => setHistoryOpen(true) },
     { id: 'open-template', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '✦', label: 'Open templates', labelJa: 'テンプレートを開く', shortcut: 'T', action: () => setTemplateOpen(true) },
     { id: 'open-color', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎨', label: 'Open color picker', labelJa: 'カラーピッカーを開く', action: () => setColorPickerOpen(true) },
@@ -1111,12 +1116,17 @@ export default function Loom() {
     { id: 'tab-pos', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: '✦', label: 'Switch to Positive tab', labelJa: 'Positive タブへ切替', shortcut: 'P', action: () => setOutputTab('positive') },
     { id: 'tab-neg', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: '✕', label: 'Switch to Negative tab', labelJa: 'Negative タブへ切替', shortcut: 'N', action: () => setOutputTab('negative') },
     { id: 'view-mode', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: viewMode === 'simple' ? '📋' : viewMode === 'expert' ? '🔧' : '🗂️', label: `View mode: ${viewMode} → cycle`, labelJa: `表示モード切替 (現在: ${viewMode === 'simple' ? 'シンプル' : viewMode === 'expert' ? 'エキスパート' : '通常'})`, action: cycleViewMode },
+    { id: 'toggle-random-mode', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: randomMode === 'chardesign' ? '🧍' : '🖼️', label: `Random mode: ${randomMode} → toggle`, labelJa: `ランダムモード切替 (現在: ${randomMode === 'chardesign' ? 'キャラデザ' : 'イラスト'})`, action: () => setRandomMode(m => m === 'chardesign' ? 'illust' : 'chardesign') },
     { id: 'share-url', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: '🔗', label: 'Share prompt', labelJa: 'プロンプトをシェア', action: copyShareUrl },
     { id: 'toggle-theme', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: theme === 'dark' ? '☀️' : '🌙', label: 'Toggle theme', labelJa: 'テーマを切替', action: () => setTheme(t => t === 'dark' ? 'light' : 'dark') },
     { id: 'toggle-lang', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: '🌐', label: 'Toggle language JA/EN', labelJa: '言語を切替 JA/EN', action: () => setLang(l => l === 'ja' ? 'en' : 'ja') },
     { id: 'export', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: '💾', label: 'Backup character', labelJa: 'キャラをバックアップ', action: handleExport },
-    // Characters
-    ...characters.map(c => ({ id: `char-${c.id}`, group: lang === 'ja' ? 'キャラクター' : 'Characters', icon: c.emoji, label: c.name, labelJa: c.name, description: `${c.blocks?.filter(b => b.enabled !== false && b.text?.trim()).length || 0} active blocks`, action: () => { setActiveCharId(c.id); setCharPanelOpen(true); } })),
+    // Characters — active character first
+    ...[...characters].sort((a, b) => a.id === activeCharId ? -1 : b.id === activeCharId ? 1 : 0).map(c => {
+      const isActive = c.id === activeCharId;
+      const activeCount = c.blocks?.filter(b => b.enabled !== false && b.text?.trim()).length || 0;
+      return { id: `char-${c.id}`, group: lang === 'ja' ? 'キャラクター' : 'Characters', icon: c.emoji, label: c.name, labelJa: c.name, description: isActive ? (lang === 'ja' ? '▶ 選択中' : '▶ Active') : `${activeCount} active blocks`, action: () => { setActiveCharId(c.id); setCharPanelOpen(true); } };
+    }),
     // Blocks
     ...blocks.map(b => ({ id: `block-${b.id}`, group: lang === 'ja' ? 'ブロック' : 'Blocks', icon: b.icon, label: lang === 'ja' ? b.name : b.nameEn, labelJa: b.name, description: b.text ? b.text.slice(0, 50) : (lang === 'ja' ? '空' : 'empty'), action: () => { setFocusBlockId(null); setTimeout(() => { document.getElementById(`block-${b.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); if (b.collapsed) updateBlock(b.id, { collapsed: false }); }, 80); } })),
   ];
