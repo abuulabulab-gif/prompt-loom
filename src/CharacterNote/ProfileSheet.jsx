@@ -135,6 +135,17 @@ const SECTIONS = [
 
 const DEFAULT_OPEN = new Set(['basic', 'appearance', 'outfit', 'ai']);
 
+// Fields where AI tag binding is visually meaningful for image generation
+const VISUAL_TAG_FIELDS = new Set([
+  'species', 'gender', 'age_child', 'age_adult', 'origin',
+  'hair', 'bangs', 'inner_color', 'eyes', 'eye_shape', 'eyebrow', 'expression',
+  'skin', 'nail', 'ear', 'body', 'height_child', 'height_adult', 'bust', 'special',
+  'color_main', 'color_sub', 'accessories',
+  'belongings',
+  'race_ability', 'transform',
+  'outfit_main', 'outfit_outdoor', 'outfit_casual', 'outfit_sleep',
+]);
+
 // ── TagRow ─────────────────────────────────────────────────────────────────
 function TagRow({ ft, color, blockOptions, charBlockIds, lang, onChange, onInsert }) {
   const [inserted, setInserted] = useState(false);
@@ -453,7 +464,7 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
         >
           {copied === 'tsv'
             ? `✓ ${lang === 'ja' ? 'コピー済み' : 'Copied!'}`
-            : '📊 TSV'}
+            : `📊 ${lang === 'ja' ? 'スプレッドシート用' : 'Spreadsheet'}`}
         </button>
       </div>
 
@@ -466,7 +477,7 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
             {openSecs[sec.id] && sec.fields.map(f => {
               const ftKey   = `${sec.id}.${f.key}`;
               const ft      = fieldTags[ftKey];
-              const showTag = showTagFields || !!ft?.tags;
+              const showTag = (showTagFields && VISUAL_TAG_FIELDS.has(f.key)) || !!ft?.tags;
               return (
                 <div key={f.key}>
                   <FieldRow

@@ -32,7 +32,7 @@ function pickForBlock(block, sharedExcluded) {
     if (pickedTags.length >= maxPicks || skippedCats.has(cat.n)) return;
     const available = cat.t.filter(t => {
       const en = t.en.toLowerCase();
-      return !TIER3_TAGS.has(en) && !sharedExcluded.has(en);
+      return !t.excludeFromRandom && !TIER3_TAGS.has(en) && !sharedExcluded.has(en);
     });
     if (available.length === 0) return;
     const chosen = available[Math.floor(Math.random() * available.length)];
@@ -157,6 +157,14 @@ export function useVariations(blocks, tool) {
 
       // Apply cross-block combo rules (fixedTags lets species from attribute trigger combos)
       applyVariationCombos(rerolledMap, fixedTags);
+
+      // Simple background → suppress lighting and effect (environmental FX clash with plain BG)
+      const SIMPLE_BG_TAGS = ['white background', 'simple background', 'gradient background', 'bokeh background', 'abstract background'];
+      if (SIMPLE_BG_TAGS.some(t => hasTag(rerolledMap['background'] || '', t))) {
+        if (rerolledMap['effect']   !== undefined) rerolledMap['effect']   = '';
+        if (rerolledMap['lighting'] !== undefined) rerolledMap['lighting'] = '';
+      }
+
       for (const b of varBlocks) {
         if (rerolledMap[b.id] !== undefined) b.text = rerolledMap[b.id];
       }

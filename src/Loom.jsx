@@ -100,6 +100,10 @@ export default function Loom() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
+  const quickMenuRef = useRef(null);
+  const [quickOpenPos, setQuickOpenPos] = useState(null);
+  const dataMenuRef = useRef(null);
+  const [dataMenuPos, setDataMenuPos] = useState(null);
   const [viewMode, setViewMode] = useState('normal'); // 'simple' | 'normal' | 'expert'
   const simpleMode = viewMode === 'simple';
   const expertMode = viewMode === 'expert';
@@ -1048,8 +1052,14 @@ export default function Loom() {
           title={lang === 'ja' ? '開発を支援する（Buy Me a Coffee）' : 'Support development'}
           className="bg-[#fbbf2412] border border-[#fbbf2440] rounded-md px-[0.5625rem] py-1 text-warn text-[0.6875rem] font-mono no-underline flex-shrink-0 cursor-pointer">☕</a>
         {/* ✦ ツール dropdown: Template / Color / Scene / +Custom(Expert) / Reset order */}
-        <div className="relative flex-shrink-0">
-          <button onClick={() => setQuickOpen(p => !p)}
+        <div ref={quickMenuRef} className="relative flex-shrink-0">
+          <button onClick={() => {
+            if (!quickOpen && quickMenuRef.current) {
+              const r = quickMenuRef.current.getBoundingClientRect();
+              setQuickOpenPos({ top: r.bottom + 4, right: Math.max(8, window.innerWidth - r.right), width: Math.min(170, window.innerWidth - 16) });
+            }
+            setQuickOpen(p => !p);
+          }}
             title={lang === 'ja' ? 'テンプレート・カラー・シーン' : 'Template / Color / Scene'}
             className="flex items-center gap-1 rounded-md px-[0.5625rem] py-1 cursor-pointer text-[0.625rem] font-mono font-bold transition-colors duration-[120ms] whitespace-nowrap border text-accent"
             style={{ background: quickOpen ? 'rgb(var(--c-blue) / 0.19)' : 'rgb(var(--c-blue) / 0.08)', borderColor: quickOpen ? 'rgb(var(--c-blue) / 0.5)' : 'rgb(var(--c-blue) / 0.31)' }}>
@@ -1058,7 +1068,7 @@ export default function Loom() {
           {quickOpen && (
             <>
               <div className="fixed inset-0 z-[199]" onClick={() => setQuickOpen(false)} />
-              <div className="absolute right-0 top-full mt-1 z-[200] bg-surface border border-line rounded-[0.5625rem] shadow-xl py-1 min-w-[10.625rem]">
+              <div className="fixed z-[200] bg-surface border border-line rounded-[0.5625rem] shadow-xl py-1" style={quickOpenPos}>
                 <button onClick={() => { setTemplateOpen(true); setQuickOpen(false); }}
                   className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt text-accent flex items-center gap-2">
                   ✦ {lang === 'ja' ? 'テンプレート' : 'Template'}
@@ -1125,8 +1135,14 @@ export default function Loom() {
         {!isMobile && <button onClick={() => setGlobalSearchOpen(true)} title={lang === 'ja' ? 'タグ全体検索 (G / Ctrl+F)' : 'Global tag search (G / Ctrl+F)'} className="bg-transparent border border-dim rounded-md px-[0.5625rem] py-1 text-muted cursor-pointer text-[0.625rem] font-mono whitespace-nowrap">🔍 {lang === 'ja' ? '検索' : 'Search'}</button>}
         {!isMobile && <button onClick={() => setPaletteOpen(true)} title={lang === 'ja' ? 'コマンドパレット (Ctrl+K)' : 'Command Palette (Ctrl+K)'} className="bg-transparent border border-dim rounded-md px-[0.5625rem] py-1 text-muted cursor-pointer text-[0.625rem] font-mono">⌘K</button>}
         {/* 💾 データ */}
-        <div className="relative flex-shrink-0 flex items-center">
-          <button onClick={() => setDataMenuOpen(p => !p)}
+        <div ref={dataMenuRef} className="relative flex-shrink-0 flex items-center">
+          <button onClick={() => {
+            if (!dataMenuOpen && dataMenuRef.current) {
+              const r = dataMenuRef.current.getBoundingClientRect();
+              setDataMenuPos({ top: r.bottom + 4, right: Math.max(8, window.innerWidth - r.right), width: Math.min(210, window.innerWidth - 16) });
+            }
+            setDataMenuOpen(p => !p);
+          }}
             title={lang === 'ja' ? 'キャラのバックアップ・復元' : 'Backup / Restore character'}
             className={`bg-transparent border rounded-md px-[0.5625rem] py-1 text-muted cursor-pointer text-[0.625rem] font-mono whitespace-nowrap ${dataMenuOpen ? 'border-accent/50 text-accent' : 'border-dim'}`}>
             💾{!isMobile && ` ${lang === 'ja' ? 'バックアップ' : 'Backup'}`} ▾
@@ -1134,7 +1150,7 @@ export default function Loom() {
           {dataMenuOpen && (
             <>
               <div className="fixed inset-0 z-[199]" onClick={() => setDataMenuOpen(false)} />
-              <div className="absolute right-0 top-full mt-1 z-[200] bg-surface border border-line rounded-[0.5625rem] shadow-xl py-1 min-w-[13.125rem]">
+              <div className="fixed z-[200] bg-surface border border-line rounded-[0.5625rem] shadow-xl py-1" style={dataMenuPos}>
                 <div className="px-2.5 py-1 text-[0.5625rem] font-mono text-muted uppercase tracking-wider">
                   {lang === 'ja' ? `選択中: ${activeChar?.name}` : `Selected: ${activeChar?.name}`}
                 </div>

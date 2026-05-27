@@ -2,7 +2,7 @@ import { useState } from "react";
 import {
   appendTag, hasTag, removeTag, splitTags, bareTag,
   OPTIONAL_CAT_NAMES, BLOCK_RANDOM_RULES, SPECIES_PARTS_MAP, RANDOM_EXCLUDE_TAGS,
-  TIER3_TAGS, TIER2_BLOCK_IDS, TIER2_BLOCK_PROB, RANDOM_EXCLUSION_RULES, RANDOM_COMBO_RULES,
+  TIER3_TAGS, TIER2_BLOCK_IDS, RANDOM_EXCLUSION_RULES, RANDOM_COMBO_RULES,
   CHARDESIGN_MODE_CONFIG, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS, KEMONOMIMI_PAIRS,
 } from "../data/constants.js";
 import { CONFLICT_MAP } from "../data/conflicts.js";
@@ -141,7 +141,9 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
         }
 
         if (TIER2_BLOCK_IDS.has(block.id)) {
-          if (mode === 'chardesign' || Math.random() > TIER2_BLOCK_PROB) {
+          // chardesign: always clear; illust: 20% skip → 80% inclusion
+          const skipChance = mode === 'chardesign' ? 1.0 : 0.20;
+          if (Math.random() < skipChance) {
             const cleared = { ...block, text: '', enabled: true, collapsed: false, lastRandomPicks: [] };
             blockMap.set(block.id, cleared);
             return cleared;
@@ -150,9 +152,12 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
 
         let newBlock;
 
-        // Quality is always fixed regardless of mode
+        // Quality: chardesign uses illustration-spec fixed tags; illust uses standard quality
         if (block.id === 'quality') {
-          newBlock = { ...block, text: 'masterpiece, best quality, ultra-detailed, highres, absurdres, official art', enabled: true, collapsed: false, lastRandomPicks: [] };
+          const qText = mode === 'chardesign'
+            ? CHARDESIGN_MODE_CONFIG.qualityText
+            : 'masterpiece, best quality, ultra-detailed, highres, absurdres';
+          newBlock = { ...block, text: qText, enabled: true, collapsed: false, lastRandomPicks: [] };
         } else if (mode === 'chardesign') {
           const cfg = CHARDESIGN_MODE_CONFIG;
 
@@ -171,7 +176,7 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
                 .filter(c => !cfg.skipFaceCats.has(c.n))
                 .map(c =>
                   c.n === '表情'
-                    ? { ...c, t: c.t.filter(t => t.en === cfg.forcedExpression) }
+                    ? { ...c, t: c.t.filter(t => cfg.allowedExpressions.has(t.en)) }
                     : c.n === '髪飾り・毛流れ'
                     ? { ...c, t: c.t.filter(t => !cfg.skipFaceTags.has(t.en)) }
                     : c.n === 'メイク・顔演出'
@@ -226,6 +231,21 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
       });
 
       applyComboRules(blockMap, mode === 'chardesign' ? CHARDESIGN_MODE_CONFIG.fixedBlocks : null);
+
+      // Simple background → suppress lighting and effect (environmental FX clash with plain BG)
+      if (mode !== 'chardesign') {
+        const bgBlock = blockMap.get('background');
+        if (bgBlock) {
+          const SIMPLE_BG_TAGS = ['white background', 'simple background', 'gradient background', 'bokeh background', 'abstract background'];
+          const hasSimpleBg = SIMPLE_BG_TAGS.some(t => hasTag(bgBlock.text || '', t));
+          if (hasSimpleBg) {
+            for (const id of ['effect', 'lighting']) {
+              const tb = blockMap.get(id);
+              if (tb && !tb.locked) blockMap.set(id, { ...tb, text: '', lastRandomPicks: [] });
+            }
+          }
+        }
+      }
 
       return {
         ...c,

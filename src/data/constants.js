@@ -120,6 +120,10 @@ export const BLOCK_RANDOM_RULES = {
     exclusiveGroups: [['シンプル', '屋外', '屋内']],
     skipIfPicked: { 'シンプル': ['時間・天気', '季節・雰囲気'] },
   },
+  outfit: {
+    // If a complete-outfit Genre tag is picked, skip individual tops/bottoms
+    skipIfPicked: { 'ジャンル': ['トップス', 'ボトムス'] },
+  },
 };
 
 // ── Tier 3 tags (0% from おまかせ; only added via combo rules) ──
@@ -283,13 +287,16 @@ export const RANDOM_COMBO_RULES = [
 // ── キャラデザモード：設定資料特化の厳格ルール ────────────
 export const CHARDESIGN_MODE_CONFIG = {
   // ブロック単位の固定テキスト（ランダム抽選を行わず強制上書き）
-  qualityText:     'masterpiece, best quality, ultra-detailed, highres, absurdres, official art',
+  qualityText:     'masterpiece, best quality, ultra-detailed, highres, sharp focus',
   artstyleText:    'illustration, flat color, cel shading, vibrant colors, hard shading',
   backgroundText:  'white background, simple background',
   compositionText: 'full body, front view, standing',
 
-  // 顔ブロック：表情を無表情に固定
-  forcedExpression: 'expressionless',
+  // 顔ブロック：表情はキャラの個性を伝える控えめな表情タグのみ許可
+  allowedExpressions: new Set([
+    'smile', 'light smile', 'expressionless', 'smirk', 'serious',
+    'sleepy', 'determined', 'shy', 'embarrassed', 'wink', 'blushing', 'pout',
+  ]),
 
   // 顔ブロック：抽選しないカテゴリ（動作・感情表現）
   skipFaceCats: new Set(['口・歯']),

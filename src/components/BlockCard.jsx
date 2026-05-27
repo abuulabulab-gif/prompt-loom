@@ -63,19 +63,20 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
   const tagRefs = useRef({});
   const [pendingScrollTag, setPendingScrollTag] = useState(null);
 
-  // After accordion opens (catStates changes), scroll to pending tag
+  // After accordion opens (catStates changes), scroll to pending tag.
+  // setTimeout gives React two extra frames to mount newly-opened accordion items.
   useEffect(() => {
     if (!pendingScrollTag) return;
-    const raf = requestAnimationFrame(() => {
+    const t = setTimeout(() => {
       const el = tagRefs.current[pendingScrollTag];
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         el.classList.add('tag-highlight');
         setTimeout(() => el.classList.remove('tag-highlight'), 750);
-        setPendingScrollTag(null);
       }
-    });
-    return () => cancelAnimationFrame(raf);
+      setPendingScrollTag(null);
+    }, 80);
+    return () => clearTimeout(t);
   }, [pendingScrollTag, block.catStates]);
 
   const handleChipJump = (bare) => {
@@ -271,7 +272,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             <span
               onClick={() => { setNameInput(block.name); setEditingName(true); }}
               title={lang === 'ja' ? 'クリックで名前を変更' : 'Click to rename'}
-              className={`${focusMode ? 'text-base' : 'text-[0.8125rem]'} font-bold flex-1 min-w-0 leading-snug cursor-text group ${isLocked ? 'text-muted' : 'text-fg'}`}
+              className={`${focusMode ? 'text-base' : 'text-[0.8125rem]'} font-bold flex-1 min-w-0 leading-snug whitespace-nowrap overflow-hidden cursor-text group ${isLocked ? 'text-muted' : 'text-fg'}`}
             >
               {lang === 'ja' ? block.name : block.nameEn}
               <span className="ml-1 text-[0.625rem] text-dim opacity-0 group-hover:opacity-100 transition-opacity">✎</span>
@@ -279,7 +280,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           )
         ) : (
           <span
-            className={`${focusMode ? 'text-base' : 'text-[0.8125rem]'} font-bold flex-1 min-w-0 leading-snug ${isLocked ? 'text-muted' : 'text-fg'}${onHide ? ' cursor-pointer select-none' : ''}`}
+            className={`${focusMode ? 'text-base' : 'text-[0.8125rem]'} font-bold flex-1 min-w-0 leading-snug whitespace-nowrap overflow-hidden ${isLocked ? 'text-muted' : 'text-fg'}${onHide ? ' cursor-pointer select-none' : ''}`}
             onDoubleClick={onHide ? hideConfirm : undefined}
             onTouchStart={onHide ? handleDoubleTap : undefined}
             title={onHide ? (lang === 'ja' ? 'ダブルタップで非表示' : 'Double-tap to hide') : undefined}
@@ -290,8 +291,8 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
         )}
         </div>{/* END LEFT group */}
 
-        {/* RIGHT: action buttons — never shrink, align to top */}
-        <div className="flex items-start gap-1.5 flex-shrink-0">
+        {/* RIGHT: action buttons — never shrink, right-align when wrapping to 2nd row */}
+        <div className="flex items-start gap-1.5 flex-shrink-0 ml-auto">
         {/* Analyze match badge */}
         {analyzedCount > 0 && (
           <span className="text-[0.5625rem] font-mono font-bold px-[0.3125rem] py-0.5 rounded flex-shrink-0"
