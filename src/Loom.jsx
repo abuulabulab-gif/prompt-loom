@@ -1579,13 +1579,17 @@ export default function Loom() {
                 return (
                   <>
                     {/* Backdrop */}
-                    <div className="fixed inset-0 z-[248] bg-black/60 backdrop-blur-[2px]" onClick={() => setFocusBlockId(null)} />
-                    {/* 3-pane modal */}
-                    <div className="fixed inset-0 z-[249] flex items-start justify-center pt-[12px] px-4 pb-4 pointer-events-none">
-                      <div className="w-full max-w-[60rem] flex gap-3 items-stretch pointer-events-auto" style={{ height: 'calc(100vh - 28px)' }}>
-                        {/* Left: BlockCard */}
-                        <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
-                          <div className="mb-2 flex items-center gap-2 flex-shrink-0">
+                    <div className="fixed inset-0 z-[248] bg-black/70 backdrop-blur-[3px]" onClick={() => setFocusBlockId(null)} />
+                    {/* Centered canvas */}
+                    <div className="fixed inset-0 z-[249] flex items-center justify-center p-[40px] pointer-events-none">
+                      <div className="w-full max-w-[58rem] flex gap-4 items-stretch pointer-events-auto" style={{ height: 'calc(100vh - 80px)', maxHeight: '90vh' }}>
+
+                        {/* Editor canvas */}
+                        <div className="flex-1 min-w-0 flex flex-col overflow-hidden rounded-[16px]"
+                          style={{ background: 'rgb(var(--surface))', border: `1.5px solid ${focusBlock.color}55`, boxShadow: `0 0 40px ${focusBlock.color}18` }}>
+                          {/* Canvas header */}
+                          <div className="flex items-center gap-2 flex-shrink-0 px-[14px] py-[10px]"
+                            style={{ borderBottom: `1px solid ${focusBlock.color}30` }}>
                             <span style={{ background: focusBlock.color + '22', border: `1px solid ${focusBlock.color}80`, color: focusBlock.color, textShadow: '0 0 8px currentColor' }} className="text-[12px] font-mono font-bold px-[10px] py-[3px] rounded-full tracking-[0.08em]">
                               🔍 {lang === 'ja' ? '集中編集モード' : 'FOCUS MODE'}
                             </span>
@@ -1598,49 +1602,56 @@ export default function Loom() {
                           <div className="overflow-y-auto flex-1">{renderCard(focusBlock, focusIdx, true)}</div>
                         </div>
 
-                        {/* Center: mini TagMap for this block */}
-                        {focusTagMapRows.length > 0 && (
-                          <div className="w-[210px] flex-shrink-0 flex flex-col overflow-hidden">
-                            <div className="text-muted text-[9px] font-mono mb-2 tracking-[0.06em] flex-shrink-0">
-                              🔗 {lang === 'ja' ? 'タグ対応表' : 'Tag Map'}
-                            </div>
-                            <div className="overflow-y-auto flex-1">
-                              {focusTagMapRows.map(row => (
-                                <div key={row.id} className="bg-surface border border-line rounded-[7px] px-[9px] py-[7px] mb-[5px]">
-                                  <div className="text-fg text-[10px] font-mono font-semibold mb-[4px] truncate">{row.label}</div>
-                                  <div className="text-prompt text-[9px] font-mono break-all leading-[1.4] mb-[6px] opacity-80">{row.promptTags}</div>
-                                  {row.notes && <div className="text-muted text-[9px] font-mono mb-[5px] leading-tight">{row.notes}</div>}
-                                  <button onClick={() => insertTagMapRow(row)}
-                                    style={{ borderColor: activeChar.color + '60', color: charColor(activeChar.color) }}
-                                    className="border rounded-[4px] px-[7px] py-[2px] text-[9px] font-mono font-bold cursor-pointer bg-transparent">
-                                    → {lang === 'ja' ? '挿入' : 'Insert'}
-                                  </button>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
+                        {/* Tool palette */}
+                        <div className="w-[175px] flex-shrink-0 flex flex-col gap-3 overflow-y-auto">
 
-                        {/* Right: block navigation */}
-                        <div className="w-[170px] flex-shrink-0 flex flex-col overflow-hidden">
-                          <div className="text-muted text-[9px] font-mono mb-2 tracking-[0.06em] flex-shrink-0">{lang === 'ja' ? '他のブロック' : 'Other blocks'}</div>
-                          <div className="flex-1 flex flex-col justify-between gap-[3px] overflow-y-auto">
-                            {visibleBlocks.filter(b => b.id !== focusBlockId).map(b => {
-                              const num = visibleBlocks.findIndex(x => x.id === b.id) + 1;
-                              return (
-                                <div key={b.id} onClick={() => setFocusBlockId(b.id)}
-                                  style={{ borderLeft: `3px solid ${b.enabled !== false ? b.color : 'rgb(var(--dim))'}`, opacity: b.enabled === false ? 0.5 : 1 }}
-                                  className="bg-surface border border-line flex items-center gap-[6px] rounded-[6px] px-[7px] py-[5px] cursor-pointer transition-all duration-[120ms]"
-                                  onMouseOver={e => e.currentTarget.style.background = 'rgb(var(--surface-alt))'}
-                                  onMouseOut={e => e.currentTarget.style.background = 'rgb(var(--surface))'}>
-                                  <span style={{ background: b.color + '22', border: `1px solid ${b.color}60`, color: b.color }} className="min-w-[16px] h-[16px] rounded-full text-[9px] font-bold flex items-center justify-center font-mono flex-shrink-0">{num}</span>
-                                  <span className="text-[11px]">{b.icon}</span>
-                                  <span className="text-fg text-[10px] font-semibold truncate flex-1">{lang === 'ja' ? b.name : b.nameEn}</span>
-                                  {b.text && <span style={{ color: b.color + '99' }} className="text-[9px] font-mono flex-shrink-0">{countTags(b.text)}</span>}
-                                </div>
-                              );
-                            })}
+                          {/* TagMap section */}
+                          {focusTagMapRows.length > 0 && (
+                            <div className="bg-surface border border-line rounded-[12px] p-[12px] flex flex-col flex-shrink-0">
+                              <div className="text-muted text-[9px] font-mono mb-[8px] tracking-[0.06em]">
+                                🔗 {lang === 'ja' ? 'タグ対応表' : 'Tag Map'}
+                              </div>
+                              <div className="flex flex-col gap-[6px] overflow-y-auto" style={{ maxHeight: '280px' }}>
+                                {focusTagMapRows.map(row => (
+                                  <div key={row.id} className="bg-panel border border-dim rounded-[7px] px-[9px] py-[7px]">
+                                    <div className="text-fg text-[10px] font-mono font-semibold mb-[3px] truncate">{row.label}</div>
+                                    <div className="text-prompt text-[9px] font-mono break-all leading-[1.4] mb-[5px] opacity-80">{row.promptTags}</div>
+                                    {row.notes && <div className="text-muted text-[9px] font-mono mb-[4px] leading-tight">{row.notes}</div>}
+                                    <button onClick={() => insertTagMapRow(row)}
+                                      style={{ borderColor: activeChar.color + '60', color: charColor(activeChar.color) }}
+                                      className="border rounded-[4px] px-[7px] py-[2px] text-[9px] font-mono font-bold cursor-pointer bg-transparent">
+                                      → {lang === 'ja' ? '挿入' : 'Insert'}
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Block navigation section */}
+                          <div className="bg-surface border border-line rounded-[12px] p-[12px] flex flex-col flex-1 min-h-0">
+                            <div className="text-muted text-[9px] font-mono mb-[8px] tracking-[0.06em] flex-shrink-0">
+                              {lang === 'ja' ? '他のブロック' : 'Other blocks'}
+                            </div>
+                            <div className="flex flex-col gap-[6px] overflow-y-auto flex-1">
+                              {visibleBlocks.filter(b => b.id !== focusBlockId).map(b => {
+                                const num = visibleBlocks.findIndex(x => x.id === b.id) + 1;
+                                return (
+                                  <div key={b.id} onClick={() => setFocusBlockId(b.id)}
+                                    style={{ borderLeft: `3px solid ${b.enabled !== false ? b.color : 'rgb(var(--dim))'}`, opacity: b.enabled === false ? 0.5 : 1 }}
+                                    className="bg-panel border border-dim flex items-center gap-[6px] rounded-[6px] px-[7px] py-[5px] cursor-pointer transition-all duration-[120ms]"
+                                    onMouseOver={e => e.currentTarget.style.background = 'rgb(var(--surface-alt))'}
+                                    onMouseOut={e => e.currentTarget.style.background = 'rgb(var(--panel))'}>
+                                    <span style={{ background: b.color + '22', border: `1px solid ${b.color}60`, color: b.color }} className="min-w-[16px] h-[16px] rounded-full text-[9px] font-bold flex items-center justify-center font-mono flex-shrink-0">{num}</span>
+                                    <span className="text-[11px]">{b.icon}</span>
+                                    <span className="text-fg text-[10px] font-semibold truncate flex-1">{lang === 'ja' ? b.name : b.nameEn}</span>
+                                    {b.text && <span style={{ color: b.color + '99' }} className="text-[9px] font-mono flex-shrink-0">{countTags(b.text)}</span>}
+                                  </div>
+                                );
+                              })}
+                            </div>
                           </div>
+
                         </div>
                       </div>
                     </div>
