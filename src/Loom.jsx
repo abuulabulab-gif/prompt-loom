@@ -1023,7 +1023,8 @@ export default function Loom() {
     <div className="bg-bg text-fg min-h-screen font-sans" style={{ paddingBottom: outputExpanded ? outputHeight : 80 }}>
 
       {/* ── HEADER ── */}
-      <div className="bg-surface border-b border-line px-[14px] py-[9px] sticky top-0 z-50 flex items-center gap-[7px] flex-wrap">
+      <div className="bg-surface border-b border-line sticky top-0 z-50">
+        <div className="max-w-[58.33rem] mx-auto px-[14px] py-[9px] flex items-center gap-[7px] flex-wrap">
         <div className="flex items-center gap-2">
           <div
             onClick={isMobile ? () => setJumpOpen(p => !p) : undefined}
@@ -1175,10 +1176,12 @@ export default function Loom() {
         </button>
         <input ref={fileRef} type="file" accept=".json,.loom" onChange={handleImport} className="hidden" />
         <input ref={presetFileRef} type="file" accept=".json,.loom" onChange={handlePresetImport} className="hidden" />
+        </div>
       </div>
 
       {/* ── CHARACTER BAR ── */}
-      <div className="bg-surface border-b border-line px-[14px] py-[7px] flex items-center gap-[5px] overflow-x-auto">
+      <div className="bg-surface border-b border-line">
+        <div className="max-w-[58.33rem] mx-auto px-[14px] py-[7px] flex items-center gap-[5px] overflow-x-auto">
         {characters.filter(c => !c.archived || c.id === activeCharId).map(c => (
           <div key={c.id} className="relative flex-shrink-0">
             {isMobile ? (
@@ -1232,6 +1235,7 @@ export default function Loom() {
             className={`rounded-[5px] px-[9px] py-1 text-[10px] font-mono cursor-pointer transition-all duration-[120ms] ${mainTab === 'note' ? 'border font-bold' : 'border border-dim text-muted'}`}>
             📖{isMobile ? '' : (' ' + (lang === 'ja' ? 'キャラノート' : 'Note'))}
           </button>
+        </div>
         </div>
       </div>
 
