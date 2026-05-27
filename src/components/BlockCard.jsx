@@ -7,6 +7,7 @@ import { EXPRESSION_PRESETS, ALL_EXPR_TAGS } from "../data/expressions.js";
 import { NEG_PRESETS } from "../data/negSuggestions.js";
 import TagBtn from "./TagBtn.jsx";
 import { TAG_DICT } from "../data/tagDictionary.js";
+import { resolveColorLabel } from "../data/colors.js";
 
 // Category IDs that start collapsed; all others start open.
 // Uses cat.id (stable, defined in blocks.js) — not cat.n (Japanese name).
@@ -39,7 +40,7 @@ const CATS_CLOSED = new Set([
 
 const SCENE_MANAGED_TAGS = new Set(['2girls', '2boys', 'multiple girls', 'multiple boys', '1other']);
 
-export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isFirst, isLast, onSavePreset, onFocus, focused, otherChars, onTransfer, conflictTags, onRemove, onHide, isMobile, isCompact, focusMode, sceneActive, analyzeText, allBlocks, onUndoBackup, isLight }) {
+export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isFirst, isLast, onSavePreset, onFocus, focused, otherChars, onTransfer, conflictTags, onRemove, onHide, isMobile, isCompact, focusMode, sceneActive, analyzeText, allBlocks, onUndoBackup, isLight, onColorPicker }) {
   const [search, setSearch] = useState('');
   const [saving, setSaving] = useState(false);
   const [pName, setPName] = useState('');
@@ -342,6 +343,15 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           >↩</button>
         )}
 
+        {/* Color picker shortcut */}
+        {onColorPicker && !isLocked && (
+          <button
+            onClick={onColorPicker}
+            title={lang === 'ja' ? 'カラーメイカーで色を追加' : 'Add color with Color Maker'}
+            className={`bg-transparent border border-dim rounded-[0.3125rem] text-muted cursor-pointer flex-shrink-0 ${focusMode ? 'px-[0.5625rem] py-1 text-[0.8125rem]' : 'px-1.5 py-0.5 text-[0.625rem]'}`}
+          >🎨</button>
+        )}
+
         {/* Focus mode */}
         {onFocus && (
           <button
@@ -558,7 +568,8 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               const bare      = bareTag(raw);
               const bareLower = bare.toLowerCase();
               const isJumpable = enToJa.has(bareLower);
-              const label     = lang === 'ja' ? (enToJa.get(bareLower) ?? bare) : bare;
+              const colorInfo  = !isJumpable ? resolveColorLabel(bare) : null;
+              const label     = lang === 'ja' ? (enToJa.get(bareLower) ?? colorInfo?.ja ?? bare) : bare;
               return (
                 <span
                   key={idx}

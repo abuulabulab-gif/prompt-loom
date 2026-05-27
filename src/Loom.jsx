@@ -16,7 +16,7 @@ import {
 } from "./data/constants.js";
 import { detectConflicts } from "./data/conflicts.js";
 import { TOOLS } from "./data/tools.js";
-import { buildColorTag } from "./data/colors.js";
+import { buildColorTag, SHADES, COLOR_PALETTE, COLOR_TARGETS } from "./data/colors.js";
 import { makeCharacter, makeCustomBlock, BLOCKS_DEF } from "./data/blocks.js";
 import PresetChip from "./components/PresetChip.jsx";
 import BlockCard from "./components/BlockCard.jsx";
@@ -209,6 +209,8 @@ export default function Loom() {
   const [naturalToTagsTab, setNaturalToTagsTab] = useState('text'); // 'text' | 'image'
   const [importToast, setImportToast] = useState(null); // null | { name: string }
   const [autoLogToast, setAutoLogToast] = useState(false);
+  const [colorToast, setColorToast] = useState(null); // null | { msg }
+  const [colorPickerDefaultTarget, setColorPickerDefaultTarget] = useState('hair');
   const [orderUpdatedAt, setOrderUpdatedAt] = useState(0);
   const [settingsUpdatedAt, setSettingsUpdatedAt] = useState(0);
   const [tagSuggestOpen, setTagSuggestOpen] = useState(false);
@@ -316,10 +318,38 @@ export default function Loom() {
 
   // ── Color picker apply ──
   const TARGET_TO_BLOCK = { hair: 'face', eyes: 'face', skin: 'body', dress: 'outfit', shirt: 'outfit', skirt: 'outfit', jacket: 'outfit', ribbon: 'outfit', shoes: 'outfit', theme: 'artstyle' };
+  const BLOCK_TO_COLOR_TARGET = { face: 'hair', body: 'skin', outfit: 'dress', artstyle: 'theme' };
+
   const applyColorTag = (shadeEn, colorEn, targetEn, targetId) => {
     const blockId = TARGET_TO_BLOCK[targetId] || 'outfit';
     const tag = targetId === 'theme' ? `${shadeEn}${colorEn} theme`.trim() : buildColorTag(shadeEn, colorEn, targetEn);
-    setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, blocks: c.blocks.map(b => b.id === blockId ? { ...b, text: appendTag(b.text, tag, '1.0'), enabled: true } : b) } : c));
+
+    // Build Japanese label for toast
+    const colorJa   = COLOR_PALETTE.find(c => c.en === colorEn)?.ja ?? colorEn;
+    const shadeObj  = SHADES.find(s => s.en === shadeEn);
+    const targetObj = COLOR_TARGETS.find(t => t.id === targetId);
+    const labelJa   = shadeObj?.id !== 'normal' && shadeObj
+      ? `${shadeObj.ja}${colorJa}${targetObj?.ja ?? targetEn}`
+      : `${colorJa}${targetObj?.ja ?? targetEn}`;
+
+    setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : {
+      ...c,
+      blocks: c.blocks.map(b => b.id !== blockId ? b : {
+        ...b, text: appendTag(b.text, tag, '1.0'), enabled: true, collapsed: false,
+      }),
+    }));
+
+    const blockName = blocks.find(b => b.id === blockId)?.[lang === 'ja' ? 'name' : 'nameEn'] ?? blockId;
+    const msg = lang === 'ja'
+      ? `🎨 ${blockName}に「${labelJa}」を追加`
+      : `🎨 "${tag}" added to ${blockName}`;
+    setColorToast({ msg });
+    setTimeout(() => setColorToast(null), 3000);
+  };
+
+  const openColorPicker = (defaultTarget = 'hair') => {
+    setColorPickerDefaultTarget(defaultTarget);
+    setColorPickerOpen(true);
   };
 
   // ── Drag-and-drop ──
@@ -1646,6 +1676,7 @@ export default function Loom() {
                   analyzeText={analyzeText}
                   allBlocks={blocks}
                   onUndoBackup={templateUndoBuf?.blockTexts[block.id] !== undefined ? () => undoSingleBlock(block.id) : undefined}
+                  onColorPicker={BLOCK_TO_COLOR_TARGET[block.id] ? () => openColorPicker(BLOCK_TO_COLOR_TARGET[block.id]) : undefined}
                   isLight={theme === 'light'} />
               );
 
@@ -2457,7 +2488,7 @@ export default function Loom() {
       {historyOpen && <HistoryModal history={history} lang={lang} onClose={() => setHistoryOpen(false)} onRestore={restoreFromHistory} onDelete={id => setHistory(prev => prev.filter(h => h.id !== id))} />}
       {naturalToTagsOpen && <NaturalToTagsModal lang={lang} apiConfig={apiConfig} blocks={blocks} onAddTags={handleAddTagsFromNatural} onClose={() => setNaturalToTagsOpen(false)} initialTab={naturalToTagsTab} />}
       {templateOpen && <TemplateModal lang={lang} isMobile={isMobile} onApply={applyTemplate} onClose={() => setTemplateOpen(false)} />}
-      {colorPickerOpen && <ColorPickerModal lang={lang} onApply={applyColorTag} onClose={() => setColorPickerOpen(false)} />}
+      {colorPickerOpen && <ColorPickerModal lang={lang} onApply={applyColorTag} onClose={() => setColorPickerOpen(false)} defaultTarget={colorPickerDefaultTarget} />}
       {sceneOpen && <SceneComposeModal characters={characters} lang={lang} activeTool={activeTool} theme={theme} onClose={() => setSceneOpen(false)} />}
       {settingsOpen && <SettingsModal lang={lang} isMobile={isMobile} defaultTab={settingsTab} onClose={() => { setSettingsOpen(false); setSettingsTab('shortcuts'); }}
         hiddenBlockIds={hiddenBlockIds} allBlocks={blocks}
@@ -2529,6 +2560,16 @@ export default function Loom() {
                 💡 {lang === 'ja' ? `ネガ推奨: ${templateUndoBuf.negHintJa}` : `Neg hint: ${templateUndoBuf.negHintEn}`}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Color Maker toast */}
+        {colorToast && (
+          <div
+            className="bg-surface border rounded-[0.625rem] shadow-xl px-4 py-3 text-[0.6875rem] font-mono max-w-[17.5rem]"
+            style={{ borderColor: 'rgb(var(--c-purple) / 0.4)' }}
+          >
+            <div className="font-bold" style={{ color: 'rgb(var(--c-purple))' }}>{colorToast.msg}</div>
           </div>
         )}
 

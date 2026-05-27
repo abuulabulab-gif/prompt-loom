@@ -6,6 +6,29 @@ import {
   CHARDESIGN_MODE_CONFIG, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS, KEMONOMIMI_PAIRS,
 } from "../data/constants.js";
 import { CONFLICT_MAP } from "../data/conflicts.js";
+import { COLOR_PALETTE, SHADES, COLOR_TARGETS, buildColorTag } from "../data/colors.js";
+
+const COLOR_CAT_IDS = new Set(['face_haircolor', 'face_eyecolor']);
+const COLOR_CAT_TARGET = { face_haircolor: 'hair', face_eyecolor: 'eyes' };
+
+function pickWeightedShade() {
+  const r = Math.random();
+  if (r < 0.65) return SHADES.find(s => s.id === 'normal');
+  if (r < 0.85) return SHADES.find(s => s.id === 'light');
+  return SHADES.find(s => s.id === 'dark');
+}
+
+function pickColorCatTag(catId) {
+  const targetId  = COLOR_CAT_TARGET[catId];
+  const targetObj = COLOR_TARGETS.find(t => t.id === targetId);
+  const color     = COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
+  const shade     = pickWeightedShade();
+  const en        = buildColorTag(shade.en, color.en, targetObj.en);
+  const ja        = shade.id !== 'normal'
+    ? `${shade.ja}${color.ja}${targetObj.ja}`
+    : `${color.ja}${targetObj.ja}`;
+  return { en, ja };
+}
 
 function applyExclusionRules(pickedEnTag, excludedTags) {
   const excl = RANDOM_EXCLUSION_RULES.get(pickedEnTag.toLowerCase());
@@ -31,6 +54,18 @@ function pickBlockTags(block, globalExcluded) {
 
   const doPick = (cat) => {
     if (picks.length >= maxPicks || skippedCats.has(cat.n)) return;
+
+    if (COLOR_CAT_IDS.has(cat.id)) {
+      const pick = pickColorCatTag(cat.id);
+      if (!globalExcluded.has(pick.en.toLowerCase())) {
+        picks.push(pick);
+        for (const ct of (CONFLICT_MAP.get(pick.en.toLowerCase()) || [])) globalExcluded.add(ct);
+        applyExclusionRules(pick.en, globalExcluded);
+        (rules.skipIfPicked?.[cat.n] || []).forEach(n => skippedCats.add(n));
+      }
+      return;
+    }
+
     const validT = cat.t.filter(t => {
       const en = t.en.toLowerCase();
       return !RANDOM_EXCLUDE_TAGS.has(t.en)

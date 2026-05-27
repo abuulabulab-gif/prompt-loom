@@ -41,3 +41,29 @@ export const COLOR_TARGETS = [
 
 export const buildColorTag = (shade, colorEn, targetEn) =>
   `${shade}${colorEn} ${targetEn}`.trim();
+
+// Reverse-parse a tag string back to a Japanese label.
+// Returns { en, ja } if the tag matches a Color Maker pattern, else null.
+export function resolveColorLabel(tagEn) {
+  if (!tagEn) return null;
+  const tagLower = tagEn.trim().toLowerCase();
+  // Longest prefix first: 'light '(6) > 'dark '(5) > ''(0)
+  const sortedShades = [...SHADES].sort((a, b) => b.en.length - a.en.length);
+  for (const shade of sortedShades) {
+    const prefix = shade.en;
+    if (prefix && !tagLower.startsWith(prefix)) continue;
+    const withoutShade = tagLower.slice(prefix.length);
+    for (const target of COLOR_TARGETS) {
+      const suffix = ' ' + target.en.toLowerCase();
+      if (!withoutShade.endsWith(suffix)) continue;
+      const colorEn = withoutShade.slice(0, -suffix.length);
+      const colorMatch = COLOR_PALETTE.find(c => c.en.toLowerCase() === colorEn);
+      if (!colorMatch) continue;
+      const ja = shade.id !== 'normal'
+        ? `${shade.ja}${colorMatch.ja}${target.ja}`
+        : `${colorMatch.ja}${target.ja}`;
+      return { en: tagEn.trim(), ja };
+    }
+  }
+  return null;
+}

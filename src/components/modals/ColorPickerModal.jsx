@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { COLOR_PALETTE, SHADES, COLOR_TARGETS, buildColorTag } from "../../data/colors.js";
 
-export default function ColorPickerModal({ lang, onApply, onClose }) {
+export default function ColorPickerModal({ lang, onApply, onClose, defaultTarget }) {
   const [shade, setShade] = useState('normal');
   const [color, setColor] = useState(COLOR_PALETTE[7]); // blue
-  const [target, setTarget] = useState(COLOR_TARGETS[0]); // hair
+  const [target, setTarget] = useState(
+    defaultTarget ? (COLOR_TARGETS.find(t => t.id === defaultTarget) ?? COLOR_TARGETS[0]) : COLOR_TARGETS[0]
+  );
 
   const shadeEn = SHADES.find(s => s.id === shade)?.en || '';
   const preview = target.id === 'theme'
