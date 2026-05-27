@@ -22,10 +22,10 @@ const charBodyText = char => {
   return char.blocks.filter(b => b.enabled !== false && ids.includes(b.id) && b.text?.trim()).map(b => b.text.trim()).join(', ');
 };
 
-export default function SceneComposeModal({ characters, lang, theme, onClose }) {
+export default function SceneComposeModal({ characters, lang, theme, onClose, defaultQuality = 'masterpiece, best quality, ultra-detailed' }) {
   const [selected, setSelected] = useState([]);
   const [relation, setRelation] = useState(SCENE_RELATIONS[0]);
-  const [globalQuality, setGlobalQuality] = useState('masterpiece, best quality, ultra-detailed');
+  const [globalQuality, setGlobalQuality] = useState(defaultQuality || 'masterpiece, best quality, ultra-detailed');
   const [useBreak, setUseBreak] = useState(true);
   const [copied, setCopied] = useState(false);
 

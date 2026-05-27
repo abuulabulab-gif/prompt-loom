@@ -106,7 +106,9 @@ function applyVariationCombos(rerolledMap, fixedTags = []) {
   }
 }
 
-export function useVariations(blocks, tool) {
+const CHARDESIGN_SKIP_REROLL = new Set(['effect', 'lighting']);
+
+export function useVariations(blocks, tool, mode = 'illust') {
   const [variations, setVariations] = useState([]);
   const [variationsOpen, setVariationsOpen] = useState(false);
   const [varCopied, setVarCopied] = useState(null);
@@ -136,7 +138,10 @@ export function useVariations(blocks, tool) {
       );
 
       // Process reroll blocks in sequential order so each block's exclusions carry forward
-      for (const rerollId of VAR_REROLL_ORDER) {
+      const rerollOrder = mode === 'chardesign'
+        ? VAR_REROLL_ORDER.filter(id => !CHARDESIGN_SKIP_REROLL.has(id))
+        : VAR_REROLL_ORDER;
+      for (const rerollId of rerollOrder) {
         const block = blockById.get(rerollId);
         if (!block || !block.cats?.length) continue;
         rerolledMap[rerollId] = pickForBlock(block, sequentialExcluded);

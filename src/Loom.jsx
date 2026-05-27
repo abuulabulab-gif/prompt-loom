@@ -29,7 +29,7 @@ import SettingsModal from "./components/modals/SettingsModal.jsx";
 import CommandPalette from "./components/CommandPalette.jsx";
 import GlobalTagSearch from "./components/GlobalTagSearch.jsx";
 import { toNaturalJa, toNaturalEn } from "./utils/naturalLanguage.js";
-import { callAI, callNaturalToTags, callTagSuggest } from "./utils/aiApi.js";
+import { callAI, callTagSuggest } from "./utils/aiApi.js";
 import NaturalToTagsModal from "./components/modals/NaturalToTagsModal.jsx";
 import CharacterNote from "./CharacterNote/index.jsx";
 import { useAuth } from "./hooks/useAuth.js";
@@ -1042,7 +1042,7 @@ export default function Loom() {
   const totalTags = balanceBlocks.reduce((s, b) => s + countTags(b.text), 0);
 
   // ── Variation expansion ──
-  const { variations, variationsOpen, setVariationsOpen, varCopied, generateVariations, copyVariation } = useVariations(blocks, tool);
+  const { variations, variationsOpen, setVariationsOpen, varCopied, generateVariations, copyVariation } = useVariations(blocks, tool, randomMode);
   const [varNatSet, setVarNatSet] = useState(new Set());
   const toggleVarNat = (i) => setVarNatSet(prev => { const n = new Set(prev); n.has(i) ? n.delete(i) : n.add(i); return n; });
 
@@ -2489,7 +2489,7 @@ export default function Loom() {
       {naturalToTagsOpen && <NaturalToTagsModal lang={lang} apiConfig={apiConfig} blocks={blocks} onAddTags={handleAddTagsFromNatural} onClose={() => setNaturalToTagsOpen(false)} initialTab={naturalToTagsTab} />}
       {templateOpen && <TemplateModal lang={lang} isMobile={isMobile} onApply={applyTemplate} onClose={() => setTemplateOpen(false)} />}
       {colorPickerOpen && <ColorPickerModal lang={lang} onApply={applyColorTag} onClose={() => setColorPickerOpen(false)} defaultTarget={colorPickerDefaultTarget} />}
-      {sceneOpen && <SceneComposeModal characters={characters} lang={lang} activeTool={activeTool} theme={theme} onClose={() => setSceneOpen(false)} />}
+      {sceneOpen && <SceneComposeModal characters={characters} lang={lang} activeTool={activeTool} theme={theme} onClose={() => setSceneOpen(false)} defaultQuality={blocks.find(b => b.id === 'quality')?.text || ''} />}
       {settingsOpen && <SettingsModal lang={lang} isMobile={isMobile} defaultTab={settingsTab} onClose={() => { setSettingsOpen(false); setSettingsTab('shortcuts'); }}
         hiddenBlockIds={hiddenBlockIds} allBlocks={blocks}
         onRestoreBlock={blockId => toggleHideBlock(blockId)}
