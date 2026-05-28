@@ -26,6 +26,7 @@ import TemplateModal from "./components/modals/TemplateModal.jsx";
 import ColorPickerModal from "./components/modals/ColorPickerModal.jsx";
 import SceneComposeModal from "./components/modals/SceneComposeModal.jsx";
 import SettingsModal from "./components/modals/SettingsModal.jsx";
+import SupportModal from "./components/modals/SupportModal.jsx";
 import CommandPalette from "./components/CommandPalette.jsx";
 import GlobalTagSearch from "./components/GlobalTagSearch.jsx";
 import { toNaturalJa, toNaturalEn } from "./utils/naturalLanguage.js";
@@ -134,6 +135,7 @@ export default function Loom() {
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
   const [sceneOpen, setSceneOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [supportOpen, setSupportOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
   const quickMenuRef = useRef(null);
@@ -851,6 +853,7 @@ export default function Loom() {
         if (paletteOpen)      { setPaletteOpen(false);      return; }
         if (globalSearchOpen) { setGlobalSearchOpen(false); return; }
         if (libraryOpen)      { setLibraryOpen(false);      return; }
+        if (supportOpen)      { setSupportOpen(false);      return; }
         if (settingsOpen)     { setSettingsOpen(false);     return; }
         if (historyOpen)      { setHistoryOpen(false);      return; }
         if (templateOpen)     { setTemplateOpen(false);     return; }
@@ -1176,9 +1179,10 @@ export default function Loom() {
         </div>
         <div className="flex-1" />
         {/* ☕ Donate */}
-        <a href={DONATE_URL} target="_blank" rel="noopener noreferrer"
+        <button
+          onClick={() => setSupportOpen(true)}
           title={lang === 'ja' ? '開発を支援する（Buy Me a Coffee）' : 'Support development'}
-          className="bg-[#fbbf2412] border border-[#fbbf2440] rounded-md px-[0.5625rem] py-1 text-warn text-[0.6875rem] font-mono no-underline flex-shrink-0 cursor-pointer">☕</a>
+          className="bg-[#fbbf2412] border border-[#fbbf2440] rounded-md px-[0.5625rem] py-1 text-warn text-[0.6875rem] font-mono flex-shrink-0 cursor-pointer">☕</button>
         {/* ✦ ツール dropdown: Template / Color / Scene / +Custom(Expert) / Reset order */}
         <div ref={quickMenuRef} className="relative flex-shrink-0">
           <button onClick={() => {
@@ -2520,6 +2524,7 @@ export default function Loom() {
       {templateOpen && <TemplateModal lang={lang} isMobile={isMobile} onApply={applyTemplate} onClose={() => setTemplateOpen(false)} />}
       {colorPickerOpen && <ColorPickerModal lang={lang} onApply={applyColorTag} onClose={() => setColorPickerOpen(false)} defaultTarget={colorPickerDefaultTarget} allowedTargets={colorPickerAllowedTargets} />}
       {sceneOpen && <SceneComposeModal characters={characters} lang={lang} activeTool={activeTool} theme={theme} onClose={() => setSceneOpen(false)} defaultQuality={blocks.find(b => b.id === 'quality')?.text || ''} />}
+      {supportOpen && <SupportModal lang={lang} isMobile={isMobile} onClose={() => setSupportOpen(false)} />}
       {settingsOpen && <SettingsModal lang={lang} isMobile={isMobile} defaultTab={settingsTab} onClose={() => { setSettingsOpen(false); setSettingsTab('shortcuts'); }}
         hiddenBlockIds={hiddenBlockIds} allBlocks={blocks}
         onRestoreBlock={blockId => toggleHideBlock(blockId)}
