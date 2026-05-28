@@ -275,7 +275,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             <span
               onClick={() => { setNameInput(block.name); setEditingName(true); }}
               title={lang === 'ja' ? 'クリックで名前を変更' : 'Click to rename'}
-              className={`${focusMode ? 'text-base' : 'text-[0.8125rem]'} font-bold flex-1 min-w-0 leading-snug whitespace-nowrap overflow-hidden cursor-text group ${isLocked ? 'text-muted' : 'text-fg'}`}
+              className={`${focusMode ? 'text-base' : 'text-[0.8125rem]'} font-bold flex-1 min-w-0 leading-snug break-words cursor-text group ${isLocked ? 'text-muted' : 'text-fg'}`}
             >
               {lang === 'ja' ? block.name : block.nameEn}
               <span className="ml-1 text-[0.625rem] text-dim opacity-0 group-hover:opacity-100 transition-opacity">✎</span>
@@ -283,7 +283,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           )
         ) : (
           <span
-            className={`${focusMode ? 'text-base' : 'text-[0.8125rem]'} font-bold flex-1 min-w-0 leading-snug whitespace-nowrap overflow-hidden ${isLocked ? 'text-muted' : 'text-fg'}${onHide ? ' cursor-pointer select-none' : ''}`}
+            className={`${focusMode ? 'text-base' : 'text-[0.8125rem]'} font-bold flex-1 min-w-0 leading-snug break-words ${isLocked ? 'text-muted' : 'text-fg'}${onHide ? ' cursor-pointer select-none' : ''}`}
             onDoubleClick={onHide ? hideConfirm : undefined}
             onTouchStart={onHide ? handleDoubleTap : undefined}
             title={onHide ? (lang === 'ja' ? 'ダブルタップで非表示' : 'Double-tap to hide') : undefined}
@@ -576,7 +576,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   onClick={isJumpable ? () => handleChipJump(bare) : undefined}
                   title={isJumpable ? (lang === 'ja' ? 'クリックでジャンプ' : 'Click to jump') : undefined}
                   style={{ background: blockColor + '15', border: `1px solid ${blockColor}50`, color: blockColor }}
-                  className={`inline-flex items-center rounded font-mono ${focusMode ? 'px-2 py-[0.1875rem] text-xs' : 'px-[0.3125rem] py-[0.0625rem] text-[0.5625rem]'}${isJumpable ? ' cursor-pointer' : ''}`}
+                  className={`inline-flex items-center rounded font-mono ${focusMode ? 'px-2 py-[0.1875rem] text-xs' : 'px-1.5 py-0.5 text-[0.6875rem]'}${isJumpable ? ' cursor-pointer' : ''}`}
                 >
                   {label}
                 </span>
@@ -587,20 +587,20 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               <div className="mt-1.5 mb-1 flex flex-col gap-[0.3125rem]">
                 {randomTags.length > 0 && (
                   <div className="flex items-center flex-wrap gap-1">
-                    <span className={`text-muted font-mono font-semibold flex-shrink-0 ${focusMode ? 'text-[0.6875rem]' : 'text-[0.5625rem]'}`}>
+                    <span className={`text-muted font-mono font-semibold flex-shrink-0 ${focusMode ? 'text-[0.6875rem]' : 'text-[0.625rem]'}`}>
                       🎲 {lang === 'ja' ? '追加:' : 'added:'}
                     </span>
                     {randomTags.map(renderChip)}
                     <button
                       onClick={() => onUpdate({ lastRandomPicks: [] })}
                       title={lang === 'ja' ? 'ランダムマーカーを消去' : 'Clear random marker'}
-                      className="text-dim text-[0.5rem] cursor-pointer ml-0.5 flex-shrink-0 leading-none"
+                      className="text-dim text-[0.625rem] cursor-pointer ml-1 flex-shrink-0 p-0.5 leading-none"
                     >×</button>
                   </div>
                 )}
                 {manualTags.length > 0 && (
                   <div className="flex items-center flex-wrap gap-1">
-                    <span className={`text-muted font-mono font-semibold flex-shrink-0 ${focusMode ? 'text-[0.6875rem]' : 'text-[0.5625rem]'}`}>
+                    <span className={`text-muted font-mono font-semibold flex-shrink-0 ${focusMode ? 'text-[0.6875rem]' : 'text-[0.625rem]'}`}>
                       👤 {lang === 'ja' ? '追加:' : 'added:'}
                     </span>
                     {manualTags.map(renderChip)}
@@ -730,7 +730,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   }}
                   title={lang === 'ja' ? (displayPicks.length > 0 ? '再抽選' : 'ランダムでタグ追加') : (displayPicks.length > 0 ? 'Re-roll' : 'Add random tags')}
                   style={displayPicks.length > 0 ? { borderColor: blockColor, color: blockColor } : undefined}
-                  className={`border border-dim text-muted rounded-[0.3125rem] cursor-pointer font-mono ${focusMode ? 'px-[0.5625rem] py-[0.3125rem] text-sm' : 'px-[0.3125rem] py-0.5 text-[0.6875rem]'}`}
+                  className={`border border-dim text-muted rounded-[0.3125rem] cursor-pointer font-mono ${focusMode ? 'px-[0.5625rem] py-[0.3125rem] text-sm' : 'px-2 py-1 text-[0.8125rem] min-h-[1.75rem]'}`}
                 >🎲{displayPicks.length > 0 ? ' ↻' : ''}</button>
               )}
             </div>

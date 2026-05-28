@@ -1139,7 +1139,7 @@ export default function Loom() {
     { id: 'tab-pos', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: '✦', label: 'Switch to Positive tab', labelJa: 'Positive タブへ切替', shortcut: 'P', action: () => setOutputTab('positive') },
     { id: 'tab-neg', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: '✕', label: 'Switch to Negative tab', labelJa: 'Negative タブへ切替', shortcut: 'N', action: () => setOutputTab('negative') },
     { id: 'view-mode', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: viewMode === 'simple' ? '📋' : viewMode === 'expert' ? '🔧' : '🗂️', label: `View mode: ${viewMode} → cycle`, labelJa: `表示モード切替 (現在: ${viewMode === 'simple' ? 'シンプル' : viewMode === 'expert' ? 'エキスパート' : '通常'})`, action: cycleViewMode },
-    { id: 'toggle-random-mode', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: randomMode === 'chardesign' ? '🧍' : '🖼️', label: `Random mode: ${randomMode} → toggle`, labelJa: `ランダムモード切替 (現在: ${randomMode === 'chardesign' ? 'キャラデザ' : 'イラスト'})`, action: () => setRandomMode(m => m === 'chardesign' ? 'illust' : 'chardesign') },
+    { id: 'toggle-random-mode', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: randomMode === 'chardesign' ? '🧍' : '🖼️', label: `Random mode: ${randomMode} → toggle`, labelJa: `ランダムモード切替 (現在: ${randomMode === 'chardesign' ? 'キャラ特化' : 'イラスト'})`, action: () => setRandomMode(m => m === 'chardesign' ? 'illust' : 'chardesign') },
     { id: 'share-url', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: '🔗', label: 'Share prompt', labelJa: 'プロンプトをシェア', action: copyShareUrl },
     { id: 'toggle-theme', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: theme === 'dark' ? '☀️' : '🌙', label: 'Toggle theme', labelJa: 'テーマを切替', action: () => setTheme(t => t === 'dark' ? 'light' : 'dark') },
     { id: 'toggle-lang', group: lang === 'ja' ? 'アプリ設定' : 'App', icon: '🌐', label: 'Toggle language JA/EN', labelJa: '言語を切替 JA/EN', action: () => setLang(l => l === 'ja' ? 'en' : 'ja') },
@@ -1422,7 +1422,7 @@ export default function Loom() {
                 <div className="text-muted text-[0.625rem] font-mono tracking-[0.07em]">📝 {lang === 'ja' ? 'キャラクターメモ（LoRA・設定・コツなど）' : 'Character Memo'}</div>
                 <div className="flex items-center gap-1">
                   <button onClick={() => setRandomMode(m => { const n = m === 'chardesign' ? 'illust' : 'chardesign'; localStorage.setItem('loom_randomMode', n); return n; })}
-                    title={randomMode === 'chardesign' ? (lang === 'ja' ? 'キャラデザモード（クリックで切替）' : 'Char.Design mode (click to switch)') : (lang === 'ja' ? 'イラストモード（クリックで切替）' : 'Illust mode (click to switch)')}
+                    title={randomMode === 'chardesign' ? (lang === 'ja' ? 'キャラ特化モード（クリックで切替）' : 'Char.Focused mode (click to switch)') : (lang === 'ja' ? 'イラストモード（クリックで切替）' : 'Illust mode (click to switch)')}
                     className="flex-shrink-0 border border-dashed rounded-[0.3125rem] px-1.5 py-0.5 cursor-pointer text-[0.625rem] font-mono bg-transparent"
                     style={{ borderColor: 'rgb(var(--c-purple) / 0.35)', color: 'rgb(var(--muted))' }}>
                     {randomMode === 'chardesign' ? '🧍' : '🖼️'}
@@ -1539,12 +1539,12 @@ export default function Loom() {
               </div>
               <div className="flex-1" />
               <button onClick={() => setRandomMode(m => { const n = m === 'chardesign' ? 'illust' : 'chardesign'; localStorage.setItem('loom_randomMode', n); return n; })}
-                title={randomMode === 'chardesign' ? (lang === 'ja' ? 'キャラデザモード（クリックでイラストモードへ）' : 'Char.Design mode (click for Illust)') : (lang === 'ja' ? 'イラストモード（クリックでキャラデザモードへ）' : 'Illust mode (click for Char.Design)')}
+                title={randomMode === 'chardesign' ? (lang === 'ja' ? 'キャラ特化モード（クリックでイラストモードへ）' : 'Char.Focused mode (click for Illust)') : (lang === 'ja' ? 'イラストモード（クリックでキャラ特化モードへ）' : 'Illust mode (click for Char.Focused)')}
                 className="flex-shrink-0 border border-dashed rounded-[0.3125rem] px-[0.4375rem] py-[0.1875rem] cursor-pointer text-[0.625rem] font-mono bg-transparent"
                 style={{ borderColor: 'rgb(var(--c-purple) / 0.35)', color: 'rgb(var(--muted))' }}>
                 {randomMode === 'chardesign' ? '🧍' : '🖼️'}
               </button>
-              <button onClick={generateRandomChar} title={lang === 'ja' ? (randomMode === 'chardesign' ? 'キャラデザモードでランダム生成' : 'イラストモードでランダム生成') : (randomMode === 'chardesign' ? 'Random (Char.Design)' : 'Random (Illust)')}
+              <button onClick={generateRandomChar} title={lang === 'ja' ? (randomMode === 'chardesign' ? 'キャラ特化モードでランダム生成' : 'イラストモードでランダム生成') : (randomMode === 'chardesign' ? 'Random (Char.Focused)' : 'Random (Illust)')}
                 className="flex-shrink-0 border border-dashed rounded-[0.3125rem] px-2 py-[0.1875rem] cursor-pointer text-[0.625rem] font-mono bg-transparent"
                 style={{ borderColor: 'rgb(var(--c-purple) / 0.5)', color: 'rgb(var(--c-purple))' }}>
                 🎲 {lang === 'ja' ? 'おまかせ' : 'Random'}

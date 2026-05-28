@@ -186,6 +186,8 @@ const LOWER_BODY_FRAME_OUT = new Set([
   'crossed legs','thigh gap','thigh strap',
   'mini skirt','micro skirt','hot pants','shorts','leggings',
   'bare thighs','thighs','leg focus','wide hips',
+  // ポーズ（クローズアップ構図と矛盾するもの）
+  'walking','running','jumping','dancing','fighting stance',
 ]);
 
 export const RANDOM_EXCLUSION_RULES = new Map([
@@ -252,6 +254,37 @@ export const RANDOM_EXCLUSION_RULES = new Map([
   ['red skin',         new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','blue skin','grey skin','porcelain skin','translucent skin'])],
   ['blue skin',        new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','grey skin','porcelain skin','translucent skin'])],
   ['grey skin',        new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','blue skin','porcelain skin','translucent skin'])],
+  // 体型の矛盾防止
+  ['flat chest',    new Set(['large breasts','huge breasts','medium breasts','breast hold','breast grab','cleavage','sideboob','underboob'])],
+  ['large breasts', new Set(['flat chest','small breasts'])],
+  ['huge breasts',  new Set(['flat chest','small breasts'])],
+  ['curvy',         new Set(['flat chest','small breasts','petite'])],
+  ['petite',        new Set(['large breasts','huge breasts','curvy'])],
+  // back view: 顔表情・正面強調タグ除外
+  ['back view', new Set([
+    'smile','light smile','grin','laughing','wink','smirk','expressionless',
+    'open mouth','embarrassed','blushing','blush','tears','crying','shy','pout',
+    'angry','surprised','confused','cleavage','sideboob','breast hold',
+  ])],
+  // 非生物: 生体反応タグ除外
+  ['doll',      new Set(['sweat','blush','blushing','tears','crying','saliva','drooling','panting','drunk'])],
+  ['robot',     new Set(['sweat','blush','blushing','tears','crying','saliva','drooling','panting','drunk'])],
+  ['android',   new Set(['sweat','blush','blushing','tears','crying','saliva','drooling','panting'])],
+  ['mannequin', new Set(['sweat','blush','blushing','tears','crying','saliva','drooling'])],
+  // 種族パーツの重複防止（ケモ耳 × ホーン/ハロ系）
+  ['dog ears',    new Set(['demon horns','oni horns','goat horns','deer antlers','halo','angel halo'])],
+  ['cat ears',    new Set(['demon horns','oni horns','goat horns','deer antlers','halo','angel halo'])],
+  ['fox ears',    new Set(['demon horns','oni horns','goat horns','deer antlers','halo','angel halo'])],
+  ['wolf ears',   new Set(['demon horns','oni horns','goat horns','deer antlers','halo','angel halo'])],
+  ['bunny ears',  new Set(['demon horns','oni horns','goat horns','deer antlers','halo','angel halo'])],
+  ['horse ears',  new Set(['demon horns','oni horns','goat horns','deer antlers'])],
+  ['demon horns', new Set(['dog ears','cat ears','fox ears','wolf ears','bunny ears','horse ears','deer antlers','halo','angel halo'])],
+  ['oni horns',   new Set(['dog ears','cat ears','fox ears','wolf ears','bunny ears','horse ears','deer antlers','halo','angel halo'])],
+  ['halo',        new Set(['demon horns','oni horns','goat horns'])],
+  ['angel halo',  new Set(['demon horns','oni horns','goat horns'])],
+  ['angel wings', new Set(['demon wings','bat wings','dragon wings'])],
+  ['demon wings', new Set(['angel wings','dragon wings','feathered wings'])],
+  ['bat wings',   new Set(['angel wings','feathered wings'])],
 ]);
 
 // ── Combo rules: trigger tag → add tag in another block ──────
@@ -298,7 +331,7 @@ export const RANDOM_COMBO_RULES = [
 export const CHARDESIGN_MODE_CONFIG = {
   // ブロック単位の固定テキスト（ランダム抽選を行わず強制上書き）
   qualityText:     'masterpiece, best quality, ultra-detailed, highres, sharp focus',
-  artstyleText:    'illustration, flat color, cel shading, vibrant colors, hard shading',
+  artstyleText:    'illustration, character design, flat color, cel shading, vibrant colors, hard shading',
   backgroundText:  'white background, simple background',
   compositionText: 'full body, front view, standing',
 
@@ -325,6 +358,33 @@ export const CHARDESIGN_MODE_CONFIG = {
 
   // コンボルールが変更してはいけないブロックID（固定ブロック）
   fixedBlocks: new Set(['quality', 'artstyle', 'background', 'composition', 'effect', 'lighting']),
+};
+
+// ── イラストモード：ドラマチックな一枚絵のためのブースト設定 ──
+export const ILLUST_MODE_CONFIG = {
+  // 構図ブロックで70%確率で優先されるドラマチックタグ
+  boostCompositionTags: new Set([
+    'dutch angle','from below','from above','low angle','high angle',
+    'dynamic angle','bird\'s eye view','over the shoulder',
+    'extreme close-up','close-up','fish-eye lens','panoramic',
+  ]),
+  // 照明ブロックで優先されるシネマティックタグ
+  boostLightingTags: new Set([
+    'cinematic lighting','dramatic lighting','rim lighting','god rays',
+    'neon lights','golden hour','backlight','spotlight','moonlight',
+    'caustics','studio lighting','sunset light',
+  ]),
+  // エフェクトブロックで優先されるドラマチックタグ
+  boostEffectTags: new Set([
+    'particle effects','magic circle','sparkles','petals','leaves',
+    'rain','snowfall','fire','embers','electricity',
+    'lens flare','bloom','chromatic aberration','fog','mist','bokeh',
+  ]),
+  // イラストモードから除外するタグ（設定画・シンプル背景系）
+  excludedTags: new Set([
+    'white background','simple background','gradient background',
+    'concept art','character design','character sheet','reference sheet','model sheet',
+  ]),
 };
 
 // ── Utilities ────────────────────────────────────────────────

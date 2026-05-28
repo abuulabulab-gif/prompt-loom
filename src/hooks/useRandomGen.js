@@ -3,7 +3,7 @@ import {
   appendTag, hasTag, removeTag, splitTags, bareTag,
   OPTIONAL_CAT_NAMES, RARE_OPT_CAT_NAMES, BLOCK_RANDOM_RULES, SPECIES_PARTS_MAP, RANDOM_EXCLUDE_TAGS,
   TIER3_TAGS, TIER2_BLOCK_IDS, RANDOM_EXCLUSION_RULES, RANDOM_COMBO_RULES,
-  CHARDESIGN_MODE_CONFIG, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS, KEMONOMIMI_PAIRS,
+  CHARDESIGN_MODE_CONFIG, ILLUST_MODE_CONFIG, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS, KEMONOMIMI_PAIRS,
 } from "../data/constants.js";
 
 const RARE_OPT_CAT_PROB = 0.15; // rare optional cats: 15% vs standard 40%
@@ -133,6 +133,77 @@ function pickBlockTags(block, globalExcluded) {
   return picks;
 }
 
+function pickBlockTagsBoosted(block, globalExcluded, boostTags) {
+  const rules = BLOCK_RANDOM_RULES[block.id] || {};
+  const disabledCats = new Set();
+  for (const group of (rules.exclusiveGroups || [])) {
+    const present = group.filter(n => block.cats.some(c => c.n === n));
+    if (present.length < 2) continue;
+    const winner = present[Math.floor(Math.random() * present.length)];
+    present.forEach(n => { if (n !== winner) disabledCats.add(n); });
+  }
+  const coreCats = block.cats.filter(cat => !OPTIONAL_CAT_NAMES.has(cat.n) && !disabledCats.has(cat.n));
+  const optCats  = block.cats.filter(cat =>  OPTIONAL_CAT_NAMES.has(cat.n) && !disabledCats.has(cat.n));
+  const maxPicks = Math.min(2 + Math.floor(block.cats.length / 3), 6);
+  const picks = [];
+  const skippedCats = new Set(disabledCats);
+
+  const doPick = (cat) => {
+    if (picks.length >= maxPicks || skippedCats.has(cat.n)) return;
+    if (COLOR_CAT_IDS.has(cat.id)) {
+      const pick = pickColorCatTag(cat.id);
+      if (!globalExcluded.has(pick.en.toLowerCase())) {
+        picks.push(pick);
+        for (const ct of (CONFLICT_MAP.get(pick.en.toLowerCase()) || [])) globalExcluded.add(ct);
+        applyExclusionRules(pick.en, globalExcluded);
+        (rules.skipIfPicked?.[cat.n] || []).forEach(n => skippedCats.add(n));
+      }
+      return;
+    }
+    const validT = cat.t.filter(t => {
+      const en = t.en.toLowerCase();
+      return !RANDOM_EXCLUDE_TAGS.has(t.en)
+        && !t.excludeFromRandom
+        && !TIER3_TAGS.has(en)
+        && !globalExcluded.has(en);
+    });
+    if (validT.length === 0) return;
+    // Boost: prefer boost tags 70% of the time if any are available
+    const boostedT = validT.filter(t => boostTags.has(t.en.toLowerCase()));
+    let pick;
+    if (boostedT.length > 0 && Math.random() < 0.70) {
+      pick = boostedT[Math.floor(Math.random() * boostedT.length)];
+    } else {
+      const normalT = validT.filter(t => !t.rareInRandom);
+      const rareT   = validT.filter(t =>  t.rareInRandom);
+      if (normalT.length === 0) {
+        pick = rareT[Math.floor(Math.random() * rareT.length)];
+      } else if (rareT.length > 0 && Math.random() < 0.20) {
+        pick = rareT[Math.floor(Math.random() * rareT.length)];
+      } else {
+        pick = normalT[Math.floor(Math.random() * normalT.length)];
+      }
+    }
+    if (WEAPON_TAGS.has(pick.en.toLowerCase()) && Math.random() > WEAPON_PICK_PROB) return;
+    picks.push(pick);
+    for (const ct of (CONFLICT_MAP.get(pick.en.toLowerCase()) || [])) globalExcluded.add(ct);
+    applyExclusionRules(pick.en, globalExcluded);
+    if (WEAPON_TAGS.has(pick.en.toLowerCase())) {
+      HAND_POSE_TAGS.forEach(t => globalExcluded.add(t.toLowerCase()));
+    }
+    (rules.skipIfPicked?.[cat.n] || []).forEach(n => skippedCats.add(n));
+  };
+
+  for (const cat of coreCats) doPick(cat);
+  const shuffledOpt = [...optCats].sort(() => Math.random() - 0.5);
+  for (const cat of shuffledOpt) {
+    if (picks.length >= maxPicks) break;
+    const prob = RARE_OPT_CAT_NAMES.has(cat.n) ? RARE_OPT_CAT_PROB : 0.4;
+    if (!skippedCats.has(cat.n) && Math.random() < prob) doPick(cat);
+  }
+  return picks;
+}
+
 function applyComboRules(blockMap, fixedBlockIds = null) {
   const allPicked = [];
   for (const [, block] of blockMap) {
@@ -206,6 +277,10 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
       if (c.id !== activeCharId) return c;
 
       const globalExcluded = new Set();
+      // Illust mode: pre-exclude design/reference/simple-background tags
+      if (mode === 'illust') {
+        ILLUST_MODE_CONFIG.excludedTags.forEach(t => globalExcluded.add(t.toLowerCase()));
+      }
       const blockMap = new Map();
 
       const newBlocks = c.blocks.map(block => {
@@ -283,7 +358,21 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
             }
           }
         } else {
-          const picks = pickBlockTags(block, globalExcluded);
+          // Illust mode: boost dramatic tags for composition/lighting/effect
+          let picks;
+          if (mode === 'illust') {
+            if (block.id === 'composition') {
+              picks = pickBlockTagsBoosted(block, globalExcluded, ILLUST_MODE_CONFIG.boostCompositionTags);
+            } else if (block.id === 'lighting') {
+              picks = pickBlockTagsBoosted(block, globalExcluded, ILLUST_MODE_CONFIG.boostLightingTags);
+            } else if (block.id === 'effect') {
+              picks = pickBlockTagsBoosted(block, globalExcluded, ILLUST_MODE_CONFIG.boostEffectTags);
+            } else {
+              picks = pickBlockTags(block, globalExcluded);
+            }
+          } else {
+            picks = pickBlockTags(block, globalExcluded);
+          }
           let text = picksToText(picks, block.strength);
           if (block.id === 'attribute') {
             const speciesCat = block.cats.find(cat => cat.n === '種族');
