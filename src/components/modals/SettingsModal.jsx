@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 
 const APP_VERSION = 'v2.0';
 const APP_YEAR = '2026';
@@ -641,6 +641,11 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                   </div>
                 );
               })}
+              <p className="text-[0.625rem] leading-relaxed" style={{ color: 'rgb(var(--muted))' }}>
+                {lang === 'ja'
+                  ? 'APIキーはこの端末のブラウザ内にのみ保存されます。共有PCでは使用後に削除してください。'
+                  : 'API keys are stored only in this browser on this device. If using a shared PC, please delete your key after use.'}
+              </p>
             </div>
           )}
 
