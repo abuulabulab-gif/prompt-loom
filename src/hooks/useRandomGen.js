@@ -534,6 +534,7 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
       return {
         ...c,
         blocks: newBlocks.map(b => blockMap.has(b.id) ? blockMap.get(b.id) : b),
+        lastModified: Date.now(), // Pull競合対策: ランダム生成結果を必ずローカル優先に
       };
     }));
   };
