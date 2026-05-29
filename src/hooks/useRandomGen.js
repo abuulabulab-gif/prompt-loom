@@ -415,7 +415,7 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
                 .map(c =>
                   c.n === '表情'
                     ? { ...c, t: c.t.filter(t => cfg.allowedExpressions.has(t.en)) }
-                    : c.n === '髪飾り・毛流れ'
+                    : c.n === '目つき・形' || c.n === '髪飾り・毛流れ'
                     ? { ...c, t: c.t.filter(t => !cfg.skipFaceTags.has(t.en)) }
                     : c.n === 'メイク・顔演出'
                     ? { ...c, t: c.t.filter(t => cfg.faceMakeupPhysical.has(t.en)) }
@@ -427,6 +427,10 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
           } else if (block.id === 'body') {
             const filteredBlock = { ...block, cats: block.cats.filter(c => !cfg.skipBodyCats.has(c.n)) };
             const picks = pickBlockTags(filteredBlock, globalExcluded, hist);
+            // soft penalty: flat/small chest → 強い胸元露出タグをoutfitブロックから除外
+            if (picks.some(p => p.en === 'flat chest' || p.en === 'small breasts')) {
+              ['open shirt','cleavage cutout','navel cutout','transparent','see-through','bikini','micro bikini','lingerie'].forEach(t => globalExcluded.add(t));
+            }
             newBlock = { ...block, text: picksToText(picks, block.strength), enabled: true, collapsed: false, lastRandomPicks: picks };
           } else if (block.id === 'feature') {
             const filteredBlock = { ...block, cats: block.cats.filter(c => !cfg.skipFeatureCats.has(c.n)) };

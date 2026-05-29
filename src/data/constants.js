@@ -375,8 +375,9 @@ export const CHARDESIGN_MODE_CONFIG = {
   // メイク・顔演出から抽選を許可する物理的個性タグのみ（八重歯・そばかす・泣きぼくろ）
   faceMakeupPhysical: new Set(['fang', 'freckles', 'mole under eye']),
 
-  // 顔ブロック：カテゴリは残すが特定タグを除外（動きのある髪）
-  skipFaceTags: new Set(['floating hair']),
+  // 顔ブロック：カテゴリは残すが特定タグを除外
+  // floating hair（動きのある髪）+ 全身絵では視認できない特殊瞳タグ
+  skipFaceTags: new Set(['floating hair', 'star-shaped pupils', 'heart-shaped pupils', 'white pupils']),
 
   // 体型ブロック：抽選しないカテゴリ（状態・ボディフォーカス）
   skipBodyCats: new Set(['状態', 'ボディフォーカス', '肌質感']),
