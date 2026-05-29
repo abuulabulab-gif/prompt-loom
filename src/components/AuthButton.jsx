@@ -2,15 +2,16 @@ import { useState, useRef, useEffect } from 'react';
 
 export default function AuthButton({ user, loading, onSignIn, onSignOut, syncStatus, lang, onForcePull }) {
   const [open, setOpen] = useState(false);
-  const [dropPos, setDropPos] = useState({ top: 0, right: 8, width: 220 });
+  const [dropPos, setDropPos] = useState({ top: 0, left: 8, width: 220 });
   const ref = useRef(null);
 
   const handleToggle = () => {
     if (!open && ref.current) {
       const rect = ref.current.getBoundingClientRect();
       const w = Math.min(220, window.innerWidth - 16);
-      const right = Math.max(8, window.innerWidth - rect.right);
-      setDropPos({ top: rect.bottom + 4, right, width: w });
+      // ボタンの右端に合わせて右寄せ、画面外にはみ出す場合は押し戻す
+      const left = Math.max(8, Math.min(rect.right - w, window.innerWidth - w - 8));
+      setDropPos({ top: rect.bottom + 4, left, width: w });
     }
     setOpen(o => !o);
   };

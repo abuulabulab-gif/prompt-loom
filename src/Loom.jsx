@@ -1188,7 +1188,8 @@ export default function Loom() {
           <button onClick={() => {
             if (!quickOpen && quickMenuRef.current) {
               const r = quickMenuRef.current.getBoundingClientRect();
-              setQuickOpenPos({ top: r.bottom + 4, right: Math.max(8, window.innerWidth - r.right), width: Math.min(170, window.innerWidth - 16) });
+              const qw = Math.min(170, window.innerWidth - 16);
+              setQuickOpenPos({ top: r.bottom + 4, left: Math.max(8, Math.min(r.right - qw, window.innerWidth - qw - 8)), width: qw });
             }
             setQuickOpen(p => !p);
           }}
@@ -1271,7 +1272,8 @@ export default function Loom() {
           <button onClick={() => {
             if (!dataMenuOpen && dataMenuRef.current) {
               const r = dataMenuRef.current.getBoundingClientRect();
-              setDataMenuPos({ top: r.bottom + 4, right: Math.max(8, window.innerWidth - r.right), width: Math.min(210, window.innerWidth - 16) });
+              const dw = Math.min(210, window.innerWidth - 16);
+              setDataMenuPos({ top: r.bottom + 4, left: Math.max(8, Math.min(r.right - dw, window.innerWidth - dw - 8)), width: dw });
             }
             setDataMenuOpen(p => !p);
           }}
