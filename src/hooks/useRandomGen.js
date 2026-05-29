@@ -427,10 +427,6 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
           } else if (block.id === 'body') {
             const filteredBlock = { ...block, cats: block.cats.filter(c => !cfg.skipBodyCats.has(c.n)) };
             const picks = pickBlockTags(filteredBlock, globalExcluded, hist);
-            // soft penalty: flat/small chest → 強い胸元露出タグをoutfitブロックから除外
-            if (picks.some(p => p.en === 'flat chest' || p.en === 'small breasts')) {
-              ['open shirt','cleavage cutout','navel cutout','transparent','see-through','bikini','micro bikini','lingerie'].forEach(t => globalExcluded.add(t));
-            }
             newBlock = { ...block, text: picksToText(picks, block.strength), enabled: true, collapsed: false, lastRandomPicks: picks };
           } else if (block.id === 'feature') {
             const filteredBlock = { ...block, cats: block.cats.filter(c => !cfg.skipFeatureCats.has(c.n)) };
