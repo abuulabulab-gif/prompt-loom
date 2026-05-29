@@ -494,7 +494,22 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
         }
       }
 
-      // 生成履歴を保存（クールダウン用）
+      // Simple background → suppress lighting and effect (environmental FX clash with plain BG)
+      if (mode !== 'chardesign') {
+        const bgBlock = blockMap.get('background');
+        if (bgBlock) {
+          const SIMPLE_BG_TAGS = ['white background', 'simple background', 'gradient background', 'bokeh background', 'abstract background'];
+          const hasSimpleBg = SIMPLE_BG_TAGS.some(t => hasTag(bgBlock.text || '', t));
+          if (hasSimpleBg) {
+            for (const id of ['effect', 'lighting']) {
+              const tb = blockMap.get(id);
+              if (tb && !tb.locked) blockMap.set(id, { ...tb, text: '', lastRandomPicks: [] });
+            }
+          }
+        }
+      }
+
+      // 生成履歴を保存（シンプル背景クリア後に実行 → 実際の最終状態を記録）
       const histEntry = {};
       for (const [, b] of blockMap) {
         if (!b.cats || !b.text) continue;
@@ -511,21 +526,6 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
         }
       }
       saveCooldown([...hist, histEntry]);
-
-      // Simple background → suppress lighting and effect (environmental FX clash with plain BG)
-      if (mode !== 'chardesign') {
-        const bgBlock = blockMap.get('background');
-        if (bgBlock) {
-          const SIMPLE_BG_TAGS = ['white background', 'simple background', 'gradient background', 'bokeh background', 'abstract background'];
-          const hasSimpleBg = SIMPLE_BG_TAGS.some(t => hasTag(bgBlock.text || '', t));
-          if (hasSimpleBg) {
-            for (const id of ['effect', 'lighting']) {
-              const tb = blockMap.get(id);
-              if (tb && !tb.locked) blockMap.set(id, { ...tb, text: '', lastRandomPicks: [] });
-            }
-          }
-        }
-      }
 
       return {
         ...c,
