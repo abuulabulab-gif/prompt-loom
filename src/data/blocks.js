@@ -32,7 +32,7 @@ export const BLOCKS_DEF = [
     {n:'メイク・顔演出',nEn:'Makeup/FX',id:'face_makeup',t:[tt('eyeshadow','アイシャドウ'),tt('eyeliner','アイライン'),tt('mascara','マスカラ'),tt('lipstick','口紅'),tt('makeup','メイク全般'),tt('heavy blush','濃いめ頬染め'),tt('nose blush','鼻染め'),tt('blush stickers','頬ステッカー'),tt('glitter','グリッター'),tt('tear','涙'),tt('teardrop','涙粒'),tt('sweat','汗'),tt('fang','八重歯'),tt('freckles','そばかす'),tt('mole under eye','泣きぼくろ')]},
   ]},
   {id:'body',name:'キャラ・体型',nameEn:'Body',icon:'💫',color:'#fb923c',colorLight:'#ea580c',collapsed:true,strength:'1.0',text:'',customTags:[],favTags:[],locked:false,cats:[
-    {n:'体型',nEn:'Body',id:'body_shape',t:[tt('slim','スリム'),tt('petite','小柄'),tt('athletic','運動的'),tt('tall','高身長'),{en:'short stature',ja:'低身長',excludeFromRandom:true},tt('slender','細身'),tt('toned','引き締まり'),tt('muscular','筋肉質'),tt('curvy','グラマー'),tt('chubby','ぽっちゃり')]},
+    {n:'体型',nEn:'Body',id:'body_shape',t:[tt('slim','スリム'),tt('petite','小柄'),tt('athletic','運動的'),tt('tall','高身長'),tt('slender','細身'),tt('toned','引き締まり'),tt('muscular','筋肉質'),tt('curvy','グラマー'),tt('chubby','ぽっちゃり')]},
     {n:'胸のサイズ',nEn:'Bust',id:'body_bust',t:[tt('flat chest','ぺったん'),tt('small breasts','小さめ'),tt('medium breasts','普通'),tt('large breasts','大きめ'),tt('huge breasts','特大')]},
     {n:'肌色',nEn:'Skin',id:'body_skin',t:[tt('fair skin','色白'),tt('pale skin','白肌'),tt('tan skin','日焼け肌'),tt('dark skin','浅黒肌'),tt('olive skin','オリーブ肌'),ttr('red skin','赤肌'),ttr('blue skin','青肌'),ttr('grey skin','グレー肌'),tt('porcelain skin','磁器のような肌'),tt('translucent skin','透き通る肌')]},
     {n:'肌質感',nEn:'Skin Texture',id:'body_skintex',t:[tt('shiny skin','艶やかな肌'),tt('wet skin','濡れ肌')]},
