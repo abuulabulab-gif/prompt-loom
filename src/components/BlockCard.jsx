@@ -613,7 +613,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
 
           {/* Strength + controls row */}
           <div className="my-[0.5625rem] mb-[0.6875rem]">
-            <div className={`flex items-center flex-wrap ${isCompact ? 'gap-[0.1875rem]' : 'gap-[0.3125rem]'}`}>
+            <div className={`flex items-center ${isMobile ? 'flex-nowrap overflow-x-auto gap-[0.1875rem]' : `flex-wrap ${isCompact ? 'gap-[0.1875rem]' : 'gap-[0.3125rem]'}`}`}>
               <span className={`${focusMode ? 'text-[0.8125rem]' : 'text-[0.625rem]'} font-mono font-semibold text-muted`}>{lang === 'ja' ? '強度:' : 'Str:'}</span>
 
               {(isMobile ? STRENGTHS.filter(s => s.v === '1.0' || s.v === '1.2') : STRENGTHS).map(s => (
