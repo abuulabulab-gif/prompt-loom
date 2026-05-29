@@ -303,10 +303,11 @@ function applyComboRules(blockMap, fixedBlockIds = null) {
         }
       }
     }
-    // CONFLICT_MAP cross-block cleanup
+    // CONFLICT_MAP cross-block cleanup（固定ブロックは対象外）
     for (const ct of (CONFLICT_MAP.get(rule.tag.toLowerCase()) || [])) {
-      for (const [, b] of blockMap) {
+      for (const [bId, b] of blockMap) {
         if (b.locked) continue;
+        if (fixedBlockIds?.has(bId)) continue;
         if (hasTag(b.text, ct)) b.text = removeTag(b.text, ct);
       }
     }
@@ -479,14 +480,17 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
 
       // 最終クリーンアップ: 全ブロックまたがりの矛盾を除去
       // 例: back view（構図）→ smile（顔）を消す、mermaid tail（キャラ）→ boots（衣装）を消す
+      // キャラ特化モードの固定ブロックは書き換え禁止
+      const fixedIds = mode === 'chardesign' ? CHARDESIGN_MODE_CONFIG.fixedBlocks : null;
       for (const [, src] of blockMap) {
         if (!src.text) continue;
         for (const seg of splitTags(src.text)) {
           const tag  = bareTag(seg).toLowerCase();
           const excls = RANDOM_EXCLUSION_RULES.get(tag);
           if (!excls) continue;
-          for (const [, tgt] of blockMap) {
+          for (const [tgtId, tgt] of blockMap) {
             if (tgt.locked) continue;
+            if (fixedIds?.has(tgtId)) continue;
             for (const excTag of excls) {
               if (hasTag(tgt.text, excTag)) tgt.text = removeTag(tgt.text, excTag);
             }

@@ -154,6 +154,8 @@ export const TIER3_TAGS = new Set([
   'tarot card',
   // 種族専用パーツ（コンボルール経由でのみ付与）
   'ball joints','cybernetics','scale skin','translucent skin','liquid body','porcelain skin',
+  // 下半身置換パーツ — 種族が一致しない限り付与禁止（妖精に人魚尾ひれなど防止）
+  'mermaid tail','lamia tail',
   // レア肌色はコンボルール経由または rareInRandom で低確率付与（TIER3除外）
 ]);
 
