@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { STRENGTHS, uid, appendTag, countTags, hasTag, toggleTag, clampW, removeTag, splitTags, bareTag, OPTIONAL_CAT_NAMES, BLOCK_RANDOM_RULES, TIER3_TAGS, RANDOM_EXCLUSION_RULES, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS, TAG_PAIR_COMBOS, TAG_SPECIES_COMBOS } from "../data/constants.js";
+import { STRENGTHS, uid, appendTag, countTags, hasTag, toggleTag, clampW, removeTag, splitTags, bareTag, OPTIONAL_CAT_NAMES, RARE_OPT_CAT_NAMES, BLOCK_RANDOM_RULES, TIER3_TAGS, RANDOM_EXCLUDE_TAGS, RANDOM_EXCLUSION_RULES, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS, TAG_PAIR_COMBOS, TAG_SPECIES_COMBOS } from "../data/constants.js";
 import { CONFLICT_MAP } from "../data/conflicts.js";
 import { EXPRESSION_PRESETS, ALL_EXPR_TAGS } from "../data/expressions.js";
 import { NEG_PRESETS } from "../data/negSuggestions.js";
@@ -702,11 +702,24 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                       if (picks.length >= maxPicks || skippedCats.has(cat.n)) return;
                       const unused = cat.t.filter(t => {
                         const en = t.en.toLowerCase();
-                        return !hasTag(baseText, t.en) && !TIER3_TAGS.has(en) && !excluded.has(en);
+                        return !hasTag(baseText, t.en)
+                          && !t.excludeFromRandom
+                          && !RANDOM_EXCLUDE_TAGS.has(t.en)
+                          && !TIER3_TAGS.has(en)
+                          && !excluded.has(en);
                       });
                       if (unused.length === 0) return;
-                      const pick = unused[Math.floor(Math.random() * unused.length)];
-                      // 武器タグは追加ゲート
+                      const normalT = unused.filter(t => !t.rareInRandom);
+                      const rareT   = unused.filter(t =>  t.rareInRandom);
+                      let pick;
+                      if (normalT.length === 0) {
+                        pick = rareT[Math.floor(Math.random() * rareT.length)];
+                      } else if (rareT.length > 0 && Math.random() < 0.20) {
+                        pick = rareT[Math.floor(Math.random() * rareT.length)];
+                      } else {
+                        pick = normalT[Math.floor(Math.random() * normalT.length)];
+                      }
+                      if (!pick) return;
                       if (WEAPON_TAGS.has(pick.en.toLowerCase()) && Math.random() > WEAPON_PICK_PROB) return;
                       picks.push(pick);
                       if (WEAPON_TAGS.has(pick.en.toLowerCase())) {
@@ -714,6 +727,8 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                       }
                       const newExcl = RANDOM_EXCLUSION_RULES.get(pick.en.toLowerCase());
                       if (newExcl) newExcl.forEach(e => excluded.add(e.toLowerCase()));
+                      const cfMap = CONFLICT_MAP.get(pick.en.toLowerCase());
+                      if (cfMap) cfMap.forEach(e => excluded.add(e));
                       (rules.skipIfPicked?.[cat.n] || []).forEach(n => skippedCats.add(n));
                     };
 
@@ -721,7 +736,8 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                     const shuffledOpt = [...optCats].sort(() => Math.random() - 0.5);
                     for (const cat of shuffledOpt) {
                       if (picks.length >= maxPicks || skippedCats.has(cat.n)) continue;
-                      if (Math.random() < 0.45) tryPick(cat);
+                      const prob = RARE_OPT_CAT_NAMES.has(cat.n) ? 0.15 : 0.40;
+                      if (Math.random() < prob) tryPick(cat);
                     }
 
                     if (picks.length === 0) return;

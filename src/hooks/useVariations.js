@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { splitTags, bareTag, appendTag, removeTag, hasTag, stripWeights, OPTIONAL_CAT_NAMES, BLOCK_RANDOM_RULES, TIER3_TAGS, RANDOM_EXCLUSION_RULES, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS } from "../data/constants.js";
+import { splitTags, bareTag, appendTag, removeTag, hasTag, stripWeights, OPTIONAL_CAT_NAMES, RARE_OPT_CAT_NAMES, BLOCK_RANDOM_RULES, TIER3_TAGS, RANDOM_EXCLUDE_TAGS, RANDOM_EXCLUSION_RULES, RANDOM_COMBO_RULES, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS } from "../data/constants.js";
 import { CONFLICT_MAP } from "../data/conflicts.js";
 
 // Blocks whose content is fixed across all variations (character identity)
@@ -32,10 +32,23 @@ function pickForBlock(block, sharedExcluded) {
     if (pickedTags.length >= maxPicks || skippedCats.has(cat.n)) return;
     const available = cat.t.filter(t => {
       const en = t.en.toLowerCase();
-      return !t.excludeFromRandom && !TIER3_TAGS.has(en) && !sharedExcluded.has(en);
+      return !t.excludeFromRandom
+        && !RANDOM_EXCLUDE_TAGS.has(t.en)
+        && !TIER3_TAGS.has(en)
+        && !sharedExcluded.has(en);
     });
     if (available.length === 0) return;
-    const chosen = available[Math.floor(Math.random() * available.length)];
+    const normalT = available.filter(t => !t.rareInRandom);
+    const rareT   = available.filter(t =>  t.rareInRandom);
+    let chosen;
+    if (normalT.length === 0) {
+      chosen = rareT[Math.floor(Math.random() * rareT.length)];
+    } else if (rareT.length > 0 && Math.random() < 0.20) {
+      chosen = rareT[Math.floor(Math.random() * rareT.length)];
+    } else {
+      chosen = normalT[Math.floor(Math.random() * normalT.length)];
+    }
+    if (!chosen) return;
     if (WEAPON_TAGS.has(chosen.en.toLowerCase()) && Math.random() > WEAPON_PICK_PROB) return;
     pickedTags.push(chosen.en);
     if (WEAPON_TAGS.has(chosen.en.toLowerCase())) {
@@ -52,14 +65,16 @@ function pickForBlock(block, sharedExcluded) {
   const shuffledOpt = [...optCats].sort(() => Math.random() - 0.5);
   for (const cat of shuffledOpt) {
     if (pickedTags.length >= maxPicks || skippedCats.has(cat.n)) break;
-    if (Math.random() < 0.4) tryPick(cat);
+    const prob = RARE_OPT_CAT_NAMES.has(cat.n) ? 0.15 : 0.40;
+    if (Math.random() < prob) tryPick(cat);
   }
 
   return pickedTags.join(', ');
 }
 
-// Apply cross-block combo rules to rerolled blocks.
-// fixedTags = bareTag list from fixed blocks (attribute/face/body) so species like mermaid/slime/doll trigger combos.
+// Apply cross-block combo rules to rerolled blocks using the full RANDOM_COMBO_RULES set.
+// fixedTags = bareTag list from fixed blocks so species/environment triggers fire correctly.
+// Fixed blocks are NOT in rerolledMap, so addCombo silently skips them.
 function applyVariationCombos(rerolledMap, fixedTags = []) {
   const allTags = [...fixedTags];
   for (const text of Object.values(rerolledMap)) {
@@ -85,23 +100,17 @@ function applyVariationCombos(rerolledMap, fixedTags = []) {
     }
   };
 
-  if (allTags.includes('mermaid') || allTags.includes('mermaid tail')) addCombo('background', 'underwater');
-  if (allTags.includes('rainy'))     addCombo('effect', 'rain');
-  if (allTags.includes('snowy'))     addCombo('effect', 'snowfall');
-  if (allTags.includes('night') || allTags.includes('starry sky')) addCombo('lighting', 'moonlight');
-
-  // Weapon → fighting stance + remove hand poses
-  for (const tag of allTags) {
-    if (WEAPON_TAGS.has(tag)) {
-      addCombo('composition', 'fighting stance');
+  for (const rule of RANDOM_COMBO_RULES) {
+    if (!allTags.includes(rule.trigger.toLowerCase())) continue;
+    if (rerolledMap[rule.blockId] === undefined) continue;
+    if (rule.prob !== undefined && Math.random() > rule.prob) continue;
+    addCombo(rule.blockId, rule.tag);
+    if (WEAPON_TAGS.has(rule.trigger.toLowerCase())) {
       for (const blockId of Object.keys(rerolledMap)) {
         for (const handTag of HAND_POSE_TAGS) {
-          if (hasTag(rerolledMap[blockId], handTag)) {
-            rerolledMap[blockId] = removeTag(rerolledMap[blockId], handTag);
-          }
+          if (hasTag(rerolledMap[blockId], handTag)) rerolledMap[blockId] = removeTag(rerolledMap[blockId], handTag);
         }
       }
-      break;
     }
   }
 }
