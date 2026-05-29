@@ -13,6 +13,43 @@ import { COLOR_PALETTE, SHADES, COLOR_TARGETS, buildColorTag, buildColorName, HU
 const COLOR_CAT_IDS = new Set(['face_haircolor', 'face_eyecolor']);
 const COLOR_CAT_TARGET = { face_haircolor: 'hair', face_eyecolor: 'eyes' };
 
+// ── フェーズ4: 多様性クールダウン ────────────────────────────────────
+// 直近の生成で使ったタグを記憶し、しばらく出にくくする
+const COOLDOWN_CAT_IDS = new Set([
+  'attr_species', 'face_haircolor', 'face_hairstyle', 'face_eyecolor',
+  'body_shape', 'body_bust', 'outfit_genre',
+  'comp_distance', 'comp_angle', 'face_expression',
+  'bg_simple', 'bg_outdoor', 'bg_indoor',
+]);
+const COOLDOWN_KEY  = 'loom_random_cooldown_v1';
+const COOLDOWN_SIZE = 5; // 直近5回分を記憶
+// 使ってからの回数ごとの重み (0=直前, 1=1回前, 2=2回前, 3=3回前)
+const COOLDOWN_DECAY = [0.15, 0.45, 0.70, 0.85];
+
+function loadCooldown() {
+  try { return JSON.parse(localStorage.getItem(COOLDOWN_KEY) || '[]'); }
+  catch { return []; }
+}
+function saveCooldown(hist) {
+  localStorage.setItem(COOLDOWN_KEY, JSON.stringify(hist.slice(-COOLDOWN_SIZE)));
+}
+function cdWeight(key, catId, hist) {
+  if (!key || !COOLDOWN_CAT_IDS.has(catId) || !hist.length) return 1.0;
+  const k = key.toLowerCase();
+  for (let i = hist.length - 1; i >= 0; i--) {
+    if (hist[i]?.[catId] === k) return COOLDOWN_DECAY[hist.length - 1 - i] ?? 1.0;
+  }
+  return 1.0;
+}
+// 重みつきランダムでインデックスを返す
+function wIdx(weights) {
+  const total = weights.reduce((s, w) => s + w, 0);
+  if (!total) return Math.floor(Math.random() * weights.length);
+  let r = Math.random() * total;
+  for (let i = 0; i < weights.length; i++) { r -= weights[i]; if (r <= 0) return i; }
+  return weights.length - 1;
+}
+
 function pickWeightedShade() {
   const r = Math.random();
   if (r < 0.65) return SHADES.find(s => s.id === 'normal');
@@ -46,17 +83,19 @@ function picksToText(picks, strength) {
   return text;
 }
 
-function pickColorCatTag(catId) {
+function pickColorCatTag(catId, hist = []) {
   if (catId === 'face_eyecolor' && Math.random() < 0.10) return pickHeterochromiaPair();
   const targetId  = COLOR_CAT_TARGET[catId];
   const targetObj = COLOR_TARGETS.find(t => t.id === targetId);
-  const color     = COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
+  // クールダウン重みつきで色を選ぶ（直近と同じ色が出にくくなる）
+  const weights   = COLOR_PALETTE.map(c => cdWeight(c.en, catId, hist));
+  const color     = COLOR_PALETTE[wIdx(weights)];
   const shade     = pickWeightedShade();
   const en        = buildColorTag(shade.en, color.en, targetObj.en);
   const ja        = shade.id !== 'normal'
     ? `${shade.ja}${color.ja}${targetObj.ja}`
     : `${color.ja}${targetObj.ja}`;
-  return { en, ja };
+  return { en, ja, _tk: color.en, _ci: catId }; // _tk/_ci は履歴記録用
 }
 
 function applyExclusionRules(pickedEnTag, excludedTags) {
@@ -64,7 +103,7 @@ function applyExclusionRules(pickedEnTag, excludedTags) {
   if (excl) excl.forEach(e => excludedTags.add(e.toLowerCase()));
 }
 
-function pickBlockTags(block, globalExcluded) {
+function pickBlockTags(block, globalExcluded, hist = []) {
   const rules = BLOCK_RANDOM_RULES[block.id] || {};
   const disabledCats = new Set();
 
@@ -84,8 +123,22 @@ function pickBlockTags(block, globalExcluded) {
   const doPick = (cat) => {
     if (picks.length >= maxPicks || skippedCats.has(cat.n)) return;
 
+    // Weighted gender pick — solo is force-added as post-step in generateRandomChar
+    if (cat.id === 'attr_gender') {
+      const r = Math.random();
+      const genderEn = r < 0.70 ? '1girl' : r < 0.98 ? '1boy' : 'androgynous';
+      const pick = cat.t.find(t => t.en === genderEn);
+      if (pick && !globalExcluded.has(pick.en.toLowerCase())) {
+        picks.push(pick);
+        for (const ct of (CONFLICT_MAP.get(pick.en.toLowerCase()) || [])) globalExcluded.add(ct);
+        applyExclusionRules(pick.en, globalExcluded);
+      }
+      (rules.skipIfPicked?.[cat.n] || []).forEach(n => skippedCats.add(n));
+      return;
+    }
+
     if (COLOR_CAT_IDS.has(cat.id)) {
-      const pick = pickColorCatTag(cat.id);
+      const pick = pickColorCatTag(cat.id, hist);
       if (!globalExcluded.has(pick.en.toLowerCase())) {
         picks.push(pick);
         for (const ct of (CONFLICT_MAP.get(pick.en.toLowerCase()) || [])) globalExcluded.add(ct);
@@ -106,7 +159,12 @@ function pickBlockTags(block, globalExcluded) {
     const normalT = validT.filter(t => !t.rareInRandom);
     const rareT   = validT.filter(t =>  t.rareInRandom);
     let pick;
-    if (normalT.length === 0) {
+    if (COOLDOWN_CAT_IDS.has(cat.id)) {
+      // クールダウン重みつきランダム（直近と同じタグが出にくい）
+      const allT = [...normalT, ...rareT];
+      const ws   = allT.map(t => (t.rareInRandom ? 0.20 : 1.0) * cdWeight(t.en, cat.id, hist));
+      pick = allT[wIdx(ws)];
+    } else if (normalT.length === 0) {
       pick = rareT[Math.floor(Math.random() * rareT.length)];
     } else if (rareT.length > 0 && Math.random() < 0.20) {
       pick = rareT[Math.floor(Math.random() * rareT.length)];
@@ -133,7 +191,7 @@ function pickBlockTags(block, globalExcluded) {
   return picks;
 }
 
-function pickBlockTagsBoosted(block, globalExcluded, boostTags) {
+function pickBlockTagsBoosted(block, globalExcluded, boostTags, hist = []) {
   const rules = BLOCK_RANDOM_RULES[block.id] || {};
   const disabledCats = new Set();
   for (const group of (rules.exclusiveGroups || [])) {
@@ -150,8 +208,21 @@ function pickBlockTagsBoosted(block, globalExcluded, boostTags) {
 
   const doPick = (cat) => {
     if (picks.length >= maxPicks || skippedCats.has(cat.n)) return;
+    // Weighted gender pick — solo is force-added as post-step in generateRandomChar
+    if (cat.id === 'attr_gender') {
+      const r = Math.random();
+      const genderEn = r < 0.70 ? '1girl' : r < 0.98 ? '1boy' : 'androgynous';
+      const pick = cat.t.find(t => t.en === genderEn);
+      if (pick && !globalExcluded.has(pick.en.toLowerCase())) {
+        picks.push(pick);
+        for (const ct of (CONFLICT_MAP.get(pick.en.toLowerCase()) || [])) globalExcluded.add(ct);
+        applyExclusionRules(pick.en, globalExcluded);
+      }
+      (rules.skipIfPicked?.[cat.n] || []).forEach(n => skippedCats.add(n));
+      return;
+    }
     if (COLOR_CAT_IDS.has(cat.id)) {
-      const pick = pickColorCatTag(cat.id);
+      const pick = pickColorCatTag(cat.id, hist);
       if (!globalExcluded.has(pick.en.toLowerCase())) {
         picks.push(pick);
         for (const ct of (CONFLICT_MAP.get(pick.en.toLowerCase()) || [])) globalExcluded.add(ct);
@@ -170,19 +241,23 @@ function pickBlockTagsBoosted(block, globalExcluded, boostTags) {
     if (validT.length === 0) return;
     // Boost: prefer boost tags 70% of the time if any are available
     const boostedT = validT.filter(t => boostTags.has(t.en.toLowerCase()));
+    const normalT  = validT.filter(t => !t.rareInRandom);
+    const rareT    = validT.filter(t =>  t.rareInRandom);
     let pick;
     if (boostedT.length > 0 && Math.random() < 0.70) {
-      pick = boostedT[Math.floor(Math.random() * boostedT.length)];
+      // ブーストタグでもクールダウンを適用
+      const bws = boostedT.map(t => cdWeight(t.en, cat.id, hist));
+      pick = boostedT[wIdx(bws)];
+    } else if (COOLDOWN_CAT_IDS.has(cat.id)) {
+      const allT = [...normalT, ...rareT];
+      const ws   = allT.map(t => (t.rareInRandom ? 0.20 : 1.0) * cdWeight(t.en, cat.id, hist));
+      pick = allT[wIdx(ws)];
+    } else if (normalT.length === 0) {
+      pick = rareT[Math.floor(Math.random() * rareT.length)];
+    } else if (rareT.length > 0 && Math.random() < 0.20) {
+      pick = rareT[Math.floor(Math.random() * rareT.length)];
     } else {
-      const normalT = validT.filter(t => !t.rareInRandom);
-      const rareT   = validT.filter(t =>  t.rareInRandom);
-      if (normalT.length === 0) {
-        pick = rareT[Math.floor(Math.random() * rareT.length)];
-      } else if (rareT.length > 0 && Math.random() < 0.20) {
-        pick = rareT[Math.floor(Math.random() * rareT.length)];
-      } else {
-        pick = normalT[Math.floor(Math.random() * normalT.length)];
-      }
+      pick = normalT[Math.floor(Math.random() * normalT.length)];
     }
     if (WEAPON_TAGS.has(pick.en.toLowerCase()) && Math.random() > WEAPON_PICK_PROB) return;
     picks.push(pick);
@@ -218,10 +293,21 @@ function applyComboRules(blockMap, fixedBlockIds = null) {
     if (!hasTag(target.text, rule.tag)) {
       target.text = appendTag(target.text, rule.tag, target.strength);
     }
-    const conflicts = RANDOM_EXCLUSION_RULES.get(rule.tag.toLowerCase());
-    if (conflicts) {
-      for (const conflictTag of conflicts) {
-        if (hasTag(target.text, conflictTag)) target.text = removeTag(target.text, conflictTag);
+    // Sweep exclusions across ALL blocks (previously only removed from target block)
+    const exclusions = RANDOM_EXCLUSION_RULES.get(rule.tag.toLowerCase());
+    if (exclusions) {
+      for (const [, b] of blockMap) {
+        if (b.locked) continue;
+        for (const excTag of exclusions) {
+          if (hasTag(b.text, excTag)) b.text = removeTag(b.text, excTag);
+        }
+      }
+    }
+    // CONFLICT_MAP cross-block cleanup
+    for (const ct of (CONFLICT_MAP.get(rule.tag.toLowerCase()) || [])) {
+      for (const [, b] of blockMap) {
+        if (b.locked) continue;
+        if (hasTag(b.text, ct)) b.text = removeTag(b.text, ct);
       }
     }
     if (WEAPON_TAGS.has(rule.trigger.toLowerCase())) {
@@ -272,6 +358,8 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
         ? '現在のプロンプトをリセットしてランダム生成しますか？'
         : 'Reset current prompt and generate a random character?'
     )) return;
+
+    const hist = loadCooldown(); // 直近の生成履歴を読み込み
 
     setCharacters(prev => prev.map(c => {
       if (c.id !== activeCharId) return c;
@@ -333,26 +421,27 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
                     : c
                 ),
             };
-            const picks = pickBlockTags(filteredBlock, globalExcluded);
+            const picks = pickBlockTags(filteredBlock, globalExcluded, hist);
             newBlock = { ...block, text: picksToText(picks, block.strength), enabled: true, collapsed: false, lastRandomPicks: picks };
           } else if (block.id === 'body') {
             const filteredBlock = { ...block, cats: block.cats.filter(c => !cfg.skipBodyCats.has(c.n)) };
-            const picks = pickBlockTags(filteredBlock, globalExcluded);
+            const picks = pickBlockTags(filteredBlock, globalExcluded, hist);
             newBlock = { ...block, text: picksToText(picks, block.strength), enabled: true, collapsed: false, lastRandomPicks: picks };
           } else if (block.id === 'feature') {
             const filteredBlock = { ...block, cats: block.cats.filter(c => !cfg.skipFeatureCats.has(c.n)) };
-            const picks = pickBlockTags(filteredBlock, globalExcluded);
+            const picks = pickBlockTags(filteredBlock, globalExcluded, hist);
             newBlock = { ...block, text: picksToText(picks, block.strength), enabled: true, collapsed: false, lastRandomPicks: picks };
           } else {
             const CHARDESIGN_SKIP_IDS = new Set(['effect', 'lighting', 'scene', 'mood']);
             if (CHARDESIGN_SKIP_IDS.has(block.id)) {
               newBlock = { ...block, text: '', enabled: true, collapsed: false, lastRandomPicks: [] };
             } else {
-              const picks = pickBlockTags(block, globalExcluded);
+              const picks = pickBlockTags(block, globalExcluded, hist);
               let text = picksToText(picks, block.strength);
               if (block.id === 'attribute') {
                 const speciesCat = block.cats.find(cat => cat.n === '種族');
                 text = buildSpeciesText(picks, block, speciesCat, text);
+                if (!hasTag(text, 'solo')) text = appendTag(text, 'solo', block.strength);
               }
               newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: picks };
             }
@@ -362,21 +451,22 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
           let picks;
           if (mode === 'illust') {
             if (block.id === 'composition') {
-              picks = pickBlockTagsBoosted(block, globalExcluded, ILLUST_MODE_CONFIG.boostCompositionTags);
+              picks = pickBlockTagsBoosted(block, globalExcluded, ILLUST_MODE_CONFIG.boostCompositionTags, hist);
             } else if (block.id === 'lighting') {
-              picks = pickBlockTagsBoosted(block, globalExcluded, ILLUST_MODE_CONFIG.boostLightingTags);
+              picks = pickBlockTagsBoosted(block, globalExcluded, ILLUST_MODE_CONFIG.boostLightingTags, hist);
             } else if (block.id === 'effect') {
-              picks = pickBlockTagsBoosted(block, globalExcluded, ILLUST_MODE_CONFIG.boostEffectTags);
+              picks = pickBlockTagsBoosted(block, globalExcluded, ILLUST_MODE_CONFIG.boostEffectTags, hist);
             } else {
-              picks = pickBlockTags(block, globalExcluded);
+              picks = pickBlockTags(block, globalExcluded, hist);
             }
           } else {
-            picks = pickBlockTags(block, globalExcluded);
+            picks = pickBlockTags(block, globalExcluded, hist);
           }
           let text = picksToText(picks, block.strength);
           if (block.id === 'attribute') {
             const speciesCat = block.cats.find(cat => cat.n === '種族');
             text = buildSpeciesText(picks, block, speciesCat, text);
+            if (!hasTag(text, 'solo')) text = appendTag(text, 'solo', block.strength);
           }
           newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: picks };
         }
@@ -386,6 +476,41 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
       });
 
       applyComboRules(blockMap, mode === 'chardesign' ? CHARDESIGN_MODE_CONFIG.fixedBlocks : null);
+
+      // 最終クリーンアップ: 全ブロックまたがりの矛盾を除去
+      // 例: back view（構図）→ smile（顔）を消す、mermaid tail（キャラ）→ boots（衣装）を消す
+      for (const [, src] of blockMap) {
+        if (!src.text) continue;
+        for (const seg of splitTags(src.text)) {
+          const tag  = bareTag(seg).toLowerCase();
+          const excls = RANDOM_EXCLUSION_RULES.get(tag);
+          if (!excls) continue;
+          for (const [, tgt] of blockMap) {
+            if (tgt.locked) continue;
+            for (const excTag of excls) {
+              if (hasTag(tgt.text, excTag)) tgt.text = removeTag(tgt.text, excTag);
+            }
+          }
+        }
+      }
+
+      // 生成履歴を保存（クールダウン用）
+      const histEntry = {};
+      for (const [, b] of blockMap) {
+        if (!b.cats || !b.text) continue;
+        for (const cat of b.cats) {
+          if (!COOLDOWN_CAT_IDS.has(cat.id)) continue;
+          if (COLOR_CAT_IDS.has(cat.id)) {
+            const cp = (b.lastRandomPicks || []).find(p => p._ci === cat.id);
+            if (cp?._tk) histEntry[cat.id] = cp._tk.toLowerCase();
+          } else {
+            for (const t of cat.t) {
+              if (hasTag(b.text, t.en)) { histEntry[cat.id] = t.en.toLowerCase(); break; }
+            }
+          }
+        }
+      }
+      saveCooldown([...hist, histEntry]);
 
       // Simple background → suppress lighting and effect (environmental FX clash with plain BG)
       if (mode !== 'chardesign') {

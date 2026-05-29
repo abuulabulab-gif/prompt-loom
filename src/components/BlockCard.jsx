@@ -205,7 +205,8 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
         className={`flex flex-wrap items-start gap-x-1.5 gap-y-1 px-3 ${focusMode ? 'py-[0.8125rem]' : 'py-[0.5625rem]'}${block.collapsed ? '' : ' bg-surfalt border-b border-line'}`}
       >
         {/* LEFT: drag + move + toggle + badge + icon + name — takes all available space */}
-        <div className="flex items-start gap-1.5 flex-1 min-w-[8.125rem]">
+        {/* On mobile: w-full forces full row → buttons wrap to row 2 and right-align via ml-auto */}
+        <div className={`flex items-start gap-1.5 ${isMobile ? 'w-full' : 'flex-1 min-w-[8.125rem]'}`}>
         {/* Drag handle */}
         <button
           {...listeners}

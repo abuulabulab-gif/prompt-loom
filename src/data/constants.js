@@ -116,7 +116,7 @@ export const KEMONOMIMI_PAIRS = [
 // exclusiveGroups: within each inner array, at most one cat is picked
 // skipIfPicked:    if cat[key] is picked, skip all cats in value[]
 // Tags excluded from random generation to enforce single-character output
-export const RANDOM_EXCLUDE_TAGS = new Set(['2girls', '2boys', 'multiple girls', 'multiple boys']);
+export const RANDOM_EXCLUDE_TAGS = new Set(['2girls', '2boys', 'multiple girls', 'multiple boys', '1other']);
 
 export const BLOCK_RANDOM_RULES = {
   background: {
@@ -285,6 +285,19 @@ export const RANDOM_EXCLUSION_RULES = new Map([
   ['angel wings', new Set(['demon wings','bat wings','dragon wings'])],
   ['demon wings', new Set(['angel wings','dragon wings','feathered wings'])],
   ['bat wings',   new Set(['angel wings','feathered wings'])],
+  // 横向き構図: 視聴者への直接アクションは不自然
+  ['side view', new Set([
+    'reaching toward viewer','pointing at viewer','eye contact','looking at viewer','waving',
+    'v-sign','peace sign','finger heart','hand heart',
+  ])],
+  // 人魚の尻尾にも足元除外を適用（buildSpeciesTextで自動追加されるため）
+  ['mermaid tail', new Set([
+    'sneakers','loafers','mary janes','sandals','slippers','heels','pumps','high heels',
+    'platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
+    'leg warmers','ankle socks','socks','knee-high socks','thighhighs','white thighhighs',
+    'black thighhighs','pantyhose','barefoot',
+    'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','pants','jeans','leggings',
+  ])],
 ]);
 
 // ── Combo rules: trigger tag → add tag in another block ──────
