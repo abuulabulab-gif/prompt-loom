@@ -104,14 +104,14 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
           zIndex: 9999,
           background: 'rgba(6,8,18,0.96)',
           border: '1px solid rgba(255,255,255,0.11)',
-          borderRadius: 7,
-          padding: '6px 10px',
-          maxWidth: 210,
+          borderRadius: 8,
+          padding: '8px 13px',
+          maxWidth: 280,
           pointerEvents: 'none',
           boxShadow: '0 6px 20px rgba(0,0,0,0.5)',
           whiteSpace: 'normal',
         }}>
-          <div style={{ fontSize: 10, fontFamily: 'monospace', color: 'rgba(255,255,255,0.88)', lineHeight: 1.55 }}>
+          <div style={{ fontSize: 12, fontFamily: 'monospace', color: 'rgba(255,255,255,0.88)', lineHeight: 1.6 }}>
             {lang === 'ja' ? desc.ja : desc.en}
           </div>
           <div style={{
