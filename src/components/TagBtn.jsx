@@ -44,13 +44,16 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
     : isFav                     ? 'rgb(var(--warn-text))'
     : 'rgb(var(--text) / 0.9)';
 
+  const calcTipPos = (rect) => {
+    const TW = 210, PAD = 6, vw = window.innerWidth || 375;
+    const raw = Math.round(rect.left + rect.width / 2);
+    return { x: Math.max(TW / 2 + PAD, Math.min(vw - TW / 2 - PAD, raw)), y: Math.round(rect.top) };
+  };
+
   const handleEnter = () => {
     if (!SUPPORTS_HOVER) return;
     setH(true);
-    if (desc && wrapRef.current) {
-      const r = wrapRef.current.getBoundingClientRect();
-      setTipPos({ x: Math.round(r.left + r.width / 2), y: Math.round(r.top) });
-    }
+    if (desc && wrapRef.current) setTipPos(calcTipPos(wrapRef.current.getBoundingClientRect()));
   };
   const handleLeave = () => { setH(false); setTipPos(null); };
 
@@ -60,8 +63,7 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
     longFired.current = false;
     longPressTimer.current = setTimeout(() => {
       longFired.current = true;
-      const r = wrapRef.current.getBoundingClientRect();
-      setTipPos({ x: Math.round(r.left + r.width / 2), y: Math.round(r.top) });
+      setTipPos(calcTipPos(wrapRef.current.getBoundingClientRect()));
       setLongTip(true);
     }, LONG_PRESS_MS);
   };
