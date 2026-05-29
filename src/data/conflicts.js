@@ -124,6 +124,10 @@ export const CONFLICT_RULES = [
   // ── カメラ角度 ─────────────────────────────────────────────────
   { tags:['from above','from below'],          ja:'見上げと見下ろしが矛盾',          en:'from above + from below' },
   { tags:['front view','back view'],           ja:'正面と後ろ向きが矛盾',            en:'front view + back view' },
+  // 横向き構図 × 視聴者への直接アクション（横顔でカメラ目線・手差しは不自然 → warn）
+  ...mk('side view',
+    ['looking at viewer','eye contact','reaching toward viewer','pointing at viewer'],
+    '横向き構図と視聴者への直接アクションが不自然', 'warn'),
   { tags:["bird's-eye view","worm's-eye view"],ja:'俯瞰とあおりが矛盾',             en:"bird's-eye view + worm's-eye view" },
   { tags:['from below',"bird's-eye view"],     ja:'見上げと俯瞰が矛盾',             en:"from below + bird's-eye view" },
   { tags:['from above',"worm's-eye view"],     ja:'見下ろしとあおりが矛盾',         en:"from above + worm's-eye view" },

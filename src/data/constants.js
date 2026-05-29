@@ -66,6 +66,7 @@ export const SPECIES_PARTS_MAP = {
   'demon':       ['demon horns', 'demon tail', 'demon wings'],
   'fairy':       ['fairy wings'],
   'mermaid':     ['mermaid tail'],
+  'lamia':       ['lamia tail'],
   'dragon girl': ['dragon horns', 'dragon tail', 'scale skin'],
   'catgirl':     ['cat ears', 'cat tail'],
   'oni':         ['oni horns'],
@@ -97,6 +98,7 @@ export const TAG_SPECIES_COMBOS = new Map([
   ['oni',         ['oni horns']],
   ['dragon girl', ['dragon horns', 'dragon tail', 'scale skin']],
   ['mermaid',     ['mermaid tail']],
+  ['lamia',       ['lamia tail']],
   ['fairy',       ['fairy wings']],
   ['doll',        ['ball joints']],
   ['android',     ['cybernetics']],
@@ -290,8 +292,15 @@ export const RANDOM_EXCLUSION_RULES = new Map([
     'reaching toward viewer','pointing at viewer','eye contact','looking at viewer','waving',
     'v-sign','peace sign','finger heart','hand heart',
   ])],
-  // 人魚の尻尾にも足元除外を適用（buildSpeciesTextで自動追加されるため）
+  // 人魚・ラミアの尻尾にも足元除外を適用（buildSpeciesTextで自動追加されるため）
   ['mermaid tail', new Set([
+    'sneakers','loafers','mary janes','sandals','slippers','heels','pumps','high heels',
+    'platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
+    'leg warmers','ankle socks','socks','knee-high socks','thighhighs','white thighhighs',
+    'black thighhighs','pantyhose','barefoot',
+    'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','pants','jeans','leggings',
+  ])],
+  ['lamia tail', new Set([
     'sneakers','loafers','mary janes','sandals','slippers','heels','pumps','high heels',
     'platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
     'leg warmers','ankle socks','socks','knee-high socks','thighhighs','white thighhighs',
