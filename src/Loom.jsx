@@ -1429,7 +1429,7 @@ export default function Loom() {
                     style={{ borderColor: 'rgb(var(--c-purple) / 0.35)', color: 'rgb(var(--muted))' }}>
                     {randomMode === 'chardesign' ? '🧍' : '🖼️'}
                   </button>
-                  <button onClick={generateRandomChar}
+                  <button onClick={() => generateRandomChar()}
                     className="flex-shrink-0 border border-dashed rounded-[0.3125rem] px-[0.4375rem] py-0.5 cursor-pointer text-[0.625rem] font-mono bg-transparent"
                     style={{ borderColor: 'rgb(var(--c-purple) / 0.5)', color: 'rgb(var(--c-purple))' }}>
                     🎲 {lang === 'ja' ? 'おまかせ' : 'Random'}
@@ -1546,7 +1546,7 @@ export default function Loom() {
                 style={{ borderColor: 'rgb(var(--c-purple) / 0.35)', color: 'rgb(var(--muted))' }}>
                 {randomMode === 'chardesign' ? '🧍' : '🖼️'}
               </button>
-              <button onClick={generateRandomChar} title={lang === 'ja' ? (randomMode === 'chardesign' ? 'キャラ特化モードでランダム生成' : 'イラストモードでランダム生成') : (randomMode === 'chardesign' ? 'Random (Char.Focused)' : 'Random (Illust)')}
+              <button onClick={() => generateRandomChar()} title={lang === 'ja' ? (randomMode === 'chardesign' ? 'キャラ特化モードでランダム生成' : 'イラストモードでランダム生成') : (randomMode === 'chardesign' ? 'Random (Char.Focused)' : 'Random (Illust)')}
                 className="flex-shrink-0 border border-dashed rounded-[0.3125rem] px-2 py-[0.1875rem] cursor-pointer text-[0.625rem] font-mono bg-transparent"
                 style={{ borderColor: 'rgb(var(--c-purple) / 0.5)', color: 'rgb(var(--c-purple))' }}>
                 🎲 {lang === 'ja' ? 'おまかせ' : 'Random'}
