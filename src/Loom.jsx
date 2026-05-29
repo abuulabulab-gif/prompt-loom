@@ -1929,7 +1929,7 @@ export default function Loom() {
                       key={b.id}
                       onClick={handleCustomTap}
                       className="w-full flex items-center gap-2 px-3 py-2.5 text-left cursor-pointer bg-transparent border-b border-line last:border-b-0"
-                      style={{ borderLeftWidth: '3px', borderLeftStyle: 'solid', borderLeftColor: b.enabled !== false ? b.color : 'rgb(var(--dim))' }}
+                      style={{ borderLeftWidth: '3px', borderLeftStyle: 'solid', borderLeftColor: b.enabled !== false ? blockTextColor(b) : 'rgb(var(--dim))' }}
                     >
                       <span className="text-sm flex-shrink-0">{b.icon}</span>
                       <div className="flex-1 min-w-0 flex flex-col">
@@ -1942,7 +1942,7 @@ export default function Loom() {
                       </div>
                       <span className="text-[0.5625rem] font-mono text-muted flex-shrink-0">✎</span>
                       {b.text && (
-                        <span className="text-[0.5625rem] font-mono font-bold flex-shrink-0" style={{ color: b.color }}>
+                        <span className="text-[0.5625rem] font-mono font-bold flex-shrink-0" style={{ color: blockTextColor(b) }}>
                           {countTags(b.text)}t
                         </span>
                       )}
@@ -1957,14 +1957,14 @@ export default function Loom() {
                       setJumpOpen(false);
                     }}
                     className="w-full flex items-center gap-2 px-3 py-2.5 text-left cursor-pointer bg-transparent border-b border-line last:border-b-0"
-                    style={{ borderLeftWidth: '3px', borderLeftStyle: 'solid', borderLeftColor: b.enabled !== false ? b.color : 'rgb(var(--dim))' }}
+                    style={{ borderLeftWidth: '3px', borderLeftStyle: 'solid', borderLeftColor: b.enabled !== false ? blockTextColor(b) : 'rgb(var(--dim))' }}
                   >
                     <span className="text-sm flex-shrink-0">{b.icon}</span>
                     <span className="text-[0.6875rem] font-mono flex-1 truncate" style={{ color: b.enabled !== false ? 'rgb(var(--text))' : 'rgb(var(--muted))' }}>
                       {lang === 'ja' ? b.name : b.nameEn}
                     </span>
                     {b.text && (
-                      <span className="text-[0.5625rem] font-mono font-bold flex-shrink-0" style={{ color: b.color }}>
+                      <span className="text-[0.5625rem] font-mono font-bold flex-shrink-0" style={{ color: blockTextColor(b) }}>
                         {countTags(b.text)}t
                       </span>
                     )}
