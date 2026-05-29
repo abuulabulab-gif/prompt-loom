@@ -405,7 +405,7 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
             background:  cfg.backgroundText,
             composition: cfg.compositionText,
           };
-          if (Object.hasOwn(chardesignFixedText, block.id)) {
+          if (chardesignFixedText[block.id] !== undefined) {
             newBlock = { ...block, text: chardesignFixedText[block.id], enabled: true, collapsed: false, lastRandomPicks: [] };
           } else if (block.id === 'face') {
             const filteredBlock = {
