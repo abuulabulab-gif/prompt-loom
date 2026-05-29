@@ -270,10 +270,14 @@ export const RANDOM_EXCLUSION_RULES = new Map([
     'open mouth','embarrassed','blushing','blush','tears','crying','shy','pout',
     'angry','surprised','confused','cleavage','sideboob','breast hold',
   ])],
-  // 非生物: 生体反応タグ除外
+  // 非生物: 生体反応 + 有機的な動物パーツを除外
   ['doll',      new Set(['sweat','blush','blushing','tears','crying','saliva','drooling','panting','drunk'])],
-  ['robot',     new Set(['sweat','blush','blushing','tears','crying','saliva','drooling','panting','drunk'])],
-  ['android',   new Set(['sweat','blush','blushing','tears','crying','saliva','drooling','panting'])],
+  ['robot',     new Set(['sweat','blush','blushing','tears','crying','saliva','drooling','panting','drunk',
+    'cat ears','bunny ears','fox ears','wolf ears','dog ears','horse ears','cow ears','animal ears',
+    'cat tail','fox tail','wolf tail','fluffy tail','bunny tail','dog tail','horse tail','cow tail'])],
+  ['android',   new Set(['sweat','blush','blushing','tears','crying','saliva','drooling','panting','drunk',
+    'cat ears','bunny ears','fox ears','wolf ears','dog ears','horse ears','cow ears','animal ears',
+    'cat tail','fox tail','wolf tail','fluffy tail','bunny tail','dog tail','horse tail','cow tail'])],
   ['mannequin', new Set(['sweat','blush','blushing','tears','crying','saliva','drooling'])],
   // 種族パーツの重複防止（ケモ耳 × ホーン/ハロ系）
   ['dog ears',    new Set(['demon horns','oni horns','goat horns','deer antlers','halo','angel halo'])],

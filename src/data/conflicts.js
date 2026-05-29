@@ -93,6 +93,12 @@ export const CONFLICT_RULES = [
   { tags:['1boy','2boys'],               ja:'男の子の人数が矛盾',              en:'1boy + 2boys' },
   { tags:['1boy','multiple boys'],       ja:'男の子の人数が矛盾',              en:'1boy + multiple boys' },
 
+  // ── 種族×性別（~girl 系種族は 1boy と矛盾。cat ears 等パーツは 1boy でも可） ────────
+  { tags:['catgirl',    '1boy'], ja:'catgirl種族と1boyが矛盾（ケモ耳ショタはcat ears+1boyで）', en:'catgirl + 1boy' },
+  { tags:['dragon girl','1boy'], ja:'ドラゴンガール種族と1boyが矛盾',                          en:'dragon girl + 1boy' },
+  { tags:['slime girl', '1boy'], ja:'スライム娘種族と1boyが矛盾',                              en:'slime girl + 1boy' },
+  { tags:['monster girl','1boy'],ja:'モンスター娘種族と1boyが矛盾',                            en:'monster girl + 1boy' },
+
   // ── カメラ距離 ─────────────────────────────────────────────────
   { tags:['close-up','full body'],             ja:'クローズアップと全身が矛盾',      en:'close-up + full body' },
   { tags:['face close-up','full body'],        ja:'顔アップと全身が矛盾',            en:'face close-up + full body' },

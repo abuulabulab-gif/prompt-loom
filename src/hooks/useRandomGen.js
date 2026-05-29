@@ -126,7 +126,7 @@ function pickBlockTags(block, globalExcluded, hist = []) {
     // Weighted gender pick — solo is force-added as post-step in generateRandomChar
     if (cat.id === 'attr_gender') {
       const r = Math.random();
-      const genderEn = r < 0.70 ? '1girl' : r < 0.98 ? '1boy' : 'androgynous';
+      const genderEn = r < 0.70 ? '1girl' : r < 0.90 ? '1boy' : r < 0.98 ? 'femboy' : 'androgynous';
       const pick = cat.t.find(t => t.en === genderEn);
       if (pick && !globalExcluded.has(pick.en.toLowerCase())) {
         picks.push(pick);
@@ -211,7 +211,7 @@ function pickBlockTagsBoosted(block, globalExcluded, boostTags, hist = []) {
     // Weighted gender pick — solo is force-added as post-step in generateRandomChar
     if (cat.id === 'attr_gender') {
       const r = Math.random();
-      const genderEn = r < 0.70 ? '1girl' : r < 0.98 ? '1boy' : 'androgynous';
+      const genderEn = r < 0.70 ? '1girl' : r < 0.90 ? '1boy' : r < 0.98 ? 'femboy' : 'androgynous';
       const pick = cat.t.find(t => t.en === genderEn);
       if (pick && !globalExcluded.has(pick.en.toLowerCase())) {
         picks.push(pick);
