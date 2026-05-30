@@ -32,6 +32,25 @@ const NON_ANIMAL_SPECIES_TAGS = new Set([
 const HYBRID_CHANCE_CHARDESIGN = 0.05; // 5%
 const HYBRID_CHANCE_ILLUST     = 0.08; // 8%
 
+// アンドロイド・ドールが主役の場合に通常は抑制する有機系ファンタジーパーツ
+const NON_BIOLOGICAL_SPECIES = new Set(['android', 'doll']);
+const ANDROID_ORGANIC_PARTS  = new Set(['oni horns', 'small horns', 'deer antlers', 'paw pads', 'scale skin']);
+
+// 衣装スタック: 主張の強い衣装ジャンル（完成系アウトフィット）
+const COMPLETE_OUTFIT_GENRES = new Set([
+  'school swimsuit','swimsuit','one-piece swimsuit','bikini','micro bikini',
+  'bunny suit','leotard','bodysuit','lingerie',
+  'school uniform','sailor uniform','blazer uniform',
+  'maid outfit','witch outfit','magical girl','gothic lolita',
+  'idol costume','cheerleader','race queen',
+  'military uniform','police uniform','nurse','nun',
+  'fantasy armor','bikini armor','sci-fi armor',
+  'wedding dress','evening gown',
+  'kimono','furisode','yukata','cheongsam','hanfu','shrine maiden',
+]);
+const OUTFIT_STYLE_TAGS  = new Set(['casual','sporty','elegant','punk','preppy','gothic','streetwear','high fashion']);
+const OUTFIT_ACCENT_TAGS = new Set(['veil','crown','tiara','scarf','necktie','bowtie','headphones','over-ear headphones']);
+
 const COLOR_CAT_IDS = new Set(['face_haircolor', 'face_eyecolor']);
 const COLOR_CAT_TARGET = { face_haircolor: 'hair', face_eyecolor: 'eyes' };
 
@@ -433,22 +452,26 @@ function cleanupAnimalParts(text, picks, speciesCat, strength, hybridChance) {
   const foundPairs  = ANIMAL_EAR_TAIL_PAIRS.filter(p => hasTag(text, p.ears) || hasTag(text, p.tail));
 
   if (isNonAnimal) {
-    if (foundPairs.length === 0) return text;
-    if (Math.random() >= hybridChance) {
-      // 通常: 動物パーツをすべて除去
-      for (const tag of [...ALL_ANIMAL_EAR_TAGS, ...ALL_ANIMAL_TAIL_TAGS]) {
-        if (hasTag(text, tag)) text = removeTag(text, tag);
+    if (foundPairs.length > 0) {
+      if (Math.random() >= hybridChance) {
+        for (const tag of [...ALL_ANIMAL_EAR_TAGS, ...ALL_ANIMAL_TAIL_TAGS]) {
+          if (hasTag(text, tag)) text = removeTag(text, tag);
+        }
+      } else if (foundPairs.length > 1) {
+        // ハイブリッド当選: 1系統だけ残す
+        const keepIdx = Math.floor(Math.random() * foundPairs.length);
+        foundPairs.forEach((p, i) => {
+          if (i === keepIdx) return;
+          if (hasTag(text, p.ears)) text = removeTag(text, p.ears);
+          if (hasTag(text, p.tail)) text = removeTag(text, p.tail);
+        });
       }
-      return text;
     }
-    // ハイブリッド当選: 複数ある場合は1系統だけ残す（それ以上は除去）
-    if (foundPairs.length > 1) {
-      const keepIdx = Math.floor(Math.random() * foundPairs.length);
-      foundPairs.forEach((p, i) => {
-        if (i === keepIdx) return;
-        if (hasTag(text, p.ears)) text = removeTag(text, p.ears);
-        if (hasTag(text, p.tail)) text = removeTag(text, p.tail);
-      });
+    // アンドロイド・ドール: 有機系ファンタジーパーツを hybrid chance でのみ許可
+    if (pickedSpecies.some(s => NON_BIOLOGICAL_SPECIES.has(s))) {
+      for (const part of ANDROID_ORGANIC_PARTS) {
+        if (hasTag(text, part) && Math.random() >= hybridChance) text = removeTag(text, part);
+      }
     }
     return text;
   }
@@ -469,7 +492,26 @@ function cleanupAnimalParts(text, picks, speciesCat, strength, hybridChance) {
   if (!hasTag(text, keepPair.ears)) text = appendTag(text, keepPair.ears, strength);
   if (!hasTag(text, keepPair.tail)) text = appendTag(text, keepPair.tail, strength);
 
+  // アンドロイド・ドール: 有機系ファンタジーパーツを hybrid chance でのみ許可
+  if (pickedSpecies.some(s => NON_BIOLOGICAL_SPECIES.has(s))) {
+    for (const part of ANDROID_ORGANIC_PARTS) {
+      if (hasTag(text, part) && Math.random() >= hybridChance) text = removeTag(text, part);
+    }
+  }
+
   return text;
+}
+
+// 衣装スタックSoft Penalty: 主張の強いジャンルがある場合にスタイル・装飾アクセを間引く
+function applyOutfitStackPenalty(blockMap) {
+  const ob = blockMap.get('outfit');
+  if (!ob?.text || ob.locked) return;
+  const hasCompleteGenre = [...COMPLETE_OUTFIT_GENRES].some(t => hasTag(ob.text, t));
+  if (!hasCompleteGenre) return;
+  let text = ob.text;
+  for (const tag of OUTFIT_STYLE_TAGS)  { if (hasTag(text, tag) && Math.random() < 0.70) text = removeTag(text, tag); }
+  for (const tag of OUTFIT_ACCENT_TAGS) { if (hasTag(text, tag) && Math.random() < 0.60) text = removeTag(text, tag); }
+  if (text !== ob.text) blockMap.set('outfit', { ...ob, text });
 }
 
 export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
@@ -626,6 +668,9 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
           }
         }
       }
+
+      // 衣装スタック Soft Penalty: 強いジャンル衣装 + スタイル/装飾の重ねすぎを間引く
+      applyOutfitStackPenalty(blockMap);
 
       // Simple background → suppress lighting and effect (environmental FX clash with plain BG)
       if (mode !== 'chardesign') {
