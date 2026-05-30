@@ -2239,7 +2239,7 @@ export default function Loom() {
                   <button onClick={() => setToolPickerOpen(p => !p)} title={lang === 'ja' ? tool.note : tool.noteEn}
                     className="flex items-center gap-1 rounded-md px-2 py-1 text-[0.6875rem] font-mono font-bold cursor-pointer whitespace-nowrap"
                     style={{ background: 'rgb(var(--tint-accent))', border: '1px solid rgb(var(--c-blue) / 0.35)', color: 'rgb(var(--c-blue-s))' }}>
-                    {tool.icon} {lang === 'ja' ? tool.name : tool.nameEn}<span className="text-[0.5625rem] opacity-65 ml-0.5">▾</span>
+                    {tool.icon} {lang === 'ja' ? tool.name : tool.nameEn}<span className="text-[0.5625rem] ml-0.5">▾</span>
                   </button>
                   {toolPickerOpen && (
                     <>
@@ -2351,7 +2351,7 @@ export default function Loom() {
                     style={{ background: 'rgb(var(--tint-accent))', border: '1px solid rgb(var(--c-blue) / 0.35)', color: 'rgb(var(--c-blue-s))' }}>
                     {tool.icon} {lang === 'ja' ? tool.name : tool.nameEn}
                     {tool.stripWeights && <span className="text-[0.5625rem] text-warn font-normal">w-off</span>}
-                    <span className="text-[0.5625rem] opacity-65">▾</span>
+                    <span className="text-[0.5625rem]">▾</span>
                   </button>
                   {toolPickerOpen && (
                     <>
