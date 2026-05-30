@@ -37,6 +37,7 @@ export const TAG_DICT = {
   'colored tips':          { ja: '毛先だけ別の色に染めたグラデーション染め', en: 'Hair with dyed tips of a contrasting color' },
   'hair between eyes':     { ja: '眉間・目の間を横切る前髪の一筋', en: 'A strand of hair crossing between the eyes' },
   'floating hair':         { ja: '風や魔力でなびく・浮かぶ髪。ダイナミックな演出に', en: 'Hair flowing or floating as if in wind or magical energy' },
+  'hair spread out':       { ja: '床や水面などに扇状に広がった髪。仰向け・水中・浮遊ポーズと組み合わせると映える', en: 'Hair spread wide across a surface — pairs beautifully with lying-down, underwater, or floating poses' },
   'maromayu':              { ja: '麻呂眉。平安貴族風の丸くて太い眉。高い位置に描かれ独特の雰囲気が出る', en: 'Round, thick eyebrows placed high on the forehead — Heian-era aristocrat style' },
 
   // ── 顔：目・表情 ──────────────────────────────────────────────
@@ -50,6 +51,7 @@ export const TAG_DICT = {
   'upturned eyes':         { ja: 'つり目。目尻が上がって気が強い・凛とした印象', en: 'Eyes with raised outer corners — sharp, strong impression' },
   'dull eyes':             { ja: '「死んだ目」。感情が抜け落ちた虚ろな目つき。ゾンビ・疲弊・洗脳キャラに', en: 'Lifeless, vacant eyes — used for exhausted, brainwashed, or zombie-like characters' },
   'empty eyes':            { ja: '瞳の中が空洞のような無のまなざし。機械・幽霊・感情欠落の表現に', en: 'Hollow, soul-less eyes with no highlight — robotic, ghostly, or emotionally void look' },
+  'smug':                  { ja: '自信満々のドヤ顔。目を細めた優越感あふれる得意げ表情。smirkより顔全体で感情が出る', en: 'Self-satisfied, arrogant expression with narrowed eyes — full-face smugness, more exaggerated than a smirk' },
 
   // ── 顔：口・メイク ────────────────────────────────────────────
   'detailed lips':         { ja: '唇の輪郭・ハイライト・質感を精細に描写させる指示タグ。唇フォーカステンプレートで使用', en: 'Directs detailed rendering of lip contour, highlights, and texture' },
@@ -59,7 +61,7 @@ export const TAG_DICT = {
   'licking lips':          { ja: '唇を舐める仕草。艶やかな印象に', en: 'Tongue touching the lips — sensual or playful gesture' },
 
   // ── 体型 ──────────────────────────────────────────────────────
-  'thigh gap':             { ja: '太ももの間に隙間を作る表現。絶対領域とも呼ばれる', en: 'Emphasized gap between the inner thighs' },
+  'thigh gap':             { ja: '直立時に太ももの内側に隙間ができる体型表現。細身・スリムさを補完するタグ', en: 'Visible gap between the inner thighs when standing — subtle slim-build emphasis' },
   'collarbone':            { ja: '鎖骨を目立たせた描写。色気や華奢さを演出する', en: 'Prominent, defined collarbone — adds elegance or appeal' },
   'toned':                 { ja: '引き締まった体型。細身だが適度な筋肉感あり', en: 'Lean and defined without being bulky — athletic slim build' },
   'loli':                  { ja: '幼い・小柄な体型の指定。成熟・大人タグとは共存できない', en: 'Small, childlike body proportions. Conflicts with adult/mature tags' },
@@ -187,6 +189,7 @@ export const TAG_DICT = {
   'motion blur':           { ja: '動いている物体がブレる表現。スピード・躍動感が出る', en: 'Blurred streaks on moving objects — conveys speed and motion' },
   'lens distortion':       { ja: '魚眼・広角レンズのような画面の歪み', en: 'Barrel or fisheye distortion from a wide-angle lens' },
   'noise texture':         { ja: '画面全体にランダムなノイズ・ざらつきを加えるテクスチャ', en: 'Random visual noise layered over the image' },
+  'silhouette':            { ja: 'キャラを黒塗りシルエットで描写。逆光・神秘的・スタイリッシュな演出に。認識率が非常に高い', en: 'Character rendered as a dark silhouette — dramatic backlit or mysterious compositions; very high recognition rate' },
   'magic circle':          { ja: '幾何学的な文様の魔法陣。召喚・魔法系の演出に', en: 'Geometric magical summoning circle' },
   'glowing tattoo':        { ja: '皮膚上で発光する文様・ルーン。魔法系キャラに映える', en: 'Luminous glowing markings or runes on skin' },
 
@@ -232,6 +235,8 @@ export const TAG_DICT = {
   'mole under eye':        { ja: '目の下の涙ぼくろ。色気・ミステリアスな印象を加える定番のポイント', en: 'Beauty mark / tear mole below the eye — adds allure or a mysterious quality' },
   'nose blush':            { ja: '鼻先まで広がった赤み。アニメ特有の照れ・幼さを強調する表現', en: 'Blush that extends over the nose — exaggerated anime-style shyness or innocence' },
   'glitter':               { ja: 'ラメ・グリッターのキラキラした輝き。フェス系メイクやファンタジー演出に', en: 'Sparkling glitter or shimmer effect — festive makeup or magical character look' },
+  'sweatdrop':             { ja: 'こめかみに飛ぶアニメ的な汗マーク。困惑・ツッコミ・焦りなどコミカルなリアクションに使う', en: 'Anime-style sweat bead flying off the temple — used for comic awkwardness or nervous reactions' },
+  'steam':                 { ja: '頭の上から蒸気が出るアニメ的演出。照れ・怒り・過熱した感情の定番コミカル表現', en: 'Steam rising from the head — classic anime shorthand for embarrassment, anger, or overexcitement' },
 
   // ── 種族・特殊 ────────────────────────────────────────────────
   'kemonomimi':            { ja: '獣耳を持つ人間キャラの総称。猫娘より広い概念でどの獣耳でも使える汎用タグ', en: 'Generic term for animal-eared human characters — broader than catgirl; covers any animal ear type' },
@@ -250,6 +255,8 @@ export const TAG_DICT = {
   'cleavage cutout':       { ja: '胸元部分を四角や丸く切り抜いたデザイン。谷間の露出を意図的に強調する', en: 'Opening cut into the chest area of an outfit — deliberately frames or exposes cleavage' },
   'navel cutout':          { ja: 'おへそ周辺を切り抜いたウィンドウデザイン。へそ出しより局所的なカット', en: 'Small window opening in clothing over the navel — surgical navel exposure in the design' },
   'open shirt':            { ja: 'シャツのボタンを外してはだけた状態。カジュアルな色気・無造作感を演出する', en: 'Shirt worn unbuttoned and open, revealing the chest — casual, effortless allure' },
+  'torn clothes':          { ja: '戦闘・ダメージで破れた衣装。バトル後・緊迫シーンの演出に使う。認識率が高く効果が出やすい', en: 'Clothing torn or shredded — battle damage or dramatic scene; highly responsive tag in AI models' },
+  'partially undressed':   { ja: '衣装を途中まで脱いだ状態。肩・胸・腰などが自然な形で露出する', en: 'Outfit partially removed — natural, non-forced skin exposure at shoulders, chest, or waist' },
 
   // ── アクセサリー ─────────────────────────────────────────────
   'thigh strap':           { ja: '太もも部分に巻きつけるベルトやストラップ。アクション系・セクシー系のアクセントに', en: 'Strap or band worn around the thigh — action, tactical, or sexy outfit accent' },
@@ -275,6 +282,9 @@ export const TAG_DICT = {
   'seiza':                 { ja: '正座。膝を揃えて足の甲の上に座る日本の伝統的な座り方。和風シーンに映える', en: 'Traditional Japanese sitting posture — kneeling with shins on the floor; suits Japanese settings' },
   'floating':              { ja: '地面から浮かんでいるポーズ。魔法・念力・霊体などの演出に', en: 'Character hovering above the ground — implies magic, psychic power, or supernatural nature' },
   'arms behind head':      { ja: '両腕を頭の後ろで組むポーズ。脇を見せる定番構図。リラックス・余裕・自信ある雰囲気に', en: 'Both arms raised and clasped behind the head — relaxed, confident pose that exposes the underarms' },
+  'arms up':               { ja: '両腕を頭上に向けて挙げるポーズ。万歳・ストレッチ・降伏・興奮など幅広い状況に使える汎用タグ', en: 'Both arms raised overhead — versatile pose for cheering, stretching, surrender, or excitement' },
+  'contrapposto':          { ja: 'コントラポスト。体重を片足に乗せ、腰と肩のラインを逆方向に傾けたS字立ちポーズ。認識率が高く自然な色気が出る', en: 'Classic contrapposto stance — weight on one leg, hips and shoulders counter-tilted into an S-curve; high recognition rate' },
+  'looking over shoulder': { ja: '片方の肩越しに視線を送るポーズ。艶やか・謎めいた後ろ半振り向きの定番演出', en: 'Glancing back over one shoulder — alluring, mysterious partial-turn pose' },
   'split':                 { ja: '両脚を180度に開いた開脚ポーズ。柔軟性・ダンス・バトル系のキャラに映える', en: 'Legs spread 180° flat on the ground — showcases flexibility; suits dancers or fighters' },
   'pinup':                 { ja: 'ピンナップポスター風のポーズ。レトロ・官能的でエレガントな魅せ方。50年代のイラスト文化に由来', en: 'Classic pin-up poster pose — retro, alluring, and elegant; inspired by 1940s–50s poster art style' },
 

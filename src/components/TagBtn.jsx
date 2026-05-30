@@ -45,9 +45,8 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
     : 'rgb(var(--text) / 0.9)';
 
   const calcTipPos = (rect) => {
-    const TW = 210, PAD = 6, vw = window.innerWidth || 375;
-    const raw = Math.round(rect.left + rect.width / 2);
-    return { x: Math.max(TW / 2 + PAD, Math.min(vw - TW / 2 - PAD, raw)), y: Math.round(rect.top) };
+    const vw = window.innerWidth || 375;
+    return { x: Math.round(vw / 2), y: Math.round(rect.top) };
   };
 
   const handleEnter = () => {
@@ -100,18 +99,23 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
           position: 'fixed',
           left: tipPos.x,
           top: tipPos.y,
-          transform: 'translate(-50%, calc(-100% - 8px))',
+          transform: 'translate(-50%, calc(-100% - 10px))',
           zIndex: 9999,
           background: 'rgba(6,8,18,0.96)',
-          border: '1px solid rgba(255,255,255,0.11)',
-          borderRadius: 8,
-          padding: '8px 13px',
-          maxWidth: 280,
+          border: '1px solid rgba(255,255,255,0.13)',
+          borderRadius: 10,
+          padding: '9px 14px 10px',
+          width: 300,
+          maxWidth: 'calc(100vw - 24px)',
           pointerEvents: 'none',
-          boxShadow: '0 6px 20px rgba(0,0,0,0.5)',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.55)',
           whiteSpace: 'normal',
+          wordBreak: 'break-word',
         }}>
-          <div style={{ fontSize: 12, fontFamily: 'monospace', color: 'rgba(255,255,255,0.88)', lineHeight: 1.6 }}>
+          <div style={{ fontSize: 9, fontFamily: 'monospace', color: 'rgba(255,255,255,0.38)', letterSpacing: '0.07em', marginBottom: 5, textTransform: 'uppercase' }}>
+            {tag.en}
+          </div>
+          <div style={{ fontSize: 12, fontFamily: 'monospace', color: 'rgba(255,255,255,0.88)', lineHeight: 1.7 }}>
             {lang === 'ja' ? desc.ja : desc.en}
           </div>
           <div style={{
@@ -141,7 +145,7 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
         {selectMode && selected ? '☑ ' : selectMode ? '☐ ' : ''}
         {lang === 'ja' ? tag.ja : tag.en}
       </button>
-      {onToggleFav && !selectMode && ((active && h) || isFav) && (
+      {onToggleFav && !selectMode && ((active && (h || IS_TOUCH)) || isFav) && (
         <button
           onClick={e => { e.stopPropagation(); onToggleFav(); }}
           className={`bg-transparent border-l border-dim cursor-pointer leading-none ${large ? 'px-[0.4375rem] py-1.5 text-[0.8125rem]' : 'px-[0.3125rem] py-[0.1875rem] text-[0.625rem]'} ${isFav ? 'text-warn' : 'text-muted'}`}

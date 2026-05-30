@@ -46,6 +46,10 @@ export const CONFLICT_RULES = [
   { tags:['closed mouth','tongue out'],  ja:'口を閉じて舌が出せない',          en:'closed mouth + tongue out' },
 
   // ── 表情 ───────────────────────────────────────────────────────
+  { tags:['smug','expressionless'],      ja:'ドヤ顔と無表情が矛盾',           en:'smug + expressionless' },
+  { tags:['smug','serious'],             ja:'ドヤ顔と真剣が矛盾',             en:'smug + serious' },
+  { tags:['smug','sad'],                 ja:'ドヤ顔と悲しいが矛盾',           en:'smug + sad' },
+  { tags:['smug','crying'],              ja:'ドヤ顔と泣いているが矛盾',       en:'smug + crying' },
   { tags:['smile','expressionless'],     ja:'笑顔と無表情が矛盾',             en:'smile + expressionless' },
   { tags:['grin','expressionless'],      ja:'笑顔と無表情が矛盾',             en:'grin + expressionless' },
   { tags:['smile','serious'],            ja:'笑顔と真剣が矛盾',               en:'smile + serious' },
@@ -82,6 +86,13 @@ export const CONFLICT_RULES = [
   { tags:['sleeping','running'],         ja:'眠りと走りが矛盾',               en:'sleeping + running' },
   { tags:['sleeping','dancing'],         ja:'眠りとダンスが矛盾',             en:'sleeping + dancing' },
   { tags:['sleeping','fighting stance'], ja:'眠りと戦闘ポーズが矛盾',         en:'sleeping + fighting stance' },
+  { tags:['sleeping','arms up'],         ja:'眠りと両腕上げが矛盾',           en:'sleeping + arms up' },
+  { tags:['contrapposto','sitting'],     ja:'S字立ちと座りが矛盾',            en:'contrapposto + sitting' },
+  { tags:['contrapposto','lying on back'],ja:'S字立ちと仰向けが矛盾',         en:'contrapposto + lying on back' },
+  { tags:['contrapposto','lying on stomach'],ja:'S字立ちとうつ伏せが矛盾',   en:'contrapposto + lying on stomach' },
+  { tags:['contrapposto','seiza'],       ja:'S字立ちと正座が矛盾',            en:'contrapposto + seiza' },
+  { tags:['contrapposto','all fours'],   ja:'S字立ちと四つん這いが矛盾',      en:'contrapposto + all fours' },
+  { tags:['contrapposto','sleeping'],    ja:'S字立ちと眠りが矛盾',            en:'contrapposto + sleeping' },
 
   // ── 人数 ─────────────────────────────────────────────────────
   { tags:['solo','2girls'],              ja:'ひとりと女の子2人が矛盾',         en:'solo + 2girls' },
@@ -128,6 +139,7 @@ export const CONFLICT_RULES = [
   { tags:['extreme perspective','simple background'], level:'warn', ja:'極端なパースとシンプル背景（パース効果が薄れる）', en:'extreme perspective + simple background (perspective reduced)' },
 
   // ── カメラ角度 ─────────────────────────────────────────────────
+  { tags:['front view','looking over shoulder'], level:'warn', ja:'正面向きと肩越しの振り返りが不自然', en:'front view + looking over shoulder (anatomically awkward)' },
   { tags:['from above','from below'],          ja:'見上げと見下ろしが矛盾',          en:'from above + from below' },
   { tags:['front view','back view'],           ja:'正面と後ろ向きが矛盾',            en:'front view + back view' },
   // 横向き構図 × 視聴者への直接アクション（横顔でカメラ目線・手差しは不自然 → warn）
@@ -379,6 +391,11 @@ export const CONFLICT_RULES = [
   ...mk('bob cut',
     ['twin tails','braid','hair updo','hair bun','double bun'],
     'ボブカットと長さが必要な髪型が矛盾'),
+
+  // ── 短い髪 × hair spread out ────────────────────────────────────
+  ...mk('very short hair', ['hair spread out'], '超ショートヘアでは広がる髪が矛盾'),
+  ...mk('short hair',      ['hair spread out'], 'ショートヘアでは広がる髪が矛盾'),
+  ...mk('pixie cut',       ['hair spread out'], 'ピクシーカットでは広がる髪が矛盾'),
 ];
 
 export const detectConflicts = text => {

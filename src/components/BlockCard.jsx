@@ -206,7 +206,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
       >
         {/* LEFT: drag + move + toggle + badge + icon + name — takes all available space */}
         {/* On mobile: w-full forces full row → buttons wrap to row 2 and right-align via ml-auto */}
-        <div className={`flex items-start gap-1.5 ${isMobile ? 'w-full' : 'flex-1 min-w-[8.125rem]'}`}>
+        <div className={`flex items-start gap-1.5 ${isMobile ? 'flex-1 min-w-0' : 'flex-1 min-w-[8.125rem]'}`}>
         {/* Drag handle */}
         <button
           {...listeners}
@@ -322,7 +322,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               color: saving ? blockColor : 'rgb(var(--muted))',
             }}
             className="rounded-[0.3125rem] px-[0.4375rem] py-0.5 text-[0.625rem] cursor-pointer"
-          >💾{!isMobile && (lang === 'ja' ? '保存' : ' Save')}</button>
+          >💾 {lang === 'ja' ? '保存' : 'Save'}</button>
         )}
 
         {/* Tag count — same height as adjacent buttons */}
@@ -376,13 +376,13 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               className="bg-transparent border border-dim rounded-[0.3125rem] px-[0.3125rem] py-0.5 text-dim text-[0.625rem] cursor-pointer"
             >→</button>
             {transferOpen && (
-              <div className="absolute right-0 top-full mt-1 z-50 bg-surface border border-linebright rounded-lg overflow-hidden shadow-lg min-w-[7.5rem]">
+              <div className="absolute right-0 top-full mt-1 z-50 bg-surface border border-linebright rounded-lg overflow-hidden shadow-lg min-w-[7.5rem] max-w-[10rem]">
                 {otherChars.map(c => (
                   <button key={c.id} onClick={() => { onTransfer?.(block.id, c.id); setTransferOpen(false); }}
                     className="w-full text-left px-2.5 py-1.5 text-[0.6875rem] text-fg cursor-pointer flex items-center gap-1"
                     onMouseOver={e => e.currentTarget.style.background = 'rgb(var(--surface-alt))'}
                     onMouseOut={e => e.currentTarget.style.background = ''}>
-                    <span>{c.emoji}</span><span style={{ color: c.color }}>{c.name}</span>
+                    <span className="flex-shrink-0">{c.emoji}</span><span style={{ color: c.color }} className="truncate">{c.name}</span>
                   </button>
                 ))}
               </div>
@@ -577,7 +577,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   onClick={isJumpable ? () => handleChipJump(bare) : undefined}
                   title={isJumpable ? (lang === 'ja' ? 'クリックでジャンプ' : 'Click to jump') : undefined}
                   style={{ background: blockColor + '15', border: `1px solid ${blockColor}50`, color: blockColor }}
-                  className={`inline-flex items-center rounded font-mono ${focusMode ? 'px-2 py-[0.1875rem] text-xs' : 'px-1.5 py-0.5 text-[0.6875rem]'}${isJumpable ? ' cursor-pointer' : ''}`}
+                  className={`inline-flex items-center rounded font-mono ${focusMode ? 'px-2 py-[0.1875rem] text-xs' : 'px-1.5 py-0.5 text-[0.6875rem]'}${isJumpable ? ' cursor-pointer underline underline-offset-2 decoration-1' : ''}`}
                 >
                   {label}
                 </span>
@@ -613,6 +613,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
 
           {/* Strength + controls row */}
           <div className="my-[0.5625rem] mb-[0.6875rem]">
+            <div className={isMobile ? 'relative' : undefined}>
             <div className={`flex items-center ${isMobile ? 'flex-nowrap overflow-x-auto gap-[0.1875rem]' : `flex-wrap ${isCompact ? 'gap-[0.1875rem]' : 'gap-[0.3125rem]'}`}`}>
               <span className={`${focusMode ? 'text-[0.8125rem]' : 'text-[0.625rem]'} font-mono font-semibold text-muted`}>{lang === 'ja' ? '強度:' : 'Str:'}</span>
 
@@ -630,7 +631,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               ))}
 
               {/* ±0.05 fine adjust */}
-              <div className="flex items-center gap-0.5 ml-0.5">
+              <div className="flex items-center gap-0 ml-[0.1875rem]">
                 <button disabled={isLocked} onClick={() => adjustWeight(-0.05)} title="-0.05"
                   className={`bg-transparent border border-dim text-muted rounded-[5px_0_0_5px] cursor-pointer disabled:cursor-default font-mono ${focusMode ? 'px-[0.5625rem] py-[0.3125rem] text-sm' : 'px-1.5 py-0.5 text-[0.6875rem]'}`}>−</button>
                 <span
@@ -747,9 +748,11 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   }}
                   title={lang === 'ja' ? (displayPicks.length > 0 ? '再抽選' : 'ランダムでタグ追加') : (displayPicks.length > 0 ? 'Re-roll' : 'Add random tags')}
                   style={displayPicks.length > 0 ? { borderColor: blockColor, color: blockColor } : undefined}
-                  className={`border border-dim text-muted rounded-[0.3125rem] cursor-pointer font-mono ${focusMode ? 'px-[0.5625rem] py-[0.3125rem] text-sm' : 'px-2 py-1 text-[0.8125rem] min-h-[1.75rem]'}`}
+                  className={`border border-dim text-muted rounded-[0.3125rem] cursor-pointer font-mono ${focusMode ? 'px-[0.5625rem] py-[0.3125rem] text-sm' : 'px-1.5 py-0.5 text-[0.75rem]'}`}
                 >🎲{displayPicks.length > 0 ? ' ↻' : ''}</button>
               )}
+            </div>
+            {isMobile && <div aria-hidden className="pointer-events-none absolute right-0 top-0 h-full w-5" style={{ background: 'linear-gradient(to left, rgb(var(--surface)), transparent)' }} />}
             </div>
 
             {/* Search — always on its own row for clean layout */}
@@ -920,7 +923,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                       }}
                       onMouseOver={e => e.target.style.color = '#f87171'}
                       onMouseOut={e => e.target.style.color = ''}
-                      className="bg-transparent border-l border-line text-dim px-[0.3125rem] py-[0.1875rem] cursor-pointer text-[0.5625rem]"
+                      className="bg-transparent border-l border-line text-dim px-2 py-1 cursor-pointer text-xs min-w-[1.75rem] flex items-center justify-center"
                     >✕</button>
                   </div>
                 ))}

@@ -301,9 +301,11 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
           <div className="flex items-center gap-[0.4375rem]">
             <span className="text-muted text-[0.625rem] font-mono whitespace-nowrap">{lang === 'ja' ? 'テーマ' : 'Theme'}</span>
             <button onClick={onToggleTheme}
+              title={lang === 'ja' ? `${theme === 'dark' ? 'ライト' : 'ダーク'}テーマに切替` : `Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
               className="flex items-center gap-[0.3125rem] rounded-[0.3125rem] px-[0.5625rem] py-1 text-[0.6875rem] font-mono font-bold cursor-pointer border transition-all duration-150 bg-surfalt border-line text-fg">
               {theme === 'dark' ? '🌙' : '☀️'}
               <span>{theme === 'dark' ? (lang === 'ja' ? 'ダーク' : 'Dark') : (lang === 'ja' ? 'ライト' : 'Light')}</span>
+              <span className="text-[0.5625rem] text-dim font-normal">{lang === 'ja' ? '→切替' : '→'}</span>
             </button>
           </div>
           {/* Language */}
@@ -513,31 +515,51 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                     {section.category}
                   </div>
                   <div className="rounded-[0.625rem] overflow-hidden border border-line">
-                    {/* Header row */}
-                    <div className="grid grid-cols-[1fr_1fr_1fr] bg-surfalt border-b border-line">
-                      <div className="px-2.5 py-1.5 text-[0.5625rem] font-mono text-muted uppercase tracking-[0.08em]">
-                        {lang === 'ja' ? '機能' : 'Feature'}
-                      </div>
-                      <div className="px-2.5 py-1.5 text-[0.5625rem] font-mono text-muted uppercase tracking-[0.08em] border-l border-line">
-                        📱 {lang === 'ja' ? 'スマホ' : 'Mobile'}
-                      </div>
-                      <div className="px-2.5 py-1.5 text-[0.5625rem] font-mono text-muted uppercase tracking-[0.08em] border-l border-line">
-                        💻 PC
-                      </div>
-                    </div>
-                    {section.rows.map((row, i) => (
-                      <div key={i} className={`grid grid-cols-[1fr_1fr_1fr] ${i < section.rows.length - 1 ? 'border-b border-line' : ''}`}>
-                        <div className="px-2.5 py-2 text-[0.6875rem] text-muted font-mono">
-                          {row.feature}
+                    {isMobile ? (
+                      section.rows.map((row, i) => (
+                        <div key={i} className={`px-3 py-2.5 ${i < section.rows.length - 1 ? 'border-b border-line' : ''}`}>
+                          <div className="text-[0.625rem] font-mono text-muted mb-1.5">{row.feature}</div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <div className="text-[0.5625rem] font-mono text-dim mb-1">📱 {lang === 'ja' ? 'スマホ' : 'Mobile'}</div>
+                              <div className={`text-xs leading-snug ${row.mobileNa ? 'text-dim line-through' : 'text-fg'}`}>{row.mobile}</div>
+                            </div>
+                            <div>
+                              <div className="text-[0.5625rem] font-mono text-dim mb-1">💻 PC</div>
+                              <div className={`text-xs leading-snug ${row.pcNa ? 'text-dim line-through' : 'text-fg'}`}>{row.pc}</div>
+                            </div>
+                          </div>
                         </div>
-                        <div className={`px-2.5 py-2 text-[0.6875rem] border-l border-line leading-snug ${row.mobileNa ? 'text-dim' : 'text-fg'}`}>
-                          {row.mobile}
+                      ))
+                    ) : (
+                      <>
+                        {/* Header row */}
+                        <div className="grid grid-cols-[1fr_1fr_1fr] bg-surfalt border-b border-line">
+                          <div className="px-2.5 py-1.5 text-[0.5625rem] font-mono text-muted uppercase tracking-[0.08em]">
+                            {lang === 'ja' ? '機能' : 'Feature'}
+                          </div>
+                          <div className="px-2.5 py-1.5 text-[0.5625rem] font-mono text-muted uppercase tracking-[0.08em] border-l border-line">
+                            📱 {lang === 'ja' ? 'スマホ' : 'Mobile'}
+                          </div>
+                          <div className="px-2.5 py-1.5 text-[0.5625rem] font-mono text-muted uppercase tracking-[0.08em] border-l border-line">
+                            💻 PC
+                          </div>
                         </div>
-                        <div className={`px-2.5 py-2 text-[0.6875rem] border-l border-line leading-snug ${row.pcNa ? 'text-dim' : 'text-fg'}`}>
-                          {row.pc}
-                        </div>
-                      </div>
-                    ))}
+                        {section.rows.map((row, i) => (
+                          <div key={i} className={`grid grid-cols-[1fr_1fr_1fr] ${i < section.rows.length - 1 ? 'border-b border-line' : ''}`}>
+                            <div className="px-2.5 py-2 text-[0.6875rem] text-muted font-mono">
+                              {row.feature}
+                            </div>
+                            <div className={`px-2.5 py-2 text-[0.6875rem] border-l border-line leading-snug ${row.mobileNa ? 'text-dim' : 'text-fg'}`}>
+                              {row.mobile}
+                            </div>
+                            <div className={`px-2.5 py-2 text-[0.6875rem] border-l border-line leading-snug ${row.pcNa ? 'text-dim' : 'text-fg'}`}>
+                              {row.pc}
+                            </div>
+                          </div>
+                        ))}
+                      </>
+                    )}
                   </div>
                 </div>
               ))}
