@@ -8,8 +8,8 @@ const SHORTCUTS = (lang) => [
     group: lang === 'ja' ? '出力' : 'Output',
     items: [
       { keys: ['Ctrl', 'Enter'], action: lang === 'ja' ? 'プロンプトをコピー' : 'Copy prompt' },
-      { keys: ['P'], action: lang === 'ja' ? 'Positive タブに切替' : 'Switch to Positive tab' },
-      { keys: ['N'], action: lang === 'ja' ? 'Negative タブに切替' : 'Switch to Negative tab' },
+      { keys: ['P'], action: lang === 'ja' ? 'ポジティブタブに切替' : 'Switch to Positive tab' },
+      { keys: ['N'], action: lang === 'ja' ? 'ネガティブタブに切替' : 'Switch to Negative tab' },
     ],
   },
   {
@@ -409,7 +409,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                 <>
                   <p className="text-muted text-[0.6875rem] font-mono bg-surfalt rounded-[0.4375rem] px-3 py-2">
                     {lang === 'ja'
-                      ? '⚠️ テキスト入力中（input / textarea フォーカス時）は無効です'
+                      ? '⚠️ テキスト欄に入力中はショートカットが無効になります'
                       : '⚠️ Shortcuts are inactive while typing in input / textarea fields'}
                   </p>
                   {SHORTCUTS(lang).map(group => (
