@@ -24,6 +24,7 @@ import HistoryModal from "./components/modals/HistoryModal.jsx";
 import ComparePanel from "./components/modals/ComparePanel.jsx";
 import TemplateModal from "./components/modals/TemplateModal.jsx";
 import ColorPickerModal from "./components/modals/ColorPickerModal.jsx";
+import FeatureMakerModal from "./components/modals/FeatureMakerModal.jsx";
 import SceneComposeModal from "./components/modals/SceneComposeModal.jsx";
 import SettingsModal from "./components/modals/SettingsModal.jsx";
 import SupportModal from "./components/modals/SupportModal.jsx";
@@ -133,6 +134,8 @@ export default function Loom() {
   const [saveStatus, setSaveStatus] = useState('');
   const [theme, setTheme] = useState('light');
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
+  const [featureMakerOpen, setFeatureMakerOpen] = useState(false);
+  const [featureMakerFilterBlock, setFeatureMakerFilterBlock] = useState(null);
   const [sceneOpen, setSceneOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
@@ -320,9 +323,9 @@ export default function Loom() {
   }, [characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight, orderUpdatedAt, settingsUpdatedAt, loaded]);
 
   // ── Color picker apply ──
-  const TARGET_TO_BLOCK = { hair: 'face', inner_hair: 'face', eyes: 'face', heterochromia: 'face', skin: 'body', dress: 'outfit', shirt: 'outfit', skirt: 'outfit', jacket: 'outfit', ribbon: 'outfit', shoes: 'outfit', theme: 'artstyle' };
+  const TARGET_TO_BLOCK = { hair: 'face', inner_hair: 'face', bangs: 'face', bang_streak: 'face', forelock: 'face', hair_tips: 'face', sidelocks: 'face', eyes: 'face', heterochromia: 'face', skin: 'body', dress: 'outfit', shirt: 'outfit', skirt: 'outfit', jacket: 'outfit', ribbon: 'outfit', accents: 'outfit', trim: 'outfit', embroidery: 'outfit', lace: 'outfit', shoes: 'outfit', theme: 'artstyle' };
   const BLOCK_TO_COLOR_TARGET   = { face: 'hair', body: 'skin', outfit: 'dress', artstyle: 'theme' };
-  const BLOCK_TO_ALLOWED_TARGETS = { face: ['hair','inner_hair','eyes','heterochromia'], body: ['skin'], outfit: ['dress','shirt','skirt','jacket','ribbon','shoes'], artstyle: ['theme'] };
+  const BLOCK_TO_ALLOWED_TARGETS = { face: ['hair','inner_hair','bangs','bang_streak','forelock','hair_tips','sidelocks','eyes','heterochromia'], body: ['skin'], outfit: ['dress','shirt','skirt','jacket','ribbon','accents','trim','embroidery','lace','shoes'], artstyle: ['theme'] };
 
   const applyColorTag = (shadeEn, colorEn, targetEn, targetId, shade2En = '', color2En = '') => {
     if (targetId === 'heterochromia') {
@@ -364,6 +367,20 @@ export default function Loom() {
     const msg = lang === 'ja'
       ? `🎨 ${blockName}に「${labelJa}」を追加`
       : `🎨 "${tag}" added to ${blockName}`;
+    setColorToast({ msg });
+    setTimeout(() => setColorToast(null), 3000);
+  };
+
+  const applyFeatureTag = (tag, blockId) => {
+    const resolvedId = blockId || 'feature';
+    setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : {
+      ...c,
+      blocks: c.blocks.map(b => b.id !== resolvedId ? b : {
+        ...b, text: appendTag(b.text, tag, '1.0'), enabled: true, collapsed: false,
+      }),
+    }));
+    const blockName = blocks.find(b => b.id === resolvedId)?.[lang === 'ja' ? 'name' : 'nameEn'] ?? resolvedId;
+    const msg = lang === 'ja' ? `🎯 ${blockName}に「${tag}」を追加` : `🎯 "${tag}" added to ${blockName}`;
     setColorToast({ msg });
     setTimeout(() => setColorToast(null), 3000);
   };
@@ -857,7 +874,8 @@ export default function Loom() {
         if (settingsOpen)     { setSettingsOpen(false);     return; }
         if (historyOpen)      { setHistoryOpen(false);      return; }
         if (templateOpen)     { setTemplateOpen(false);     return; }
-        if (colorPickerOpen)  { setColorPickerOpen(false);  return; }
+        if (colorPickerOpen)   { setColorPickerOpen(false);   return; }
+        if (featureMakerOpen)  { setFeatureMakerOpen(false);  return; }
         if (sceneOpen)        { setSceneOpen(false);        return; }
         if (analyzeOpen)      { setAnalyzeOpen(false); setAnalyzeText(''); return; }
         if (quickOpen)        { setQuickOpen(false);        return; }
@@ -910,7 +928,7 @@ export default function Loom() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paletteOpen, globalSearchOpen, libraryOpen, analyzeOpen, historyOpen, templateOpen, colorPickerOpen, sceneOpen, settingsOpen, focusBlockId,
+  }, [paletteOpen, globalSearchOpen, libraryOpen, analyzeOpen, historyOpen, templateOpen, colorPickerOpen, featureMakerOpen, sceneOpen, settingsOpen, focusBlockId,
       activeCharId, currentText, posText, negText, activeChar]);
 
   // DALL-E selected → auto-switch to natural language tab; leaving DALL-E → back to positive
@@ -1130,7 +1148,8 @@ export default function Loom() {
     { id: 'image-to-tags', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🖼️', label: 'Image → tags (AI)', labelJa: '画像からタグ生成（AI）', action: () => { setNaturalToTagsTab('image'); setNaturalToTagsOpen(true); } },
     { id: 'open-history', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🕐', label: 'Open history', labelJa: '履歴を開く', shortcut: 'H', action: () => setHistoryOpen(true) },
     { id: 'open-template', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '✦', label: 'Open templates', labelJa: 'テンプレートを開く', shortcut: 'T', action: () => setTemplateOpen(true) },
-    { id: 'open-color', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎨', label: 'Open color picker', labelJa: 'カラーピッカーを開く', action: () => setColorPickerOpen(true) },
+    { id: 'open-color',   group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎨', label: 'Open color picker',   labelJa: 'カラーメイカーを開く',  action: () => setColorPickerOpen(true) },
+    { id: 'open-feature', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎯', label: 'Open feature maker',  labelJa: '特徴メーカーを開く',   action: () => setFeatureMakerOpen(true) },
     ...(characters.length > 1 ? [{ id: 'open-scene', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎬', label: 'Open scene compose', labelJa: 'シーン合成を開く', action: () => setSceneOpen(true) }] : []),
     { id: 'open-settings', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '⚙️', label: 'Open settings / shortcuts', labelJa: '設定・ショートカット', shortcut: '?', action: () => setSettingsOpen(true) },
     // AI Tools
@@ -1224,6 +1243,11 @@ export default function Loom() {
                   className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
                   style={{ color: 'rgb(var(--c-purple))' }}>
                   🎨 {lang === 'ja' ? 'カラー' : 'Color'}
+                </button>
+                <button onClick={() => { setFeatureMakerFilterBlock(null); setFeatureMakerOpen(true); setQuickOpen(false); }}
+                  className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
+                  style={{ color: 'rgb(var(--c-purple))' }}>
+                  🎯 {lang === 'ja' ? '特徴' : 'Feature'}
                 </button>
                 {characters.length > 1 && (
                   <button onClick={() => { setSceneOpen(true); setQuickOpen(false); }}
@@ -1713,6 +1737,7 @@ export default function Loom() {
                   allBlocks={blocks}
                   onUndoBackup={templateUndoBuf?.blockTexts[block.id] !== undefined ? () => undoSingleBlock(block.id) : undefined}
                   onColorPicker={BLOCK_TO_COLOR_TARGET[block.id] ? () => openColorPicker(BLOCK_TO_COLOR_TARGET[block.id], BLOCK_TO_ALLOWED_TARGETS[block.id]) : undefined}
+                  onFeatureMaker={['face','feature','body','outfit'].includes(block.id) ? () => { setFeatureMakerFilterBlock(block.id); setFeatureMakerOpen(true); } : undefined}
                   isLight={theme === 'light'} />
               );
 
@@ -2525,6 +2550,7 @@ export default function Loom() {
       {naturalToTagsOpen && <NaturalToTagsModal lang={lang} apiConfig={apiConfig} blocks={blocks} onAddTags={handleAddTagsFromNatural} onClose={() => setNaturalToTagsOpen(false)} initialTab={naturalToTagsTab} />}
       {templateOpen && <TemplateModal lang={lang} isMobile={isMobile} onApply={applyTemplate} onClose={() => setTemplateOpen(false)} />}
       {colorPickerOpen && <ColorPickerModal lang={lang} onApply={applyColorTag} onClose={() => setColorPickerOpen(false)} defaultTarget={colorPickerDefaultTarget} allowedTargets={colorPickerAllowedTargets} />}
+      {featureMakerOpen && <FeatureMakerModal lang={lang} blocks={blocks} onApply={applyFeatureTag} onClose={() => setFeatureMakerOpen(false)} filterBlockId={featureMakerFilterBlock} />}
       {sceneOpen && <SceneComposeModal characters={characters} lang={lang} activeTool={activeTool} theme={theme} onClose={() => setSceneOpen(false)} defaultQuality={blocks.find(b => b.id === 'quality')?.text || ''} />}
       {supportOpen && <SupportModal lang={lang} isMobile={isMobile} onClose={() => setSupportOpen(false)} />}
       {settingsOpen && <SettingsModal lang={lang} isMobile={isMobile} defaultTab={settingsTab} onClose={() => { setSettingsOpen(false); setSettingsTab('shortcuts'); }}

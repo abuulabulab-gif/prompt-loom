@@ -110,6 +110,14 @@ export const TAG_DICT = {
   'sweater vest':          { ja: 'セーターベスト（袖なしニット）。カジュアル知的系のアカデミックファッション', en: 'Sleeveless knit vest — academic or preppy style' },
   'cloak':                 { ja: 'クローク。肩から羽織る袖なしのマント状の外套。ファンタジー系に', en: 'Sleeveless outer robe draped over the shoulders — fantasy or medieval style' },
   'sleeveless':            { ja: 'ノースリーブ。袖がない衣装の総称。肩・二の腕・脇が露出し、軽快でアクティブな印象', en: 'Any top with no sleeves — exposes shoulders and upper arms; sporty or summer feel' },
+  'slit skirt':            { ja: '裾に深いスリット（切れ込み）が入ったスカート。脚の動きと色気を同時に演出する', en: 'Skirt with a deep slit at the hem — adds movement and a sensual leg line' },
+  'side slit':             { ja: '衣装の側面に入ったスリット。スカート・ドレス・チャイナドレスに多い。脚のラインが見える', en: 'Opening cut into the side of a garment — exposes the leg; common in dresses and cheongsam' },
+  'open back':             { ja: '背中が大きく開いたデザイン。エレガントな露背スタイルで、素材を問わず使われる', en: 'Garment with a low-cut or fully exposed back — elegant skin reveal at the rear' },
+  'side cutout':           { ja: '衣装の側面をくり抜いたデザイン。ウエストや脇腹のラインを強調する現代的なカット', en: 'Cutout on the side of the outfit — reveals the waist or flank; modern, sculptural design' },
+  'preppy':                { ja: 'プレッピースタイル。アメリカのアイビーリーグ文化由来の清潔感ある上品カジュアル。ポロシャツ・チェック・ニット系に合う', en: 'Ivy League–inspired clean-cut casual style — polo shirts, plaid, and knit sweaters' },
+  'gothic':                { ja: 'ゴシック調のスタイル修飾語。暗め・荘厳・ヴィクトリアン要素を衣装に加える。ゴスロリと違いアウトフィット全体のスタイルを変える', en: 'Style modifier that adds dark, Victorian, or solemn Gothic elements to an outfit — broader than gothic lolita' },
+  'streetwear':            { ja: 'ストリートウェア。ヒップホップ・スケーター文化由来の都市型カジュアル。ビッグシルエット・ロゴ・スニーカーが定番', en: 'Urban casual fashion rooted in hip-hop/skate culture — oversized fits, logos, and sneakers' },
+  'high fashion':          { ja: 'ハイファッション。ランウェイ発のハイブランド・前衛的デザイナーズ系スタイル。鋭いシルエットと独創的な素材感が特徴', en: 'Runway-level designer fashion — sharp silhouettes, unconventional materials, avant-garde aesthetics' },
 
   // ── 特殊パーツ ────────────────────────────────────────────────
   'ball joints':           { ja: '球体関節人形のような球形のジョイントパーツ。ドール系キャラに', en: 'Spherical ball-and-socket joints at limbs — doll aesthetic' },

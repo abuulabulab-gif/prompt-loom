@@ -279,6 +279,41 @@ function pickBlockTagsBoosted(block, globalExcluded, boostTags, hist = []) {
   return picks;
 }
 
+function applyIllustSoftPenalties(blockMap) {
+  const allTags = new Set();
+  for (const [, b] of blockMap) {
+    if (!b.text) continue;
+    for (const seg of splitTags(b.text)) allTags.add(bareTag(seg).toLowerCase());
+  }
+
+  // extreme/face close-up時: 体型・胸・全身ポーズ・遠景背景をSoft Penalty（70%確率で除去）
+  const hasStrongCloseUp = allTags.has('extreme close-up') || allTags.has('face close-up');
+  if (hasStrongCloseUp) {
+    for (const [id, b] of blockMap) {
+      if (!b.text || b.locked) continue;
+      const segs = splitTags(b.text);
+      const filtered = segs.filter(seg =>
+        !ILLUST_MODE_CONFIG.closeupSoftPenaltyTags.has(bareTag(seg).toLowerCase()) || Math.random() > 0.70
+      );
+      if (filtered.length !== segs.length)
+        blockMap.set(id, { ...b, text: filtered.join(', ') });
+    }
+  }
+
+  // 顔隠しタグ × 顔見せタグのペア: 70%確率で隠しタグを除去
+  for (const [hidingTag, showingTag] of ILLUST_MODE_CONFIG.faceHidePenaltyPairs) {
+    if (allTags.has(hidingTag) && allTags.has(showingTag) && Math.random() < 0.70) {
+      for (const [id, b] of blockMap) {
+        if (!b.text || b.locked) continue;
+        if (hasTag(b.text, hidingTag)) {
+          blockMap.set(id, { ...b, text: removeTag(b.text, hidingTag) });
+          break;
+        }
+      }
+    }
+  }
+}
+
 function applyComboRules(blockMap, fixedBlockIds = null) {
   const allPicked = [];
   for (const [, block] of blockMap) {
@@ -512,6 +547,9 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
           }
         }
       }
+
+      // Illust mode: close-up Soft Penalty + 顔隠しペナルティ
+      if (mode === 'illust') applyIllustSoftPenalties(blockMap);
 
       // 生成履歴を保存（シンプル背景クリア後に実行 → 実際の最終状態を記録）
       const histEntry = {};

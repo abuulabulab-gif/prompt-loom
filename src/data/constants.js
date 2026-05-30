@@ -29,7 +29,7 @@ export const LIMIT_LEN = 750;
 // Categories in this set are "optional" for 🎲 (picked with ~45% chance).
 // Categories NOT in this set are "core" and always get a pick first.
 // Categories picked at reduced probability (~15%) — neither core nor standard optional
-export const RARE_OPT_CAT_NAMES = new Set(['肌質感', 'ピアス・刺青', '装備・ケア']);
+export const RARE_OPT_CAT_NAMES = new Set(['肌質感', 'ピアス・刺青', '装備・ケア', '衣装アクセント']);
 
 export const OPTIONAL_CAT_NAMES = new Set([
   // 顔
@@ -39,7 +39,7 @@ export const OPTIONAL_CAT_NAMES = new Set([
   // 体型（肌色はコア化 → 常に1つ選ばれる）
   '肌質感', '細部', 'ボディフォーカス', '状態', '足',
   // 衣装
-  '素材・装飾', '装飾アクセ',
+  '素材・装飾', '装飾アクセ', '服装スタイル', '衣装アクセント',
   // 特徴
   'ピアス・刺青', '装備・ケア', '武器・小物',
   // エフェクト（全て任意）
@@ -209,14 +209,14 @@ export const RANDOM_EXCLUSION_RULES = new Map([
     'platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
     'ankle socks','socks','knee-high socks','thighhighs','white thighhighs','black thighhighs',
     'pantyhose','leg warmers','barefoot',
-    'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','pants','jeans','leggings',
+    'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','slit skirt','pants','jeans','leggings',
   ])],
   ['lamia', new Set([
     'sneakers','loafers','mary janes','sandals','slippers','heels','pumps','high heels',
     'platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
     'ankle socks','socks','knee-high socks','thighhighs','white thighhighs','black thighhighs',
     'pantyhose','leg warmers','barefoot',
-    'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','pants','jeans','leggings',
+    'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','slit skirt','pants','jeans','leggings',
   ])],
   // 裸足 → フットウェア全般を除外
   ['barefoot', new Set([
@@ -228,6 +228,9 @@ export const RANDOM_EXCLUSION_RULES = new Map([
   // 背景環境の矛盾
   ['underwater',   new Set(['fire','explosion','embers','electricity','lightning','lens flare','god rays','sparkles'])],
   ['outer space',  new Set(['rain','snowfall','wind','mist','fire','explosion','sunlight'])],
+  // 時間帯 × 照明の矛盾（クロスブロック）
+  ['day',   new Set(['moonlight'])],
+  ['night', new Set(['sunlight'])],
   // ポーズの矛盾
   ['lying on back',    new Set(['standing','walking','running','jumping','kneeling','on one knee','crouching','fighting stance','dancing'])],
   ['lying on stomach', new Set(['standing','walking','running','jumping','kneeling','on one knee','crouching','fighting stance'])],
@@ -304,14 +307,14 @@ export const RANDOM_EXCLUSION_RULES = new Map([
     'platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
     'leg warmers','ankle socks','socks','knee-high socks','thighhighs','white thighhighs',
     'black thighhighs','pantyhose','barefoot',
-    'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','pants','jeans','leggings',
+    'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','slit skirt','pants','jeans','leggings',
   ])],
   ['lamia tail', new Set([
     'sneakers','loafers','mary janes','sandals','slippers','heels','pumps','high heels',
     'platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
     'leg warmers','ankle socks','socks','knee-high socks','thighhighs','white thighhighs',
     'black thighhighs','pantyhose','barefoot',
-    'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','pants','jeans','leggings',
+    'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','slit skirt','pants','jeans','leggings',
   ])],
 ]);
 
@@ -414,6 +417,27 @@ export const ILLUST_MODE_CONFIG = {
     'white background','simple background','gradient background',
     'concept art','character design','character sheet','reference sheet','model sheet',
   ]),
+  // extreme/face close-up時にSoft Penalty（70%確率で除去）するタグ
+  closeupSoftPenaltyTags: new Set([
+    // 体型（近距離では見えにくい）
+    'slim','petite','athletic','tall','slender','toned','muscular','curvy','chubby',
+    // 胸サイズ（顔寄り構図では画面外）
+    'flat chest','small breasts','medium breasts','large breasts','huge breasts',
+    // 全身前提ポーズ（LOWER_BODY_FRAME_OUTにないもの）
+    'crouching','floating','kneeling','on one knee','split','lying','on side',
+    // 露出ディテール（close-upでは画面外）
+    'side slit','open back','side cutout','slit skirt',
+    // 遠景背景（close-upではボケ・抽象化されやすく情報が乗りにくい）
+    'mountain','desert','forest','field','lake','castle','waterfall','cityscape',
+  ]),
+  // 顔を隠すタグ × 顔を見せるタグのペア [hidingTag, showingTag]
+  faceHidePenaltyPairs: [
+    ['sunglasses', 'heterochromia'],
+    ['sunglasses', 'eye contact'],
+    ['face mask', 'parted lips'],
+    ['face mask', 'open mouth'],
+    ['eyepatch', 'beautiful detailed eyes'],
+  ],
 };
 
 // ── Utilities ────────────────────────────────────────────────

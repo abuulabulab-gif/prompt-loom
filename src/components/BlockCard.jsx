@@ -40,7 +40,7 @@ const CATS_CLOSED = new Set([
 
 const SCENE_MANAGED_TAGS = new Set(['2girls', '2boys', 'multiple girls', 'multiple boys', '1other']);
 
-export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isFirst, isLast, onSavePreset, onFocus, focused, otherChars, onTransfer, conflictTags, onRemove, onHide, isMobile, isCompact, focusMode, sceneActive, analyzeText, allBlocks, onUndoBackup, isLight, onColorPicker }) {
+export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isFirst, isLast, onSavePreset, onFocus, focused, otherChars, onTransfer, conflictTags, onRemove, onHide, isMobile, isCompact, focusMode, sceneActive, analyzeText, allBlocks, onUndoBackup, isLight, onColorPicker, onFeatureMaker }) {
   const [search, setSearch] = useState('');
   const [saving, setSaving] = useState(false);
   const [pName, setPName] = useState('');
@@ -206,7 +206,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
       >
         {/* LEFT: drag + move + toggle + badge + icon + name — takes all available space */}
         {/* On mobile: w-full forces full row → buttons wrap to row 2 and right-align via ml-auto */}
-        <div className={`flex items-start gap-1.5 ${isMobile ? 'flex-1 min-w-0' : 'flex-1 min-w-[8.125rem]'}`}>
+        <div className={`flex items-start gap-1.5 ${isMobile ? 'w-full' : 'flex-1 min-w-[8.125rem]'}`}>
         {/* Drag handle */}
         <button
           {...listeners}
@@ -351,6 +351,15 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             title={lang === 'ja' ? 'カラーメイカーで色を追加' : 'Add color with Color Maker'}
             className={`bg-transparent border border-dim rounded-[0.3125rem] text-muted cursor-pointer flex-shrink-0 ${focusMode ? 'px-[0.5625rem] py-1 text-[0.8125rem]' : 'px-1.5 py-0.5 text-[0.625rem]'}`}
           >🎨</button>
+        )}
+
+        {/* Feature maker shortcut */}
+        {onFeatureMaker && !isLocked && (
+          <button
+            onClick={onFeatureMaker}
+            title={lang === 'ja' ? '特徴メーカーで特徴を追加' : 'Add feature with Feature Maker'}
+            className={`bg-transparent border border-dim rounded-[0.3125rem] text-muted cursor-pointer flex-shrink-0 ${focusMode ? 'px-[0.5625rem] py-1 text-[0.8125rem]' : 'px-1.5 py-0.5 text-[0.625rem]'}`}
+          >🎯</button>
         )}
 
         {/* Focus mode */}
