@@ -10,6 +10,28 @@ const RARE_OPT_CAT_PROB = 0.15; // rare optional cats: 15% vs standard 40%
 import { CONFLICT_MAP } from "../data/conflicts.js";
 import { COLOR_PALETTE, SHADES, COLOR_TARGETS, buildColorTag, buildColorName, HUE_GROUPS } from "../data/colors.js";
 
+// ── 種族パーツ系統管理 ───────────────────────────────────────────────────
+// 動物耳+尻尾のペア定義（両方が同系統であるべき）
+const ANIMAL_EAR_TAIL_PAIRS = [
+  { ears: 'cat ears',   tail: 'cat tail'   },
+  { ears: 'fox ears',   tail: 'fox tail'   },
+  { ears: 'wolf ears',  tail: 'wolf tail'  },
+  { ears: 'dog ears',   tail: 'dog tail'   },
+  { ears: 'bunny ears', tail: 'bunny tail' },
+  { ears: 'horse ears', tail: 'horse tail' },
+  { ears: 'cow ears',   tail: 'cow tail'   },
+];
+const ALL_ANIMAL_EAR_TAGS  = new Set(ANIMAL_EAR_TAIL_PAIRS.map(p => p.ears).concat(['animal ears']));
+const ALL_ANIMAL_TAIL_TAGS = new Set(ANIMAL_EAR_TAIL_PAIRS.map(p => p.tail).concat(['fluffy tail', 'multiple tails']));
+// 非獣系種族: 通常は動物耳・動物尻尾を付与しない
+const NON_ANIMAL_SPECIES_TAGS = new Set([
+  'elf','dark elf','angel','demon','vampire','witch','fairy',
+  'ghost','slime girl','mermaid','lamia','dragon girl','oni','doll','android',
+]);
+// ハイブリッド確率（モード別）— この確率で例外的に動物パーツを許可
+const HYBRID_CHANCE_CHARDESIGN = 0.05; // 5%
+const HYBRID_CHANCE_ILLUST     = 0.08; // 8%
+
 const COLOR_CAT_IDS = new Set(['face_haircolor', 'face_eyecolor']);
 const COLOR_CAT_TARGET = { face_haircolor: 'hair', face_eyecolor: 'eyes' };
 
@@ -399,6 +421,57 @@ function buildSpeciesText(picks, block, speciesCat, text) {
   return text;
 }
 
+// ── 種族パーツ系統クリーンアップ ─────────────────────────────────────────
+// buildSpeciesText 後に呼び出し、動物耳/尻尾の混線を解消する。
+// - 非獣系種族（vampire, elf等）: hybridChance 未満の場合のみ動物パーツを残す
+// - 獣系（kemonomimi等）: 複数系統が混在していれば1系統に統一
+function cleanupAnimalParts(text, picks, speciesCat, strength, hybridChance) {
+  const pickedSpecies = picks
+    .filter(p => speciesCat?.t.some(st => st.en === p.en))
+    .map(p => p.en.toLowerCase());
+  const isNonAnimal = pickedSpecies.some(s => NON_ANIMAL_SPECIES_TAGS.has(s));
+  const foundPairs  = ANIMAL_EAR_TAIL_PAIRS.filter(p => hasTag(text, p.ears) || hasTag(text, p.tail));
+
+  if (isNonAnimal) {
+    if (foundPairs.length === 0) return text;
+    if (Math.random() >= hybridChance) {
+      // 通常: 動物パーツをすべて除去
+      for (const tag of [...ALL_ANIMAL_EAR_TAGS, ...ALL_ANIMAL_TAIL_TAGS]) {
+        if (hasTag(text, tag)) text = removeTag(text, tag);
+      }
+      return text;
+    }
+    // ハイブリッド当選: 複数ある場合は1系統だけ残す（それ以上は除去）
+    if (foundPairs.length > 1) {
+      const keepIdx = Math.floor(Math.random() * foundPairs.length);
+      foundPairs.forEach((p, i) => {
+        if (i === keepIdx) return;
+        if (hasTag(text, p.ears)) text = removeTag(text, p.ears);
+        if (hasTag(text, p.tail)) text = removeTag(text, p.tail);
+      });
+    }
+    return text;
+  }
+
+  // 獣系（kemonomimi / catgirl / human 10% 等）: 1系統に統一
+  if (foundPairs.length <= 1) return text;
+  const completePairs = foundPairs.filter(p => hasTag(text, p.ears) && hasTag(text, p.tail));
+  const keepPair = completePairs.length > 0
+    ? completePairs[Math.floor(Math.random() * completePairs.length)]
+    : foundPairs[Math.floor(Math.random() * foundPairs.length)];
+
+  // 他系統を除去してから、片方だけ残っているなら補完する
+  ANIMAL_EAR_TAIL_PAIRS.forEach(p => {
+    if (p === keepPair) return;
+    if (hasTag(text, p.ears)) text = removeTag(text, p.ears);
+    if (hasTag(text, p.tail)) text = removeTag(text, p.tail);
+  });
+  if (!hasTag(text, keepPair.ears)) text = appendTag(text, keepPair.ears, strength);
+  if (!hasTag(text, keepPair.tail)) text = appendTag(text, keepPair.tail, strength);
+
+  return text;
+}
+
 export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
   const [randomMode, setRandomMode] = useState(() => localStorage.getItem('loom_randomMode') || 'illust');
 
@@ -496,6 +569,7 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
               if (block.id === 'attribute') {
                 const speciesCat = block.cats.find(cat => cat.n === '種族');
                 text = buildSpeciesText(picks, block, speciesCat, text);
+                text = cleanupAnimalParts(text, picks, speciesCat, block.strength, HYBRID_CHANCE_CHARDESIGN);
                 if (!hasTag(text, 'solo')) text = appendTag(text, 'solo', block.strength);
               }
               newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: picks };
@@ -521,6 +595,7 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
           if (block.id === 'attribute') {
             const speciesCat = block.cats.find(cat => cat.n === '種族');
             text = buildSpeciesText(picks, block, speciesCat, text);
+            text = cleanupAnimalParts(text, picks, speciesCat, block.strength, HYBRID_CHANCE_ILLUST);
             if (!hasTag(text, 'solo')) text = appendTag(text, 'solo', block.strength);
           }
           newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: picks };
