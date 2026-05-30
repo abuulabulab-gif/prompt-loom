@@ -4,32 +4,48 @@ import { FEATURE_CATS, FEATURE_ITEMS } from "../../data/features.js";
 const ACCENT = '#6c8fff';
 
 export default function FeatureMakerModal({ lang, blocks, onApply, onClose, filterBlockId }) {
-  const [catId,    setCatId]    = useState('face');
-  const [partId,   setPartId]   = useState(null);
-  const [optionEn, setOptionEn] = useState(null);
+  const [catId,      setCatId]      = useState('face');
+  const [partId,     setPartId]     = useState(null);
+  const [subtypeId,  setSubtypeId]  = useState(null);
+  const [optionEn,   setOptionEn]   = useState(null);
 
-  // filterBlockId 指定時: 全カテゴリから targetBlock が一致するアイテムだけ集める
-  const allItems     = Object.values(FEATURE_ITEMS).flat();
+  const allItems      = Object.values(FEATURE_ITEMS).flat();
   const filteredItems = filterBlockId ? allItems.filter(item => item.targetBlock === filterBlockId) : null;
-  const isFiltered   = Boolean(filteredItems);
+  const isFiltered    = Boolean(filteredItems);
+  const displayItems  = isFiltered ? filteredItems : (FEATURE_ITEMS[catId] || []);
 
-  const displayItems = isFiltered ? filteredItems : (FEATURE_ITEMS[catId] || []);
-  const part   = partId   ? displayItems.find(p => p.id === partId) : null;
-  const option = optionEn && part ? part.options.find(o => o.en === optionEn) : null;
+  const part         = partId ? displayItems.find(p => p.id === partId) : null;
+  const hasSubtypes  = Boolean(part?.subtypes);
+  const subtype      = subtypeId && part?.subtypes ? part.subtypes.find(s => s.id === subtypeId) : null;
+  const currentOpts  = hasSubtypes ? (subtype?.options ?? []) : (part?.options ?? []);
+  const option       = optionEn ? currentOpts.find(o => o.en === optionEn) : null;
 
   const targetBlockName = part
     ? (blocks?.find(b => b.id === part.targetBlock)?.[lang === 'ja' ? 'name' : 'nameEn'] ?? part.targetBlock)
     : null;
 
-  const handleCatChange = (id) => { setCatId(id); setPartId(null); setOptionEn(null); };
-  const handlePartChange = (id) => { setPartId(id); setOptionEn(null); };
+  const handleCatChange     = (id) => { setCatId(id); setPartId(null); setSubtypeId(null); setOptionEn(null); };
+  const handlePartChange    = (id) => { setPartId(id); setSubtypeId(null); setOptionEn(null); };
+  const handleSubtypeChange = (id) => { setSubtypeId(id); setOptionEn(null); };
   const handleApply = () => {
     if (!option || !part) return;
     onApply(option.en, part.targetBlock);
   };
 
-  const s1 = isFiltered ? '①' : '②';
-  const s2 = isFiltered ? '②' : '③';
+  // ステップ番号の計算
+  const base   = isFiltered ? 0 : 1;
+  const sSteps = ['①','②','③','④'];
+  const sPart    = sSteps[base];
+  const sSubtype = sSteps[base + 1];
+  const sOption  = sSteps[base + (hasSubtypes ? 2 : 1)];
+
+  const chip = (label, active, onClick) => (
+    <button key={label} onClick={onClick}
+      style={active ? { background: ACCENT + '22', borderColor: ACCENT, color: ACCENT } : {}}
+      className={`rounded-md px-2.5 py-1 text-[0.6875rem] cursor-pointer font-mono ${active ? 'font-bold border' : 'bg-surfalt border border-line text-fg'}`}>
+      {label}
+    </button>
+  );
 
   return (
     <div className="fixed inset-0 bg-black/80 z-[300] flex items-center justify-center p-4" onClick={onClose}>
@@ -43,54 +59,66 @@ export default function FeatureMakerModal({ lang, blocks, onApply, onClose, filt
           </button>
         </div>
 
-        {/* ① カテゴリ — 全部入りモードのみ */}
+        {/* ① カテゴリ（全部入りのみ） */}
         {!isFiltered && (
           <>
             <div className="text-muted text-[0.625rem] font-mono mb-1.5 tracking-[0.07em]">
               {lang === 'ja' ? '① カテゴリ' : '① Category'}
             </div>
             <div className="flex gap-[0.3125rem] mb-3.5">
-              {FEATURE_CATS.map(c => (
-                <button key={c.id} onClick={() => handleCatChange(c.id)}
-                  style={catId === c.id ? { background: ACCENT + '22', borderColor: ACCENT, color: ACCENT } : {}}
-                  className={`flex-1 rounded-md px-2 py-1.5 text-[0.6875rem] cursor-pointer font-mono ${catId === c.id ? 'font-bold border' : 'bg-surfalt border border-line text-fg'}`}>
-                  {c.icon} {lang === 'ja' ? c.ja : c.en}
-                </button>
+              {FEATURE_CATS.map(c => chip(
+                `${c.icon} ${lang === 'ja' ? c.ja : c.en}`,
+                catId === c.id,
+                () => handleCatChange(c.id)
               ))}
             </div>
           </>
         )}
 
-        {/* パーツ選択 */}
+        {/* パーツ */}
         <div className="text-muted text-[0.625rem] font-mono mb-1.5 tracking-[0.07em]">
-          {lang === 'ja' ? `${s1} パーツ` : `${s1} Part`}
+          {lang === 'ja' ? `${sPart} パーツ` : `${sPart} Part`}
         </div>
         <div className="flex flex-wrap gap-[0.3125rem] mb-3.5">
-          {displayItems.map(item => (
-            <button key={item.id} onClick={() => handlePartChange(item.id)}
-              style={partId === item.id ? { background: ACCENT + '22', borderColor: ACCENT, color: ACCENT } : {}}
-              className={`rounded-md px-2.5 py-1 text-[0.6875rem] cursor-pointer font-mono ${partId === item.id ? 'font-bold border' : 'bg-surfalt border border-line text-fg'}`}>
-              {lang === 'ja' ? item.ja : item.en}
-            </button>
+          {displayItems.map(item => chip(
+            lang === 'ja' ? item.ja : item.en,
+            partId === item.id,
+            () => handlePartChange(item.id)
           ))}
           {isFiltered && displayItems.length === 0 && (
-            <span className="text-dim text-[0.625rem] font-mono">{lang === 'ja' ? 'このブロック用の特徴はありません' : 'No features for this block'}</span>
+            <span className="text-dim text-[0.625rem] font-mono">
+              {lang === 'ja' ? 'このブロック用の特徴はありません' : 'No features for this block'}
+            </span>
           )}
         </div>
 
-        {/* 位置・状態選択 */}
-        {part && (
+        {/* 種類（subtypes がある場合のみ） */}
+        {part && hasSubtypes && (
           <>
             <div className="text-muted text-[0.625rem] font-mono mb-1.5 tracking-[0.07em]">
-              {lang === 'ja' ? `${s2} 位置・状態` : `${s2} Position / State`}
+              {lang === 'ja' ? `${sSubtype} 種類` : `${sSubtype} Type`}
+            </div>
+            <div className="flex flex-wrap gap-[0.3125rem] mb-3.5">
+              {part.subtypes.map(st => chip(
+                lang === 'ja' ? st.ja : (st.en ?? st.ja),
+                subtypeId === st.id,
+                () => handleSubtypeChange(st.id)
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* 位置・状態 */}
+        {part && (!hasSubtypes || subtype) && (
+          <>
+            <div className="text-muted text-[0.625rem] font-mono mb-1.5 tracking-[0.07em]">
+              {lang === 'ja' ? `${sOption} 位置・状態` : `${sOption} Position / State`}
             </div>
             <div className="flex flex-wrap gap-[0.3125rem] mb-2">
-              {part.options.map(opt => (
-                <button key={opt.en} onClick={() => setOptionEn(opt.en)}
-                  style={optionEn === opt.en ? { background: ACCENT + '22', borderColor: ACCENT, color: ACCENT } : {}}
-                  className={`rounded-md px-2.5 py-1 text-[0.6875rem] cursor-pointer font-mono ${optionEn === opt.en ? 'font-bold border' : 'bg-surfalt border border-line text-fg'}`}>
-                  {lang === 'ja' ? opt.ja : opt.en}
-                </button>
+              {currentOpts.map(opt => chip(
+                lang === 'ja' ? opt.ja : opt.en,
+                optionEn === opt.en,
+                () => setOptionEn(opt.en)
               ))}
             </div>
             {part.lrWarning && (
@@ -107,7 +135,7 @@ export default function FeatureMakerModal({ lang, blocks, onApply, onClose, filt
             {lang === 'ja' ? '生成されるタグ' : 'Generated tag'}
           </div>
           <code className="text-prompt text-[0.8125rem] font-mono break-all">
-            {option ? option.en : (lang === 'ja' ? '← パーツと位置を選んでください' : '← Select a part and position')}
+            {option ? option.en : (lang === 'ja' ? '← パーツ・位置を選んでください' : '← Select a part and position')}
           </code>
         </div>
 

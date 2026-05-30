@@ -68,7 +68,7 @@ export default function LibraryModal({ characters, activeCharId, lang, onClose, 
               {search ? (lang === 'ja' ? '該当するキャラが見つかりません' : 'No characters found') : (lang === 'ja' ? 'キャラクターがいません' : 'No characters here')}
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))' }}>
+            <div className="grid grid-cols-2 gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(11.25rem, 1fr))' }}>
               {filtered.map(c => {
                 const isActive = c.id === activeCharId;
                 return (

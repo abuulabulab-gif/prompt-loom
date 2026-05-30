@@ -16,7 +16,6 @@ import {
 } from "./data/constants.js";
 import { detectConflicts } from "./data/conflicts.js";
 import { TOOLS } from "./data/tools.js";
-import { buildColorTag, buildColorName, SHADES, COLOR_PALETTE, COLOR_TARGETS } from "./data/colors.js";
 import { makeCharacter, makeCustomBlock, BLOCKS_DEF } from "./data/blocks.js";
 import PresetChip from "./components/PresetChip.jsx";
 import BlockCard from "./components/BlockCard.jsx";
@@ -88,14 +87,15 @@ function mergeCharacterBlocks(savedBlocks) {
     processedIds.add(saved.id);
     return {
       ...deep(def),
-      text:       migrateAliasesInText(saved.text       ?? def.text),
-      enabled:    saved.enabled    !== false,
-      strength:   saved.strength   ?? def.strength,
-      locked:     saved.locked     ?? false,
-      favTags:    saved.favTags    ?? [],
-      customTags: saved.customTags ?? [],
-      collapsed:  saved.collapsed  !== undefined ? saved.collapsed : def.collapsed,
-      catStates:  saved.catStates  ?? {},
+      text:            migrateAliasesInText(saved.text ?? def.text),
+      enabled:         saved.enabled    !== false,
+      strength:        saved.strength   ?? def.strength,
+      locked:          saved.locked     ?? false,
+      favTags:         saved.favTags    ?? [],
+      customTags:      saved.customTags ?? [],
+      collapsed:       saved.collapsed  !== undefined ? saved.collapsed : def.collapsed,
+      catStates:       saved.catStates  ?? {},
+      lastRandomPicks: saved.lastRandomPicks ?? [],
     };
   }).filter(Boolean);
 
@@ -219,6 +219,10 @@ export default function Loom() {
   const [colorPickerDefaultTarget, setColorPickerDefaultTarget] = useState('hair');
   const [orderUpdatedAt, setOrderUpdatedAt] = useState(0);
   const [settingsUpdatedAt, setSettingsUpdatedAt] = useState(0);
+  const [blockStatusOpen, setBlockStatusOpen] = useState(false);
+  const [blockStatusPos, setBlockStatusPos] = useState(null);
+  const blockStatusRef = useRef(null);
+  const gridIconRef = useRef(null);
   const [tagSuggestOpen, setTagSuggestOpen] = useState(false);
   const [tagSuggestions, setTagSuggestions] = useState([]);
   const [tagSuggestBusy, setTagSuggestBusy] = useState(false);
@@ -323,50 +327,31 @@ export default function Loom() {
   }, [characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight, orderUpdatedAt, settingsUpdatedAt, loaded]);
 
   // ── Color picker apply ──
-  const TARGET_TO_BLOCK = { hair: 'face', inner_hair: 'face', bangs: 'face', bang_streak: 'face', forelock: 'face', hair_tips: 'face', sidelocks: 'face', eyes: 'face', heterochromia: 'face', skin: 'body', dress: 'outfit', shirt: 'outfit', skirt: 'outfit', jacket: 'outfit', ribbon: 'outfit', accents: 'outfit', trim: 'outfit', embroidery: 'outfit', lace: 'outfit', shoes: 'outfit', theme: 'artstyle' };
-  const BLOCK_TO_COLOR_TARGET   = { face: 'hair', body: 'skin', outfit: 'dress', artstyle: 'theme' };
-  const BLOCK_TO_ALLOWED_TARGETS = { face: ['hair','inner_hair','bangs','bang_streak','forelock','hair_tips','sidelocks','eyes','heterochromia'], body: ['skin'], outfit: ['dress','shirt','skirt','jacket','ribbon','accents','trim','embroidery','lace','shoes'], artstyle: ['theme'] };
+  const TARGET_TO_BLOCK = { hair: 'face', inner_hair: 'face', bangs: 'face', bang_streak: 'face', forelock: 'face', hair_tips: 'face', sidelocks: 'face', eyes: 'face', heterochromia: 'face', dress: 'outfit', shirt: 'outfit', skirt: 'outfit', jacket: 'outfit', ribbon: 'outfit', accents: 'outfit', trim: 'outfit', embroidery: 'outfit', lace: 'outfit', shoes: 'outfit', bg_color: 'background' };
+  const BLOCK_TO_COLOR_TARGET   = { face: 'hair', outfit: 'dress', background: 'bg_color' };
+  const BLOCK_TO_ALLOWED_TARGETS = { face: ['hair','inner_hair','bangs','bang_streak','forelock','hair_tips','sidelocks','eyes','heterochromia'], outfit: ['dress','shirt','skirt','jacket','ribbon','accents','trim','embroidery','lace','shoes'], background: ['bg_color'] };
 
-  const applyColorTag = (shadeEn, colorEn, targetEn, targetId, shade2En = '', color2En = '') => {
-    if (targetId === 'heterochromia') {
-      const name1 = buildColorName(shadeEn, colorEn);
-      const name2 = buildColorName(shade2En, color2En);
-      const tag1  = `${name1} and ${name2} eyes`;
-      const tag2  = 'heterochromia';
-      setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : {
-        ...c,
-        blocks: c.blocks.map(b => b.id !== 'face' ? b : {
-          ...b, text: appendTag(appendTag(b.text, tag1, '1.0'), tag2, '1.0'), enabled: true, collapsed: false,
-        }),
-      }));
-      const faceBlockName = blocks.find(b => b.id === 'face')?.[lang === 'ja' ? 'name' : 'nameEn'] ?? 'face';
-      const msg = lang === 'ja' ? `🎨 ${faceBlockName}に「オッドアイ」を追加` : `🎨 heterochromia added to ${faceBlockName}`;
-      setColorToast({ msg });
-      setTimeout(() => setColorToast(null), 3000);
-      return;
-    }
+  // 新API: applyColorTag(tags[], targetId) — ColorPickerModalから配列で渡される
+  const applyColorTag = (tags, targetId) => {
+    const blockId = targetId === 'heterochromia' ? 'face' : (TARGET_TO_BLOCK[targetId] || 'outfit');
+    const tagArray = Array.isArray(tags) ? tags : [tags];
 
-    const blockId = TARGET_TO_BLOCK[targetId] || 'outfit';
-    const tag = buildColorTag(shadeEn, colorEn, targetEn);
-
-    const colorJa   = COLOR_PALETTE.find(c => c.en === colorEn)?.ja ?? colorEn;
-    const shadeObj  = SHADES.find(s => s.en === shadeEn);
-    const targetObj = COLOR_TARGETS.find(t => t.id === targetId);
-    const labelJa   = shadeObj?.id !== 'normal' && shadeObj
-      ? `${shadeObj.ja}${colorJa}${targetObj?.ja ?? targetEn}`
-      : `${colorJa}${targetObj?.ja ?? targetEn}`;
-
-    setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : {
+    setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : ({
       ...c,
-      blocks: c.blocks.map(b => b.id !== blockId ? b : {
-        ...b, text: appendTag(b.text, tag, '1.0'), enabled: true, collapsed: false,
-      }),
-    }));
+      blocks: c.blocks.map(b => b.id !== blockId ? b : ({
+        ...b,
+        text: tagArray.reduce((t, tag) => appendTag(t, tag, '1.0'), b.text),
+        enabled: true, collapsed: false,
+      })),
+    })));
 
-    const blockName = blocks.find(b => b.id === blockId)?.[lang === 'ja' ? 'name' : 'nameEn'] ?? blockId;
-    const msg = lang === 'ja'
-      ? `🎨 ${blockName}に「${labelJa}」を追加`
-      : `🎨 "${tag}" added to ${blockName}`;
+    const blockName    = blocks.find(b => b.id === blockId)?.[lang === 'ja' ? 'name' : 'nameEn'] ?? blockId;
+    const labelPreview = tagArray[0] ?? '';
+    const msg = targetId === 'heterochromia'
+      ? (lang === 'ja' ? `🎨 ${blockName}に「オッドアイ」を追加` : `🎨 heterochromia added to ${blockName}`)
+      : (lang === 'ja'
+        ? `🎨 ${blockName}に「${labelPreview}」${tagArray.length > 1 ? `他${tagArray.length - 1}件` : ''}を追加`
+        : `🎨 "${labelPreview}"${tagArray.length > 1 ? ` +${tagArray.length - 1}` : ''} added to ${blockName}`);
     setColorToast({ msg });
     setTimeout(() => setColorToast(null), 3000);
   };
@@ -868,6 +853,7 @@ export default function Loom() {
       // Escape → close top modal (or exit focus mode)
       if (e.key === 'Escape') {
         if (paletteOpen)      { setPaletteOpen(false);      return; }
+        if (blockStatusOpen)  { setBlockStatusOpen(false);  return; }
         if (globalSearchOpen) { setGlobalSearchOpen(false); return; }
         if (libraryOpen)      { setLibraryOpen(false);      return; }
         if (supportOpen)      { setSupportOpen(false);      return; }
@@ -928,7 +914,7 @@ export default function Loom() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paletteOpen, globalSearchOpen, libraryOpen, analyzeOpen, historyOpen, templateOpen, colorPickerOpen, featureMakerOpen, sceneOpen, settingsOpen, focusBlockId,
+  }, [paletteOpen, globalSearchOpen, libraryOpen, analyzeOpen, historyOpen, templateOpen, colorPickerOpen, featureMakerOpen, sceneOpen, settingsOpen, blockStatusOpen, focusBlockId,
       activeCharId, currentText, posText, negText, activeChar]);
 
   // DALL-E selected → auto-switch to natural language tab; leaving DALL-E → back to positive
@@ -1148,9 +1134,9 @@ export default function Loom() {
     { id: 'image-to-tags', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🖼️', label: 'Image → tags (AI)', labelJa: '画像からタグ生成（AI）', action: () => { setNaturalToTagsTab('image'); setNaturalToTagsOpen(true); } },
     { id: 'open-history', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🕐', label: 'Open history', labelJa: '履歴を開く', shortcut: 'H', action: () => setHistoryOpen(true) },
     { id: 'open-template', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '✦', label: 'Open templates', labelJa: 'テンプレートを開く', shortcut: 'T', action: () => setTemplateOpen(true) },
-    { id: 'open-color',   group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎨', label: 'Open color picker',   labelJa: 'カラーメイカーを開く',  action: () => setColorPickerOpen(true) },
+    { id: 'open-color',   group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎨', label: 'Open color picker',   labelJa: 'カラーメイカーを開く',  action: () => openColorPicker() },
     { id: 'open-feature', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎯', label: 'Open feature maker',  labelJa: '特徴メーカーを開く',   action: () => setFeatureMakerOpen(true) },
-    ...(characters.length > 1 ? [{ id: 'open-scene', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎬', label: 'Open scene compose', labelJa: 'シーン合成を開く', action: () => setSceneOpen(true) }] : []),
+    ...(characters.length > 1 ? [{ id: 'open-scene', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎬', label: 'Open Collab', labelJa: 'キャラ共演を開く', action: () => setSceneOpen(true) }] : []),
     { id: 'open-settings', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '⚙️', label: 'Open settings / shortcuts', labelJa: '設定・ショートカット', shortcut: '?', action: () => setSettingsOpen(true) },
     // AI Tools
     ...TOOLS.map((t, i) => ({ id: `tool-${t.id}`, group: lang === 'ja' ? 'AIツール' : 'AI Tools', icon: t.icon, label: t.name, labelJa: t.name, shortcut: String(i + 1), action: () => { setActiveTool(t.id); setEditingSuffix(false); } })),
@@ -1181,9 +1167,18 @@ export default function Loom() {
         <div className="max-w-[58.33rem] mx-auto px-3.5 py-[0.5625rem] flex items-center gap-[0.4375rem] flex-wrap">
         <div className="flex items-center gap-2">
           <div
-            onClick={isMobile ? () => setJumpOpen(p => !p) : undefined}
-            title={isMobile ? (lang === 'ja' ? 'ブロック一覧を開く' : 'Open block list') : undefined}
-            className={`w-[1.875rem] h-[1.875rem] rounded-lg flex items-center justify-center flex-shrink-0 bg-[linear-gradient(135deg,#5a7fff,#b06fff)]${isMobile ? ' cursor-pointer active:opacity-70 select-none' : ''}`}
+            ref={gridIconRef}
+            onClick={() => {
+              if (isMobile) { setJumpOpen(p => !p); return; }
+              if (!blockStatusOpen && gridIconRef.current) {
+                const r = gridIconRef.current.getBoundingClientRect();
+                const w = 220;
+                setBlockStatusPos({ top: r.bottom + 4, left: Math.max(8, Math.min(r.left, window.innerWidth - w - 8)), width: w });
+              }
+              setBlockStatusOpen(p => !p);
+            }}
+            title={lang === 'ja' ? 'ブロックステータス' : 'Block status'}
+            className="w-[1.875rem] h-[1.875rem] rounded-lg flex items-center justify-center flex-shrink-0 bg-[linear-gradient(135deg,#5a7fff,#b06fff)] cursor-pointer active:opacity-70 select-none"
           >
             <svg width="15" height="15" viewBox="0 0 15 15" fill="white">
               <circle cx="2.5" cy="2.5" r="1.5"/><circle cx="7.5" cy="2.5" r="1.5"/><circle cx="12.5" cy="2.5" r="1.5"/>
@@ -1191,7 +1186,7 @@ export default function Loom() {
               <circle cx="2.5" cy="12.5" r="1.5"/><circle cx="7.5" cy="12.5" r="1.5"/><circle cx="12.5" cy="12.5" r="1.5"/>
             </svg>
           </div>
-          <div>
+          <div onClick={() => window.location.reload()} title={lang === 'ja' ? 'ページを再読み込み' : 'Reload page'} className="cursor-pointer select-none">
             <div className="text-xl font-black tracking-[0.22em] leading-none" style={{ fontFamily: "'Century Gothic', 'AppleGothic', 'Gill Sans', sans-serif" }}>LOOM</div>
             <div className="text-[0.5625rem] text-muted tracking-[0.08em]">The Prompt Weaving Studio</div>
           </div>
@@ -1212,10 +1207,10 @@ export default function Loom() {
             }
             setQuickOpen(p => !p);
           }}
-            title={lang === 'ja' ? 'テンプレート・カラー・シーン' : 'Template / Color / Scene'}
+            title={lang === 'ja' ? 'テンプレート・カラー・キャラ共演' : 'Template / Color / Collab'}
             className="flex items-center gap-1 rounded-md px-[0.5625rem] py-1 cursor-pointer text-[0.625rem] font-mono font-bold transition-colors duration-[120ms] whitespace-nowrap border text-accent"
             style={{ background: quickOpen ? 'rgb(var(--c-blue) / 0.19)' : 'rgb(var(--c-blue) / 0.08)', borderColor: quickOpen ? 'rgb(var(--c-blue) / 0.5)' : 'rgb(var(--c-blue) / 0.31)' }}>
-            ✦{!isMobile && ` ${lang === 'ja' ? 'ツール' : 'Tools'}`} <span className="text-[0.5rem] opacity-60">▾</span>
+            ✦{!isMobile && ` ${lang === 'ja' ? 'ツール' : 'Tools'}`} <span className="text-[0.5rem] opacity-80">▾</span>
           </button>
           {quickOpen && (
             <>
@@ -1236,10 +1231,10 @@ export default function Loom() {
                   <button onClick={() => { setNaturalToTagsTab('image'); setNaturalToTagsOpen(true); setQuickOpen(false); }}
                     className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
                     style={{ color: 'rgb(var(--c-purple))' }}>
-                    🖼 {lang === 'ja' ? '画像からタグ生成' : 'Image to Tags'}
+                    👁️ {lang === 'ja' ? '画像からタグ生成' : 'Image to Tags'}
                   </button>
                 )}
-                <button onClick={() => { setColorPickerOpen(true); setQuickOpen(false); }}
+                <button onClick={() => { openColorPicker(); setQuickOpen(false); }}
                   className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
                   style={{ color: 'rgb(var(--c-purple))' }}>
                   🎨 {lang === 'ja' ? 'カラー' : 'Color'}
@@ -1253,7 +1248,7 @@ export default function Loom() {
                   <button onClick={() => { setSceneOpen(true); setQuickOpen(false); }}
                     className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
                     style={{ color: 'rgb(var(--c-green))' }}>
-                    🎬 {lang === 'ja' ? 'シーン合成' : 'Scene'}
+                    🎬 {lang === 'ja' ? 'キャラ共演' : 'Collab'}
                   </button>
                 )}
                 {expertMode && (
@@ -1788,7 +1783,7 @@ export default function Loom() {
                               <div className="text-muted text-[0.5625rem] font-mono mb-2 tracking-[0.06em]">
                                 🔗 {lang === 'ja' ? 'タグ対応表' : 'Tag Map'}
                               </div>
-                              <div className="flex flex-col gap-1.5 overflow-y-auto" style={{ maxHeight: '280px' }}>
+                              <div className="flex flex-col gap-1.5 overflow-y-auto" style={{ maxHeight: '17.5rem' }}>
                                 {focusTagMapRows.map(row => (
                                   <div key={row.id} className="bg-panel border border-dim rounded-[0.4375rem] px-[0.5625rem] py-[0.4375rem]">
                                     <div className="text-fg text-[0.625rem] font-mono font-semibold mb-[0.1875rem] truncate">{row.label}</div>
@@ -2015,6 +2010,85 @@ export default function Loom() {
         </>
       )}
 
+      {/* ── Block Status Popover (PC) ── */}
+      {!isMobile && blockStatusOpen && (
+        <>
+          <div className="fixed inset-0 z-[199]" onClick={() => setBlockStatusOpen(false)} />
+          <div
+            ref={blockStatusRef}
+            className="fixed z-[200] rounded-[0.625rem] overflow-hidden"
+            style={{
+              top: blockStatusPos?.top,
+              left: blockStatusPos?.left,
+              width: blockStatusPos?.width ?? 220,
+              maxHeight: '72vh',
+              background: 'rgb(var(--surface))',
+              border: theme === 'light'
+                ? '1px solid rgba(0,0,0,0.14)'
+                : '1px solid rgb(var(--border-bright))',
+              boxShadow: theme === 'light'
+                ? '0 8px 32px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.10)'
+                : '0 8px 32px rgba(0,0,0,0.55)',
+            }}
+          >
+            {/* ヘッダー */}
+            <div className="px-3 py-2 flex items-center justify-between flex-shrink-0"
+              style={{ borderBottom: theme === 'light' ? '1px solid rgba(0,0,0,0.10)' : '1px solid rgb(var(--border))' }}>
+              <span className="text-[0.625rem] font-mono font-bold"
+                style={{ color: theme === 'light' ? 'rgba(0,0,0,0.55)' : 'rgb(var(--muted))' }}>
+                {lang === 'ja' ? 'ブロックステータス' : 'Block Status'}
+              </span>
+              <span className="text-[0.5625rem] font-mono"
+                style={{ color: theme === 'light' ? 'rgba(0,0,0,0.38)' : 'rgb(var(--dim))' }}>
+                {visibleBlocks.filter(b => b.enabled !== false && b.text).length}/{visibleBlocks.length}
+              </span>
+            </div>
+            {/* ブロック一覧 */}
+            <div className="overflow-y-auto" style={{ maxHeight: 'calc(72vh - 2.25rem)' }}>
+              {visibleBlocks.map(b => {
+                const bc = blockTextColor(b);
+                const enabled = b.enabled !== false;
+                const tagCount = b.text ? countTags(b.text) : 0;
+                return (
+                  <button
+                    key={b.id}
+                    onClick={() => {
+                      document.getElementById(`block-${b.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      setBlockStatusOpen(false);
+                    }}
+                    className="w-full flex items-center gap-[0.5rem] px-3 py-[0.4375rem] text-left cursor-pointer transition-colors duration-100"
+                    style={{
+                      borderLeft: `3px solid ${enabled ? bc : 'rgb(var(--dim))'}`,
+                      borderBottom: theme === 'light' ? '1px solid rgba(0,0,0,0.07)' : '1px solid rgb(var(--border))',
+                      background: 'transparent',
+                      opacity: enabled ? 1 : 0.5,
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = theme === 'light' ? 'rgba(0,0,0,0.04)' : 'rgb(var(--surface-alt))'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                  >
+                    <span className="text-[0.875rem] flex-shrink-0 leading-none">{b.icon}</span>
+                    <span className="text-[0.6875rem] font-mono flex-1 min-w-0 truncate"
+                      style={{ color: enabled ? 'rgb(var(--text))' : 'rgb(var(--muted))' }}>
+                      {lang === 'ja' ? b.name : b.nameEn}
+                    </span>
+                    <div className="flex items-center gap-[0.25rem] flex-shrink-0">
+                      {b.locked && (
+                        <span style={{ color: theme === 'light' ? 'rgba(0,0,0,0.35)' : 'rgb(var(--muted))' }}
+                          className="text-[0.5625rem]">🔒</span>
+                      )}
+                      <span className="text-[0.5625rem] font-mono font-bold min-w-[1.25rem] text-right"
+                        style={{ color: tagCount > 0 ? bc : (theme === 'light' ? 'rgba(0,0,0,0.25)' : 'rgb(var(--dim))') }}>
+                        {tagCount > 0 ? `${tagCount}t` : '—'}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </>
+      )}
+
       {/* ── OUTPUT BAR ── */}
       {mainTab === 'note' ? null : /* output bar shown only in editor mode */
       <div
@@ -2044,7 +2118,7 @@ export default function Loom() {
                   <button onClick={() => setToolPickerOpen(p => !p)} title={lang === 'ja' ? tool.note : tool.noteEn}
                     className="flex items-center gap-1 rounded-md px-2 py-1 text-[0.6875rem] font-mono font-bold cursor-pointer whitespace-nowrap"
                     style={{ background: 'rgb(var(--tint-accent))', border: '1px solid rgb(var(--c-blue) / 0.35)', color: 'rgb(var(--c-blue-s))' }}>
-                    {tool.icon} {lang === 'ja' ? tool.name : tool.nameEn}<span className="text-[0.5625rem] opacity-40 ml-0.5">▾</span>
+                    {tool.icon} {lang === 'ja' ? tool.name : tool.nameEn}<span className="text-[0.5625rem] opacity-65 ml-0.5">▾</span>
                   </button>
                   {toolPickerOpen && (
                     <>
@@ -2092,23 +2166,23 @@ export default function Loom() {
                   </>
                 )}
               </div>
-              {/* Mobile Row 2: Action buttons — PC order: ▼ 📸 🗑 ✏️ | flex-1 | token | COPY */}
+              {/* Mobile Row 2: Action buttons — PC order: ▼ 📸 ✏️ 🗑 | flex-1 | token | COPY */}
               <div className={`flex-shrink-0 flex items-center gap-[0.3125rem] ${outputExpanded ? 'mb-1.5' : 'mb-0'}`}>
                 <button onClick={() => setOutputExpanded(p => !p)}
                   className="bg-transparent border border-dim rounded-md text-muted cursor-pointer text-[0.6875rem] px-[0.4375rem] py-[0.3125rem]">{outputExpanded ? '▼' : '▲'}</button>
                 <button onClick={handleSnapshot} disabled={!posText} title={lang === 'ja' ? 'スナップショット（履歴に手動保存）' : 'Snapshot'}
                   style={{ background: snapped ? warnColor + '22' : 'none', border: `1px solid ${snapped ? warnColor + '60' : 'rgb(var(--dim))'}` }}
                   className={`rounded-md px-[0.5625rem] py-[0.3125rem] text-xs inline-flex items-center justify-center leading-none transition-all duration-200 ${snapped ? 'text-warn' : 'text-muted'} ${posText ? 'cursor-pointer' : 'cursor-default'}`}>📸</button>
-                <button onClick={handleResetAll} title={lang === 'ja' ? 'プロンプトをすべてリセット' : 'Reset all'}
-                  className="rounded-md px-[0.5625rem] py-[0.3125rem] text-[0.6875rem] cursor-pointer font-mono border border-dim text-muted"
-                  onMouseOver={e => { e.currentTarget.style.borderColor = dangerColor + '80'; e.currentTarget.style.color = dangerColor; }}
-                  onMouseOut={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.color = ''; }}>🗑</button>
                 {outputTab !== 'natural' && (
                   <button onClick={() => { if (!outputEditMode) { if (!outputEditText) setOutputEditText(currentText); setOutputEditMode(true); setOutputExpanded(true); } else { setOutputEditMode(false); } }}
                     disabled={!currentText} title={lang === 'ja' ? 'コピー前に手直し' : 'Edit before copy'}
                     style={{ background: outputEditMode ? warnColor + '22' : 'none', border: `1px solid ${outputEditMode ? warnColor + '60' : 'rgb(var(--dim))'}`, color: outputEditMode ? warnColor : 'rgb(var(--muted))' }}
                     className="rounded-md px-[0.5625rem] py-[0.3125rem] text-[0.6875rem] transition-all duration-200 cursor-pointer disabled:cursor-default font-mono">✏️</button>
                 )}
+                <button onClick={handleResetAll} title={lang === 'ja' ? 'プロンプトをすべてリセット' : 'Reset all'}
+                  className="rounded-md px-[0.5625rem] py-[0.3125rem] text-[0.6875rem] cursor-pointer font-mono border border-dim text-muted"
+                  onMouseOver={e => { e.currentTarget.style.borderColor = dangerColor + '80'; e.currentTarget.style.color = dangerColor; }}
+                  onMouseOut={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.color = ''; }}>🗑</button>
                 {/* Mobile MJ AR chips */}
                 {activeTool === 'mj' && outputTab !== 'natural' && (() => {
                   const sfxVal = toolSuffixes[activeTool] || '';
@@ -2156,7 +2230,7 @@ export default function Loom() {
                     style={{ background: 'rgb(var(--tint-accent))', border: '1px solid rgb(var(--c-blue) / 0.35)', color: 'rgb(var(--c-blue-s))' }}>
                     {tool.icon} {lang === 'ja' ? tool.name : tool.nameEn}
                     {tool.stripWeights && <span className="text-[0.5625rem] text-warn font-normal">w-off</span>}
-                    <span className="text-[0.5625rem] opacity-40">▾</span>
+                    <span className="text-[0.5625rem] opacity-65">▾</span>
                   </button>
                   {toolPickerOpen && (
                     <>
@@ -2213,7 +2287,7 @@ export default function Loom() {
                   title={lang === 'ja' ? 'バリエーションを3種類生成' : 'Generate 3 variations'}
                   style={{ background: variationsOpen ? 'rgb(var(--tint-accent))' : 'none', border: `1px solid ${variationsOpen ? 'rgb(var(--c-blue) / 0.5)' : 'rgb(var(--dim))'}`, color: variationsOpen ? 'rgb(var(--c-blue-s))' : 'rgb(var(--muted))' }}
                   className="rounded-md px-[0.5625rem] py-1 text-[0.6875rem] cursor-pointer disabled:cursor-default font-mono flex-shrink-0">
-                  🎲 {lang === 'ja' ? 'バリエ' : 'Vary'}
+                  🔀 {lang === 'ja' ? 'バリエ' : 'Vary'}
                 </button>
                 <button onClick={() => { setAnalyzeOpen(p => { if (p) setAnalyzeText(''); return !p; }); setOutputExpanded(true); }}
                   title={lang === 'ja' ? 'プロンプト逆解析 — 貼り付けたプロンプトのタグをハイライト (A)' : 'Analyze prompt — highlight matching tags (A)'}
@@ -2222,24 +2296,24 @@ export default function Loom() {
                   ◎ {lang === 'ja' ? '解析' : 'Analyze'}
                 </button>
               </div>
-              {/* Row 2: ▼ 📸 🗑 ✏️ [sfx] | flex-1 | [token] [COPY] */}
+              {/* Row 2: ▼ 📸 ✏️ 🗑 [sfx] | flex-1 | [token] [COPY] */}
               <div className={`flex items-center gap-1.5 ${outputExpanded ? 'mb-0.5' : 'mb-0'}`}>
-                {/* Left: collapse + snapshot + reset + edit */}
+                {/* Left: collapse + snapshot + edit + reset */}
                 <button onClick={() => setOutputExpanded(p => !p)} title={lang === 'ja' ? '出力エリアを折りたたむ/展開' : 'Collapse/expand output'}
                   className="bg-transparent border border-dim rounded-md text-muted cursor-pointer text-[0.6875rem] px-[0.4375rem] py-1 flex-shrink-0">{outputExpanded ? '▼' : '▲'}</button>
                 <button onClick={handleSnapshot} disabled={!posText} title={lang === 'ja' ? 'スナップショット（履歴に手動保存）' : 'Snapshot'}
                   style={{ background: snapped ? warnColor + '22' : 'none', border: `1px solid ${snapped ? warnColor + '60' : 'rgb(var(--dim))'}` }}
                   className={`rounded-md px-[0.5625rem] py-1 text-xs inline-flex items-center justify-center leading-none transition-all duration-200 flex-shrink-0 ${snapped ? 'text-warn' : 'text-muted'} ${posText ? 'cursor-pointer' : 'cursor-default'}`}>📸</button>
-                <button onClick={handleResetAll} title={lang === 'ja' ? 'プロンプトをすべてリセット' : 'Reset all prompts'}
-                  className="rounded-md px-[0.5625rem] py-1 text-[0.6875rem] cursor-pointer font-mono border border-dim text-muted transition-all duration-200 flex-shrink-0"
-                  onMouseOver={e => { e.currentTarget.style.borderColor = dangerColor + '80'; e.currentTarget.style.color = dangerColor; }}
-                  onMouseOut={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.color = ''; }}>🗑</button>
                 {outputTab !== 'natural' && (
                   <button onClick={() => { if (!outputEditMode) { if (!outputEditText) setOutputEditText(currentText); setOutputEditMode(true); setOutputExpanded(true); } else { setOutputEditMode(false); } }}
                     disabled={!currentText} title={lang === 'ja' ? 'コピー前に手直し' : 'Edit before copy'}
                     style={{ background: outputEditMode ? warnColor + '22' : 'none', border: `1px solid ${outputEditMode ? warnColor + '60' : 'rgb(var(--dim))'}`, color: outputEditMode ? warnColor : 'rgb(var(--muted))' }}
                     className="rounded-md px-[0.5625rem] py-1 text-[0.6875rem] transition-all duration-200 cursor-pointer disabled:cursor-default font-mono flex-shrink-0">✏️</button>
                 )}
+                <button onClick={handleResetAll} title={lang === 'ja' ? 'プロンプトをすべてリセット' : 'Reset all prompts'}
+                  className="rounded-md px-[0.5625rem] py-1 text-[0.6875rem] cursor-pointer font-mono border border-dim text-muted transition-all duration-200 flex-shrink-0"
+                  onMouseOver={e => { e.currentTarget.style.borderColor = dangerColor + '80'; e.currentTarget.style.color = dangerColor; }}
+                  onMouseOut={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.color = ''; }}>🗑</button>
                 {apiConfig.apiKey && outputTab === 'positive' && (
                   <button onClick={() => { if (tagSuggestOpen) { setTagSuggestOpen(false); } else { handleTagSuggest(); setOutputExpanded(true); } }}
                     disabled={tagSuggestBusy || !posText}
@@ -2392,7 +2466,7 @@ export default function Loom() {
                 onChange={e => setAnalyzeText(e.target.value)}
                 placeholder={lang === 'ja' ? 'プロンプトをここに貼り付け → 一致するタグが緑でハイライトされます' : 'Paste a prompt here → matching tags are highlighted green in the blocks above'}
                 className="w-full bg-bg border border-dim rounded-[0.3125rem] text-fg text-[0.6875rem] font-mono px-[0.5625rem] py-1.5 outline-none resize-none"
-                style={{ minHeight: '54px' }}
+                style={{ minHeight: '3.375rem' }}
               />
               {/* Unrecognized tags */}
               {analyzeText && (() => {
@@ -2451,7 +2525,7 @@ export default function Loom() {
             <div className="flex-shrink-0 mb-1.5 bg-bg border border-linebright rounded-lg overflow-hidden">
               <div className="flex items-center justify-between px-3 py-1.5 border-b border-line">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[0.625rem] font-mono text-muted">🎲 {lang === 'ja' ? `バリエーション (${variations.length}種)` : `Variations (${variations.length})`}</span>
+                  <span className="text-[0.625rem] font-mono text-muted">🔀 {lang === 'ja' ? `バリエーション (${variations.length}種)` : `Variations (${variations.length})`}</span>
                   {/* Source indicator */}
                   <span className="text-[0.5625rem] font-mono px-[0.3125rem] py-[0.0625rem] rounded-[0.1875rem]"
                     style={varSource === 'original'

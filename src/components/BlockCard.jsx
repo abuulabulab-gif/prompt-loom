@@ -73,8 +73,10 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
       const el = tagRefs.current[pendingScrollTag];
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.classList.add('tag-highlight');
-        setTimeout(() => el.classList.remove('tag-highlight'), 750);
+        setTimeout(() => {
+          el.classList.add('tag-highlight');
+          setTimeout(() => el.classList.remove('tag-highlight'), 1200);
+        }, 300);
       }
       setPendingScrollTag(null);
     }, 80);
@@ -322,7 +324,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               color: saving ? blockColor : 'rgb(var(--muted))',
             }}
             className="rounded-[0.3125rem] px-[0.4375rem] py-0.5 text-[0.625rem] cursor-pointer"
-          >💾 {lang === 'ja' ? '保存' : 'Save'}</button>
+          >📌 {lang === 'ja' ? '保存' : 'Save'}</button>
         )}
 
         {/* Tag count — same height as adjacent buttons */}
@@ -635,7 +637,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   className={`rounded-[0.3125rem] cursor-pointer disabled:cursor-default font-mono whitespace-nowrap transition-all duration-[120ms] ${focusMode ? 'py-[0.3125rem] text-[0.8125rem]' : 'py-0.5 text-[0.625rem]'} ${isCompact ? 'px-1' : (focusMode ? 'px-2.5' : 'px-1.5')} ${block.strength === s.v ? 'font-bold' : 'font-normal border border-dim text-muted'}`}
                 >
                   {lang === 'ja' ? s.l : s.le}
-                  {!isCompact && <span className="opacity-50 ml-[0.1875rem] text-[0.5625rem]">{s.v}</span>}
+                  {!isCompact && <span className="opacity-70 ml-[0.1875rem] text-[0.5625rem]">{s.v}</span>}
                 </button>
               ))}
 
@@ -894,7 +896,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                     ))}
                     {sceneActive && cat.n === '性別・人数' && (
                       <span className="text-[0.625rem] font-mono text-muted self-center px-1">
-                        {lang === 'ja' ? '複数人数はシーン合成で設定' : 'Multi-person: use Scene Compose'}
+                        {lang === 'ja' ? '複数人数はキャラ共演で設定' : 'Multi-person: use Collab'}
                       </span>
                     )}
                   </div>

@@ -1,9 +1,17 @@
+import { useEffect } from "react";
+
 const DONATE_URL = 'https://buymeacoffee.com/prompt_loom';
 const X_URL = 'https://x.com/prompt_loom';
 
 export default function WelcomeHint({ lang, theme, onSetLang, onSetTheme, onDismiss, onOpenGuide, onOpenSettings }) {
   const L = lang;
   const T = theme;
+
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onDismiss(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onDismiss]);
 
   const steps = [
     {

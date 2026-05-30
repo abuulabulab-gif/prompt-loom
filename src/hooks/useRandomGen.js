@@ -300,6 +300,25 @@ function applyIllustSoftPenalties(blockMap) {
     }
   }
 
+  // 色気アクセント max 1 — 複数拾われた場合はランダムで1つだけ残す
+  const sexyPicked = [];
+  for (const [id, b] of blockMap) {
+    if (!b.text || b.locked) continue;
+    for (const seg of splitTags(b.text)) {
+      const tag = bareTag(seg).toLowerCase();
+      if (ILLUST_MODE_CONFIG.subtleSexyTags.has(tag)) sexyPicked.push({ id, tag: bareTag(seg) });
+    }
+  }
+  if (sexyPicked.length > 1) {
+    const keepIdx = Math.floor(Math.random() * sexyPicked.length);
+    for (let i = 0; i < sexyPicked.length; i++) {
+      if (i === keepIdx) continue;
+      const { id, tag } = sexyPicked[i];
+      const b = blockMap.get(id);
+      if (b && !b.locked) blockMap.set(id, { ...b, text: removeTag(b.text, tag) });
+    }
+  }
+
   // 顔隠しタグ × 顔見せタグのペア: 70%確率で隠しタグを除去
   for (const [hidingTag, showingTag] of ILLUST_MODE_CONFIG.faceHidePenaltyPairs) {
     if (allTags.has(hidingTag) && allTags.has(showingTag) && Math.random() < 0.70) {

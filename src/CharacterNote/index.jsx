@@ -4,9 +4,9 @@ import PromptLog from "./PromptLog.jsx";
 import TagMap from "./TagMap.jsx";
 
 const TABS = [
-  { id: 'profile', icon: '📋', ja: '設定シート',    en: 'Profile' },
-  { id: 'log',     icon: '🗂', ja: 'プロンプトログ', en: 'Prompt Log' },
-  { id: 'tagmap',  icon: '🔗', ja: 'タグ対応表',    en: 'Tag Map' },
+  { id: 'profile', icon: '🪪', ja: '設定シート',    en: 'Profile' },
+  { id: 'log',     icon: '📜', ja: 'プロンプトログ', en: 'Prompt Log' },
+  { id: 'tagmap',  icon: '🗂️', ja: 'タグ対応表',    en: 'Tag Map' },
 ];
 
 export default function CharacterNote({ char, lang, activeTool, posText, negText, onUpdateChar, onRestoreBlocks }) {

@@ -8,7 +8,7 @@ export default function CharVersions({ activeChar, lang, onSave, onRestore, onDe
   return (
     <div className="mb-[0.5625rem]">
       <div className="flex items-center gap-2 mb-1">
-        <span className="text-muted text-[0.625rem] font-mono">🕐 {lang === 'ja' ? 'バージョン管理' : 'Versions'}</span>
+        <span className="text-muted text-[0.625rem] font-mono">📷 {lang === 'ja' ? 'バージョン管理' : 'Versions'}</span>
         <span className="text-muted text-[0.625rem] font-mono">{versions.length}/10</span>
         <button onClick={() => setOpen(o => !o)} className="text-muted text-[0.625rem] cursor-pointer border border-dim rounded px-[0.3125rem] py-[0.0625rem]">{open ? '▲' : '▼'}</button>
       </div>

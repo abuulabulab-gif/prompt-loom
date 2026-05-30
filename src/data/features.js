@@ -47,8 +47,31 @@ export const FEATURE_ITEMS = {
         { ja:'首', en:'subtle birthmark on neck' },
       ],
     },
+    {
+      id:'bandaid_face', ja:'絆創膏', en:'Bandaid',
+      targetBlock:'face',
+      lrWarning:true,
+      options:[
+        { ja:'左頬', en:'bandaid on left cheek' },
+        { ja:'右頬', en:'bandaid on right cheek' },
+        { ja:'鼻',   en:'bandaid on nose' },
+        { ja:'額',   en:'bandaid on forehead' },
+      ],
+    },
   ],
   body: [
+    {
+      id:'body_mole', ja:'ほくろ', en:'Mole',
+      targetBlock:'body',
+      lrWarning:true,
+      options:[
+        { ja:'首',       en:'small mole on neck' },
+        { ja:'鎖骨',     en:'small mole on collarbone' },
+        { ja:'肩',       en:'small mole on shoulder' },
+        { ja:'胸元',     en:'small mole on upper chest' },
+        { ja:'太もも',   en:'small mole on thigh' },
+      ],
+    },
     {
       id:'body_scar', ja:'傷跡', en:'Scar',
       targetBlock:'body',
@@ -84,8 +107,78 @@ export const FEATURE_ITEMS = {
         { ja:'脚', en:'bandage on leg' },
       ],
     },
+    {
+      id:'bandaid_body', ja:'絆創膏', en:'Bandaid',
+      targetBlock:'feature',
+      options:[
+        { ja:'腕', en:'bandaid on arm' },
+        { ja:'膝', en:'bandaid on knee' },
+        { ja:'脚', en:'bandaid on leg' },
+      ],
+    },
   ],
   accessory: [
+    {
+      id:'piercing_pos', ja:'ピアス', en:'Piercing',
+      targetBlock:'feature',
+      lrWarning:true,
+      options:[
+        { ja:'両耳',   en:'ear piercing' },
+        { ja:'左耳',   en:'ear piercing left ear' },
+        { ja:'右耳',   en:'ear piercing right ear' },
+        { ja:'へそ',   en:'navel piercing' },
+        { ja:'リップ', en:'lip piercing' },
+        { ja:'鼻',     en:'nose piercing' },
+      ],
+    },
+    {
+      id:'glasses_pos', ja:'眼鏡', en:'Glasses',
+      targetBlock:'outfit',
+      subtypes:[
+        {
+          id:'normal', ja:'ノーマル',
+          options:[
+            { ja:'着用中',     en:'wearing glasses' },
+            { ja:'頭に乗せる', en:'glasses on head' },
+          ],
+        },
+        {
+          id:'under_rim', ja:'アンダーリム',
+          options:[
+            { ja:'着用中',     en:'under-rim glasses' },
+            { ja:'頭に乗せる', en:'under-rim glasses on head' },
+          ],
+        },
+        {
+          id:'half_rim', ja:'ハーフリム',
+          options:[
+            { ja:'着用中',     en:'half-rim glasses' },
+            { ja:'頭に乗せる', en:'half-rim glasses on head' },
+          ],
+        },
+        {
+          id:'round', ja:'丸メガネ',
+          options:[
+            { ja:'着用中',     en:'round eyewear' },
+            { ja:'頭に乗せる', en:'round eyewear on head' },
+          ],
+        },
+        {
+          id:'square', ja:'スクエア',
+          options:[
+            { ja:'着用中',     en:'square eyewear' },
+            { ja:'頭に乗せる', en:'square eyewear on head' },
+          ],
+        },
+        {
+          id:'goggles', ja:'ゴーグル',
+          options:[
+            { ja:'着用中',     en:'goggles' },
+            { ja:'頭に乗せる', en:'goggles on head' },
+          ],
+        },
+      ],
+    },
     {
       id:'sunglasses_pos', ja:'サングラス', en:'Sunglasses',
       targetBlock:'outfit',
@@ -93,14 +186,6 @@ export const FEATURE_ITEMS = {
         { ja:'着用中',       en:'wearing sunglasses' },
         { ja:'頭に乗せる',   en:'sunglasses on head' },
         { ja:'首元にかける', en:'sunglasses hanging from collar' },
-      ],
-    },
-    {
-      id:'glasses_pos', ja:'眼鏡', en:'Glasses',
-      targetBlock:'outfit',
-      options:[
-        { ja:'着用中',     en:'wearing glasses' },
-        { ja:'頭に乗せる', en:'glasses on head' },
       ],
     },
     {

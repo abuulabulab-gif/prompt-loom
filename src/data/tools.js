@@ -4,5 +4,5 @@ export const TOOLS = [
   { id:'nai',     name:'NovelAI',        nameEn:'NovelAI',        icon:'📘', suffix:'',               note:'重みを{}形式に変換',       noteEn:'Converts weights to {}',   sep:', ' },
   { id:'sd',      name:'SD/WebUI',       nameEn:'SD/WebUI',       icon:'🖼️', suffix:'',               note:'Forge/ComfyUI対応',        noteEn:'Forge/ComfyUI',            sep:', ' },
   { id:'flux',    name:'Flux2',          nameEn:'Flux2',          icon:'⚡', suffix:'',               note:'重み構文を自動除去',       noteEn:'Auto-strips weights',      sep:', ', stripWeights:true },
-  { id:'dalle',   name:'DALL-E/Copilot', nameEn:'DALL-E/Copilot', icon:'🎨', suffix:'',               note:'自然文タブへ自動切替',    noteEn:'Auto-switches to natural', sep:', ' },
+  { id:'dalle',   name:'DALL-E/Copilot', nameEn:'DALL-E/Copilot', icon:'🪄', suffix:'',               note:'自然文タブへ自動切替',    noteEn:'Auto-switches to natural', sep:', ' },
 ];

@@ -119,9 +119,11 @@ input::placeholder, textarea::placeholder {
 
 @keyframes tag-highlight-flash {
   0%   { filter: brightness(1); }
-  35%  { filter: brightness(1.6); }
+  20%  { filter: brightness(1.7); }
+  40%  { filter: brightness(1); }
+  65%  { filter: brightness(1.7); }
   100% { filter: brightness(1); }
 }
 .tag-highlight {
-  animation: tag-highlight-flash 0.75s ease-out;
+  animation: tag-highlight-flash 1.2s ease-out;
 }

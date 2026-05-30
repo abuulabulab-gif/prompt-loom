@@ -97,33 +97,27 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
       {showTip && (
         <div style={{
           position: 'fixed',
-          left: tipPos.x,
-          top: tipPos.y,
-          transform: 'translate(-50%, calc(-100% - 10px))',
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%)',
           zIndex: 9999,
-          background: 'rgba(6,8,18,0.96)',
-          border: '1px solid rgba(255,255,255,0.13)',
-          borderRadius: 10,
-          padding: '9px 14px 10px',
-          width: 300,
-          maxWidth: 'calc(100vw - 24px)',
+          background: 'rgba(6,8,18,0.97)',
+          border: '1px solid rgba(255,255,255,0.15)',
+          borderRadius: '0.875rem',
+          padding: '0.875rem 1.25rem 1rem',
+          width: '21.25rem',
+          maxWidth: 'calc(100vw - 2rem)',
           pointerEvents: 'none',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.55)',
+          boxShadow: '0 16px 48px rgba(0,0,0,0.7)',
           whiteSpace: 'normal',
           wordBreak: 'break-word',
         }}>
-          <div style={{ fontSize: 9, fontFamily: 'monospace', color: 'rgba(255,255,255,0.38)', letterSpacing: '0.07em', marginBottom: 5, textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '0.6875rem', fontFamily: 'monospace', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.08em', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
             {tag.en}
           </div>
-          <div style={{ fontSize: 12, fontFamily: 'monospace', color: 'rgba(255,255,255,0.88)', lineHeight: 1.7 }}>
+          <div style={{ fontSize: '0.75rem', fontFamily: 'monospace', color: 'rgba(255,255,255,0.92)', lineHeight: 1.8 }}>
             {lang === 'ja' ? desc.ja : desc.en}
           </div>
-          <div style={{
-            position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)',
-            width: 0, height: 0,
-            borderLeft: '5px solid transparent', borderRight: '5px solid transparent',
-            borderTop: '5px solid rgba(6,8,18,0.96)',
-          }} />
         </div>
       )}
       <button

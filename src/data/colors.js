@@ -26,15 +26,20 @@ export const SHADES = [
 ];
 
 export const COLOR_TARGETS = [
-  { id:'hair',          ja:'髪',            en:'hair'             },
-  { id:'inner_hair',    ja:'インナーカラー', en:'inner hair'       },
-  { id:'bangs',         ja:'前髪',          en:'bangs'            },
-  { id:'bang_streak',   ja:'前髪メッシュ',  en:'streak in bangs'  },
-  { id:'forelock',      ja:'前髪の一束',    en:'forelock'         },
-  { id:'hair_tips',     ja:'毛先',          en:'hair tips'        },
-  { id:'sidelocks',     ja:'サイドヘア',    en:'sidelocks'        },
+  // ── 髪全体（カラータイプ選択あり）─────────────────────────────
+  { id:'hair',          ja:'髪全体',        en:'hair',           hairGroup:'full'    },
+  // ── 前髪系（カラータイプ選択あり）──────────────────────────────
+  { id:'bangs',         ja:'前髪',          en:'bangs',          hairGroup:'front'   },
+  { id:'forelock',      ja:'前髪の一束',    en:'forelock',       hairGroup:'front'   },
+  // ── 部分カラー（単色のみ）──────────────────────────────────────
+  { id:'inner_hair',    ja:'インナー',      en:'inner hair',     hairGroup:'partial' },
+  { id:'bang_streak',   ja:'メッシュ',      en:'streak in bangs',hairGroup:'partial' },
+  { id:'hair_tips',     ja:'毛先',          en:'hair tips',      hairGroup:'partial' },
+  { id:'sidelocks',     ja:'サイドヘア',    en:'sidelocks',      hairGroup:'partial' },
+  // ── 瞳 ────────────────────────────────────────────────────────
   { id:'eyes',          ja:'瞳',            en:'eyes'             },
-  { id:'heterochromia', ja:'オッドアイ',    en:'heterochromia'},
+  { id:'heterochromia', ja:'オッドアイ',    en:'heterochromia'    },
+  // ── 衣装 ──────────────────────────────────────────────────────
   { id:'dress',         ja:'服',            en:'dress'       },
   { id:'shirt',         ja:'シャツ',        en:'shirt'       },
   { id:'skirt',         ja:'スカート',      en:'skirt'       },
@@ -45,8 +50,25 @@ export const COLOR_TARGETS = [
   { id:'embroidery',    ja:'刺繍',          en:'embroidery'  },
   { id:'lace',          ja:'レース',        en:'lace'        },
   { id:'shoes',         ja:'靴',            en:'footwear'    },
-  { id:'skin',          ja:'肌',            en:'skin'        },
-  { id:'theme',         ja:'テーマ色',      en:'theme'       },
+  // ── キャラパーツ ──────────────────────────────────────────────
+  { id:'nails',         ja:'爪',            en:'nails'       },
+  { id:'tail_color',    ja:'しっぽ',        en:'tail'        },
+  // ── その他 ────────────────────────────────────────────────────
+  { id:'bg_color',      ja:'背景カラー',    en:'background'  },
+];
+
+// 髪カラータイプ（髪全体・前髪系用）
+export const HAIR_TYPES = [
+  { id:'single',   ja:'単色',       en:'Single',   desc:'単色で染める' },
+  { id:'gradient', ja:'グラデ',     en:'Gradient', desc:'2色がグラデーションで変化' },
+  { id:'twotone',  ja:'ツートン',   en:'Two-tone', desc:'2色がはっきり分かれる' },
+  { id:'split',    ja:'スプリット', en:'Split',    desc:'左右で2色に分かれる' },
+];
+
+// 前髪用タイプ（グラデまでに限定）
+export const FRONT_HAIR_TYPES = [
+  { id:'single',   ja:'単色',   en:'Single',   desc:'単色で染める' },
+  { id:'gradient', ja:'グラデ', en:'Gradient', desc:'2色がグラデーションで変化' },
 ];
 
 // Overrides for shade+color combos that produce nonsensical/contradictory prompt text.
@@ -119,10 +141,19 @@ function _resolveColorName(nameLower) {
   return null;
 }
 
+// 髪カラータイプタグの日本語ラベル
+const HAIR_TYPE_LABELS = {
+  'gradient hair': 'グラデ髪', 'two-tone hair': 'ツートン髪',
+  'split-color hair': 'スプリット髪', 'multicolored hair': 'マルチカラー髪',
+};
+
 // Reverse-parse a tag string to a Japanese label. Returns { en, ja } or null.
 export function resolveColorLabel(tagEn) {
   if (!tagEn) return null;
   const tagLower = tagEn.trim().toLowerCase();
+
+  // Hair type tags
+  if (HAIR_TYPE_LABELS[tagLower]) return { en: tagEn.trim(), ja: HAIR_TYPE_LABELS[tagLower] };
 
   // Inner hair: "inner {name} hair"
   const innerM = tagLower.match(/^inner (.+) hair$/);

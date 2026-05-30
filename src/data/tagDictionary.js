@@ -88,6 +88,8 @@ export const TAG_DICT = {
   'see-through':           { ja: '薄い素材で下が透けて見える表現', en: 'Sheer fabric that reveals what is underneath' },
   'ruffles':               { ja: 'ひらひらした波型の装飾。フリルより大きめで豪華な印象', en: 'Wavy, gathered fabric trim — larger and more dramatic than frills' },
   'garter belt':           { ja: 'ストッキングを留める腰ベルト型の下着。太ももに装着する', en: 'Elastic belt worn around the waist/hips to hold up stockings' },
+  'stirrup leggings':      { ja: 'トレンカ。かかとと足先が開いた足首カバー付きレギンス。アパレル・ダンス系に多い', en: 'Footless tights with a strap under the foot — common in dance and fashion looks' },
+  'tights':                { ja: 'タイツ。脚全体を覆う厚手の不透明なストッキング。パンストより生地が厚い', en: 'Thick opaque hosiery covering legs — heavier and more opaque than pantyhose' },
   'pantyhose':             { ja: 'パンスト。脚全体を覆う薄いナイロンのタイツ', en: 'Thin nylon tights covering legs and hips' },
   'thighhighs':            { ja: '太ももまでの長いオーバーニーソックス', en: 'Thigh-high socks or stockings' },
   'pleated skirt':         { ja: '細かいヒダ（プリーツ）のスカート。制服によく使われる', en: 'Skirt with knife-pleats, common in school uniforms' },
@@ -118,6 +120,13 @@ export const TAG_DICT = {
   'gothic':                { ja: 'ゴシック調のスタイル修飾語。暗め・荘厳・ヴィクトリアン要素を衣装に加える。ゴスロリと違いアウトフィット全体のスタイルを変える', en: 'Style modifier that adds dark, Victorian, or solemn Gothic elements to an outfit — broader than gothic lolita' },
   'streetwear':            { ja: 'ストリートウェア。ヒップホップ・スケーター文化由来の都市型カジュアル。ビッグシルエット・ロゴ・スニーカーが定番', en: 'Urban casual fashion rooted in hip-hop/skate culture — oversized fits, logos, and sneakers' },
   'high fashion':          { ja: 'ハイファッション。ランウェイ発のハイブランド・前衛的デザイナーズ系スタイル。鋭いシルエットと独創的な素材感が特徴', en: 'Runway-level designer fashion — sharp silhouettes, unconventional materials, avant-garde aesthetics' },
+
+  // ── 特徴・装備 ────────────────────────────────────────────────
+  'bandaid':               { ja: '絆創膏。傷口に貼られた小さなテープ絆創膏。活発・戦闘後・ドジっ子キャラの演出に使う', en: 'Adhesive bandage strip on skin — used for energetic, battle-worn, or clumsy character expressions' },
+  'bandages':              { ja: '巻き包帯。怪我を覆う白い布製の包帯。ダメージを受けたキャラや戦闘後の表現に', en: 'White cloth bandage wrapping around a body part — battle-damage or injury effect' },
+  'eyepatch':              { ja: '眼帯。片目を覆う革または布製のパッチ。クールなキャラやファンタジー系に多い', en: 'Patch covering one eye — worn by cool, mysterious, or fantasy character archetypes' },
+  'collar':                { ja: '首輪。ペット風・ゴシック系・ファンタジー従属系キャラのアクセサリー', en: 'Collar worn around the neck — worn by pet-play, gothic, or fantasy-servitude character types' },
+  'face mask':             { ja: '口元を覆うフェイスマスク。医療用・防塵・ファッション系で外見のミステリアス感を演出する', en: 'Mask covering the mouth/lower face — medical, dustproof, or fashion-forward mystery effect' },
 
   // ── 特殊パーツ ────────────────────────────────────────────────
   'ball joints':           { ja: '球体関節人形のような球形のジョイントパーツ。ドール系キャラに', en: 'Spherical ball-and-socket joints at limbs — doll aesthetic' },

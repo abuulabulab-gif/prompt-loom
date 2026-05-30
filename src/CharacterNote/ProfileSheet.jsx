@@ -61,6 +61,22 @@ const SECTIONS = [
     ],
   },
   {
+    id: 'outfit', icon: '👗', ja: '衣装・見た目', en: 'Outfits',
+    fields: [
+      { key: 'outfit_main',    ja: 'メイン衣装（詳細）',  en: 'Main outfit (details)', multi: true },
+      { key: 'outfit_outdoor', ja: '外出衣装',            en: 'Outdoor outfit' },
+      { key: 'outfit_casual',  ja: '部屋着',              en: 'Casual / home wear' },
+      { key: 'outfit_sleep',   ja: 'パジャマ・寝具',      en: 'Sleepwear' },
+    ],
+  },
+  {
+    id: 'ai', icon: '🤖', ja: 'AI用メモ', en: 'AI Notes',
+    fields: [
+      { key: 'ai_tags',        ja: 'よく使うAIタグ',          en: 'Common AI tags', multi: true },
+      { key: 'ai_visual',      ja: 'ビジュアル・構図の指針',   en: 'Visual & composition guidance', multi: true },
+    ],
+  },
+  {
     id: 'speech', icon: '💬', ja: '話し方・感情', en: 'Speech & Emotions',
     fields: [
       { key: 'speech_style',  ja: '話し方の特徴・口調',         en: 'Speech style & tone' },
@@ -107,22 +123,6 @@ const SECTIONS = [
       { key: 'race_ability',   ja: '種族能力・属性',     en: 'Species ability / Attribute' },
       { key: 'combat',         ja: '戦闘スタイル',       en: 'Combat style' },
       { key: 'transform',      ja: '変身・解放形態',     en: 'Transformation / Release form', multi: true },
-    ],
-  },
-  {
-    id: 'outfit', icon: '👗', ja: '衣装・見た目', en: 'Outfits',
-    fields: [
-      { key: 'outfit_main',    ja: 'メイン衣装（詳細）',  en: 'Main outfit (details)', multi: true },
-      { key: 'outfit_outdoor', ja: '外出衣装',            en: 'Outdoor outfit' },
-      { key: 'outfit_casual',  ja: '部屋着',              en: 'Casual / home wear' },
-      { key: 'outfit_sleep',   ja: 'パジャマ・寝具',      en: 'Sleepwear' },
-    ],
-  },
-  {
-    id: 'ai', icon: '🤖', ja: 'AI用メモ', en: 'AI Notes',
-    fields: [
-      { key: 'ai_tags',        ja: 'よく使うAIタグ',          en: 'Common AI tags', multi: true },
-      { key: 'ai_visual',      ja: 'ビジュアル・構図の指針',   en: 'Visual & composition guidance', multi: true },
     ],
   },
   {

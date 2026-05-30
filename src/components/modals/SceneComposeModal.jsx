@@ -71,7 +71,7 @@ export default function SceneComposeModal({ characters, lang, theme, onClose, de
         className="bg-surface border border-linebright rounded-[0.875rem] w-full max-w-[38.75rem] max-h-[90vh] overflow-y-auto p-[1.125rem]">
 
         <div className="flex items-center justify-between mb-1.5">
-          <span className="text-fg text-[0.9375rem] font-extrabold">🎬 {lang === 'ja' ? 'シーン合成' : 'Scene Compose'}</span>
+          <span className="text-fg text-[0.9375rem] font-extrabold">🎬 {lang === 'ja' ? 'キャラ共演' : 'Collab'}</span>
           <button onClick={onClose} className="bg-transparent border border-dim rounded-md px-2.5 py-1 text-muted cursor-pointer text-xs">
             {lang === 'ja' ? '閉じる' : 'Close'}
           </button>

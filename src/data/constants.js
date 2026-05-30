@@ -29,7 +29,7 @@ export const LIMIT_LEN = 750;
 // Categories in this set are "optional" for 🎲 (picked with ~45% chance).
 // Categories NOT in this set are "core" and always get a pick first.
 // Categories picked at reduced probability (~15%) — neither core nor standard optional
-export const RARE_OPT_CAT_NAMES = new Set(['肌質感', 'ピアス・刺青', '装備・ケア', '衣装アクセント']);
+export const RARE_OPT_CAT_NAMES = new Set(['肌質感', 'ピアス・刺青', '装備・ケア']);
 
 export const OPTIONAL_CAT_NAMES = new Set([
   // 顔
@@ -39,7 +39,7 @@ export const OPTIONAL_CAT_NAMES = new Set([
   // 体型（肌色はコア化 → 常に1つ選ばれる）
   '肌質感', '細部', 'ボディフォーカス', '状態', '足',
   // 衣装
-  '素材・装飾', '装飾アクセ', '服装スタイル', '衣装アクセント',
+  '素材・装飾', '装飾アクセ', '服装スタイル', 'レッグウェア',
   // 特徴
   'ピアス・刺青', '装備・ケア', '武器・小物',
   // エフェクト（全て任意）
@@ -185,7 +185,7 @@ const LOWER_BODY_FRAME_OUT = new Set([
   'sneakers','loafers','mary janes','sandals','slippers','heels','pumps',
   'high heels','platform shoes','ankle boots','boots','knee-high boots',
   'thigh-high boots','platform boots','leg warmers','ankle socks','socks',
-  'knee-high socks','thighhighs','white thighhighs','black thighhighs','pantyhose',
+  'knee-high socks','thighhighs','white thighhighs','black thighhighs','tights','pantyhose','stirrup leggings',
   'barefoot','soles','toes','foot focus','pointed toes','toenail polish',
   'crossed legs','thigh gap','thigh strap',
   'mini skirt','micro skirt','hot pants','shorts','leggings',
@@ -208,14 +208,14 @@ export const RANDOM_EXCLUSION_RULES = new Map([
     'sneakers','loafers','mary janes','sandals','slippers','heels','pumps','high heels',
     'platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
     'ankle socks','socks','knee-high socks','thighhighs','white thighhighs','black thighhighs',
-    'pantyhose','leg warmers','barefoot',
+    'tights','pantyhose','stirrup leggings','leg warmers','barefoot',
     'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','slit skirt','pants','jeans','leggings',
   ])],
   ['lamia', new Set([
     'sneakers','loafers','mary janes','sandals','slippers','heels','pumps','high heels',
     'platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
     'ankle socks','socks','knee-high socks','thighhighs','white thighhighs','black thighhighs',
-    'pantyhose','leg warmers','barefoot',
+    'tights','pantyhose','stirrup leggings','leg warmers','barefoot',
     'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','slit skirt','pants','jeans','leggings',
   ])],
   // 裸足 → フットウェア全般を除外
@@ -225,6 +225,9 @@ export const RANDOM_EXCLUSION_RULES = new Map([
     'leg warmers','ankle socks','socks','knee-high socks','thighhighs','white thighhighs',
     'black thighhighs','pantyhose',
   ])],
+  // 服装スタイルとジャンルの重複除去
+  ['casual wear', new Set(['casual'])],
+  ['sportswear',  new Set(['sporty'])],
   // 背景環境の矛盾
   ['underwater',   new Set(['fire','explosion','embers','electricity','lightning','lens flare','god rays','sparkles'])],
   ['outer space',  new Set(['rain','snowfall','wind','mist','fire','explosion','sunlight'])],
@@ -306,14 +309,14 @@ export const RANDOM_EXCLUSION_RULES = new Map([
     'sneakers','loafers','mary janes','sandals','slippers','heels','pumps','high heels',
     'platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
     'leg warmers','ankle socks','socks','knee-high socks','thighhighs','white thighhighs',
-    'black thighhighs','pantyhose','barefoot',
+    'black thighhighs','tights','pantyhose','stirrup leggings','barefoot',
     'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','slit skirt','pants','jeans','leggings',
   ])],
   ['lamia tail', new Set([
     'sneakers','loafers','mary janes','sandals','slippers','heels','pumps','high heels',
     'platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
     'leg warmers','ankle socks','socks','knee-high socks','thighhighs','white thighhighs',
-    'black thighhighs','pantyhose','barefoot',
+    'black thighhighs','tights','pantyhose','stirrup leggings','barefoot',
     'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','slit skirt','pants','jeans','leggings',
   ])],
 ]);
@@ -379,8 +382,8 @@ export const CHARDESIGN_MODE_CONFIG = {
   faceMakeupPhysical: new Set(['fang', 'freckles', 'mole under eye']),
 
   // 顔ブロック：カテゴリは残すが特定タグを除外
-  // floating hair（動きのある髪）+ 全身絵では視認できない特殊瞳タグ
-  skipFaceTags: new Set(['floating hair', 'star-shaped pupils', 'heart-shaped pupils', 'white pupils']),
+  // floating hair（動きのある髪）+ 全身絵では視認できない特殊瞳タグ + 色気系（キャラデザでは不要）
+  skipFaceTags: new Set(['floating hair', 'star-shaped pupils', 'heart-shaped pupils', 'white pupils', 'bedroom eyes', 'seductive gaze', 'sultry look', 'teasing smile']),
 
   // 体型ブロック：抽選しないカテゴリ（状態・ボディフォーカス）
   skipBodyCats: new Set(['状態', 'ボディフォーカス', '肌質感']),
@@ -416,6 +419,12 @@ export const ILLUST_MODE_CONFIG = {
   excludedTags: new Set([
     'white background','simple background','gradient background',
     'concept art','character design','character sheet','reference sheet','model sheet',
+  ]),
+  // 色気アクセントタグ — ランダムで同時に複数出た場合に1つだけ残す対象
+  subtleSexyTags: new Set([
+    'sultry look', 'seductive gaze', 'teasing smile', 'bedroom eyes',
+    'licking lips', 'biting lip',
+    'hand on neck', 'leaning forward',
   ]),
   // extreme/face close-up時にSoft Penalty（70%確率で除去）するタグ
   closeupSoftPenaltyTags: new Set([
