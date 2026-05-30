@@ -39,6 +39,9 @@ export const COLOR_TARGETS = [
   // ── 瞳 ────────────────────────────────────────────────────────
   { id:'eyes',          ja:'瞳',            en:'eyes'             },
   { id:'heterochromia', ja:'オッドアイ',    en:'heterochromia'    },
+  // ── キャラパーツ ──────────────────────────────────────────────
+  { id:'nails',         ja:'爪',            en:'nails'       },
+  { id:'tail_color',    ja:'しっぽ',        en:'tail'        },
   // ── 衣装 ──────────────────────────────────────────────────────
   { id:'dress',         ja:'服',            en:'dress'       },
   { id:'shirt',         ja:'シャツ',        en:'shirt'       },
@@ -50,9 +53,6 @@ export const COLOR_TARGETS = [
   { id:'embroidery',    ja:'刺繍',          en:'embroidery'  },
   { id:'lace',          ja:'レース',        en:'lace'        },
   { id:'shoes',         ja:'靴',            en:'footwear'    },
-  // ── キャラパーツ ──────────────────────────────────────────────
-  { id:'nails',         ja:'爪',            en:'nails'       },
-  { id:'tail_color',    ja:'しっぽ',        en:'tail'        },
   // ── その他 ────────────────────────────────────────────────────
   { id:'bg_color',      ja:'背景カラー',    en:'background'  },
 ];
