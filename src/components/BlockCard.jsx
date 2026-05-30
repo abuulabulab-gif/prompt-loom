@@ -15,7 +15,7 @@ const CATS_CLOSED = new Set([
   // 顔
   'face_innerhair', 'face_bangs', 'face_eyeshape', 'face_eyebrows', 'face_mouth', 'face_hairdetail', 'face_makeup',
   // 属性
-  'attr_age', 'attr_parts',
+  'attr_age', 'attr_kemono', 'attr_parts',
   // 体型
   'body_skin', 'body_detail', 'body_focus', 'body_feet',
   // 衣装
