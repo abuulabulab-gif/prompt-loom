@@ -591,6 +591,116 @@ function applyOutfitStackPenalty(blockMap) {
   if (text !== ob.text) blockMap.set('outfit', { ...ob, text });
 }
 
+// ── カラーメーカー自動付与レイヤー ─────────────────────────────────────────
+// 衣装・キャラパーツが存在するとき条件付きで色タグを付与する
+const CM_OUTFIT_SLOTS = [
+  // [targetEn, trigger tags or null, probability, isDetail]
+  ['dress',      new Set(['dress','sundress','sweater dress','wedding dress','evening gown','cheongsam','hanfu','furisode','kimono','yukata','shrine maiden','maid outfit','witch outfit','magical girl','gothic lolita','idol costume','cheerleader','race queen','fantasy armor','bikini armor','bunny suit','bodysuit','leotard','swimsuit','one-piece swimsuit','school swimsuit','tracksuit']), 0.55, false],
+  ['shirt',      new Set(['shirt','blouse','white shirt','dress shirt','school uniform','sailor uniform','blazer uniform','off shoulder','crop top','tank top','tube top','halter top','sleeveless','sports bra']),                                                                                                                                                                                    0.40, false],
+  ['skirt',      new Set(['skirt','pleated skirt','mini skirt','micro skirt','slit skirt']),                                                                                                                                                                                                                                                                                                          0.50, false],
+  ['jacket',     new Set(['jacket','coat','trench coat','cardigan','hoodie','sweater','sweater vest','vest','turtleneck']),                                                                                                                                                                                                                                                                            0.40, false],
+  ['ribbon',     new Set(['ribbons','bows','ruffles','frills']),                                                                                                                                                                                                                                                                                                                                      0.65, true ],
+  ['trim',       new Set(['lace trim']),                                                                                                                                                                                                                                                                                                                                                              0.65, true ],
+  ['embroidery', new Set(['embroidery']),                                                                                                                                                                                                                                                                                                                                                             0.65, true ],
+  ['lace',       new Set(['lace']),                                                                                                                                                                                                                                                                                                                                                                   0.55, true ],
+  ['footwear',   new Set(['sneakers','loafers','mary janes','sandals','slippers','heels','pumps','high heels','platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots']),                                                                                                                                                                                          0.30, false],
+];
+const CM_TAIL_TRIGGERS = new Set(['cat tail','fox tail','wolf tail','fluffy tail','bunny tail','dog tail','horse tail','cow tail','demon tail','dragon tail','multiple tails']);
+
+function applyColorMakerLayer(blockMap, mode) {
+  const overallProb = mode === 'chardesign' ? 0.70 : 0.55;
+  if (Math.random() > overallProb) return;
+
+  const outfitBlock = blockMap.get('outfit');
+  const attrBlock   = blockMap.get('attribute');
+  const featBlock   = blockMap.get('feature');
+
+  const mainColorObj  = COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
+  const mainShade     = pickWeightedShade();
+  const useAccent     = Math.random() < 0.40;
+  const accentColorEn = useAccent ? pickContrastingColor(mainColorObj.en) : null;
+  const accentShade   = useAccent ? pickWeightedShade() : mainShade;
+  const accentColorObj = accentColorEn ? (COLOR_PALETTE.find(c => c.en === accentColorEn) ?? { en: accentColorEn }) : mainColorObj;
+
+  const makeTag = (isDetail, targetEn) => {
+    const shade = (isDetail && useAccent) ? accentShade : mainShade;
+    const cObj  = (isDetail && useAccent) ? accentColorObj : mainColorObj;
+    return buildColorTag(shade.en, cObj.en, targetEn);
+  };
+
+  let added = 0;
+  const MAX_TAGS = 5;
+
+  if (outfitBlock && !outfitBlock.locked) {
+    let text = outfitBlock.text || '';
+    for (const [targetEn, keys, prob, isDetail] of CM_OUTFIT_SLOTS) {
+      if (added >= MAX_TAGS) break;
+      if (keys !== null && ![...keys].some(k => hasTag(text, k))) continue;
+      if (keys === null && !text) continue;
+      if (Math.random() > prob) continue;
+      const tag = makeTag(isDetail, targetEn);
+      if (!hasTag(text, tag)) { text = appendTag(text, tag, outfitBlock.strength); added++; }
+    }
+    if (text !== (outfitBlock.text || '')) blockMap.set('outfit', { ...outfitBlock, text });
+  }
+
+  if (added < MAX_TAGS && attrBlock && !attrBlock.locked) {
+    const t = attrBlock.text || '';
+    if ([...CM_TAIL_TRIGGERS].some(k => hasTag(t, k)) && Math.random() < 0.55) {
+      const tag = makeTag(true, 'tail');
+      if (!hasTag(t, tag)) { blockMap.set('attribute', { ...attrBlock, text: appendTag(t, tag, attrBlock.strength) }); added++; }
+    }
+  }
+
+  if (added < MAX_TAGS && featBlock && !featBlock.locked && Math.random() < 0.15) {
+    const t = featBlock.text || '';
+    const tag = makeTag(true, 'nails');
+    if (!hasTag(t, tag)) blockMap.set('feature', { ...featBlock, text: appendTag(t, tag, featBlock.strength) });
+  }
+}
+
+// ── 特徴メーカー自動配置レイヤー ─────────────────────────────────────────
+// 位置が曖昧な特徴タグに位置情報を付与する
+const FM_POSITIONS = new Map([
+  ['mole',      { pos: ['mole under left eye','mole under right eye','mole near mouth','mole on cheek','mole on neck','mole on collarbone'], face: true  }],
+  ['scar',      { pos: ['facial scar','scar above eyebrow','scar on cheek','scar on neck'],                                                  face: true  }],
+  ['birthmark', { pos: ['birthmark on cheek','birthmark on neck','birthmark on shoulder'],                                                   face: false }],
+  ['tattoo',    { pos: ['tattoo on shoulder','tattoo on upper arm','tattoo on back','tattoo on thigh'],                                      face: false }],
+  ['bandaid',   { pos: ['bandaid on cheek','bandaid on forehead','bandaid on nose'],                                                         face: true  }],
+  ['eyepatch',  { pos: ['eyepatch over left eye','eyepatch over right eye'],                                                                 face: true  }],
+]);
+const FM_FACE_NEUTRAL = new Set(['neck','collarbone','shoulder','back','thigh','arm']);
+
+function applyFeatureMakerLayer(blockMap) {
+  const allText = [...blockMap.values()].map(b => b.text || '').join(', ');
+  let faceUsed = hasTag(allText, 'mole under eye') ? 1 : 0;
+
+  for (const [blockId, block] of blockMap) {
+    if (!block.text || block.locked) continue;
+    let text = block.text;
+    let changed = false;
+
+    for (const [baseTag, { pos, face }] of FM_POSITIONS) {
+      if (!hasTag(text, baseTag)) continue;
+
+      let available = pos;
+      if (face && faceUsed >= 2) {
+        // 顔に特徴が集中している場合は首・肩等の非顔位置のみ許可
+        available = pos.filter(p => [...FM_FACE_NEUTRAL].some(n => p.includes(n)));
+        if (available.length === 0) continue;
+      }
+
+      const chosen = available[Math.floor(Math.random() * available.length)];
+      text = removeTag(text, baseTag);
+      text = appendTag(text, chosen, block.strength);
+      changed = true;
+      if (face && [...FM_FACE_NEUTRAL].every(n => !chosen.includes(n))) faceUsed++;
+    }
+
+    if (changed) blockMap.set(blockId, { ...block, text });
+  }
+}
+
 export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
   const [randomMode, setRandomMode] = useState(() => localStorage.getItem('loom_randomMode') || 'illust');
 
@@ -756,6 +866,9 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
 
       // 衣装スタック Soft Penalty: 強いジャンル衣装 + スタイル/装飾の重ねすぎを間引く
       applyOutfitStackPenalty(blockMap);
+      // カラーメーカー・特徴メーカーの条件付き自動付与レイヤー
+      applyColorMakerLayer(blockMap, mode);
+      applyFeatureMakerLayer(blockMap);
 
       // Simple background → suppress lighting and effect (environmental FX clash with plain BG)
       if (mode !== 'chardesign') {
