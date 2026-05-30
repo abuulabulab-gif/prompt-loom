@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect } from "react";
 
-const APP_VERSION = 'v2.0';
+const APP_VERSION = 'v2.1';
 const APP_YEAR = '2026';
 
 const SHORTCUTS = (lang) => [
@@ -52,10 +52,16 @@ const SHORTCUTS = (lang) => [
 
 const MOBILE_TIPS = (lang) => [
   {
-    icon: '☰',
+    icon: '⊞',
     text: lang === 'ja'
-      ? 'ヘッダー左のLOOMアイコンをタップするとブロック一覧が表示され、目的のブロックへ瞬時にジャンプできます'
-      : 'Tap the LOOM icon (top-left) to open the block list. Tap any entry to instantly scroll to that block',
+      ? 'ヘッダー左の9点グリッドアイコンをタップするとブロック一覧ドロワーが開き、目的のブロックへ瞬時にジャンプできます'
+      : 'Tap the 9-dot grid icon (top-left) to open the block list drawer. Tap any entry to instantly scroll to that block',
+  },
+  {
+    icon: '🔄',
+    text: lang === 'ja'
+      ? '「LOOM」ロゴをタップするとページを再読み込みできます。動作がおかしいときや表示が乱れたときに使ってください'
+      : 'Tap the "LOOM" logo to reload the page. Use this when something feels off or the display is not responding correctly',
   },
   {
     icon: '🎲',
@@ -110,6 +116,18 @@ const MOBILE_TIPS = (lang) => [
     text: lang === 'ja'
       ? 'COPYボタンでプロンプトをクリップボードへコピー。✏️ボタンでコピー前に最終テキストを手直しできます'
       : 'COPY button copies the prompt. Tap ✏️ to manually edit the final text right before copying',
+  },
+  {
+    icon: '🎨',
+    text: lang === 'ja'
+      ? '✦ツール → 🎨カラーメーカーで髪・瞳・衣装・背景などの色をビジュアルで選択。グラデ・ツートン・スプリット等のカラータイプにも対応。ブロックの🎨ボタンから絞り込み起動も可能'
+      : '✦ Tools → 🎨 Color Maker to visually pick colors for hair, eyes, outfits, background, and more. Supports gradient, two-tone, and split types. Launch from a block\'s 🎨 button for targeted use',
+  },
+  {
+    icon: '🎯',
+    text: lang === 'ja'
+      ? '✦ツール → 🎯特徴メーカーでほくろ・傷跡・眼鏡・絆創膏・ピアスなどをカテゴリ→パーツ→位置の3ステップで選択してタグ追加。ブロックの🎯ボタンからそのブロック向けの特徴に絞り込んで起動も可能'
+      : '✦ Tools → 🎯 Feature Maker to add moles, scars, glasses, bandaids, piercings and more in three steps. Launch from a block\'s 🎯 button for block-specific features',
   },
   {
     icon: '💡',
@@ -176,6 +194,8 @@ const GUIDE = (lang) => [
       { icon: lang === 'ja' ? '🗑 全リセット' : '🗑 Reset All', text: lang === 'ja' ? '出力バー左側の🗑ボタンで全ブロックのテキストを一括リセット。展開/折りたたみ・📸・✏️と同じ行の左詰め側に並んでいる。確認ダイアログあり' : 'The 🗑 button in the output bar\'s left cluster resets all block text at once. A confirmation dialog appears' },
       { icon: '📷 Ver', text: lang === 'ja' ? 'バージョン管理でブロック設定を名前付きスナップショットで保存。任意の時点に復元可能（最大10件）' : 'Version control saves named block-state snapshots. Restore to any of up to 10 saved points' },
       { icon: lang === 'ja' ? '⌘K コマンド' : '⌘K Palette', text: lang === 'ja' ? 'Ctrl+K コマンドパレットで全機能にキーボードからアクセス。「おまかせ」もここから実行可' : 'Ctrl+K command palette gives keyboard access to all features including Random generation' },
+      { icon: lang === 'ja' ? '⊞ キャラパネル' : '⊞ Char Panel', text: lang === 'ja' ? '【PC限定】ヘッダー左の9点グリッドアイコンをクリックすると全キャラクターの一覧パネルが縦展開。各キャラのサムネイル（またはアイコン）・ブロックドット・充実度バー・タグ数を確認でき、クリックでキャラ切替も可能' : '[PC only] Click the 9-dot grid icon in the header to open the character list panel. Shows each character\'s thumbnail (or emoji), block dots, fill bar, and tag count — click to switch characters' },
+      { icon: lang === 'ja' ? '✏️ 絵文字' : '✏️ Emoji', text: lang === 'ja' ? '【PC限定】キャラパネルの絵文字プリセット右の入力欄に任意の絵文字を入力してキャラアイコンをカスタマイズ。Enterまたはフォーカスを外すと確定' : '[PC only] Type any emoji in the input field to the right of the emoji preset row in the character panel — press Enter or click away to apply' },
       { icon: lang === 'ja' ? '▦ 列数' : '▦ Col', text: lang === 'ja' ? '【PC限定】列数切替（▢/▥/▦）でブロックを1/2/3列表示。ヘッダー右側に表示される' : '[PC only] Column toggle (▢/▥/▦) for 1/2/3-column block layout. Appears in the top-right header' },
       { icon: lang === 'ja' ? '↩ 取り消し' : '↩ Undo', text: lang === 'ja' ? 'テンプレート適用後、変更されたブロックのヘッダーに↩ボタンが表示される。ブロック単位でテンプレート適用前の状態に戻せる（5秒間有効）' : 'After applying a template, ↩ appears on each changed block. Click to revert that block individually (active for 5 seconds)' },
       { icon: lang === 'ja' ? '↺ 順リセット' : '↺ Reset', text: lang === 'ja' ? '✦ ツールメニューの「↺ブロック順リセット」でブロックの並び順をデフォルトに戻す。カスタムブロックは末尾に残る' : '"↺ Reset block order" in ✦ Tools restores the default arrangement. Custom blocks stay at end' },
@@ -225,7 +245,7 @@ const PLATFORM_DIFF = (lang) => [
     category: lang === 'ja' ? 'キャラクター識別' : 'Character ID',
     rows: [
       { feature: lang === 'ja' ? 'バー表示' : 'Bar display', mobile: lang === 'ja' ? '色の丸のみ' : 'Color dot only', pc: lang === 'ja' ? '色 + 種族絵文字 + 名前' : 'Color + species emoji + name' },
-      { feature: lang === 'ja' ? '絵文字の変更' : 'Change emoji', mobile: lang === 'ja' ? '設定なし（色のみ）' : 'Not available (color only)', pc: lang === 'ja' ? 'キャラパネルで種族絵文字を設定' : 'Set species emoji in char panel', mobileNa: true },
+      { feature: lang === 'ja' ? '絵文字の変更' : 'Change emoji', mobile: lang === 'ja' ? '設定なし（色のみ）' : 'Not available (color only)', pc: lang === 'ja' ? 'キャラパネルで選択。入力欄から任意の絵文字もカスタム設定可能' : 'Select from presets in char panel, or type any custom emoji in the input field', mobileNa: true },
     ],
   },
   {
@@ -240,7 +260,7 @@ const PLATFORM_DIFF = (lang) => [
     rows: [
       { feature: lang === 'ja' ? 'カスタムブロック上限' : 'Custom block limit', mobile: lang === 'ja' ? '最大3個' : 'Max 3', pc: lang === 'ja' ? '最大5個' : 'Max 5' },
       { feature: lang === 'ja' ? '強度ボタン表示' : 'Strength buttons', mobile: lang === 'ja' ? '標準・強の2段階' : '2 levels (Norm / Strong)', pc: lang === 'ja' ? '6段階すべて表示' : 'All 6 levels shown' },
-      { feature: lang === 'ja' ? 'ブロックへのジャンプ' : 'Jump to block', mobile: lang === 'ja' ? 'グリッドアイコン → ドロワー一覧' : 'Grid icon → drawer list', pc: lang === 'ja' ? 'スクロールで移動' : 'Scroll to navigate' },
+      { feature: lang === 'ja' ? 'ブロックへのジャンプ' : 'Jump to block', mobile: lang === 'ja' ? 'グリッドアイコン → ブロック一覧ドロワー' : 'Grid icon → block list drawer', pc: lang === 'ja' ? 'グリッドアイコン → キャラパネル内でブロックドット確認、スクロールで移動' : 'Grid icon → character panel (block dots), or scroll to navigate' },
       { feature: lang === 'ja' ? 'ブロックの非表示' : 'Hide block', mobile: lang === 'ja' ? 'Expertモード：ダブルタップ' : 'Expert: double-tap', pc: lang === 'ja' ? 'Expertモード：ダブルタップ' : 'Expert: double-tap' },
     ],
   },
@@ -732,6 +752,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                 </div>
                 <div className="space-y-[0.3125rem]">
                   {[
+                    { v: 'v2.1', note: lang === 'ja' ? 'カラーメーカーv2：髪グラデ・ツートン・スプリット対応、背景・爪・しっぽカラー追加。特徴メーカー拡張：眼鏡サブタイプ選択、絆創膏（顔/ボディ）・ボディほくろ・ピアス追加。キャラクターパネル（PCグリッドアイコン）：縦リストでサムネ/絵文字・ブロックドット・充実度バー・タグ数を一覧表示、クリックでキャラ切替・新キャラ追加も可能。絵文字カスタム入力：プリセット外の任意絵文字を直接入力可能に。ユニコーン🦄を絵文字一覧に追加（22種）。衣装ブロックにレッグウェア・フットウェアカテゴリ分離追加。LOOMロゴクリック・タップでページリロード。目つき・表情に新タグ追加。シーン合成→キャラ共演に改名' : 'Color Maker v2: gradient, two-tone, and split hair types; background/nail/tail colors added. Feature Maker expanded: glasses subtype selection, face/body bandaid, body mole, piercing. Character Panel (PC grid icon): vertical list showing thumbnail/emoji, block dots, fill bar, and tag count — click to switch characters or add new ones. Custom emoji input: type any emoji beyond the preset list. Unicorn 🦄 added to emoji presets (22 total). Outfit block now has separate Legwear and Footwear categories. LOOM logo click/tap reloads page. New eye and expression tags. Scene Compose renamed to Collab.' },
                     { v: 'v2.0', note: lang === 'ja' ? 'フォーカスモードをスマホに対応（フルスクリーンオーバーレイ）。アクティブタグストリップ追加（クリックでカテゴリジャンプ＆ハイライト）。高DPI/FHD向けremベース・レスポンシブフォント。ランダム生成を2モード再設計（🧍キャラ特化/🖼️イラスト）。逆解析に一括適用・未認識タグのカスタム登録。クラウド同期に「今すぐ同期」ボタン・オフライン復帰自動再Push・履歴オートスライス。競合タグ警告を2段階化（エラー/ソフト）。タグ名変更エイリアス・カテゴリ安定ID対応（データ移行堅牢化）' : 'Focus mode now on mobile (fullscreen overlay). Active tag strip — click chip to jump to its category with highlight. Responsive rem-based font for HiDPI/FHD. Random gen redesigned: 2 modes (🧍 Char.Focused / 🖼️ Illust). Analyze: batch apply + custom-import for unknown tags. Cloud sync: "Sync now" force-pull, auto-retry on reconnect, history auto-slice. Conflict warnings now two-level (error / soft). Tag alias migration + stable category IDs for data robustness.' },
                     { v: 'v2.0', note: lang === 'ja' ? 'カラーメーカー大幅拡張：部分カラー（インナー・メッシュ・毛先・サイドヘア）・前髪系（forelock）・オッドアイ（2色ピッカー）・爪色・しっぽ色を追加。矛盾する色名の自動修正（pale blue・midnight blue等）。特徴メーカー新規追加：ほくろ・そばかす・傷跡・あざ・眼鏡（6種）・サングラス・眼帯・包帯・タトゥー・絆創膏・ピアスをカテゴリ→パーツ→位置の3ステップで追加。アイコン整理（作風🖌️、DALL-E🪄、画像解析👁️）。タグ辞書にbandaid・bandages・eyepatch・collar・face mask追加。ウェルカムモーダルにEscapeキー対応追加' : 'Color Maker major expansion: partial hair colors (inner/streak/tips/sidelocks), forelock, heterochromia dual-picker, nail color, tail color. Auto-fix for contradictory color names. Feature Maker added: moles, freckles, scars, birthmarks, glasses (6 types), sunglasses, eyepatch, bandage, tattoo, bandaid, piercing — 3-step flow. Icon cleanup: artstyle 🖌️, DALL-E 🪄, image-to-tags 👁️. Tag dictionary additions. Welcome modal now closes on Escape.' },
                     { v: 'v1.9', note: lang === 'ja' ? '極限クローズアップテンプレート追加（口元・目・魚眼）。テンプレートにネガ推奨タグ（negHint）表示。全テンプレートタグをブロックで個別選択可能に統一。ブロック別テンプレート適用取り消し（↩）ボタン追加。キャラノート設定シートにAIタグフィールド・TSVエクスポート・エディタからのインポートを統合。プロンプトログの重複自動記録防止・タグ対応表の挿入時重複スキップ。ランダム生成から特定タグを除外するexcludeFromRandomフラグ追加。競合ルール・タグ辞書拡充' : 'New extreme close-up templates (lip focus, eye focus, fisheye). Templates show negHint suggestions. All template tags now individually selectable in blocks. Per-block template undo (↩) button. Character note profile sheet gains per-field AI tag rows, TSV export, and editor import. Prompt log dedup on COPY, tag map insert dedup. excludeFromRandom flag to prevent extreme tags in random generation. Expanded conflict rules and tag dictionary.' },

@@ -1172,12 +1172,12 @@ export default function Loom() {
               if (isMobile) { setJumpOpen(p => !p); return; }
               if (!blockStatusOpen && gridIconRef.current) {
                 const r = gridIconRef.current.getBoundingClientRect();
-                const w = 220;
-                setBlockStatusPos({ top: r.bottom + 4, left: Math.max(8, Math.min(r.left, window.innerWidth - w - 8)), width: w });
+                const w = 264;
+                setBlockStatusPos({ top: r.bottom + 6, left: Math.max(8, Math.min(r.left, window.innerWidth - w - 8)), width: w });
               }
               setBlockStatusOpen(p => !p);
             }}
-            title={lang === 'ja' ? 'ブロックステータス' : 'Block status'}
+            title={lang === 'ja' ? 'キャラクター一覧' : 'Characters'}
             className="w-[1.875rem] h-[1.875rem] rounded-lg flex items-center justify-center flex-shrink-0 bg-[linear-gradient(135deg,#5a7fff,#b06fff)] cursor-pointer active:opacity-70 select-none"
           >
             <svg width="15" height="15" viewBox="0 0 15 15" fill="white">
@@ -1558,6 +1558,30 @@ export default function Loom() {
                   style={{ background: activeChar.emoji === em ? activeChar.color + '30' : 'transparent' }}
                   className="text-xs cursor-pointer p-[0.0625rem] leading-none rounded-[0.1875rem] text-center">{em}</span>)}
               </div>
+              <input
+                key={`emoji-${activeChar.id}`}
+                type="text"
+                defaultValue={CHAR_EMOJIS.includes(activeChar.emoji) ? '' : activeChar.emoji}
+                placeholder="✏️"
+                maxLength={8}
+                onBlur={e => {
+                  const raw = e.target.value.trim();
+                  if (!raw) return;
+                  const first = (typeof Intl !== 'undefined' && Intl.Segmenter)
+                    ? ([...new Intl.Segmenter().segment(raw)][0]?.segment ?? '')
+                    : ([...raw][0] ?? '');
+                  if (first) updateChar(activeChar.id, { emoji: first });
+                }}
+                onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+                title={lang === 'ja' ? '絵文字をカスタム入力（任意の絵文字をペーストまたは入力）' : 'Custom emoji — paste or type any emoji'}
+                style={{
+                  width: '1.875rem', textAlign: 'center', fontSize: '0.75rem',
+                  background: 'rgb(var(--bg))',
+                  border: `1px solid ${CHAR_EMOJIS.includes(activeChar.emoji) ? 'rgb(var(--dim))' : activeChar.color + '80'}`,
+                  color: 'rgb(var(--text))',
+                }}
+                className="flex-shrink-0 rounded-[0.25rem] outline-none py-[0.0625rem] font-mono"
+              />
               <div className="flex-1" />
               <button onClick={() => setRandomMode(m => { const n = m === 'chardesign' ? 'illust' : 'chardesign'; localStorage.setItem('loom_randomMode', n); return n; })}
                 title={randomMode === 'chardesign' ? (lang === 'ja' ? 'キャラ特化モード（クリックでイラストモードへ）' : 'Char.Focused mode (click for Illust)') : (lang === 'ja' ? 'イラストモード（クリックでキャラ特化モードへ）' : 'Illust mode (click for Char.Focused)')}
@@ -2010,80 +2034,125 @@ export default function Loom() {
         </>
       )}
 
-      {/* ── Block Status Popover (PC) ── */}
+      {/* ── キャラクターパネル (PC) ── */}
       {!isMobile && blockStatusOpen && (
         <>
           <div className="fixed inset-0 z-[199]" onClick={() => setBlockStatusOpen(false)} />
           <div
             ref={blockStatusRef}
-            className="fixed z-[200] rounded-[0.625rem] overflow-hidden"
+            className="fixed z-[200] rounded-[0.75rem] overflow-hidden"
             style={{
               top: blockStatusPos?.top,
               left: blockStatusPos?.left,
-              width: blockStatusPos?.width ?? 220,
-              maxHeight: '72vh',
+              width: blockStatusPos?.width ?? 264,
+              maxHeight: '80vh',
               background: 'rgb(var(--surface))',
-              border: theme === 'light'
-                ? '1px solid rgba(0,0,0,0.14)'
-                : '1px solid rgb(var(--border-bright))',
-              boxShadow: theme === 'light'
-                ? '0 8px 32px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.10)'
-                : '0 8px 32px rgba(0,0,0,0.55)',
+              border: theme === 'light' ? '1px solid rgba(0,0,0,0.12)' : '1px solid rgb(var(--border-bright))',
+              boxShadow: theme === 'light' ? '0 12px 40px rgba(0,0,0,0.16), 0 2px 6px rgba(0,0,0,0.08)' : '0 12px 40px rgba(0,0,0,0.6)',
             }}
           >
             {/* ヘッダー */}
-            <div className="px-3 py-2 flex items-center justify-between flex-shrink-0"
-              style={{ borderBottom: theme === 'light' ? '1px solid rgba(0,0,0,0.10)' : '1px solid rgb(var(--border))' }}>
-              <span className="text-[0.625rem] font-mono font-bold"
-                style={{ color: theme === 'light' ? 'rgba(0,0,0,0.55)' : 'rgb(var(--muted))' }}>
-                {lang === 'ja' ? 'ブロックステータス' : 'Block Status'}
+            <div className="px-3 py-[0.4375rem] flex items-center gap-2 flex-shrink-0"
+              style={{ borderBottom: theme === 'light' ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgb(var(--border))' }}>
+              <span className="text-[0.5625rem] font-mono font-bold tracking-[0.1em] uppercase"
+                style={{ color: theme === 'light' ? 'rgba(0,0,0,0.4)' : 'rgb(var(--muted))' }}>
+                {lang === 'ja' ? 'キャラクター' : 'Characters'}
               </span>
-              <span className="text-[0.5625rem] font-mono"
-                style={{ color: theme === 'light' ? 'rgba(0,0,0,0.38)' : 'rgb(var(--dim))' }}>
-                {visibleBlocks.filter(b => b.enabled !== false && b.text).length}/{visibleBlocks.length}
+              <span className="text-[0.5rem] font-mono rounded-full px-[0.3125rem] py-[0.0625rem]"
+                style={{ background: theme === 'light' ? 'rgba(0,0,0,0.07)' : 'rgb(var(--surface-alt))', color: theme === 'light' ? 'rgba(0,0,0,0.4)' : 'rgb(var(--muted))' }}>
+                {characters.length}
               </span>
             </div>
-            {/* ブロック一覧 */}
-            <div className="overflow-y-auto" style={{ maxHeight: 'calc(72vh - 2.25rem)' }}>
-              {visibleBlocks.map(b => {
-                const bc = blockTextColor(b);
-                const enabled = b.enabled !== false;
-                const tagCount = b.text ? countTags(b.text) : 0;
+            {/* キャラ行リスト */}
+            <div className="overflow-y-auto" style={{ maxHeight: 'calc(80vh - 2rem)', scrollbarWidth: 'thin' }}>
+              {characters.map(c => {
+                const isActive = c.id === activeCharId;
+                const cc = theme === 'light' ? (c.colorLight ?? c.color) : c.color;
+                const thumb = thumbs[c.id]?.[0];
+                const nonNeg = c.blocks.filter(b => b.id !== 'negative');
+                const total  = nonNeg.length;
+                const active = nonNeg.filter(b => b.enabled !== false && b.text).length;
+                const tags   = nonNeg.filter(b => b.enabled !== false).reduce((s, b) => s + countTags(b.text), 0);
+                const fill   = total > 0 ? active / total : 0;
+                const dots   = nonNeg.slice(0, 16);
                 return (
                   <button
-                    key={b.id}
-                    onClick={() => {
-                      document.getElementById(`block-${b.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      setBlockStatusOpen(false);
-                    }}
-                    className="w-full flex items-center gap-[0.5rem] px-3 py-[0.4375rem] text-left cursor-pointer transition-colors duration-100"
+                    key={c.id}
+                    onClick={() => { setActiveCharId(c.id); setCharPanelOpen(true); setBlockStatusOpen(false); }}
+                    className="w-full flex items-center gap-[0.625rem] px-3 py-[0.5625rem] cursor-pointer transition-colors duration-100 text-left"
                     style={{
-                      borderLeft: `3px solid ${enabled ? bc : 'rgb(var(--dim))'}`,
-                      borderBottom: theme === 'light' ? '1px solid rgba(0,0,0,0.07)' : '1px solid rgb(var(--border))',
-                      background: 'transparent',
-                      opacity: enabled ? 1 : 0.5,
+                      borderLeft: `3px solid ${isActive ? cc : 'transparent'}`,
+                      background: isActive ? (theme === 'light' ? `${cc}0e` : `${cc}18`) : 'transparent',
+                      borderBottom: theme === 'light' ? '1px solid rgba(0,0,0,0.06)' : '1px solid rgb(var(--border))',
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.background = theme === 'light' ? 'rgba(0,0,0,0.04)' : 'rgb(var(--surface-alt))'; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = theme === 'light' ? 'rgba(0,0,0,0.03)' : 'rgb(var(--surface-alt))'; }}
+                    onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
                   >
-                    <span className="text-[0.875rem] flex-shrink-0 leading-none">{b.icon}</span>
-                    <span className="text-[0.6875rem] font-mono flex-1 min-w-0 truncate"
-                      style={{ color: enabled ? 'rgb(var(--text))' : 'rgb(var(--muted))' }}>
-                      {lang === 'ja' ? b.name : b.nameEn}
-                    </span>
-                    <div className="flex items-center gap-[0.25rem] flex-shrink-0">
-                      {b.locked && (
-                        <span style={{ color: theme === 'light' ? 'rgba(0,0,0,0.35)' : 'rgb(var(--muted))' }}
-                          className="text-[0.5625rem]">🔒</span>
-                      )}
-                      <span className="text-[0.5625rem] font-mono font-bold min-w-[1.25rem] text-right"
-                        style={{ color: tagCount > 0 ? bc : (theme === 'light' ? 'rgba(0,0,0,0.25)' : 'rgb(var(--dim))') }}>
-                        {tagCount > 0 ? `${tagCount}t` : '—'}
-                      </span>
+                    {/* サムネ or 絵文字 */}
+                    <div className="flex-shrink-0 rounded-[0.4375rem] overflow-hidden flex items-center justify-center"
+                      style={{
+                        width: 40, height: 40,
+                        background: thumb ? undefined : `${cc}22`,
+                        border: `1.5px solid ${isActive ? cc + '80' : (theme === 'light' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.08)')}`,
+                      }}>
+                      {thumb
+                        ? <img src={thumb} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                        : <span className="text-[1.375rem] leading-none select-none">{c.emoji}</span>
+                      }
+                    </div>
+                    {/* 情報エリア */}
+                    <div className="flex-1 min-w-0">
+                      {/* 名前 */}
+                      <div className="text-[0.6875rem] font-mono font-bold truncate leading-tight"
+                        style={{ color: isActive ? cc : 'rgb(var(--text))' }}>
+                        {c.name}
+                      </div>
+                      {/* ブロックドット */}
+                      <div className="flex flex-wrap gap-[0.1875rem] mt-[0.3125rem]">
+                        {dots.map(b => {
+                          const hasTag = b.enabled !== false && b.text;
+                          const bc = theme === 'light' ? (b.colorLight ?? b.color) : b.color;
+                          return (
+                            <div key={b.id} title={lang === 'ja' ? b.name : b.nameEn}
+                              style={{
+                                width: 6, height: 6, borderRadius: '50%', flexShrink: 0,
+                                background: hasTag ? bc : (theme === 'light' ? 'rgba(0,0,0,0.13)' : 'rgba(255,255,255,0.1)'),
+                                opacity: b.enabled === false ? 0.3 : 1,
+                              }} />
+                          );
+                        })}
+                      </div>
+                      {/* 充実度バー + 統計 */}
+                      <div className="flex items-center gap-[0.375rem] mt-[0.3125rem]">
+                        <div className="flex-1 rounded-full overflow-hidden"
+                          style={{ height: 3, background: theme === 'light' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.08)' }}>
+                          <div style={{ width: `${fill * 100}%`, height: '100%', background: cc, borderRadius: 9999 }} />
+                        </div>
+                        <span className="text-[0.5rem] font-mono flex-shrink-0"
+                          style={{ color: theme === 'light' ? 'rgba(0,0,0,0.38)' : 'rgb(var(--dim))' }}>
+                          <span style={{ color: tags > 0 ? cc : undefined, fontWeight: tags > 0 ? 700 : 400 }}>{tags}t</span>
+                          {' · '}{active}/{total}b
+                        </span>
+                      </div>
                     </div>
                   </button>
                 );
               })}
+              {/* ➕ 新キャラ */}
+              <button
+                onClick={() => { addCharacter(); setBlockStatusOpen(false); }}
+                className="w-full flex items-center gap-[0.625rem] px-3 py-[0.5rem] cursor-pointer transition-opacity duration-150 hover:opacity-60"
+                style={{
+                  borderLeft: '3px solid transparent',
+                  color: theme === 'light' ? 'rgba(0,0,0,0.32)' : 'rgb(var(--muted))',
+                }}
+              >
+                <div className="flex-shrink-0 rounded-[0.4375rem] flex items-center justify-center"
+                  style={{ width: 40, height: 40, border: theme === 'light' ? '1.5px dashed rgba(0,0,0,0.18)' : '1.5px dashed rgb(var(--dim))' }}>
+                  <span className="text-base leading-none">＋</span>
+                </div>
+                <span className="text-[0.625rem] font-mono">{lang === 'ja' ? '新キャラクターを追加' : 'Add character'}</span>
+              </button>
             </div>
           </div>
         </>

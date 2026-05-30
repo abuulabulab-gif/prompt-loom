@@ -1,9 +1,9 @@
 // ── Character palette ────────────────────────────────────────
 export const CHAR_COLORS       = ['#f472b6','#c084fc','#60a5fa','#34d399','#fbbf24','#fb923c','#f87171','#22d3ee','#a78bfa','#86efac'];
 export const CHAR_COLORS_LIGHT = ['#9d174d','#6d28d9','#1e40af','#065f46','#92400e','#c2410c','#b91c1c','#155e75','#4c1d95','#14532d'];
-// Species: cat/rabbit/dog/deer/horse/fox/wolf/snake/dragon/fairy/mermaid/elf/vampire/angel/demon/android/ghost
+// Species: cat/rabbit/dog/deer/horse/fox/wolf/snake/dragon/unicorn/fairy/mermaid/elf/vampire/angel/demon/android/ghost
 // Archetypes: royalty/idol/knight/mage
-export const CHAR_EMOJIS = ['🐱','🐰','🐶','🦌','🐴','🦊','🐺','🐍','🐉','🧚','🧜','🧝','🧛','👼','😈','🤖','👻','👑','🎭','⚔️','🧙'];
+export const CHAR_EMOJIS = ['🐱','🐰','🐶','🦌','🐴','🦊','🐺','🐍','🐉','🦄','🧚','🧜','🧝','🧛','👼','😈','🤖','👻','👑','🎭','⚔️','🧙'];
 
 // ── Theme color objects (used by inline styles during migration) ──
 export const THEMES = {
