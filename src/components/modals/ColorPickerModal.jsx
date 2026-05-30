@@ -124,7 +124,7 @@ export default function ColorPickerModal({ lang, onApply, onClose, defaultTarget
         className="bg-surface border border-linebright rounded-[0.875rem] w-full max-w-[27.5rem] max-h-[88vh] overflow-y-auto p-[1.125rem]">
 
         <div className="flex items-center justify-between mb-3.5">
-          <span className="text-fg text-sm font-bold">🎨 {lang === 'ja' ? 'カラーメイカー' : 'Color Maker'}</span>
+          <span className="text-fg text-sm font-bold">🎨 {lang === 'ja' ? 'カラーメーカー' : 'Color Maker'}</span>
           <button onClick={onClose} className="bg-transparent border border-dim rounded-md px-2.5 py-1 text-muted cursor-pointer text-xs">
             {lang === 'ja' ? '閉じる' : 'Close'}
           </button>

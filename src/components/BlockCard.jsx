@@ -350,7 +350,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
         {onColorPicker && !isLocked && (
           <button
             onClick={onColorPicker}
-            title={lang === 'ja' ? 'カラーメイカーで色を追加' : 'Add color with Color Maker'}
+            title={lang === 'ja' ? 'カラーメーカーで色を追加' : 'Add color with Color Maker'}
             className={`bg-transparent border border-dim rounded-[0.3125rem] text-muted cursor-pointer flex-shrink-0 ${focusMode ? 'px-[0.5625rem] py-1 text-[0.8125rem]' : 'px-1.5 py-0.5 text-[0.625rem]'}`}
           >🎨</button>
         )}

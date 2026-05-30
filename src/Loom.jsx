@@ -1137,7 +1137,7 @@ export default function Loom() {
     { id: 'image-to-tags', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🖼️', label: 'Image → tags (AI)', labelJa: '画像からタグ生成（AI）', action: () => { setNaturalToTagsTab('image'); setNaturalToTagsOpen(true); } },
     { id: 'open-history', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🕐', label: 'Open history', labelJa: '履歴を開く', shortcut: 'H', action: () => setHistoryOpen(true) },
     { id: 'open-template', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '✦', label: 'Open templates', labelJa: 'テンプレートを開く', shortcut: 'T', action: () => setTemplateOpen(true) },
-    { id: 'open-color',   group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎨', label: 'Open color picker',   labelJa: 'カラーメイカーを開く',  action: () => openColorPicker() },
+    { id: 'open-color',   group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎨', label: 'Open color picker',   labelJa: 'カラーメーカーを開く',  action: () => openColorPicker() },
     { id: 'open-feature', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎯', label: 'Open feature maker',  labelJa: '特徴メーカーを開く',   action: () => setFeatureMakerOpen(true) },
     ...(characters.length > 1 ? [{ id: 'open-scene', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎬', label: 'Open Collab', labelJa: 'キャラ共演を開く', action: () => setSceneOpen(true) }] : []),
     { id: 'open-settings', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '⚙️', label: 'Open settings / shortcuts', labelJa: '設定・ショートカット', shortcut: '?', action: () => setSettingsOpen(true) },
