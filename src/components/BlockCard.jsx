@@ -570,7 +570,12 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             const randomPickSet = new Set(
               (block.lastRandomPicks || [])
                 .filter(t => hasTag(block.text, t.en))
-                .map(t => t.en.toLowerCase())
+                .flatMap(t => {
+                  const keys = [t.en.toLowerCase()];
+                  if (Array.isArray(t.extraEn)) keys.push(...t.extraEn.map(e => e.toLowerCase()));
+                  else if (t.extraEn) keys.push(t.extraEn.toLowerCase());
+                  return keys;
+                })
             );
             const randomTags = activeTags.filter(raw => randomPickSet.has(bareTag(raw).toLowerCase()));
             const manualTags  = activeTags.filter(raw => !randomPickSet.has(bareTag(raw).toLowerCase()));

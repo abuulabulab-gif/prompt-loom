@@ -119,16 +119,93 @@ function picksToText(picks, strength) {
   let text = '';
   for (const t of picks) {
     text = appendTag(text, t.en, strength);
-    if (t.extraEn) text = appendTag(text, t.extraEn, strength);
+    if (Array.isArray(t.extraEn)) {
+      for (const e of t.extraEn) text = appendTag(text, e, strength);
+    } else if (t.extraEn) {
+      text = appendTag(text, t.extraEn, strength);
+    }
   }
   return text;
 }
 
-function pickColorCatTag(catId, hist = []) {
+// ── 髪色表現タイプ ─────────────────────────────────────────────────────────
+// [単色, グラデ, ツートン, スプリット, 部分カラー, 前髪カラー]
+const HAIR_EXPR_WEIGHTS = {
+  chardesign: [55, 10,  8,  7, 13,  7],
+  illust:     [40, 15, 12, 10, 13, 10],
+};
+const HAIR_EXPR_TYPES    = ['solid','gradient','twotone','split','partial','bangs'];
+const HAIR_PARTIAL_TGTS  = ['inner hair', 'hair tips', 'sidelocks', 'streak in bangs'];
+const HAIR_BANGS_TGTS    = ['bangs', 'forelock'];
+
+function pickContrastingColor(baseColorEn) {
+  const baseIdx = HUE_GROUPS.findIndex(g => g.includes(baseColorEn));
+  let idx; let t = 0;
+  do { idx = Math.floor(Math.random() * HUE_GROUPS.length); } while (idx === baseIdx && ++t < 10);
+  const g = HUE_GROUPS[idx];
+  return g[Math.floor(Math.random() * g.length)];
+}
+
+function pickSimilarColor(baseColorEn) {
+  const baseIdx = HUE_GROUPS.findIndex(g => g.includes(baseColorEn));
+  if (baseIdx === -1) return pickContrastingColor(baseColorEn);
+  let idx = baseIdx;
+  if (Math.random() < 0.35) {
+    const adj = [(baseIdx - 1 + HUE_GROUPS.length) % HUE_GROUPS.length, (baseIdx + 1) % HUE_GROUPS.length];
+    idx = adj[Math.floor(Math.random() * adj.length)];
+  }
+  const g = HUE_GROUPS[idx];
+  const cands = idx === baseIdx ? g.filter(c => c !== baseColorEn) : g;
+  return (cands.length ? cands : g)[Math.floor(Math.random() * (cands.length || g.length))];
+}
+
+function pickHairColorExpression(hist, mode) {
+  const baseWeights = COLOR_PALETTE.map(c => cdWeight(c.en, 'face_haircolor', hist));
+  const baseColor   = COLOR_PALETTE[wIdx(baseWeights)];
+  const baseShade   = pickWeightedShade();
+  const baseEn      = buildColorName(baseShade.en, baseColor.en) + ' hair';
+  const baseJa      = baseShade.id !== 'normal' ? `${baseShade.ja}${baseColor.ja}` : baseColor.ja;
+  const base        = { en: baseEn, _tk: baseColor.en, _ci: 'face_haircolor' };
+
+  const exprW  = HAIR_EXPR_WEIGHTS[mode] ?? HAIR_EXPR_WEIGHTS.illust;
+  const expr   = HAIR_EXPR_TYPES[wIdx(exprW)];
+  if (expr === 'solid') return { ...base, ja: `${baseJa}髪` };
+
+  const needsContrast = expr === 'twotone' || expr === 'split';
+  const c2En    = needsContrast ? pickContrastingColor(baseColor.en) : pickSimilarColor(baseColor.en);
+  const shade2  = pickWeightedShade();
+  const tag2En  = buildColorName(shade2.en, c2En) + ' hair';
+  const c2Obj   = COLOR_PALETTE.find(c => c.en === c2En) || { ja: c2En };
+  const c2Ja    = shade2.id !== 'normal' ? `${shade2.ja}${c2Obj.ja}` : c2Obj.ja;
+  if (expr === 'gradient') return { ...base, extraEn: ['gradient hair', tag2En],     ja: `${baseJa}→${c2Ja}グラデ` };
+  if (expr === 'twotone')  return { ...base, extraEn: ['two-tone hair', tag2En],     ja: `${baseJa}×${c2Ja}ツートン` };
+  if (expr === 'split')    return { ...base, extraEn: ['split-color hair', tag2En],  ja: `${baseJa}×${c2Ja}スプリット` };
+
+  // 部分カラー
+  const accentColorEn = pickContrastingColor(baseColor.en);
+  const accentShade   = pickWeightedShade();
+  const accentObj     = COLOR_PALETTE.find(c => c.en === accentColorEn) || { ja: accentColorEn };
+  const accentJa      = accentShade.id !== 'normal' ? `${accentShade.ja}${accentObj.ja}` : accentObj.ja;
+  if (expr === 'partial') {
+    const targetEn  = HAIR_PARTIAL_TGTS[Math.floor(Math.random() * HAIR_PARTIAL_TGTS.length)];
+    const accentTag = buildColorTag(accentShade.en, accentColorEn, targetEn);
+    const targetJa  = COLOR_TARGETS.find(t => t.en === targetEn)?.ja ?? targetEn;
+    return { ...base, extraEn: [accentTag], ja: `${baseJa}×${accentJa}${targetJa}` };
+  }
+  // 前髪カラー
+  const bangTgt   = HAIR_BANGS_TGTS[Math.floor(Math.random() * HAIR_BANGS_TGTS.length)];
+  const useGrad   = Math.random() < 0.30;
+  const accentTag = buildColorTag(accentShade.en, accentColorEn, bangTgt);
+  const targetJa  = COLOR_TARGETS.find(t => t.en === bangTgt)?.ja ?? bangTgt;
+  const extras    = useGrad ? [`gradient ${bangTgt}`, accentTag] : [accentTag];
+  return { ...base, extraEn: extras, ja: `${baseJa}×${accentJa}${targetJa}カラー` };
+}
+
+function pickColorCatTag(catId, hist = [], mode = 'illust') {
+  if (catId === 'face_haircolor') return pickHairColorExpression(hist, mode);
   if (catId === 'face_eyecolor' && Math.random() < 0.10) return pickHeterochromiaPair();
   const targetId  = COLOR_CAT_TARGET[catId];
   const targetObj = COLOR_TARGETS.find(t => t.id === targetId);
-  // クールダウン重みつきで色を選ぶ（直近と同じ色が出にくくなる）
   const weights   = COLOR_PALETTE.map(c => cdWeight(c.en, catId, hist));
   const color     = COLOR_PALETTE[wIdx(weights)];
   const shade     = pickWeightedShade();
@@ -136,7 +213,7 @@ function pickColorCatTag(catId, hist = []) {
   const ja        = shade.id !== 'normal'
     ? `${shade.ja}${color.ja}${targetObj.ja}`
     : `${color.ja}${targetObj.ja}`;
-  return { en, ja, _tk: color.en, _ci: catId }; // _tk/_ci は履歴記録用
+  return { en, ja, _tk: color.en, _ci: catId };
 }
 
 function applyExclusionRules(pickedEnTag, excludedTags) {
@@ -144,7 +221,7 @@ function applyExclusionRules(pickedEnTag, excludedTags) {
   if (excl) excl.forEach(e => excludedTags.add(e.toLowerCase()));
 }
 
-function pickBlockTags(block, globalExcluded, hist = []) {
+function pickBlockTags(block, globalExcluded, hist = [], mode = 'illust') {
   const rules = BLOCK_RANDOM_RULES[block.id] || {};
   const disabledCats = new Set();
 
@@ -179,7 +256,7 @@ function pickBlockTags(block, globalExcluded, hist = []) {
     }
 
     if (COLOR_CAT_IDS.has(cat.id)) {
-      const pick = pickColorCatTag(cat.id, hist);
+      const pick = pickColorCatTag(cat.id, hist, mode);
       if (!globalExcluded.has(pick.en.toLowerCase())) {
         picks.push(pick);
         for (const ct of (CONFLICT_MAP.get(pick.en.toLowerCase()) || [])) globalExcluded.add(ct);
@@ -232,7 +309,7 @@ function pickBlockTags(block, globalExcluded, hist = []) {
   return picks;
 }
 
-function pickBlockTagsBoosted(block, globalExcluded, boostTags, hist = []) {
+function pickBlockTagsBoosted(block, globalExcluded, boostTags, hist = [], mode = 'illust') {
   const rules = BLOCK_RANDOM_RULES[block.id] || {};
   const disabledCats = new Set();
   for (const group of (rules.exclusiveGroups || [])) {
@@ -263,7 +340,7 @@ function pickBlockTagsBoosted(block, globalExcluded, boostTags, hist = []) {
       return;
     }
     if (COLOR_CAT_IDS.has(cat.id)) {
-      const pick = pickColorCatTag(cat.id, hist);
+      const pick = pickColorCatTag(cat.id, hist, mode);
       if (!globalExcluded.has(pick.en.toLowerCase())) {
         picks.push(pick);
         for (const ct of (CONFLICT_MAP.get(pick.en.toLowerCase()) || [])) globalExcluded.add(ct);
@@ -591,30 +668,35 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
                     : c
                 ),
             };
-            const picks = pickBlockTags(filteredBlock, globalExcluded, hist);
+            const picks = pickBlockTags(filteredBlock, globalExcluded, hist, 'chardesign');
             newBlock = { ...block, text: picksToText(picks, block.strength), enabled: true, collapsed: false, lastRandomPicks: picks };
           } else if (block.id === 'body') {
             const filteredBlock = { ...block, cats: block.cats.filter(c => !cfg.skipBodyCats.has(c.n)) };
-            const picks = pickBlockTags(filteredBlock, globalExcluded, hist);
+            const picks = pickBlockTags(filteredBlock, globalExcluded, hist, 'chardesign');
             newBlock = { ...block, text: picksToText(picks, block.strength), enabled: true, collapsed: false, lastRandomPicks: picks };
           } else if (block.id === 'feature') {
             const filteredBlock = { ...block, cats: block.cats.filter(c => !cfg.skipFeatureCats.has(c.n)) };
-            const picks = pickBlockTags(filteredBlock, globalExcluded, hist);
+            const picks = pickBlockTags(filteredBlock, globalExcluded, hist, 'chardesign');
             newBlock = { ...block, text: picksToText(picks, block.strength), enabled: true, collapsed: false, lastRandomPicks: picks };
           } else {
             const CHARDESIGN_SKIP_IDS = new Set(['effect', 'lighting', 'scene', 'mood']);
             if (CHARDESIGN_SKIP_IDS.has(block.id)) {
               newBlock = { ...block, text: '', enabled: true, collapsed: false, lastRandomPicks: [] };
             } else {
-              const picks = pickBlockTags(block, globalExcluded, hist);
+              const picks = pickBlockTags(block, globalExcluded, hist, 'chardesign');
               let text = picksToText(picks, block.strength);
               if (block.id === 'attribute') {
                 const speciesCat = block.cats.find(cat => cat.n === '種族');
+                const textBefore = text;
                 text = buildSpeciesText(picks, block, speciesCat, text);
                 text = cleanupAnimalParts(text, picks, speciesCat, block.strength, HYBRID_CHANCE_CHARDESIGN);
                 if (!hasTag(text, 'solo')) text = appendTag(text, 'solo', block.strength);
+                const added = splitTags(text).map(bareTag).filter(en => en && !hasTag(textBefore, en) && !picks.some(p => p.en.toLowerCase() === en.toLowerCase()));
+                const allPicks = added.length ? [...picks, ...added.map(en => ({ en, ja: en }))] : picks;
+                newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: allPicks };
+              } else {
+                newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: picks };
               }
-              newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: picks };
             }
           }
         } else {
@@ -622,23 +704,26 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
           let picks;
           if (mode === 'illust') {
             if (block.id === 'composition') {
-              picks = pickBlockTagsBoosted(block, globalExcluded, ILLUST_MODE_CONFIG.boostCompositionTags, hist);
+              picks = pickBlockTagsBoosted(block, globalExcluded, ILLUST_MODE_CONFIG.boostCompositionTags, hist, mode);
             } else if (block.id === 'lighting') {
-              picks = pickBlockTagsBoosted(block, globalExcluded, ILLUST_MODE_CONFIG.boostLightingTags, hist);
+              picks = pickBlockTagsBoosted(block, globalExcluded, ILLUST_MODE_CONFIG.boostLightingTags, hist, mode);
             } else if (block.id === 'effect') {
-              picks = pickBlockTagsBoosted(block, globalExcluded, ILLUST_MODE_CONFIG.boostEffectTags, hist);
+              picks = pickBlockTagsBoosted(block, globalExcluded, ILLUST_MODE_CONFIG.boostEffectTags, hist, mode);
             } else {
-              picks = pickBlockTags(block, globalExcluded, hist);
+              picks = pickBlockTags(block, globalExcluded, hist, mode);
             }
           } else {
-            picks = pickBlockTags(block, globalExcluded, hist);
+            picks = pickBlockTags(block, globalExcluded, hist, mode);
           }
           let text = picksToText(picks, block.strength);
           if (block.id === 'attribute') {
             const speciesCat = block.cats.find(cat => cat.n === '種族');
+            const textBefore = text;
             text = buildSpeciesText(picks, block, speciesCat, text);
             text = cleanupAnimalParts(text, picks, speciesCat, block.strength, HYBRID_CHANCE_ILLUST);
             if (!hasTag(text, 'solo')) text = appendTag(text, 'solo', block.strength);
+            const added = splitTags(text).map(bareTag).filter(en => en && !hasTag(textBefore, en) && !picks.some(p => p.en.toLowerCase() === en.toLowerCase()));
+            picks = added.length ? [...picks, ...added.map(en => ({ en, ja: en }))] : picks;
           }
           newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: picks };
         }

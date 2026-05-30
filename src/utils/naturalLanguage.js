@@ -1,11 +1,16 @@
 import { splitTags, bareTag } from '../data/constants.js';
+import { resolveColorLabel } from '../data/colors.js';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function getTagLabels(blockText, cats) {
   const active = splitTags(blockText).map(bareTag).filter(Boolean);
   const allDefs = cats.flatMap(c => c.t);
-  // Unknown tags (custom / manually typed) fall back to {en, ja: en} so they're not silently dropped
-  return active.map(en => allDefs.find(d => d.en.toLowerCase() === en.toLowerCase()) || { en, ja: en });
+  // ColorMaker生成タグ（light pink hair等）はresolveColorLabelで日本語変換、それ以外はenをfallback
+  return active.map(en =>
+    allDefs.find(d => d.en.toLowerCase() === en.toLowerCase())
+    || resolveColorLabel(en)
+    || { en, ja: en }
+  );
 }
 
 function getBlock(blocks, id) {
