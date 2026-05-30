@@ -979,6 +979,9 @@ export default function Loom() {
     setCharacters(prev => prev.map(c =>
       c.id === activeCharId ? { ...c, blocks: c.blocks.map(b => ({ ...b, text: '' })) } : c
     ));
+    setOutputEditMode(false);
+    setOutputEditText('');
+    setAiResult('');
   };
 
   const restoreFromHistory = (entry) => {
