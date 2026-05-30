@@ -1172,7 +1172,7 @@ export default function Loom() {
               if (isMobile) { setJumpOpen(p => !p); return; }
               if (!blockStatusOpen && gridIconRef.current) {
                 const r = gridIconRef.current.getBoundingClientRect();
-                const w = 264;
+                const w = 380;
                 setBlockStatusPos({ top: r.bottom + 6, left: Math.max(8, Math.min(r.left, window.innerWidth - w - 8)), width: w });
               }
               setBlockStatusOpen(p => !p);
@@ -1394,7 +1394,7 @@ export default function Loom() {
           </select>
         )}
         {isMobile && <button onClick={() => setCharPanelOpen(p => !p)} className="bg-transparent border border-dim rounded-[0.3125rem] text-muted cursor-pointer text-[0.6875rem] px-[0.5625rem] py-1 flex-shrink-0 whitespace-nowrap">{charPanelOpen ? '▲' : '▼'} {lang === 'ja' ? '詳細' : 'Info'}</button>}
-        <div className="flex gap-1 flex-shrink-0">
+        <div className="flex gap-[0.375rem] flex-shrink-0 ml-[0.375rem]">
           <button onClick={() => setMainTab('editor')}
             style={mainTab === 'editor' ? { background: activeChar?.color + '22', borderColor: activeChar?.color, color: charColor(activeChar?.color) } : undefined}
             className={`rounded-[0.3125rem] px-[0.5625rem] py-1 text-[0.625rem] font-mono cursor-pointer transition-all duration-[120ms] ${mainTab === 'editor' ? 'border font-bold' : 'border border-dim text-muted'}`}>
@@ -1418,7 +1418,8 @@ export default function Loom() {
           <div style={{ maxWidth: contentMax }} className="mx-auto">
             <div className="flex flex-col gap-1.5 mb-[0.5625rem]">
               <div className="flex items-center gap-1.5">
-                <input value={activeChar.name} onChange={e => updateChar(activeChar.id, { name: e.target.value })}
+                <input value={activeChar.name} onChange={e => updateChar(activeChar.id, { name: e.target.value.slice(0, 20) })}
+                  maxLength={20}
                   style={{ background: 'rgb(var(--bg))', border: `1px solid ${activeChar.color}60`, color: 'rgb(var(--text))' }}
                   className="rounded-[0.4375rem] text-[0.8125rem] font-bold px-2.5 py-[0.3125rem] outline-none flex-1 min-w-0" />
                 <button onClick={() => duplicateCharacter(activeChar.id)}
@@ -1455,12 +1456,17 @@ export default function Loom() {
                   </button>
                 </div>
               </div>
-              <textarea value={activeChar.memo} onChange={e => updateChar(activeChar.id, { memo: e.target.value })}
+              <textarea value={activeChar.memo} onChange={e => updateChar(activeChar.id, { memo: e.target.value.slice(0, 500) })}
+                maxLength={500}
                 placeholder={lang === 'ja' ? 'LoRA名、使用モデル、生成のコツなど自由にメモ...' : 'LoRA names, model, tips...'}
                 style={{ background: 'rgb(var(--bg))', border: `1px solid ${activeChar.color}40`, color: 'rgb(var(--text))' }}
                 className="w-full min-h-[2.875rem] rounded-[0.4375rem] text-xs px-2.5 py-[0.4375rem] font-mono resize-y box-border outline-none leading-[1.6]"
                 onFocus={e => e.target.style.borderColor = activeChar.color + '80'}
                 onBlur={e => e.target.style.borderColor = activeChar.color + '40'} />
+              <div className="text-right text-[0.5625rem] font-mono mt-[0.1875rem]"
+                style={{ color: (activeChar.memo?.length ?? 0) >= 480 ? 'rgb(var(--c-orange))' : 'rgb(var(--dim))' }}>
+                {activeChar.memo?.length ?? 0}/500
+              </div>
             </div>
             <div className="flex gap-0 mb-[0.3125rem] min-h-7">
               {[
@@ -1544,7 +1550,8 @@ export default function Loom() {
           <div style={{ maxWidth: contentMax }} className="mx-auto px-3.5">
             {/* Compact 1-line strip */}
             <div className="flex items-center gap-[0.5625rem]">
-              <input value={activeChar.name} onChange={e => updateChar(activeChar.id, { name: e.target.value })}
+              <input value={activeChar.name} onChange={e => updateChar(activeChar.id, { name: e.target.value.slice(0, 20) })}
+                maxLength={20}
                 style={{ background: 'rgb(var(--bg))', border: `1px solid ${activeChar.color}60`, color: 'rgb(var(--text))' }}
                 className="rounded-[0.4375rem] text-[0.8125rem] font-bold px-2.5 py-1 outline-none min-w-[5.625rem] max-w-[9.375rem]" />
               <div className="flex gap-[0.1875rem] items-center flex-shrink-0">
@@ -1606,12 +1613,17 @@ export default function Loom() {
                 {/* Memo */}
                 <div className="mb-[0.5625rem]">
                   <div className="text-muted text-[0.625rem] font-mono tracking-[0.07em] mb-[0.1875rem]">📝 {lang === 'ja' ? 'キャラクターメモ（LoRA・設定・コツなど）' : 'Character Memo'}</div>
-                  <textarea value={activeChar.memo} onChange={e => updateChar(activeChar.id, { memo: e.target.value })}
+                  <textarea value={activeChar.memo} onChange={e => updateChar(activeChar.id, { memo: e.target.value.slice(0, 500) })}
+                    maxLength={500}
                     placeholder={lang === 'ja' ? 'LoRA名、使用モデル、生成のコツなど自由にメモ...' : 'LoRA names, model, tips...'}
                     style={{ background: 'rgb(var(--bg))', border: `1px solid ${activeChar.color}40`, color: 'rgb(var(--text))' }}
                     className="w-full min-h-[2.375rem] rounded-[0.4375rem] text-xs px-2.5 py-1.5 font-mono resize-y box-border outline-none leading-[1.6]"
                     onFocus={e => e.target.style.borderColor = activeChar.color + '80'}
                     onBlur={e => e.target.style.borderColor = activeChar.color + '40'} />
+                  <div className="text-right text-[0.5625rem] font-mono mt-[0.1875rem]"
+                    style={{ color: (activeChar.memo?.length ?? 0) >= 480 ? 'rgb(var(--c-orange))' : 'rgb(var(--dim))' }}>
+                    {activeChar.memo?.length ?? 0}/500
+                  </div>
                 </div>
                 {/* Preset row */}
                 <div className="flex gap-0 mb-[0.5625rem] min-h-7">
@@ -2037,14 +2049,14 @@ export default function Loom() {
       {/* ── キャラクターパネル (PC) ── */}
       {!isMobile && blockStatusOpen && (
         <>
-          <div className="fixed inset-0 z-[199]" onClick={() => setBlockStatusOpen(false)} />
+          <div className="fixed inset-0 z-[199] bg-black/40 transition-opacity duration-150" onClick={() => setBlockStatusOpen(false)} />
           <div
             ref={blockStatusRef}
             className="fixed z-[200] rounded-[0.75rem] overflow-hidden"
             style={{
               top: blockStatusPos?.top,
               left: blockStatusPos?.left,
-              width: blockStatusPos?.width ?? 264,
+              width: blockStatusPos?.width ?? 380,
               maxHeight: '80vh',
               background: 'rgb(var(--surface))',
               border: theme === 'light' ? '1px solid rgba(0,0,0,0.12)' : '1px solid rgb(var(--border-bright))',
@@ -2075,6 +2087,19 @@ export default function Loom() {
                 const tags   = nonNeg.filter(b => b.enabled !== false).reduce((s, b) => s + countTags(b.text), 0);
                 const fill   = total > 0 ? active / total : 0;
                 const dots   = nonNeg.slice(0, 16);
+                // ── プロンプト健康診断 ──
+                const allText   = nonNeg.filter(b => b.enabled !== false && b.text).map(b => b.text).join(', ');
+                const conflicts = allText ? detectConflicts(allText) : [];
+                const errCount  = conflicts.filter(r => !r.level || r.level === 'error').length;
+                const warnCount = conflicts.filter(r => r.level === 'warn').length;
+                const maxBlock  = nonNeg.reduce((m, b) => Math.max(m, countTags(b.text)), 0);
+                const totalWarn = warnCount + (maxBlock >= 14 ? 1 : 0);
+                const risk = !allText            ? null
+                           : errCount >= 2       ? { label: '大', color: '#f87171' }
+                           : errCount === 1      ? { label: '中', color: '#fb923c' }
+                           : totalWarn >= 2      ? { label: '中', color: '#fbbf24' }
+                           : totalWarn === 1     ? { label: '小', color: '#a3e635' }
+                           :                      { label: '良', color: '#4ade80' };
                 return (
                   <button
                     key={c.id}
@@ -2103,32 +2128,59 @@ export default function Loom() {
                     {/* 情報エリア */}
                     <div className="flex-1 min-w-0">
                       {/* 名前 */}
-                      <div className="text-[0.6875rem] font-mono font-bold truncate leading-tight"
+                      <div className="text-[0.6875rem] font-mono font-bold truncate leading-tight mt-1.5"
                         style={{ color: isActive ? cc : 'rgb(var(--text))' }}>
                         {c.name}
                       </div>
-                      {/* ブロックドット */}
-                      <div className="flex flex-wrap gap-[0.1875rem] mt-[0.3125rem]">
-                        {dots.map(b => {
-                          const hasTag = b.enabled !== false && b.text;
-                          const bc = theme === 'light' ? (b.colorLight ?? b.color) : b.color;
-                          return (
-                            <div key={b.id} title={lang === 'ja' ? b.name : b.nameEn}
+                      {/* grid 2列: 左=dots/bar(1fr)、右=バッジ/統計(auto) → 右列幅が自動統一 */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', columnGap: '0.5rem', rowGap: '0.3125rem', marginTop: '0.4375rem' }}>
+                        {/* row1 左: ドット */}
+                        <div className="flex flex-wrap gap-[0.3125rem] min-w-0" style={{ alignSelf: 'end' }}>
+                          {dots.map(b => {
+                            const hasTag = b.enabled !== false && b.text;
+                            const bc = theme === 'light' ? (b.colorLight ?? b.color) : b.color;
+                            return (
+                              <div key={b.id} title={lang === 'ja' ? b.name : b.nameEn}
+                                style={{
+                                  width: 10, height: 10, borderRadius: '50%', flexShrink: 0,
+                                  background: hasTag ? bc : (theme === 'light' ? 'rgba(0,0,0,0.13)' : 'rgba(255,255,255,0.1)'),
+                                  opacity: b.enabled === false ? 0.3 : 1,
+                                }} />
+                            );
+                          })}
+                        </div>
+                        {/* row1 右: 健康診断バッジ（統計の真上・中央揃え） */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {risk && (
+                            <div
+                              title={
+                                errCount >= 2  ? (lang === 'ja' ? `競合タグ ${errCount}件` : `${errCount} conflicts`)
+                              : errCount === 1 ? (lang === 'ja' ? '競合タグ 1件' : '1 conflict')
+                              : totalWarn >= 1 ? (lang === 'ja' ? `注意タグ ${totalWarn}件` : `${totalWarn} soft issues`)
+                              :                  (lang === 'ja' ? '問題なし' : 'No issues')
+                              }
                               style={{
-                                width: 6, height: 6, borderRadius: '50%', flexShrink: 0,
-                                background: hasTag ? bc : (theme === 'light' ? 'rgba(0,0,0,0.13)' : 'rgba(255,255,255,0.1)'),
-                                opacity: b.enabled === false ? 0.3 : 1,
-                              }} />
-                          );
-                        })}
-                      </div>
-                      {/* 充実度バー + 統計 */}
-                      <div className="flex items-center gap-[0.375rem] mt-[0.3125rem]">
-                        <div className="flex-1 rounded-full overflow-hidden"
+                                fontSize: '0.625rem', fontFamily: 'monospace', fontWeight: 800,
+                                color: risk.color,
+                                background: `${risk.color}18`,
+                                border: `1px solid ${risk.color}60`,
+                                borderRadius: '0.3125rem',
+                                padding: '2px 6px',
+                                lineHeight: 1.4,
+                                letterSpacing: '0.03em',
+                                whiteSpace: 'nowrap',
+                              }}>
+                              {risk.label}
+                            </div>
+                          )}
+                        </div>
+                        {/* row2 左: 充実度バー */}
+                        <div className="rounded-full overflow-hidden self-center"
                           style={{ height: 3, background: theme === 'light' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.08)' }}>
                           <div style={{ width: `${fill * 100}%`, height: '100%', background: cc, borderRadius: 9999 }} />
                         </div>
-                        <span className="text-[0.5rem] font-mono flex-shrink-0"
+                        {/* row2 右: 統計テキスト */}
+                        <span className="text-[0.5rem] font-mono text-center self-center"
                           style={{ color: theme === 'light' ? 'rgba(0,0,0,0.38)' : 'rgb(var(--dim))' }}>
                           <span style={{ color: tags > 0 ? cc : undefined, fontWeight: tags > 0 ? 700 : 400 }}>{tags}t</span>
                           {' · '}{active}/{total}b
