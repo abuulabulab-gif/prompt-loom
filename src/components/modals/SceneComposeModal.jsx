@@ -7,19 +7,35 @@ const SCENE_POSITIONS = [
   { id: 'back',   ja: '後ろ', en: 'in the background'   },
 ];
 const SCENE_RELATIONS = [
-  { ja: '見つめ合う',     en: 'looking at each other'    },
-  { ja: '手をつなぐ',     en: 'holding hands'             },
-  { ja: '背中合わせ',     en: 'back to back'              },
-  { ja: '抱き合う',       en: 'hugging'                   },
-  { ja: '並んで立つ',     en: 'standing side by side'     },
-  { ja: '対決',           en: 'facing each other'         },
-  { ja: '寄り添う',       en: 'leaning on each other'     },
-  { ja: '指定なし',       en: ''                          },
+  { ja: '見つめ合う',       en: 'looking at each other'    },
+  { ja: '手をつなぐ',       en: 'holding hands'             },
+  { ja: '背中合わせ',       en: 'back to back'              },
+  { ja: '抱き合う',         en: 'hugging'                   },
+  { ja: '並んで立つ',       en: 'standing side by side'     },
+  { ja: '対決・向き合う',   en: 'facing each other'         },
+  { ja: '対峙（対立感）',   en: 'standoff'                  },
+  { ja: '睨み合い',         en: 'confrontation'             },
+  { ja: 'ライバル',         en: 'rivals'                    },
+  { ja: '激しい視線',       en: 'intense stare'             },
+  { ja: '緊迫した空気',     en: 'tense atmosphere'          },
+  { ja: '寄り添う',         en: 'leaning on each other'     },
+  { ja: '指定なし',         en: ''                          },
 ];
 
+// 共演時にBREAKセグメントから除外するタグ（全体の人数タグと競合するため）
+const COLLAB_REMOVE_TAGS = new Set([
+  'solo','1girl','1boy','2girls','2boys','multiple girls','multiple boys','1other',
+  'androgynous','femboy','tomboy',
+]);
 const charBodyText = char => {
   const ids = ['attribute', 'face', 'body', 'outfit', 'feature', 'effect'];
-  return char.blocks.filter(b => b.enabled !== false && ids.includes(b.id) && b.text?.trim()).map(b => b.text.trim()).join(', ');
+  const segs = char.blocks
+    .filter(b => b.enabled !== false && ids.includes(b.id) && b.text?.trim())
+    .flatMap(b => b.text.trim().split(',').map(s => s.trim()).filter(Boolean));
+  return segs.filter(seg => {
+    const bare = seg.replace(/^\(+/, '').replace(/:[0-9.]+\)+$/, '').replace(/\)+$/, '').trim().toLowerCase();
+    return !COLLAB_REMOVE_TAGS.has(bare);
+  }).join(', ');
 };
 
 export default function SceneComposeModal({ characters, lang, theme, onClose, defaultQuality = 'masterpiece, best quality, ultra-detailed' }) {
