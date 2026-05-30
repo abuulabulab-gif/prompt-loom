@@ -12,6 +12,7 @@ export const CONFLICT_RULES = [
   { tags:['loli','adult'],              ja:'幼い体型と大人が矛盾',            en:'loli + adult' },
   { tags:['loli','young adult'],        ja:'幼い体型と青年が矛盾',            en:'loli + young adult' },
   { tags:['young','mature female'],     ja:'幼いと成熟体型が矛盾',            en:'young + mature female' },
+  { tags:['young','muscular'],          ja:'幼いと筋肉質が矛盾',              en:'young + muscular' },
   { tags:['tall','short stature'],      ja:'高身長と低身長が矛盾',            en:'tall + short stature' },
   { tags:['slim','chubby'],             ja:'スリムとぽっちゃりが矛盾',        en:'slim + chubby' },
   { tags:['slender','muscular'],        ja:'細身と筋肉質が矛盾',              en:'slender + muscular' },
