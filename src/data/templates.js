@@ -99,7 +99,6 @@ export const TEMPLATES = [
     apply: {
       composition: 'upper body, back view, looking back',
       body:         { mode: 'merge', tags: 'nape, bare shoulders, bare back' },
-      face:         { mode: 'merge', tags: 'hair updo' },
     },
   },
   {
