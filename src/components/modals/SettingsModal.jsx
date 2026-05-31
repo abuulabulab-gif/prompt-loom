@@ -276,11 +276,12 @@ const PLATFORM_DIFF = (lang) => [
   },
 ];
 
-export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds = new Set(), allBlocks = [], onRestoreBlock, onRestoreAllBlocks, theme, onToggleTheme, viewMode, onSetViewMode, onToggleLang, onShowWelcome, defaultTab, apiConfig, onSaveApiConfig }) {
+export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds = new Set(), allBlocks = [], onRestoreBlock, onRestoreAllBlocks, theme, onToggleTheme, viewMode, onSetViewMode, onToggleLang, onShowWelcome, defaultTab, apiConfig, onSaveApiConfig, user, onDeleteCloud }) {
   const [tab, setTab] = useState(defaultTab || 'shortcuts');
   const [localInput, setLocalInput]   = useState({ openai: '', claude: '' });
   const [apiKeyVisible, setApiKeyVisible] = useState(false);
   const [apiSaved, setApiSaved]       = useState(false);
+  const [deleteState, setDeleteState] = useState('idle'); // 'idle' | 'confirm' | 'deleting' | 'done' | 'error'
 
   useEffect(() => {
     setLocalInput({ openai: '', claude: '' });
@@ -808,6 +809,74 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
                   ))}
                 </ul>
               </div>
+
+              {/* Cloud data management */}
+              {user && (
+                <div className="rounded-[0.625rem] border px-3.5 py-3 space-y-2" style={{ borderColor: 'rgb(var(--c-red) / 0.3)', background: 'rgb(var(--c-red) / 0.04)' }}>
+                  <div className="text-[0.625rem] font-mono font-semibold uppercase tracking-[0.08em]" style={{ color: 'rgb(var(--c-red))' }}>
+                    {lang === 'ja' ? 'クラウドデータ' : 'Cloud Data'}
+                  </div>
+                  <p className="text-muted text-[0.625rem] leading-[1.6]">
+                    {lang === 'ja'
+                      ? 'Firestoreに保存された同期データを削除します。この端末のローカルデータは消えません。'
+                      : 'Deletes your synced data from Firestore. Local data on this device is not affected.'}
+                  </p>
+                  {deleteState === 'idle' && (
+                    <button
+                      onClick={() => setDeleteState('confirm')}
+                      className="rounded-[0.4375rem] px-3 py-1.5 text-[0.6875rem] font-mono font-bold cursor-pointer border transition-all"
+                      style={{ color: 'rgb(var(--c-red))', borderColor: 'rgb(var(--c-red) / 0.4)', background: 'transparent' }}
+                    >
+                      {lang === 'ja' ? 'クラウドデータを削除…' : 'Delete cloud data…'}
+                    </button>
+                  )}
+                  {deleteState === 'confirm' && (
+                    <div className="space-y-2">
+                      <p className="text-[0.6875rem] font-mono font-bold" style={{ color: 'rgb(var(--c-red))' }}>
+                        {lang === 'ja' ? '本当に削除しますか？' : 'Are you sure?'}
+                      </p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={async () => {
+                            setDeleteState('deleting');
+                            const result = await onDeleteCloud?.();
+                            setDeleteState(result?.ok ? 'done' : 'error');
+                          }}
+                          className="rounded-[0.4375rem] px-3 py-1.5 text-[0.6875rem] font-mono font-bold cursor-pointer border-none text-white"
+                          style={{ background: 'rgb(var(--c-red))' }}
+                        >
+                          {lang === 'ja' ? '削除する' : 'Delete'}
+                        </button>
+                        <button
+                          onClick={() => setDeleteState('idle')}
+                          className="rounded-[0.4375rem] px-3 py-1.5 text-[0.6875rem] font-mono cursor-pointer border bg-surfalt text-muted"
+                          style={{ borderColor: 'rgb(var(--border))' }}
+                        >
+                          {lang === 'ja' ? 'キャンセル' : 'Cancel'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  {deleteState === 'deleting' && (
+                    <span className="text-muted text-[0.6875rem] font-mono">{lang === 'ja' ? '削除中…' : 'Deleting…'}</span>
+                  )}
+                  {deleteState === 'done' && (
+                    <span className="text-[0.6875rem] font-mono font-bold" style={{ color: 'rgb(var(--c-green))' }}>
+                      {lang === 'ja' ? '✓ 削除しました' : '✓ Deleted'}
+                    </span>
+                  )}
+                  {deleteState === 'error' && (
+                    <div className="space-y-1">
+                      <span className="text-[0.6875rem] font-mono" style={{ color: 'rgb(var(--c-red))' }}>
+                        {lang === 'ja' ? '削除に失敗しました' : 'Delete failed'}
+                      </span>
+                      <button onClick={() => setDeleteState('idle')} className="block text-muted text-[0.625rem] font-mono cursor-pointer bg-transparent border-none p-0">
+                        {lang === 'ja' ? '戻る' : 'Back'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Copyright */}
               <div className="border-t border-line pt-3.5 text-center space-y-1">

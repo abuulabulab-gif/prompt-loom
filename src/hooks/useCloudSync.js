@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { pushToCloud, pullFromCloud, mergeCharacters } from "../sync/firestore.js";
+import { pushToCloud, pullFromCloud, deleteFromCloud, mergeCharacters } from "../sync/firestore.js";
 
 export function useCloudSync({
   user, signInWithGoogle, loaded,
@@ -135,5 +135,14 @@ export function useCloudSync({
 
   const markRemoteApply = () => { isApplyingRemoteSettings.current = true; };
 
-  return { syncStatus, syncErrToast, setSyncErrToast, syncErrCode, dataSizeToast, handleSignIn, handleForcePull, markRemoteApply };
+  const handleDeleteCloud = async () => {
+    const { user: u } = liveRef.current;
+    if (!u) return { ok: false };
+    setSyncStatus('syncing');
+    const result = await deleteFromCloud(u.uid);
+    setSyncStatus(result.ok ? '' : 'error');
+    return result;
+  };
+
+  return { syncStatus, syncErrToast, setSyncErrToast, syncErrCode, dataSizeToast, handleSignIn, handleForcePull, handleDeleteCloud, markRemoteApply };
 }

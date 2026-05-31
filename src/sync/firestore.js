@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { fstore } from '../firebase';
 
 const MAX_CLOUD_VERSIONS   = 10;
@@ -67,6 +67,17 @@ export async function pullFromCloud(uid) {
   } catch (e) {
     console.error('pullFromCloud failed', e?.code ?? e?.name, e);
     return null;
+  }
+}
+
+export async function deleteFromCloud(uid) {
+  try {
+    const ref = doc(fstore, 'users', uid, 'data', 'state');
+    await deleteDoc(ref);
+    return { ok: true };
+  } catch (e) {
+    console.error('deleteFromCloud failed', e?.code ?? e?.name, e);
+    return { ok: false };
   }
 }
 

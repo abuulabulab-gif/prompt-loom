@@ -236,7 +236,7 @@ export default function Loom() {
   const activeChar = characters.find(c => c.id === activeCharId) || characters[0];
   const blocks = activeChar?.blocks || [];
 
-  const { syncStatus, syncErrToast, setSyncErrToast, syncErrCode, dataSizeToast, handleSignIn, handleForcePull, markRemoteApply } = useCloudSync({
+  const { syncStatus, syncErrToast, setSyncErrToast, syncErrCode, dataSizeToast, handleSignIn, handleForcePull, handleDeleteCloud, markRemoteApply } = useCloudSync({
     user, signInWithGoogle, loaded,
     characters, orderUpdatedAt, settingsUpdatedAt,
     setCharacters, setOrderUpdatedAt, setSettingsUpdatedAt,
@@ -2759,7 +2759,8 @@ export default function Loom() {
         viewMode={viewMode} onSetViewMode={setViewMode}
         onToggleLang={() => setLang(l => l === 'ja' ? 'en' : 'ja')}
         onShowWelcome={reshowWelcome}
-        apiConfig={apiConfig} onSaveApiConfig={saveApiConfig} />}
+        apiConfig={apiConfig} onSaveApiConfig={saveApiConfig}
+        user={user} onDeleteCloud={handleDeleteCloud} />}
       {paletteOpen && <CommandPalette commands={paletteCommands} lang={lang} onClose={() => setPaletteOpen(false)} />}
 
       {/* ── THUMBNAIL PREVIEW MODAL ── */}
