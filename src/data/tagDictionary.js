@@ -298,6 +298,7 @@ export const TAG_DICT = {
   'steam':                 { ja: '頭の上から蒸気が出るアニメ的演出。照れ・怒り・過熱した感情の定番コミカル表現', en: 'Steam rising from the head — classic anime shorthand for embarrassment, anger, or overexcitement' },
 
   // ── 種族・特殊 ────────────────────────────────────────────────
+  'demi-human':            { ja: '亜人。人間に近いが異なる種族の総称。性別を問わず使えるジェンダーフリーな種族タグ。ゴブリン・エルフ・獣人などのモンスター系ヒューマノイド全般を指す', en: 'Humanoid being of a non-human race — gender-neutral species tag covering goblins, beastfolk, and other humanoid monster types' },
   'kemonomimi':            { ja: '獣耳を持つ人間キャラの総称。猫娘より広い概念でどの獣耳でも使える汎用タグ', en: 'Generic term for animal-eared human characters — broader than catgirl; covers any animal ear type' },
   'oni':                   { ja: '日本の鬼。角・金棒・虎柄の腰巻きが定番。赤鬼・青鬼など様々なバリエーション', en: 'Japanese demon/ogre with horns and a club — red or blue skin, tiger-stripe loincloth design' },
   'succubus':              { ja: 'サキュバス。悪魔の種族で人を誘惑する魔物。翼・角・尻尾が特徴', en: 'Succubus — seductive demon with wings, horns, and a spaded tail' },
