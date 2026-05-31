@@ -40,6 +40,7 @@ export const TAG_DICT = {
   'colored tips':          { ja: '毛先だけ別の色に染めたグラデーション染め', en: 'Hair with dyed tips of a contrasting color' },
   'hair between eyes':     { ja: '眉間・目の間を横切る前髪の一筋', en: 'A strand of hair crossing between the eyes' },
   'floating hair':         { ja: '風や魔力でなびく・浮かぶ髪。ダイナミックな演出に', en: 'Hair flowing or floating as if in wind or magical energy' },
+  'hair over shoulder':    { ja: 'ロングの髪を片側の肩の前に流したスタイリング。ロング系キャラの正面・横顔ショットで映える定番の髪の置き方', en: 'Long hair draped forward over one shoulder — a classic styling detail for long-haired characters in portrait shots' },
   'hair spread out':       { ja: '床や水面などに扇状に広がった髪。仰向け・水中・浮遊ポーズと組み合わせると映える', en: 'Hair spread wide across a surface — pairs beautifully with lying-down, underwater, or floating poses' },
   'maromayu':              { ja: '麻呂眉。平安貴族風の丸くて太い眉。高い位置に描かれ独特の雰囲気が出る', en: 'Round, thick eyebrows placed high on the forehead — Heian-era aristocrat style' },
 
@@ -126,6 +127,7 @@ export const TAG_DICT = {
   'vintage':               { ja: '1950〜70年代のレトロファッション調に誘導する。くすんだ色合い・ハイウエスト・フレアスカート・アナログな質感が特徴', en: 'Retro 1950s–70s fashion aesthetic — muted tones, high waists, flared skirts, and an analog worn texture' },
   'bohemian':              { ja: 'ヒッピー・旅人・民族衣装ミックスの自由奔放なスタイル。花柄・フリンジ・重ね着・エスニック小物が定番', en: 'Free-spirited blend of folk, hippie, and ethnic fashion — florals, fringe, layering, and artisan accessories' },
   'gothic':                { ja: 'ゴシック調のスタイル修飾語。暗め・荘厳・ヴィクトリアン要素を衣装に加える。ゴスロリと違いアウトフィット全体のスタイルを変える', en: 'Style modifier that adds dark, Victorian, or solemn Gothic elements to an outfit — broader than gothic lolita' },
+  'asymmetrical outfit':   { ja: '左右で異なるデザインの非対称な衣装。ゲーム・アニメ系キャラに多く見られる個性的なスタイリング。ひと目でキャラクターらしさが出る', en: 'Outfit with different designs on each side — a staple of game and anime character design that instantly conveys a unique identity' },
   'streetwear':            { ja: 'ストリートウェア。ヒップホップ・スケーター文化由来の都市型カジュアル。ビッグシルエット・ロゴ・スニーカーが定番', en: 'Urban casual fashion rooted in hip-hop/skate culture — oversized fits, logos, and sneakers' },
   'high fashion':          { ja: 'ハイファッション。ランウェイ発のハイブランド・前衛的デザイナーズ系スタイル。鋭いシルエットと独創的な素材感が特徴', en: 'Runway-level designer fashion — sharp silhouettes, unconventional materials, avant-garde aesthetics' },
 
@@ -313,6 +315,9 @@ export const TAG_DICT = {
   'platform boots':        { ja: '靴底が特別に厚いブーツ。ゴスロリ・パンク・原宿系ファッションの定番', en: 'Boots with an extra-thick platform sole — goth, punk, or Harajuku fashion' },
   'leg warmers':           { ja: '足首から膝にかけてのカバー。ダンス・80年代ファッション・防寒用など幅広く使われる', en: 'Thick fabric tubes worn on the lower legs — dance, retro 80s, or cold-weather styling' },
   'zettai ryouiki':        { ja: '絶対領域。ミニスカートの裾とニーソックス上端の間に見える太もも素肌の通称。7:4:3（スカート:素肌:靴下）がゴールデン比とされる', en: 'The strip of bare thigh between a miniskirt hem and thigh-highs — "absolute territory"; 7:4:3 golden ratio' },
+  'frilled socks':         { ja: 'フリル（ひらひら）付きのソックス。ロリータ・お嬢様・ドレス系の衣装との相性が良く、可愛らしさを一気に引き上げる', en: 'Socks with frilled edges — pairs beautifully with lolita, princess, or dress styles; strongly elevates cuteness' },
+  'single thighhigh':      { ja: '片方の脚だけニーハイを履いた非対称スタイル。キャラクターの個性・こだわり・ちぐはぐな魅力を演出する定番タグ', en: 'Thigh-high worn on only one leg — asymmetric look that gives characters a quirky, distinctive personality' },
+  'mismatched legwear':    { ja: '左右で異なる靴下やレッグウェア。ちぐはぐさがキャラクターの個性・子供っぽさ・独自スタイルを演出する', en: 'Different legwear on each leg — the asymmetry conveys a quirky, playful, or uniquely styled character' },
 
   // ── 持ち物・武器 ─────────────────────────────────────────────
   'holding fan':           { ja: '扇子（または団扇）を手に持つポーズ。和風・中華風・貴族系に映える', en: 'Holding a folding or flat fan — Japanese, Chinese, or aristocratic aesthetic' },
