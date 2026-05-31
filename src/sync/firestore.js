@@ -4,6 +4,10 @@ import { fstore } from '../firebase';
 const MAX_CLOUD_VERSIONS   = 10;
 const MAX_CLOUD_PROMPT_LOG = 30;
 
+// Firestore は undefined を invalid-argument として弾く。
+// JSON.parse(JSON.stringify()) で undefined キーを除去し、安全なオブジェクトに変換する。
+const sanitize = (obj) => JSON.parse(JSON.stringify(obj));
+
 // Strip heavy per-block fields from version snapshots before cloud push.
 // `cats` is always rebuilt from BLOCKS_DEF via mergeCharacterBlocks on restore.
 // `lastRandomPicks` is ephemeral UI state, not needed in cloud storage.
@@ -29,21 +33,21 @@ const toCloudChars = (chars) =>
 export async function pushToCloud(uid, characters, orderUpdatedAt, settings, settingsUpdatedAt) {
   try {
     const ref = doc(fstore, 'users', uid, 'data', 'state');
-    const payload = {
-      characters: toCloudChars(characters),
-      characterOrder: characters.map(c => c.id),
-      orderUpdatedAt: orderUpdatedAt ?? Date.now(),
-      settings: settings ?? null,
+    // sanitize で undefined を除去してから送信（invalid-argument 防止）
+    const clean = sanitize({
+      characters:       toCloudChars(characters),
+      characterOrder:   characters.map(c => c.id),
+      orderUpdatedAt:   orderUpdatedAt ?? Date.now(),
+      settings:         settings ?? null,
       settingsUpdatedAt: settingsUpdatedAt ?? 0,
-      updatedAt: serverTimestamp(),
-    };
+    });
     // Warn before Firestore's 1 MiB document limit
-    const sizeBytes = new Blob([JSON.stringify(payload)]).size;
+    const sizeBytes = new Blob([JSON.stringify(clean)]).size;
     if (sizeBytes > 900_000) {
       console.warn('pushToCloud: payload too large', sizeBytes);
       return { ok: false, tooBig: true };
     }
-    await setDoc(ref, payload);
+    await setDoc(ref, { ...clean, updatedAt: serverTimestamp() });
     return { ok: true };
   } catch (e) {
     console.error('pushToCloud failed', e?.code ?? e?.name, e);
