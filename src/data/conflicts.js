@@ -94,6 +94,9 @@ export const CONFLICT_RULES = [
   { tags:['contrapposto','seiza'],       ja:'S字立ちと正座が矛盾',            en:'contrapposto + seiza' },
   { tags:['contrapposto','all fours'],   ja:'S字立ちと四つん這いが矛盾',      en:'contrapposto + all fours' },
   { tags:['contrapposto','sleeping'],    ja:'S字立ちと眠りが矛盾',            en:'contrapposto + sleeping' },
+  ...mk('w sitting',    ['standing','jumping','running','walking'], 'W座りと立ち系ポーズが矛盾'),
+  ...mk('crossed legs', ['standing','jumping','running','walking'], '脚組みと立ち系ポーズが矛盾'),
+  ...mk('legs up',      ['standing','running','walking'],           '足上げと立ち系ポーズが矛盾'),
 
   // ── 人数 ─────────────────────────────────────────────────────
   { tags:['solo','2girls'],              ja:'ひとりと女の子2人が矛盾',         en:'solo + 2girls' },
@@ -230,7 +233,7 @@ export const CONFLICT_RULES = [
     'sneakers','loafers','oxford shoes','ballet flats','mary janes','sandals','geta','slippers',
     'heels','pumps','mules','high heels','platform shoes',
     'ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
-    'thighhighs','white thighhighs','black thighhighs','tights','pantyhose','knee-high socks',
+    'thighhighs','tights','pantyhose','knee-high socks','frilled socks','single thighhigh',
   ], 'ハーピーの鳥足と靴/ニーハイ類が不自然（アニメ設定では多様なため警告のみ）', 'warn'),
 
   // ── 種族×衣装（人魚） ─────────────────────────────────────────
@@ -257,6 +260,9 @@ export const CONFLICT_RULES = [
   { tags:['mermaid','knee-high socks'],   ja:'人魚とニーハイソックスが矛盾（脚がない）',    en:'mermaid + knee-high socks' },
   { tags:['mermaid','platform boots'],    ja:'人魚と厚底ブーツが矛盾（脚がない）',           en:'mermaid + platform boots' },
   { tags:['mermaid','leg warmers'],       ja:'人魚とレッグウォーマーが矛盾（脚がない）',      en:'mermaid + leg warmers' },
+  { tags:['mermaid','frilled socks'],    ja:'人魚とフリルソックスが矛盾（脚がない）',        en:'mermaid + frilled socks' },
+  { tags:['mermaid','single thighhigh'],ja:'人魚と片方ニーハイが矛盾（脚がない）',          en:'mermaid + single thighhigh' },
+  { tags:['mermaid','mismatched legwear'],ja:'人魚と左右違い靴下が矛盾（脚がない）',        en:'mermaid + mismatched legwear' },
 
   // ── 種族×衣装（ラミア）─────────────────────────────────────────
   { tags:['lamia','thighhighs'],          ja:'ラミアとニーハイが矛盾（蛇の下半身）',        en:'lamia + thighhighs' },
@@ -281,6 +287,9 @@ export const CONFLICT_RULES = [
   { tags:['lamia','ankle socks'],         ja:'ラミアとアンクルソックスが矛盾（蛇の下半身）',en:'lamia + ankle socks' },
   { tags:['lamia','platform boots'],      ja:'ラミアと厚底ブーツが矛盾（蛇の下半身）',       en:'lamia + platform boots' },
   { tags:['lamia','leg warmers'],         ja:'ラミアとレッグウォーマーが矛盾（蛇の下半身）',  en:'lamia + leg warmers' },
+  { tags:['lamia','frilled socks'],      ja:'ラミアとフリルソックスが矛盾（蛇の下半身）',    en:'lamia + frilled socks' },
+  { tags:['lamia','single thighhigh'],  ja:'ラミアと片方ニーハイが矛盾（蛇の下半身）',      en:'lamia + single thighhigh' },
+  { tags:['lamia','mismatched legwear'],ja:'ラミアと左右違い靴下が矛盾（蛇の下半身）',      en:'lamia + mismatched legwear' },
 
   // ── 髪型 × 髪の長さ ───────────────────────────────────────────
   { tags:['drill hair','short hair'],     ja:'ドリルヘアとショートが矛盾（長さが必要）',    en:'drill hair + short hair' },
@@ -328,16 +337,16 @@ export const CONFLICT_RULES = [
     'sailor uniform','maid outfit','furisode','cheongsam','shrine maiden',
     'nurse','magical girl','gothic lolita','idol costume','cheerleader',
     'race queen','bikini armor','bunny suit','leotard',
-    'school swimsuit','bikini','micro bikini','lingerie',
+    'school swimsuit','bikini','micro bikini','frilled bikini','string bikini','monokini','lingerie',
     'blouse','off shoulder','crop top','halter top','tube top','sports bra',
-    'skirt','pleated skirt','mini skirt','micro skirt','hot pants',
-    'thighhighs','white thighhighs','black thighhighs','pantyhose',
+    'skirt','pleated skirt','mini skirt','micro skirt','pencil skirt','flared skirt','hot pants',
+    'thighhighs','pantyhose','frilled socks',
   ], '男性キャラと女性向け衣装・アイテムが矛盾'),
 
   // ── 幼い体型×極端な描写 ─────────────────────────────────────────
   ...mk('loli',  ['huge breasts','large breasts'],                '幼い体型と大きな胸が矛盾'),
   ...mk('loli',  ['cleavage','sideboob','underboob',
-                  'lingerie','micro bikini'],                      '幼い体型と過激な描写が矛盾'),
+                  'lingerie','micro bikini','string bikini','monokini'], '幼い体型と過激な描写が矛盾'),
   ...mk('child', ['huge breasts','large breasts'],               '子どもと大きな胸サイズが矛盾'),
 
   // ══════════════════════════════════════════════════════════════════
@@ -345,14 +354,14 @@ export const CONFLICT_RULES = [
   // ══════════════════════════════════════════════════════════════════
   // ドレス類（スカート一体型）→ パンツ・レギンス追加は矛盾
   ...['dress','sundress','sweater dress','wedding dress','evening gown'].flatMap(o =>
-    mk(o, ['pants','jeans','leggings'], `${o}とボトムスが重ね着で矛盾`)),
+    mk(o, ['pants','jeans','leggings','cargo pants'], `${o}とボトムスが重ね着で矛盾`)),
   // ワンピース型（全身カバー）→ ボトムス全般と矛盾
   ...['swimsuit','one-piece swimsuit','school swimsuit',
       'bunny suit','leotard','bodysuit'].flatMap(o =>
-    mk(o, ['skirt','pleated skirt','mini skirt','micro skirt',
-           'pants','jeans','leggings','shorts','hot pants'], `${o}とボトムスが重ね着で矛盾`)),
-  ...mk('maid outfit', ['pants','jeans','leggings'],  'メイド服とパンツ類が重ね着で矛盾'),
-  ...mk('cheongsam',   ['pants','jeans','leggings'],  'チャイナドレスとパンツ類が重ね着で矛盾'),
+    mk(o, ['skirt','pleated skirt','mini skirt','micro skirt','pencil skirt','flared skirt',
+           'pants','jeans','leggings','shorts','hot pants','cargo pants'], `${o}とボトムスが重ね着で矛盾`)),
+  ...mk('maid outfit', ['pants','jeans','leggings','cargo pants'], 'メイド服とパンツ類が重ね着で矛盾'),
+  ...mk('cheongsam',   ['pants','jeans','leggings','cargo pants'], 'チャイナドレスとパンツ類が重ね着で矛盾'),
 
   // ══════════════════════════════════════════════════════════════════
   // ③ 視点×ボディフォーカス（前後の同時指定）
@@ -374,10 +383,10 @@ export const CONFLICT_RULES = [
   // ══════════════════════════════════════════════════════════════════
   // 冬・雪 × 水着・裸足（ファンサービスなど意図的な組み合わせもあるため warn）
   ...mk('snowy',
-    ['bikini','micro bikini','swimsuit','one-piece swimsuit','school swimsuit','barefoot'],
+    ['bikini','micro bikini','frilled bikini','string bikini','monokini','swimsuit','one-piece swimsuit','school swimsuit','barefoot'],
     '雪の環境と夏向け衣装・裸足（ファンサービス系では意図的なこともある）', 'warn'),
   ...mk('snow',
-    ['bikini','micro bikini','swimsuit','one-piece swimsuit','school swimsuit','barefoot'],
+    ['bikini','micro bikini','frilled bikini','string bikini','monokini','swimsuit','one-piece swimsuit','school swimsuit','barefoot'],
     '雪の環境と夏向け衣装・裸足（ファンサービス系では意図的なこともある）', 'warn'),
   // 水中 × 使用不可アイテム・エフェクト
   ...mk('underwater',
