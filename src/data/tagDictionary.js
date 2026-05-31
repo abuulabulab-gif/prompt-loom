@@ -113,7 +113,7 @@ export const TAG_DICT = {
   'cheongsam':             { ja: 'チャイナドレス。高いスリット＋立て衿が特徴の中国伝統衣装', en: 'Traditional Chinese qipao dress with high slit and mandarin collar' },
   'hanfu':                 { ja: '漢服。古代中国の伝統衣装。広い袖・流れるような布地が特徴', en: 'Traditional Han Chinese clothing with flowing wide sleeves — ancient Chinese aesthetic' },
   'virgin killer sweater': { ja: '童貞を殺す服。正面は普通のセーターだが背中が腰まで大きく開いたバックレスデザイン。ネット発祥のニックネームだがAIの認識率が高い', en: 'Backless sweater that looks normal from the front but reveals skin all the way down the back — internet-culture name with high AI recognition' },
-  'noren blouse':          { ja: '乳暖簾。胸元が暖簾のように左右に割れたブラウス。布が胸を半分ほど隠しつつ谷間〜下乳が露出する独特のデザイン。⚠️認識率はモデルによって差がある', en: 'Blouse that parts at the chest like a shop curtain — partially covers while exposing cleavage and underboob. ⚠️ Recognition varies by model; combine with sideboob for stability' },
+  'breast curtains':       { ja: '乳暖簾。胸元が暖簾のように左右に割れたブラウス。布が胸を半分ほど隠しつつ谷間〜下乳が露出する独特のデザイン。⚠️認識率はモデルによって差がある', en: 'Fabric that parts at the chest like curtains — partially covers while exposing cleavage and underboob. ⚠️ Recognition varies by model; combine with sideboob for stability' },
   'bunny suit':            { ja: 'バニーガールスーツ。うさ耳・カフス・コルセット型の露出コスチューム', en: 'Bunny-girl costume with rabbit ears, cuffs, and a corseted body' },
   'leotard':               { ja: 'レオタード。体にぴったりした一体型の水着に似た衣装。体操・ダンス系に', en: 'Tight one-piece body-hugging garment — like a swimsuit; worn in gymnastics/dance' },
   'race queen':            { ja: 'レースクイーン。モータースポーツイベントのキャンペーンガール衣装。ミニ丈＋ハイヒールが定番', en: 'Japanese motorsport promo-girl outfit — usually a mini dress with heels' },
