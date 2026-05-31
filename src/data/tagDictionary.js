@@ -105,6 +105,7 @@ export const TAG_DICT = {
   'harem outfit':          { ja: 'ハーレムの踊り子風衣装。お腹を出したクロップトップ＋ゆったりしたパンツのセット。上下セットで生成されるが単体指定より組み合わせが安定する', en: 'Harem dancer costume — midriff-baring crop top and flowing pants as a set; pairing with harem pants gives more stable results' },
   'harem pants':           { ja: 'ゆったりして裾に向かって絞られるアラビア風パンツ。上半身を別の衣装と組み合わせたい時に単体で使う。ハーレム衣装より汎用性が高い', en: 'Loose flowing pants that taper at the ankle — use alone to combine with any top; more versatile than the full harem outfit' },
   'thobe':                 { ja: 'アラビア半島の民族衣装。足首まで覆う長袖ローブ。白が定番だが黒・色付きもある。清潔感・中東的な風格・神秘的な雰囲気を与える', en: 'Full-length long-sleeved robe from the Arabian Peninsula — typically white; conveys a dignified Middle Eastern or mysterious atmosphere' },
+  'meiji schoolgirl uniform': { ja: '明治〜大正時代の女学生制服。和服（着物）の上に袴を合わせたスタイル。胸元にリボンがつくことが多く、レトロで凛とした雰囲気が出る', en: 'Meiji/Taisho–era Japanese schoolgirl uniform — kimono top with a hakama skirt, often with a chest ribbon; gives a refined retro Japanese aesthetic' },
   'gothic lolita':         { ja: 'ゴスロリ。黒を基調にしたフリルたっぷりのロリータファッション', en: 'Black-dominant, Victorian-inspired frilly lolita fashion' },
   'sci-fi armor':          { ja: 'SFアーマー。ファンタジー鎧のSF版。未来的な素材・デザインの全身鎧', en: 'Futuristic full-body armor with sleek tech design' },
   'techwear':              { ja: 'テックウェア。防水・多機能ポケット・サイバー配色のアーバン系ファッション。機械化キャラやサイバーパンク背景と相性抜群', en: 'Urban tactical streetwear with a sci-fi edge — waterproof materials, utility pockets, cyberpunk palette' },
