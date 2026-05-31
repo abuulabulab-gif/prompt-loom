@@ -140,6 +140,7 @@ export const TAG_DICT = {
   'bohemian':              { ja: 'ヒッピー・旅人・民族衣装ミックスの自由奔放なスタイル。花柄・フリンジ・重ね着・エスニック小物が定番', en: 'Free-spirited blend of folk, hippie, and ethnic fashion — florals, fringe, layering, and artisan accessories' },
   'gothic':                { ja: 'ゴシック調のスタイル修飾語。暗め・荘厳・ヴィクトリアン要素を衣装に加える。ゴスロリと違いアウトフィット全体のスタイルを変える', en: 'Style modifier that adds dark, Victorian, or solemn Gothic elements to an outfit — broader than gothic lolita' },
   'asymmetrical outfit':   { ja: '左右で異なるデザインの非対称な衣装。ゲーム・アニメ系キャラに多く見られる個性的なスタイリング。ひと目でキャラクターらしさが出る', en: 'Outfit with different designs on each side — a staple of game and anime character design that instantly conveys a unique identity' },
+  'revealing clothes':     { ja: '露出度の高い服の汎用修飾語。具体的な衣装タグに添えることで全体の肌露出感を引き上げる。単体よりも組み合わせで使うと効果的', en: 'General modifier for skimpy or skin-baring outfits — combine with specific clothing tags to raise the overall level of exposure' },
   'streetwear':            { ja: 'ストリートウェア。ヒップホップ・スケーター文化由来の都市型カジュアル。ビッグシルエット・ロゴ・スニーカーが定番', en: 'Urban casual fashion rooted in hip-hop/skate culture — oversized fits, logos, and sneakers' },
   'high fashion':          { ja: 'ハイファッション。ランウェイ発のハイブランド・前衛的デザイナーズ系スタイル。鋭いシルエットと独創的な素材感が特徴', en: 'Runway-level designer fashion — sharp silhouettes, unconventional materials, avant-garde aesthetics' },
 
