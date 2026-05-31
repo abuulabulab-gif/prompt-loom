@@ -108,8 +108,9 @@ export const CONFLICT_RULES = [
   { tags:['1boy','2boys'],               ja:'男の子の人数が矛盾',              en:'1boy + 2boys' },
   { tags:['1boy','multiple boys'],       ja:'男の子の人数が矛盾',              en:'1boy + multiple boys' },
 
-  // ── 種族×性別（humanoid表現のため英語タグに girl が残るものは warn に緩和） ────────
-  // catgirl / fox girl / kemonomimi girl はattr_kemonoの耳タグ+性別で代替するため削除済み
+  // ── 種族×性別（~girl 系種族は 1boy と矛盾。cat ears 等パーツは 1boy でも可） ────────
+  { tags:['catgirl',      '1boy'], ja:'catgirl種族と1boyが矛盾（ケモ耳系は cat ears+1boy で）', en:'catgirl + 1boy' },
+  { tags:['fox girl',     '1boy'], ja:'fox girl種族と1boyが矛盾（ケモ耳系は fox ears+1boy で）', en:'fox girl + 1boy' },
   { tags:['dragon girl',  '1boy'], level:'warn', ja:'竜人タグは人型女性寄りの表現になりやすい',  en:'dragon girl + 1boy (may render feminine)' },
   { tags:['slime girl',   '1boy'], level:'warn', ja:'スライム系タグは人型女性寄りの表現になりやすい', en:'slime girl + 1boy (may render feminine)' },
   { tags:['goblin girl',  '1boy'], level:'warn', ja:'ゴブリン系タグは人型女性寄りの表現になりやすい', en:'goblin girl + 1boy (may render feminine)' },
