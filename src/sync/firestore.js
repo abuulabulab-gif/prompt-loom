@@ -21,7 +21,7 @@ const toCloudChars = (chars) =>
     }));
     const slimPromptLog = (promptLog || []).slice(-MAX_CLOUD_PROMPT_LOG).map(entry => ({
       ...entry,
-      blocks: entry.blocks ? entry.blocks.map(slimVersionBlock) : undefined,
+      blocks: entry.blocks ? entry.blocks.map(slimVersionBlock) : null,
     }));
     return { ...rest, versions: slimVersions, promptLog: slimPromptLog };
   });
