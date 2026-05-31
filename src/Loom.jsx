@@ -722,7 +722,24 @@ export default function Loom() {
 
     setCharacters(prev => prev.map(c => {
       if (c.id !== activeCharId) return c;
-      return { ...c, blocks: c.blocks.map(b => { if (tmpl.apply[b.id] !== undefined) return { ...b, text: tmpl.apply[b.id] }; return b; }) };
+      return {
+        ...c,
+        blocks: c.blocks.map(b => {
+          const v = tmpl.apply[b.id];
+          if (v === undefined) return b;
+          // merge モード: 既存テキストにタグを追記（キャラ本質を消さない）
+          if (typeof v === 'object' && v.mode === 'merge') {
+            let text = b.text || '';
+            for (const seg of splitTags(v.tags || '')) {
+              const tag = bareTag(seg);
+              if (tag && !hasTag(text, tag)) text = appendTag(text, tag, b.strength);
+            }
+            return { ...b, text };
+          }
+          // replace モード: 従来通り上書き
+          return { ...b, text: v };
+        }),
+      };
     }));
     setTemplateOpen(false);
   };

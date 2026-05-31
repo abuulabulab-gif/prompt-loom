@@ -85,7 +85,7 @@ export const TEMPLATES = [
     descEn: 'Thigh focus / zettai ryouiki',
     apply: {
       composition: 'cowboy shot',
-      body: 'crossed legs, leg focus, thighs, zettai ryouiki',
+      body:         { mode: 'merge', tags: 'crossed legs, leg focus, thighs, zettai ryouiki' },
       outfit: 'skirt, thighhighs',
     },
   },
@@ -98,8 +98,8 @@ export const TEMPLATES = [
     descEn: 'Nape, bare shoulder, bare back composition',
     apply: {
       composition: 'upper body, back view, looking back',
-      body: 'nape, bare shoulders, bare back',
-      face: 'hair updo',
+      body:         { mode: 'merge', tags: 'nape, bare shoulders, bare back' },
+      face:         { mode: 'merge', tags: 'hair updo' },
     },
   },
   {
@@ -113,7 +113,7 @@ export const TEMPLATES = [
     negHintEn: 'standing, low angle, from below',
     apply: {
       composition: 'from above, high angle, sitting, looking up, foreshortening',
-      body: 'barefoot, foot focus, toes',
+      body:         { mode: 'merge', tags: 'barefoot, foot focus, toes' },
     },
   },
   {
@@ -125,7 +125,7 @@ export const TEMPLATES = [
     descEn: 'Armpits / sleeveless bust-up shot',
     apply: {
       composition: 'bust shot, arms behind head',
-      body: 'armpits',
+      body:         { mode: 'merge', tags: 'armpits' },
       outfit: 'tank top, sleeveless',
     },
   },
@@ -141,7 +141,7 @@ export const TEMPLATES = [
     negHintEn: "low angle, from below, worm's-eye view",
     apply: {
       composition: 'upper body, high angle, arms behind head',
-      body: 'armpits, armpit focus',
+      body:         { mode: 'merge', tags: 'armpits, armpit focus' },
     },
   },
   {
@@ -155,7 +155,7 @@ export const TEMPLATES = [
     negHintEn: "high angle, from above, bird's-eye view",
     apply: {
       composition: 'full body, from below, low angle, foreshortening',
-      body: 'thighs, leg focus',
+      body:         { mode: 'merge', tags: 'thighs, leg focus' },
     },
   },
   {
@@ -167,7 +167,7 @@ export const TEMPLATES = [
     descEn: 'Midriff and navel focus with crop top',
     apply: {
       composition: 'cowboy shot',
-      body: 'midriff, midriff focus, navel',
+      body:         { mode: 'merge', tags: 'midriff, midriff focus, navel' },
       outfit: 'crop top, shorts',
     },
   },
@@ -182,7 +182,7 @@ export const TEMPLATES = [
     negHintEn: 'back view, hair down, covering neck, turtleneck',
     apply: {
       composition: 'upper body, side view, hand behind head',
-      body: 'nape, bare shoulders',
+      body:         { mode: 'merge', tags: 'nape, bare shoulders' },
     },
   },
   {
@@ -196,7 +196,7 @@ export const TEMPLATES = [
     negHintEn: 'standing, walking, sitting, from below',
     apply: {
       composition: "bird's-eye view, lying on back, full body, looking up",
-      face: 'floating hair',
+      face:         { mode: 'merge', tags: 'floating hair' },
     },
   },
   {
@@ -208,7 +208,7 @@ export const TEMPLATES = [
     descEn: 'Skin-tight clothing detail with maximum thigh emphasis',
     apply: {
       composition: 'lower body',
-      body: 'thighs, thigh gap, zettai ryouiki',
+      body:         { mode: 'merge', tags: 'thighs, thigh gap, zettai ryouiki' },
       outfit: 'thighhighs, skintight',
     },
   },
@@ -251,7 +251,7 @@ export const TEMPLATES = [
     negHintEn: 'eyes, upper body, full face, full body, zoomed out',
     apply: {
       composition: 'close-up, lower half of face, macro shot',
-      face: 'parted lips, detailed lips',
+      face:         { mode: 'merge', tags: 'parted lips, detailed lips' },
     },
   },
   {
@@ -265,7 +265,7 @@ export const TEMPLATES = [
     negHintEn: 'full face, mouth focus, full body, zoomed out',
     apply: {
       composition: 'extreme close-up on eyes, macro shot',
-      face: 'eye focus, detailed pupils',
+      face:         { mode: 'merge', tags: 'eye focus, detailed pupils' },
     },
   },
   {

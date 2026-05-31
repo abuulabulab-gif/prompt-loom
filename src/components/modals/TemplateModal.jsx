@@ -23,7 +23,8 @@ const BLOCK_LABEL = {
 
 function previewText(tmpl) {
   const first = Object.values(tmpl.apply)[0] ?? '';
-  return first.length > 50 ? first.slice(0, 50) + '…' : first;
+  const text = typeof first === 'object' ? (first.tags ?? '') : first;
+  return text.length > 50 ? text.slice(0, 50) + '…' : text;
 }
 
 function TemplateCard({ tmpl, lang, onApply }) {
