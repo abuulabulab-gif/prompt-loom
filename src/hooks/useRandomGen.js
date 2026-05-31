@@ -13,13 +13,19 @@ import { COLOR_PALETTE, SHADES, COLOR_TARGETS, buildColorTag, buildColorName, HU
 // ── 種族パーツ系統管理 ───────────────────────────────────────────────────
 // 動物耳+尻尾のペア定義（両方が同系統であるべき）
 const ANIMAL_EAR_TAIL_PAIRS = [
-  { ears: 'cat ears',   tail: 'cat tail'   },
-  { ears: 'fox ears',   tail: 'fox tail'   },
-  { ears: 'wolf ears',  tail: 'wolf tail'  },
-  { ears: 'dog ears',   tail: 'dog tail'   },
-  { ears: 'bunny ears', tail: 'bunny tail' },
-  { ears: 'horse ears', tail: 'horse tail' },
-  { ears: 'cow ears',   tail: 'cow tail'   },
+  { ears: 'cat ears',      tail: 'cat tail'      },
+  { ears: 'fox ears',      tail: 'fox tail'      },
+  { ears: 'wolf ears',     tail: 'wolf tail'     },
+  { ears: 'dog ears',      tail: 'dog tail'      },
+  { ears: 'bunny ears',    tail: 'bunny tail'    },
+  { ears: 'tiger ears',    tail: 'tiger tail'    },
+  { ears: 'squirrel ears', tail: 'squirrel tail' },
+  { ears: 'mouse ears',    tail: 'mouse tail'    },
+  { ears: 'sheep ears',    tail: 'sheep horns'   },
+  { ears: 'deer ears',     tail: 'deer antlers'  },
+  { ears: 'goat ears',     tail: 'goat horns'    },
+  { ears: 'horse ears',    tail: 'horse tail'    },
+  { ears: 'cow ears',      tail: 'cow tail'      },
 ];
 const ALL_ANIMAL_EAR_TAGS  = new Set(ANIMAL_EAR_TAIL_PAIRS.map(p => p.ears).concat(['animal ears']));
 const ALL_ANIMAL_TAIL_TAGS = new Set(ANIMAL_EAR_TAIL_PAIRS.map(p => p.tail).concat(['fluffy tail', 'multiple tails']));
@@ -27,6 +33,7 @@ const ALL_ANIMAL_TAIL_TAGS = new Set(ANIMAL_EAR_TAIL_PAIRS.map(p => p.tail).conc
 const NON_ANIMAL_SPECIES_TAGS = new Set([
   'elf','dark elf','angel','demon','vampire','witch','fairy',
   'ghost','slime girl','mermaid','lamia','dragon girl','oni','doll','android',
+  'human','harpy','succubus','goblin girl','monster girl',
 ]);
 // ハイブリッド確率（モード別）— この確率で例外的に動物パーツを許可
 const HYBRID_CHANCE_CHARDESIGN = 0.05; // 5%
@@ -58,7 +65,7 @@ const COLOR_CAT_TARGET = { face_haircolor: 'hair', face_eyecolor: 'eyes' };
 // 直近の生成で使ったタグを記憶し、しばらく出にくくする
 const COOLDOWN_CAT_IDS = new Set([
   'attr_species', 'face_haircolor', 'face_hairstyle', 'face_eyecolor',
-  'body_shape', 'body_bust', 'outfit_genre',
+  'body_shape', 'body_bust', 'outfit_formal', 'outfit_uniform', 'outfit_ethnic', 'outfit_cosplay', 'outfit_swim', 'outfit_lingerie',
   'comp_distance', 'comp_angle', 'face_expression',
   'bg_simple', 'bg_outdoor', 'bg_indoor',
 ]);
@@ -504,9 +511,27 @@ function buildSpeciesText(picks, block, speciesCat, text) {
       continue;
     }
     if (en === 'human') {
-      if (Math.random() < 0.1) {
-        const pair = KEMONOMIMI_PAIRS[Math.floor(Math.random() * KEMONOMIMI_PAIRS.length)];
-        for (const partEn of pair) { if (!hasTag(text, partEn)) text = appendTag(text, partEn, block.strength); }
+      continue; // 人間は純粋な人間 — ケモ耳・幻想パーツは付与しない
+    }
+    if (en === 'kemonomimi girl') {
+      const pair = KEMONOMIMI_PAIRS[Math.floor(Math.random() * KEMONOMIMI_PAIRS.length)];
+      for (const partEn of pair) { if (!hasTag(text, partEn)) text = appendTag(text, partEn, block.strength); }
+      continue;
+    }
+    if (en === 'monster girl') {
+      // 幻想パーツプールからランダムに1〜2カテゴリ選ぶ
+      const pools = [
+        ['small horns','demon horns','oni horns','dragon horns','deer antlers'],
+        ['demon tail','dragon tail'],
+        ['demon wings','feathered wings','fairy wings','mechanical wings'],
+        ['scale skin','third eye','paw pads','pointy ears','elf ears'],
+      ];
+      const numParts = Math.random() < 0.45 ? 2 : 1;
+      const shuffled = pools.slice().sort(() => Math.random() - 0.5);
+      for (let i = 0; i < numParts; i++) {
+        const pool = shuffled[i];
+        const part = pool[Math.floor(Math.random() * pool.length)];
+        if (!hasTag(text, part)) text = appendTag(text, part, block.strength);
       }
       continue;
     }
@@ -701,6 +726,28 @@ function applyFeatureMakerLayer(blockMap) {
   }
 }
 
+// ── 雰囲気タグ自動付与レイヤー ────────────────────────────────────────────
+// chardesign: 5% / illust: 55% の確率で背景ブロックに雰囲気タグを1つ付与。
+// シンプル背景が選ばれている場合はスキップ。
+const ATMOSPHERE_TAGS = [
+  'calm atmosphere', 'ethereal atmosphere', 'moody atmosphere', 'shadowy atmosphere',
+  'candlelit atmosphere', 'rainy atmosphere', 'cinematic atmosphere', 'pastel atmosphere',
+  'misty atmosphere', 'sunset atmosphere',
+];
+const SIMPLE_BG_SET = new Set(['white background', 'simple background', 'gradient background', 'bokeh background', 'abstract background']);
+
+function applyAtmosphereLayer(blockMap, mode) {
+  const prob = mode === 'chardesign' ? 0.05 : 0.55;
+  if (Math.random() > prob) return;
+  const bgBlock = blockMap.get('background');
+  if (!bgBlock || bgBlock.locked) return;
+  const text = bgBlock.text || '';
+  if ([...SIMPLE_BG_SET].some(t => hasTag(text, t))) return;
+  const pick = ATMOSPHERE_TAGS[Math.floor(Math.random() * ATMOSPHERE_TAGS.length)];
+  if (hasTag(text, pick)) return;
+  blockMap.set('background', { ...bgBlock, text: appendTag(text, pick, bgBlock.strength) });
+}
+
 export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
   const [randomMode, setRandomMode] = useState(() => localStorage.getItem('loom_randomMode') || 'illust');
 
@@ -842,6 +889,19 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
         return newBlock;
       });
 
+      // ゴブリン娘 → 擬似ゴブリン置換（human + green skin + pointy ears）
+      {
+        const attrB = blockMap.get('attribute');
+        const bodyB = blockMap.get('body');
+        if (attrB && !attrB.locked && bodyB && !bodyB.locked && hasTag(attrB.text || '', 'goblin girl')) {
+          const attrText = appendTag(removeTag(attrB.text, 'goblin girl'), 'pointy ears', attrB.strength);
+          blockMap.set('attribute', { ...attrB, text: attrText });
+          if (!hasTag(bodyB.text || '', 'green skin')) {
+            blockMap.set('body', { ...bodyB, text: appendTag(bodyB.text || '', 'green skin', bodyB.strength) });
+          }
+        }
+      }
+
       applyComboRules(blockMap, mode === 'chardesign' ? CHARDESIGN_MODE_CONFIG.fixedBlocks : null);
 
       // 最終クリーンアップ: 全ブロックまたがりの矛盾を除去
@@ -869,6 +929,7 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
       // カラーメーカー・特徴メーカーの条件付き自動付与レイヤー
       applyColorMakerLayer(blockMap, mode);
       applyFeatureMakerLayer(blockMap);
+      applyAtmosphereLayer(blockMap, mode);
 
       // Simple background → suppress lighting and effect (environmental FX clash with plain BG)
       if (mode !== 'chardesign') {

@@ -35,11 +35,11 @@ export const OPTIONAL_CAT_NAMES = new Set([
   // 顔
   'インナーカラー', '前髪', '目つき・形', '眉', '口・歯', '髪飾り・毛流れ', 'メイク・顔演出',
   // 属性
-  '年齢感', 'ケモ耳・尻尾', '幻想パーツ',
+  '年齢感', 'ケモ耳・しっぽ・角', '幻想パーツ',
   // 体型（肌色はコア化 → 常に1つ選ばれる）
   '肌質感', '細部', 'ボディフォーカス', '状態', '足',
-  // 衣装
-  '素材・装飾', '装飾アクセ', '服装スタイル', 'レッグウェア',
+  // 衣装（民族・水着・ランジェリーは任意；フォーマル・制服・コスプレはコア扱い）
+  '素材・装飾', '装飾アクセ', '服装スタイル', 'レッグウェア', '民族・伝統衣装', '水着・スポーツ', 'ランジェリー・部屋着',
   // 特徴
   'ピアス・刺青', '装備・ケア', '武器・小物',
   // エフェクト（全て任意）
@@ -47,7 +47,7 @@ export const OPTIONAL_CAT_NAMES = new Set([
   // 構図
   '手・指', '視線・演出', 'シチュ',
   // 背景
-  '屋内', '時間・天気', '季節・雰囲気',
+  '屋内', '時間・天気', '季節・雰囲気', '空気感',
   // 品質
   '仕上がり', '顔の精細化',
   // アートスタイル（スタイルは外す → 常にコア扱い）
@@ -64,11 +64,14 @@ export const SPECIES_PARTS_MAP = {
   'dark elf':    ['elf ears'],
   'angel':       ['angel wings', 'halo'],
   'demon':       ['demon horns', 'demon tail', 'demon wings'],
+  'succubus':    ['demon horns', 'demon tail', 'demon wings'],
   'fairy':       ['fairy wings'],
+  'harpy':       ['feathered wings'],
   'mermaid':     ['mermaid tail'],
   'lamia':       ['lamia tail'],
   'dragon girl': ['dragon horns', 'dragon tail', 'scale skin'],
   'catgirl':     ['cat ears', 'cat tail'],
+  'fox girl':    ['fox ears', 'fox tail'],
   'oni':         ['oni horns'],
   'doll':        ['ball joints'],
   'android':     ['cybernetics'],
@@ -76,25 +79,34 @@ export const SPECIES_PARTS_MAP = {
 
 // ── UI combo: bidirectional pairs (clicking either tag syncs the other) ──
 export const TAG_PAIR_COMBOS = new Map([
-  ['cat ears',    'cat tail'],   ['cat tail',    'cat ears'],
-  ['fox ears',    'fox tail'],   ['fox tail',    'fox ears'],
-  ['wolf ears',   'wolf tail'],  ['wolf tail',   'wolf ears'],
-  ['dog ears',    'dog tail'],   ['dog tail',    'dog ears'],
-  ['bunny ears',  'bunny tail'], ['bunny tail',  'bunny ears'],
-  ['horse ears',  'horse tail'], ['horse tail',  'horse ears'],
-  ['cow ears',    'cow tail'],   ['cow tail',    'cow ears'],
-  ['dragon horns','dragon tail'],['dragon tail', 'dragon horns'],
-  ['demon horns', 'demon tail'], ['demon tail',  'demon horns'],
-  ['angel wings', 'halo'],       ['halo',        'angel wings'],
+  ['cat ears',      'cat tail'],      ['cat tail',      'cat ears'],
+  ['fox ears',      'fox tail'],      ['fox tail',      'fox ears'],
+  ['wolf ears',     'wolf tail'],     ['wolf tail',     'wolf ears'],
+  ['dog ears',      'dog tail'],      ['dog tail',      'dog ears'],
+  ['bunny ears',    'bunny tail'],    ['bunny tail',    'bunny ears'],
+  ['tiger ears',    'tiger tail'],    ['tiger tail',    'tiger ears'],
+  ['squirrel ears', 'squirrel tail'], ['squirrel tail', 'squirrel ears'],
+  ['mouse ears',    'mouse tail'],    ['mouse tail',    'mouse ears'],
+  ['sheep ears',    'sheep horns'],   ['sheep horns',   'sheep ears'],
+  ['deer ears',     'deer antlers'],  ['deer antlers',  'deer ears'],
+  ['goat ears',     'goat horns'],    ['goat horns',    'goat ears'],
+  ['horse ears',    'horse tail'],    ['horse tail',    'horse ears'],
+  ['cow ears',      'cow tail'],      ['cow tail',      'cow ears'],
+  ['dragon horns',  'dragon tail'],   ['dragon tail',   'dragon horns'],
+  ['demon horns',   'demon tail'],    ['demon tail',    'demon horns'],
+  ['angel wings',   'halo'],         ['halo',           'angel wings'],
 ]);
 
 // ── UI combo: species → parts (one-way, fires only when species toggled ON) ──
 export const TAG_SPECIES_COMBOS = new Map([
   ['catgirl',     ['cat ears', 'cat tail']],
+  ['fox girl',    ['fox ears', 'fox tail']],
   ['angel',       ['angel wings', 'halo']],
   ['demon',       ['demon horns', 'demon tail', 'demon wings']],
+  ['succubus',    ['demon horns', 'demon tail', 'demon wings']],
   ['elf',         ['elf ears']],
   ['dark elf',    ['elf ears']],
+  ['harpy',       ['feathered wings']],
   ['oni',         ['oni horns']],
   ['dragon girl', ['dragon horns', 'dragon tail', 'scale skin']],
   ['mermaid',     ['mermaid tail']],
@@ -106,12 +118,18 @@ export const TAG_SPECIES_COMBOS = new Map([
 
 // ── Random: kemonomimi base pairs (ears + tail sets) ──
 export const KEMONOMIMI_PAIRS = [
-  ['cat ears',   'cat tail'],
-  ['fox ears',   'fox tail'],
-  ['wolf ears',  'wolf tail'],
-  ['dog ears',   'dog tail'],
-  ['bunny ears', 'bunny tail'],
-  ['cow ears',   'cow tail'],
+  ['cat ears',      'cat tail'],
+  ['fox ears',      'fox tail'],
+  ['wolf ears',     'wolf tail'],
+  ['dog ears',      'dog tail'],
+  ['bunny ears',    'bunny tail'],
+  ['tiger ears',    'tiger tail'],
+  ['squirrel ears', 'squirrel tail'],
+  ['mouse ears',    'mouse tail'],
+  ['sheep ears',    'sheep horns'],
+  ['deer ears',     'deer antlers'],
+  ['goat ears',     'goat horns'],
+  ['cow ears',      'cow tail'],
 ];
 
 // ── Random generation: mutually exclusive category groups ────
@@ -126,8 +144,15 @@ export const BLOCK_RANDOM_RULES = {
     skipIfPicked: { 'シンプル': ['時間・天気', '季節・雰囲気'] },
   },
   outfit: {
-    // If a complete-outfit Genre tag is picked, skip individual tops/bottoms
-    skipIfPicked: { 'ジャンル': ['トップス', 'ボトムス'] },
+    exclusiveGroups: [['フォーマル・ドレス', '制服・ユニフォーム', '民族・伝統衣装', 'コスプレ・ファンタジー', '水着・スポーツ', 'ランジェリー・部屋着']],
+    skipIfPicked: {
+      'フォーマル・ドレス':    ['トップス', 'ボトムス'],
+      '制服・ユニフォーム':    ['トップス', 'ボトムス'],
+      '民族・伝統衣装':        ['トップス', 'ボトムス'],
+      'コスプレ・ファンタジー':['トップス', 'ボトムス'],
+      '水着・スポーツ':        ['トップス', 'ボトムス'],
+      'ランジェリー・部屋着':  ['トップス', 'ボトムス'],
+    },
   },
 };
 
@@ -194,6 +219,13 @@ const LOWER_BODY_FRAME_OUT = new Set([
   'walking','running','jumping','dancing','fighting stance',
 ]);
 
+// 寝間着・肌着系から排除する屋外靴（スリッパ・裸足・靴下類はOK）
+const SLEEPWEAR_SHOE_EXCL = new Set([
+  'sneakers','loafers','oxford shoes','ballet flats','mary janes','sandals','geta',
+  'heels','pumps','mules','high heels','platform shoes',
+  'ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
+]);
+
 export const RANDOM_EXCLUSION_RULES = new Map([
   // フレーミング → 下半身タグ除外
   ['extreme close-up', LOWER_BODY_FRAME_OUT],
@@ -251,8 +283,8 @@ export const RANDOM_EXCLUSION_RULES = new Map([
   ['serious',      new Set(['laughing','grin','excited','blushing','embarrassed','shy'])],
   // アートスタイルとレンダリングの矛盾
   ['pixel art',       new Set(['depth of field','bokeh','subsurface scattering','smooth shading','soft shading','painterly','bloom'])],
-  ['lineart',         new Set(['watercolor','oil painting','depth of field','bokeh','subsurface scattering','smooth shading','soft shading'])],
-  ['sketch',          new Set(['cel shading','depth of field','bokeh','subsurface scattering','smooth shading','bloom','glowing'])],
+  ['lineart',         new Set(['watercolor','oil painting','depth of field','bokeh','subsurface scattering','smooth shading','soft shading','vibrant colors','pastel colors','warm colors','cool colors','neon colors'])],
+  ['sketch',          new Set(['cel shading','depth of field','bokeh','subsurface scattering','smooth shading','bloom','glowing','vibrant colors','pastel colors','warm colors','cool colors','neon colors'])],
   ['flat design',     new Set(['depth of field','bokeh','subsurface scattering','smooth shading','soft shading','painterly','bloom','glowing'])],
   ['retro artstyle',  new Set(['depth of field','bokeh','subsurface scattering','smooth shading','soft shading','painterly'])],
   ['monochrome',      new Set(['vibrant colors','colorful','neon colors','warm colors','cool colors','pastel colors','cel shading'])],
@@ -263,7 +295,8 @@ export const RANDOM_EXCLUSION_RULES = new Map([
   ['translucent skin', new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','blue skin','grey skin','porcelain skin'])],
   ['red skin',         new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','blue skin','grey skin','porcelain skin','translucent skin'])],
   ['blue skin',        new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','grey skin','porcelain skin','translucent skin'])],
-  ['grey skin',        new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','blue skin','porcelain skin','translucent skin'])],
+  ['grey skin',        new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','blue skin','green skin','porcelain skin','translucent skin'])],
+  ['green skin',       new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','blue skin','grey skin','porcelain skin','translucent skin'])],
   // 体型の矛盾防止
   ['flat chest',    new Set(['large breasts','huge breasts','medium breasts','breast hold','breast grab','cleavage','sideboob','underboob'])],
   ['large breasts', new Set(['flat chest','small breasts'])],
@@ -286,24 +319,60 @@ export const RANDOM_EXCLUSION_RULES = new Map([
     'cat tail','fox tail','wolf tail','fluffy tail','bunny tail','dog tail','horse tail','cow tail'])],
   ['mannequin', new Set(['sweat','blush','blushing','tears','crying','saliva','drooling'])],
   // 種族パーツの重複防止（ケモ耳 × ホーン/ハロ系）
-  ['dog ears',    new Set(['demon horns','oni horns','goat horns','deer antlers','halo','angel halo'])],
-  ['cat ears',    new Set(['demon horns','oni horns','goat horns','deer antlers','halo','angel halo'])],
-  ['fox ears',    new Set(['demon horns','oni horns','goat horns','deer antlers','halo','angel halo'])],
-  ['wolf ears',   new Set(['demon horns','oni horns','goat horns','deer antlers','halo','angel halo'])],
-  ['bunny ears',  new Set(['demon horns','oni horns','goat horns','deer antlers','halo','angel halo'])],
-  ['horse ears',  new Set(['demon horns','oni horns','goat horns','deer antlers'])],
-  ['demon horns', new Set(['dog ears','cat ears','fox ears','wolf ears','bunny ears','horse ears','deer antlers','halo','angel halo'])],
-  ['oni horns',   new Set(['dog ears','cat ears','fox ears','wolf ears','bunny ears','horse ears','deer antlers','halo','angel halo'])],
-  ['halo',        new Set(['demon horns','oni horns','goat horns'])],
-  ['angel halo',  new Set(['demon horns','oni horns','goat horns'])],
+  // ※同種の耳と角はペアなので排除しない（sheep ears+sheep horns等はOK）
+  ['dog ears',      new Set(['demon horns','oni horns','goat horns','sheep horns','deer antlers','halo','angel halo'])],
+  ['cat ears',      new Set(['demon horns','oni horns','goat horns','sheep horns','deer antlers','halo','angel halo'])],
+  ['fox ears',      new Set(['demon horns','oni horns','goat horns','sheep horns','deer antlers','halo','angel halo'])],
+  ['wolf ears',     new Set(['demon horns','oni horns','goat horns','sheep horns','deer antlers','halo','angel halo'])],
+  ['bunny ears',    new Set(['demon horns','oni horns','goat horns','sheep horns','deer antlers','halo','angel halo'])],
+  ['tiger ears',    new Set(['demon horns','oni horns','goat horns','sheep horns','deer antlers','halo','angel halo'])],
+  ['squirrel ears', new Set(['demon horns','oni horns','goat horns','sheep horns','deer antlers','halo','angel halo'])],
+  ['mouse ears',    new Set(['demon horns','oni horns','goat horns','sheep horns','deer antlers','halo','angel halo'])],
+  ['horse ears',    new Set(['demon horns','oni horns','goat horns','sheep horns','deer antlers'])],
+  ['cow ears',      new Set(['demon horns','oni horns','goat horns','sheep horns','deer antlers'])],
+  ['sheep ears',    new Set(['demon horns','oni horns','goat horns','deer antlers','halo','angel halo'])],           // sheep hornsは除外しない
+  ['deer ears',     new Set(['demon horns','oni horns','goat horns','sheep horns','halo','angel halo'])],            // deer antlersは除外しない
+  ['goat ears',     new Set(['demon horns','oni horns','sheep horns','deer antlers','halo','angel halo'])],          // goat hornsは除外しない
+  ['demon horns', new Set(['dog ears','cat ears','fox ears','wolf ears','bunny ears','tiger ears','squirrel ears','mouse ears','horse ears','cow ears','sheep ears','deer ears','goat ears','deer antlers','sheep horns','goat horns','halo','angel halo'])],
+  ['oni horns',   new Set(['dog ears','cat ears','fox ears','wolf ears','bunny ears','tiger ears','squirrel ears','mouse ears','horse ears','cow ears','sheep ears','deer ears','goat ears','deer antlers','sheep horns','goat horns','halo','angel halo'])],
+  // 新しい角の相互排他（同種ペアは除外しない）
+  ['deer antlers', new Set(['demon horns','oni horns','sheep horns','goat horns','halo','angel halo','dog ears','cat ears','fox ears','wolf ears','bunny ears','tiger ears','squirrel ears','mouse ears','horse ears','cow ears','sheep ears','goat ears'])],
+  ['sheep horns',  new Set(['demon horns','oni horns','goat horns','deer antlers','halo','angel halo','dog ears','cat ears','fox ears','wolf ears','bunny ears','tiger ears','squirrel ears','mouse ears','horse ears','cow ears','deer ears','goat ears'])],
+  ['goat horns',   new Set(['demon horns','oni horns','sheep horns','deer antlers','halo','angel halo','dog ears','cat ears','fox ears','wolf ears','bunny ears','tiger ears','squirrel ears','mouse ears','horse ears','cow ears','deer ears','sheep ears'])],
+  ['halo',        new Set(['demon horns','oni horns','goat horns','sheep horns','deer antlers'])],
+  ['angel halo',  new Set(['demon horns','oni horns','goat horns','sheep horns','deer antlers'])],
   ['angel wings', new Set(['demon wings','bat wings','dragon wings'])],
   ['demon wings', new Set(['angel wings','dragon wings','feathered wings'])],
   ['bat wings',   new Set(['angel wings','feathered wings'])],
+  ['feathered wings', new Set(['demon wings','bat wings','angel wings','fairy wings','mechanical wings'])],
   // 横向き構図: 視聴者への直接アクションは不自然
   ['side view', new Set([
     'reaching toward viewer','pointing at viewer','eye contact','looking at viewer','waving',
     'v-sign','peace sign','finger heart','hand heart',
   ])],
+  // ハーピー → 鳥足のため屋外靴排除（warn レベルと連動）
+  ['harpy', new Set([
+    'sneakers','loafers','oxford shoes','ballet flats','mary janes','sandals','geta',
+    'heels','pumps','mules','high heels','platform shoes',
+    'ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
+  ])],
+  // sleeping → 表情・視線・インタラクション排除
+  ['sleeping', new Set([
+    'grin','laughing','wink','smug','excited',
+    'looking at viewer','looking away','looking back','looking up','eye contact',
+    'head tilt','waving','pointing','peace sign','reaching toward viewer',
+    'open mouth','tongue out',
+  ])],
+  // chibi → 官能的なボディフォーカス排除
+  ['chibi', new Set([
+    'cleavage','sideboob','underboob','armpits','midriff','thighs','bare thighs',
+    'leg focus','wide hips','zettai ryouiki','navel cutout','cleavage cutout',
+  ])],
+  // 寝間着・肌着系 → 屋外靴を排除（スリッパ・靴下・裸足は許可）
+  ['pajamas',   SLEEPWEAR_SHOE_EXCL],
+  ['nightgown', SLEEPWEAR_SHOE_EXCL],
+  ['babydoll',  SLEEPWEAR_SHOE_EXCL],
+
   // 人魚・ラミアの尻尾にも足元除外を適用（buildSpeciesTextで自動追加されるため）
   ['mermaid tail', new Set([
     'sneakers','loafers','mary janes','sandals','slippers','heels','pumps','high heels',
@@ -359,6 +428,44 @@ export const RANDOM_COMBO_RULES = [
   { trigger: 'dark elf',       blockId: 'body',        tag: 'grey skin',      prob: 0.25 },
   // 裸足のとき低確率でフットネイル付与
   { trigger: 'barefoot',       blockId: 'body',        tag: 'toenail polish', prob: 0.25 },
+  // アンドロイド → 機械パーツのランダム付与
+  { trigger: 'android', blockId: 'attribute', tag: 'robot ears',  prob: 0.50 },
+  { trigger: 'android', blockId: 'attribute', tag: 'ball joints', prob: 0.30 },
+  // 戦闘系衣装 → fighting stance
+  { trigger: 'fantasy armor',  blockId: 'composition', tag: 'fighting stance', prob: 0.65 },
+  { trigger: 'sci-fi armor',   blockId: 'composition', tag: 'fighting stance', prob: 0.60 },
+  { trigger: 'bikini armor',   blockId: 'composition', tag: 'fighting stance', prob: 0.55 },
+  // 自然な背景マッチ
+  { trigger: 'swimsuit',       blockId: 'background',  tag: 'beach',   prob: 0.50 },
+  { trigger: 'bikini',         blockId: 'background',  tag: 'beach',   prob: 0.55 },
+  { trigger: 'nun',            blockId: 'background',  tag: 'church',  prob: 0.45 },
+  // 角+耳の自動ペアリング（random gen では TAG_PAIR_COMBOS が使えないため）
+  { trigger: 'sheep ears',  blockId: 'attribute', tag: 'sheep horns',  prob: 0.75 },
+  { trigger: 'deer ears',   blockId: 'attribute', tag: 'deer antlers', prob: 0.80 },
+  { trigger: 'goat ears',   blockId: 'attribute', tag: 'goat horns',   prob: 0.75 },
+  // 擬似ゴブリンパス: 尖り耳→緑肌確定 / 緑肌→尖り耳65% / monster girl→緑肌20% / human→緑肌4%
+  { trigger: 'pointy ears',  blockId: 'body',      tag: 'green skin',  },               // 100%確定
+  { trigger: 'green skin',   blockId: 'attribute',  tag: 'pointy ears', prob: 0.65 },
+  { trigger: 'monster girl', blockId: 'body',       tag: 'green skin',  prob: 0.20 },
+  // シチュ・背景の自然な一致
+  { trigger: 'shrine maiden',   blockId: 'background',  tag: 'shrine',    prob: 0.40 },
+  { trigger: 'school uniform',  blockId: 'composition', tag: 'at school', prob: 0.50 },
+  { trigger: 'blazer uniform',  blockId: 'composition', tag: 'at school', prob: 0.45 },
+  { trigger: 'sailor uniform',  blockId: 'composition', tag: 'at school', prob: 0.45 },
+  { trigger: 'maid outfit',     blockId: 'composition', tag: 'indoors',   prob: 0.55 },
+  { trigger: 'nurse',           blockId: 'composition', tag: 'indoors',   prob: 0.50 },
+  // コスプレ → 関連装飾品の自動付与
+  { trigger: 'jiangshi costume', blockId: 'outfit',   tag: 'jiangshi hat',  prob: 0.90 },
+  { trigger: 'mummy costume',    blockId: 'feature',  tag: 'bandages',      prob: 0.90 },
+  { trigger: 'ghost costume',    blockId: 'outfit',   tag: 'veil',          prob: 0.60 },
+  { trigger: 'witch outfit',     blockId: 'outfit',   tag: 'hat',           prob: 0.75 },
+  { trigger: 'pirate outfit',    blockId: 'outfit',   tag: 'hat',           prob: 0.65 },
+  { trigger: 'gothic lolita',    blockId: 'outfit',   tag: 'choker',        prob: 0.65 },
+  { trigger: 'magical girl',     blockId: 'feature',  tag: 'holding wand',  prob: 0.70 },
+  { trigger: 'shrine maiden',    blockId: 'outfit',   tag: 'kanzashi',      prob: 0.65 },
+  { trigger: 'kimono',           blockId: 'outfit',   tag: 'kanzashi',      prob: 0.55 },
+  { trigger: 'furisode',         blockId: 'outfit',   tag: 'kanzashi',      prob: 0.70 },
+  { trigger: 'yukata',           blockId: 'outfit',   tag: 'kanzashi',      prob: 0.50 },
 ];
 
 // ── キャラデザモード：設定資料特化の厳格ルール ────────────

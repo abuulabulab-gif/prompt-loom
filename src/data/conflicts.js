@@ -11,8 +11,8 @@ export const CONFLICT_RULES = [
   { tags:['loli','mature female'],      ja:'幼い体型と成熟体型が矛盾',        en:'loli + mature female' },
   { tags:['loli','adult'],              ja:'幼い体型と大人が矛盾',            en:'loli + adult' },
   { tags:['loli','young adult'],        ja:'幼い体型と青年が矛盾',            en:'loli + young adult' },
-  { tags:['young','mature female'],     ja:'幼いと成熟体型が矛盾',            en:'young + mature female' },
-  { tags:['young','muscular'],          ja:'幼いと筋肉質が矛盾',              en:'young + muscular' },
+  { tags:['child','mature female'],     ja:'子どもと成熟体型が矛盾',            en:'child + mature female' },
+  { tags:['child','muscular'],          ja:'子どもと筋肉質が矛盾',              en:'child + muscular' },
   { tags:['tall','short stature'],      ja:'高身長と低身長が矛盾',            en:'tall + short stature' },
   { tags:['slim','chubby'],             ja:'スリムとぽっちゃりが矛盾',        en:'slim + chubby' },
   { tags:['slender','muscular'],        ja:'細身と筋肉質が矛盾',              en:'slender + muscular' },
@@ -106,10 +106,12 @@ export const CONFLICT_RULES = [
   { tags:['1boy','multiple boys'],       ja:'男の子の人数が矛盾',              en:'1boy + multiple boys' },
 
   // ── 種族×性別（~girl 系種族は 1boy と矛盾。cat ears 等パーツは 1boy でも可） ────────
-  { tags:['catgirl',    '1boy'], ja:'catgirl種族と1boyが矛盾（ケモ耳ショタはcat ears+1boyで）', en:'catgirl + 1boy' },
-  { tags:['dragon girl','1boy'], ja:'ドラゴンガール種族と1boyが矛盾',                          en:'dragon girl + 1boy' },
-  { tags:['slime girl', '1boy'], ja:'スライム娘種族と1boyが矛盾',                              en:'slime girl + 1boy' },
-  { tags:['monster girl','1boy'],ja:'モンスター娘種族と1boyが矛盾',                            en:'monster girl + 1boy' },
+  { tags:['catgirl',      '1boy'], ja:'catgirl種族と1boyが矛盾（ケモ耳ショタはcat ears+1boyで）', en:'catgirl + 1boy' },
+  { tags:['fox girl',     '1boy'], ja:'fox girl種族と1boyが矛盾（ケモ耳ショタはfox ears+1boyで）', en:'fox girl + 1boy' },
+  { tags:['dragon girl',  '1boy'], ja:'ドラゴンガール種族と1boyが矛盾',                          en:'dragon girl + 1boy' },
+  { tags:['slime girl',   '1boy'], ja:'スライム娘種族と1boyが矛盾',                              en:'slime girl + 1boy' },
+  { tags:['goblin girl',  '1boy'], ja:'ゴブリン娘種族と1boyが矛盾',                              en:'goblin girl + 1boy' },
+  { tags:['monster girl', '1boy'], ja:'モンスター娘種族と1boyが矛盾',                            en:'monster girl + 1boy' },
 
   // ── カメラ距離 ─────────────────────────────────────────────────
   { tags:['close-up','full body'],             ja:'クローズアップと全身が矛盾',      en:'close-up + full body' },
@@ -223,6 +225,14 @@ export const CONFLICT_RULES = [
   { tags:['light novel illustration','photorealistic'],  ja:'ライトノベル絵とフォトリアルが矛盾', en:'light novel illustration + photorealistic' },
   { tags:['light novel illustration','3D rendering'],    ja:'ライトノベル絵と3Dレンダリングが矛盾',en:'light novel illustration + 3D rendering' },
 
+  // ── 種族×衣装（ハーピー：鳥足のため靴・ニーハイが不自然 → warn）────────
+  ...mk('harpy', [
+    'sneakers','loafers','oxford shoes','ballet flats','mary janes','sandals','geta','slippers',
+    'heels','pumps','mules','high heels','platform shoes',
+    'ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
+    'thighhighs','white thighhighs','black thighhighs','tights','pantyhose','knee-high socks',
+  ], 'ハーピーの鳥足と靴/ニーハイ類が不自然（アニメ設定では多様なため警告のみ）', 'warn'),
+
   // ── 種族×衣装（人魚） ─────────────────────────────────────────
   { tags:['mermaid','thighhighs'],        ja:'人魚とニーハイが矛盾（脚がない）',            en:'mermaid + thighhighs' },
   { tags:['mermaid','shorts'],            ja:'人魚とショーツが矛盾（脚がない）',            en:'mermaid + shorts' },
@@ -328,7 +338,7 @@ export const CONFLICT_RULES = [
   ...mk('loli',  ['huge breasts','large breasts'],                '幼い体型と大きな胸が矛盾'),
   ...mk('loli',  ['cleavage','sideboob','underboob',
                   'lingerie','micro bikini'],                      '幼い体型と過激な描写が矛盾'),
-  ...mk('young', ['huge breasts'],                                '年齢感タグと極端な胸サイズが矛盾'),
+  ...mk('child', ['huge breasts','large breasts'],               '子どもと大きな胸サイズが矛盾'),
 
   // ══════════════════════════════════════════════════════════════════
   // ② 衣装の重ね着パニック（全身服×ボトムス）
