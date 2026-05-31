@@ -121,6 +121,7 @@ export const TAG_DICT = {
   'bunny suit':            { ja: 'バニーガールスーツ。うさ耳・カフス・コルセット型の露出コスチューム', en: 'Bunny-girl costume with rabbit ears, cuffs, and a corseted body' },
   'leotard':               { ja: 'レオタード。体にぴったりした一体型の水着に似た衣装。体操・ダンス系に', en: 'Tight one-piece body-hugging garment — like a swimsuit; worn in gymnastics/dance' },
   'race queen':            { ja: 'レースクイーン。モータースポーツイベントのキャンペーンガール衣装。ミニ丈＋ハイヒールが定番', en: 'Japanese motorsport promo-girl outfit — usually a mini dress with heels' },
+  'lab coat':              { ja: '白衣。医者・研究者・薬剤師などが着る白い膝丈前後のコート。知的・クール・理系キャラの定番衣装', en: 'White knee-length coat worn by doctors, researchers, and pharmacists — a classic look for intellectual or science-type characters' },
   'bikini armor':          { ja: 'ビキニアーマー。ビキニ型の防具。ファンタジーRPGのセクシー戦士の定番衣装', en: 'Fantasy battle outfit — armor styled as a bikini; iconic skimpy warrior costume' },
   'magical girl':          { ja: '魔法少女衣装。ふわふわドレスにステッキ・リボンを組み合わせた変身ヒロイン風', en: 'Magical girl transformation outfit — frilly dress with ribbon and wand' },
   'micro bikini':          { ja: 'マイクロビキニ。布地が極端に小さく肌の露出が非常に多い水着', en: 'Extremely minimal bikini with tiny triangles of fabric — very high skin exposure' },
@@ -319,7 +320,7 @@ export const TAG_DICT = {
 
   // ── アクセサリー ─────────────────────────────────────────────
   'thigh strap':           { ja: '太もも部分に巻きつけるベルトやストラップ。アクション系・セクシー系のアクセントに', en: 'Strap or band worn around the thigh — action, tactical, or sexy outfit accent' },
-  'chest strap':           { ja: '胸を水平や斜めに横切るハーネス・ベルト状のストラップ。ミリタリー・ファッション系キャラに多く、露出コーデのアクセントになる', en: 'Harness-style strap crossing the chest — used in military, fashion, or revealing outfit accents' },
+  'chest harness':         { ja: '胸・肩周りに複数のストラップが交差するハーネス型アクセサリー。戦士・ヴィラン・オルタナ系キャラの定番。視覚インパクトが強く認識率も高い', en: 'Multi-strap harness crossing the chest and shoulders — staple of warrior, villain, and alternative-fashion characters; strong visual impact' },
   'arm warmers':           { ja: '手首から肘にかけての袖なしカバー。フィンガーレスグローブより長い', en: 'Fabric sleeves covering the wrist to elbow with no attached gloves' },
   'anklet':                { ja: '足首につけるブレスレット。ビーチ・ボヘミアン・和装に合わせやすい', en: 'Bracelet worn around the ankle — beach, bohemian, or summer styling' },
 
