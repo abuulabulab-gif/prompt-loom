@@ -27,6 +27,9 @@ export const TAG_DICT = {
   'lineart':               { ja: '線画のみ。色塗りなし・アウトラインだけの状態', en: 'Line drawing with no color fill — sketch outline only' },
   'atmospheric':           { ja: '空気感・雰囲気を重視したほんのり霞む表現', en: 'Hazy, moody atmosphere with soft gradation' },
   'smooth shading':        { ja: 'なめらかなグラデーションで立体感を表現するシェーディング', en: 'Gradual, smooth transitions between light and shadow' },
+  'hard shading':          { ja: '光と影の境界線がくっきり分かれたシェーディング。セルシェードより立体的・彫刻的な陰影になる', en: 'Sharp, defined light-shadow boundary — more sculptural than cel shading, strong tonal contrast' },
+  'subsurface scattering': { ja: '皮膚に光が染み込んで内側から散乱する表現（SSS）。頬や耳が透けるように赤みを帯び、生きた肌感が出る', en: 'Light penetrates and scatters beneath the skin — produces rosy translucency at cheeks and ears (SSS)' },
+  'candid photography':    { ja: '被写体が気づいていない自然なスナップ写真スタイル。演出なしの日常的な瞬間を切り取ったようなリアルな雰囲気に', en: 'Unstaged snapshot — subject appears unaware of the camera, giving a natural, everyday candid feel' },
 
   // ── 顔：髪 ───────────────────────────────────────────────────
   'ahoge':                 { ja: '頭頂部から1本だけぴょんと跳ねる「アホ毛」。アニメキャラらしさが出る', en: 'Single strand of hair sticking up from the head — iconic anime trait' },
@@ -52,6 +55,7 @@ export const TAG_DICT = {
   'dull eyes':             { ja: '「死んだ目」。感情が抜け落ちた虚ろな目つき。ゾンビ・疲弊・洗脳キャラに', en: 'Lifeless, vacant eyes — used for exhausted, brainwashed, or zombie-like characters' },
   'empty eyes':            { ja: '瞳の中が空洞のような無のまなざし。機械・幽霊・感情欠落の表現に', en: 'Hollow, soul-less eyes with no highlight — robotic, ghostly, or emotionally void look' },
   'smug':                  { ja: '自信満々のドヤ顔。目を細めた優越感あふれる得意げ表情。smirkより顔全体で感情が出る', en: 'Self-satisfied, arrogant expression with narrowed eyes — full-face smugness, more exaggerated than a smirk' },
+  'jitome':                { ja: 'ジト目。半目で見る冷めた・呆れた・懐疑的な視線。「（ジト…）」というリアクションシーンの定番', en: 'Deadpan half-lidded stare of skepticism or exasperation — the classic "seriously?" anime reaction look' },
 
   // ── 顔：口・メイク ────────────────────────────────────────────
   'detailed lips':         { ja: '唇の輪郭・ハイライト・質感を精細に描写させる指示タグ。唇フォーカステンプレートで使用', en: 'Directs detailed rendering of lip contour, highlights, and texture' },
@@ -88,7 +92,7 @@ export const TAG_DICT = {
   'fishnet':               { ja: '網目状の透け素材。タイツや衣装の素材として使われる', en: 'Open-mesh fabric showing skin through a grid pattern' },
   'see-through':           { ja: '薄い素材で下が透けて見える表現', en: 'Sheer fabric that reveals what is underneath' },
   'ruffles':               { ja: 'ひらひらした波型の装飾。フリルより大きめで豪華な印象', en: 'Wavy, gathered fabric trim — larger and more dramatic than frills' },
-  'garter belt':           { ja: 'ストッキングを留める腰ベルト型の下着。太ももに装着する', en: 'Elastic belt worn around the waist/hips to hold up stockings' },
+  'garter belt':           { ja: 'ストッキングを固定するウエスト〜腰に巻くベルト型ランジェリー。ニーハイやタイツと組み合わせるとセクシーさが増す', en: 'Suspender belt worn at the waist to hold up stockings — pairs with thighhighs for a lingerie look' },
   'stirrup leggings':      { ja: 'トレンカ。かかとと足先が開いた足首カバー付きレギンス。アパレル・ダンス系に多い', en: 'Footless tights with a strap under the foot — common in dance and fashion looks' },
   'tights':                { ja: 'タイツ。脚全体を覆う厚手の不透明なストッキング。パンストより生地が厚い', en: 'Thick opaque hosiery covering legs — heavier and more opaque than pantyhose' },
   'pantyhose':             { ja: 'パンスト。脚全体を覆う薄いナイロンのタイツ', en: 'Thin nylon tights covering legs and hips' },
@@ -113,11 +117,14 @@ export const TAG_DICT = {
   'sweater vest':          { ja: 'セーターベスト（袖なしニット）。カジュアル知的系のアカデミックファッション', en: 'Sleeveless knit vest — academic or preppy style' },
   'cloak':                 { ja: 'クローク。肩から羽織る袖なしのマント状の外套。ファンタジー系に', en: 'Sleeveless outer robe draped over the shoulders — fantasy or medieval style' },
   'sleeveless':            { ja: 'ノースリーブ。袖がない衣装の総称。肩・二の腕・脇が露出し、軽快でアクティブな印象', en: 'Any top with no sleeves — exposes shoulders and upper arms; sporty or summer feel' },
+  'shrug':                 { ja: '肩〜腕だけを覆う極端に短いボレロ風の羽織り。クロップトップよりさらに短くお腹が完全に露出した独特のシルエット', en: 'Very short bolero-style top covering only the shoulders and arms — shorter than a crop top, entire midriff bare' },
   'slit skirt':            { ja: '裾に深いスリット（切れ込み）が入ったスカート。脚の動きと色気を同時に演出する', en: 'Skirt with a deep slit at the hem — adds movement and a sensual leg line' },
   'side slit':             { ja: '衣装の側面に入ったスリット。スカート・ドレス・チャイナドレスに多い。脚のラインが見える', en: 'Opening cut into the side of a garment — exposes the leg; common in dresses and cheongsam' },
   'open back':             { ja: '背中が大きく開いたデザイン。エレガントな露背スタイルで、素材を問わず使われる', en: 'Garment with a low-cut or fully exposed back — elegant skin reveal at the rear' },
   'side cutout':           { ja: '衣装の側面をくり抜いたデザイン。ウエストや脇腹のラインを強調する現代的なカット', en: 'Cutout on the side of the outfit — reveals the waist or flank; modern, sculptural design' },
   'preppy':                { ja: 'プレッピースタイル。アメリカのアイビーリーグ文化由来の清潔感ある上品カジュアル。ポロシャツ・チェック・ニット系に合う', en: 'Ivy League–inspired clean-cut casual style — polo shirts, plaid, and knit sweaters' },
+  'vintage':               { ja: '1950〜70年代のレトロファッション調に誘導する。くすんだ色合い・ハイウエスト・フレアスカート・アナログな質感が特徴', en: 'Retro 1950s–70s fashion aesthetic — muted tones, high waists, flared skirts, and an analog worn texture' },
+  'bohemian':              { ja: 'ヒッピー・旅人・民族衣装ミックスの自由奔放なスタイル。花柄・フリンジ・重ね着・エスニック小物が定番', en: 'Free-spirited blend of folk, hippie, and ethnic fashion — florals, fringe, layering, and artisan accessories' },
   'gothic':                { ja: 'ゴシック調のスタイル修飾語。暗め・荘厳・ヴィクトリアン要素を衣装に加える。ゴスロリと違いアウトフィット全体のスタイルを変える', en: 'Style modifier that adds dark, Victorian, or solemn Gothic elements to an outfit — broader than gothic lolita' },
   'streetwear':            { ja: 'ストリートウェア。ヒップホップ・スケーター文化由来の都市型カジュアル。ビッグシルエット・ロゴ・スニーカーが定番', en: 'Urban casual fashion rooted in hip-hop/skate culture — oversized fits, logos, and sneakers' },
   'high fashion':          { ja: 'ハイファッション。ランウェイ発のハイブランド・前衛的デザイナーズ系スタイル。鋭いシルエットと独創的な素材感が特徴', en: 'Runway-level designer fashion — sharp silhouettes, unconventional materials, avant-garde aesthetics' },
@@ -224,6 +231,8 @@ export const TAG_DICT = {
   'outer space':           { ja: '宇宙空間。星や惑星・銀河を背景にしたSF・ファンタジー系', en: 'Space setting with stars, planets, or galaxies — sci-fi or cosmic feel' },
   'underwater':            { ja: '水中・海中シーン。光の揺らめきや泡・サンゴの演出に', en: 'Submerged underwater scene with light rays, bubbles, and marine elements' },
   'throne room':           { ja: '玉座と豪華な内装の王室の間。権威・ファンタジー系の背景', en: 'Royal throne hall with ornate decor — regal or fantasy setting' },
+  'golden hour':           { ja: '日没前後15〜30分の黄金色の柔らかい光。空全体がオレンジ〜黄色に染まり、長い影が生まれる写真家に最も愛される光の時間帯', en: 'Warm golden light just before or after sunset — soft, long shadows and an orange-tinted sky; a photographer\'s favourite' },
+  'dusk':                  { ja: '日没直後の薄暗い時間帯。残照が地平線に残り、空が濃い青紫・藍色に染まるトワイライト。夕焼けより暗く夜より明るい', en: 'The brief twilight just after sunset — residual glow at the horizon, deep blue-purple spreading overhead; between sunset and night' },
   'nostalgic':             { ja: '懐かしい・郷愁を誘う雰囲気。夕暮れ・古い街並み・フィルム写真のようなトーン', en: 'Wistful, longing mood — evokes memories through warm faded tones and familiar settings' },
   'dark atmosphere':       { ja: '暗く重苦しい不穏な雰囲気。ホラー・ダーク・ヴィラン系シーンに', en: 'Oppressive, brooding mood — suits horror, dark fantasy, or villain-character scenes' },
   'dreamy':                { ja: '夢の中のような幻想的でぼんやりした柔らかい空気感。ソフトフォーカス・霞み・淡い光と相性が良い', en: 'Soft, hazy dreamlike atmosphere — pairs well with soft-focus, pastel tones, and diffuse lighting' },
@@ -280,6 +289,7 @@ export const TAG_DICT = {
   'wet hair':              { ja: '濡れてまとまった髪。入浴後・雨の中など、しっとりした色気を出す', en: 'Hair damp and clinging together — suggests bath, rain, or post-swim; adds subtle sensuality' },
 
   // ── 素材・装飾 ───────────────────────────────────────────────
+  'latex':                 { ja: '光沢のある合成ゴム素材。体のラインを完全に密着して際立たせる。黒・赤・白が定番色。⚠️サービスによってはNSFW判定される可能性あり', en: 'Shiny rubber material that clings tightly to every body line — black, red, and white are typical. ⚠️ May be flagged NSFW on some services' },
   'skintight':             { ja: '体のラインに密着した衣装の素材感。ボディスーツ・レオタードと相性が良い', en: 'Clothing that fits skin-tight, emphasizing every body line — pairs well with bodysuit or leotard' },
   'cleavage cutout':       { ja: '胸元部分を四角や丸く切り抜いたデザイン。谷間の露出を意図的に強調する', en: 'Opening cut into the chest area of an outfit — deliberately frames or exposes cleavage' },
   'navel cutout':          { ja: 'おへそ周辺を切り抜いたウィンドウデザイン。へそ出しより局所的なカット', en: 'Small window opening in clothing over the navel — surgical navel exposure in the design' },
@@ -289,6 +299,7 @@ export const TAG_DICT = {
 
   // ── アクセサリー ─────────────────────────────────────────────
   'thigh strap':           { ja: '太もも部分に巻きつけるベルトやストラップ。アクション系・セクシー系のアクセントに', en: 'Strap or band worn around the thigh — action, tactical, or sexy outfit accent' },
+  'chest strap':           { ja: '胸を水平や斜めに横切るハーネス・ベルト状のストラップ。ミリタリー・ファッション系キャラに多く、露出コーデのアクセントになる', en: 'Harness-style strap crossing the chest — used in military, fashion, or revealing outfit accents' },
   'arm warmers':           { ja: '手首から肘にかけての袖なしカバー。フィンガーレスグローブより長い', en: 'Fabric sleeves covering the wrist to elbow with no attached gloves' },
   'anklet':                { ja: '足首につけるブレスレット。ビーチ・ボヘミアン・和装に合わせやすい', en: 'Bracelet worn around the ankle — beach, bohemian, or summer styling' },
 
@@ -313,6 +324,10 @@ export const TAG_DICT = {
   'arms behind head':      { ja: '両腕を頭の後ろで組むポーズ。脇を見せる定番構図。リラックス・余裕・自信ある雰囲気に', en: 'Both arms raised and clasped behind the head — relaxed, confident pose that exposes the underarms' },
   'arms up':               { ja: '両腕を頭上に向けて挙げるポーズ。万歳・ストレッチ・降伏・興奮など幅広い状況に使える汎用タグ', en: 'Both arms raised overhead — versatile pose for cheering, stretching, surrender, or excitement' },
   'contrapposto':          { ja: 'コントラポスト。体重を片足に乗せ、腰と肩のラインを逆方向に傾けたS字立ちポーズ。認識率が高く自然な色気が出る', en: 'Classic contrapposto stance — weight on one leg, hips and shoulders counter-tilted into an S-curve; high recognition rate' },
+  'arched back':           { ja: '背中を大きく反らせるポーズ。胸を張り腰を突き出すことでボディラインを強調。セクシーさ・柔軟性・ダイナミックな動きの演出に', en: 'Spine curved backward with chest thrust forward — emphasizes body silhouette; used for sensual or dynamic poses' },
+  'w sitting':             { ja: 'W座り（アヒル座り）。両膝を外側に向けて開き、かかとをお尻の横に置いた座り方。脚がW字型に見えるのが特徴', en: 'Sitting with both knees bent outward and feet beside the hips, forming a W shape — also called duck sitting' },
+  'crossed legs':          { ja: '脚組み。片脚を反対側の太ももの上に乗せた座り方。あぐらとは異なりエレガント・クール・余裕ある印象になる', en: 'One leg crossed over the other at the knee while seated — elegant and composed, distinct from cross-legged (agura)' },
+  'legs up':               { ja: '横たわった状態や座った状態から脚を持ち上げるポーズ。脚のラインを見せたり、無防備さ・遊び心を演出する', en: 'Legs raised upward from a lying or seated position — shows off leg lines; conveys playfulness or vulnerability' },
   'looking over shoulder': { ja: '片方の肩越しに視線を送るポーズ。艶やか・謎めいた後ろ半振り向きの定番演出', en: 'Glancing back over one shoulder — alluring, mysterious partial-turn pose' },
   'split':                 { ja: '両脚を180度に開いた開脚ポーズ。柔軟性・ダンス・バトル系のキャラに映える', en: 'Legs spread 180° flat on the ground — showcases flexibility; suits dancers or fighters' },
   'pinup':                 { ja: 'ピンナップポスター風のポーズ。レトロ・官能的でエレガントな魅せ方。50年代のイラスト文化に由来', en: 'Classic pin-up poster pose — retro, alluring, and elegant; inspired by 1940s–50s poster art style' },
