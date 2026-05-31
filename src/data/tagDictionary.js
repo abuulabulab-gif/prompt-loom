@@ -101,6 +101,7 @@ export const TAG_DICT = {
   'pleated skirt':         { ja: '細かいヒダ（プリーツ）のスカート。制服によく使われる', en: 'Skirt with knife-pleats, common in school uniforms' },
   'pencil skirt':          { ja: 'タイトスカート。体のラインに密着したストレートシルエットのスカート。OL・大人っぽい・セクシー系の演出に反映率が高い', en: 'Body-hugging straight skirt with a narrow silhouette — strong recognition; effective for office, mature, or sexy looks' },
   'cargo pants':           { ja: 'カーゴパンツ。腿や膝横に大きなポケットが付いたミリタリー・ストリート系パンツ。たくましさ・アクティブさ・無骨な個性が出る', en: 'Utility pants with large patch pockets on the thighs — military or streetwear aesthetic; conveys a tough, active character' },
+  'low-rise':              { ja: 'ウエストの位置が低いローライズ。腰骨・へそ下の肌が露出する。Y2K系・セクシー系コーデに。パンツやスカートに組み合わせて使う', en: 'Low-waisted fit that exposes the hip bones and lower abdomen — Y2K or sexy styling; combine with any bottom' },
   'gym uniform':           { ja: '体操服。日本の学校で着られる運動用制服。白い半袖シャツ＋紺のショートパンツが定番。学校シーンや部活キャラに', en: 'Japanese school gym clothes — white short-sleeve shirt and navy shorts; perfect for school or club activity scenes' },
   'furisode':              { ja: '長い袖が特徴の振り袖。成人式・正装用の和装', en: 'Formal kimono with long flowing sleeves for special occasions' },
   'dirndl':               { ja: 'ドイツ・オーストリアなどアルプス地方の民族衣装。コルセット型ボディス＋スカート＋胸前エプロンの3点セット。お祭り・農村・ファンタジー系に', en: 'Alpine folk dress — fitted corset bodice, a skirt, and an apron tied at the front; suits festival or rural fantasy scenes' },
