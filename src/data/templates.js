@@ -72,7 +72,7 @@ export const TEMPLATES = [
     desc: 'スマホを持ちカメラ目線の自撮り構図。高めアングル・腕を伸ばしたポーズ',
     descEn: 'Smartphone selfie — high angle, outstretched arm, looking at viewer',
     apply: {
-      composition: 'portrait, from above, looking at viewer, outstretched arm',
+      composition: 'selfie, portrait, from above, looking at viewer, outstretched arm',
       feature:     'holding smartphone',
     },
   },
