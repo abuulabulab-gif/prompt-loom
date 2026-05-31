@@ -63,6 +63,19 @@ export const TEMPLATES = [
       background:  'white background, simple background',
     },
   },
+  // ── 撮影スタイル ──
+  {
+    id: 'selfie',
+    name: '自撮り',
+    nameEn: 'Selfie',
+    icon: '🤳',
+    desc: 'スマホを持ちカメラ目線の自撮り構図。高めアングル・腕を伸ばしたポーズ',
+    descEn: 'Smartphone selfie — high angle, outstretched arm, looking at viewer',
+    apply: {
+      composition: 'portrait, from above, looking at viewer, outstretched arm',
+      feature:     'holding smartphone',
+    },
+  },
   // ── 構図・フェチ特化テンプレート（SFW）──
   {
     id: 'zettairyouiki',
