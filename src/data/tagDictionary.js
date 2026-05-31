@@ -226,6 +226,15 @@ export const TAG_DICT = {
   'throne room':           { ja: '玉座と豪華な内装の王室の間。権威・ファンタジー系の背景', en: 'Royal throne hall with ornate decor — regal or fantasy setting' },
   'nostalgic':             { ja: '懐かしい・郷愁を誘う雰囲気。夕暮れ・古い街並み・フィルム写真のようなトーン', en: 'Wistful, longing mood — evokes memories through warm faded tones and familiar settings' },
   'dark atmosphere':       { ja: '暗く重苦しい不穏な雰囲気。ホラー・ダーク・ヴィラン系シーンに', en: 'Oppressive, brooding mood — suits horror, dark fantasy, or villain-character scenes' },
+  'dreamy':                { ja: '夢の中のような幻想的でぼんやりした柔らかい空気感。ソフトフォーカス・霞み・淡い光と相性が良い', en: 'Soft, hazy dreamlike atmosphere — pairs well with soft-focus, pastel tones, and diffuse lighting' },
+  'mysterious':            { ja: '謎めいた神秘的な雰囲気。正体不明の存在感や暗示的な情景描写を誘導する', en: 'Enigmatic, otherworldly mood that evokes hidden meaning and an unseen presence' },
+  'cozy':                  { ja: 'ぽかぽかとした居心地の良い温もりのある雰囲気。暖炉・ニット・秋色のイメージと親和性が高い', en: 'Warm, snug, comforting atmosphere — evokes fireplaces, knit blankets, and autumn-toned interiors' },
+  'fantasy world':         { ja: '剣と魔法のファンタジー世界観の指定。雰囲気だけでなく世界設定全体に影響し、城・魔法陣・幻想地形が描かれやすくなる', en: 'Sets the scene in a sword-and-sorcery fantasy world — affects architecture, landscape, and overall atmosphere' },
+  'post-apocalyptic':      { ja: '文明崩壊後の廃墟世界観。廃ビル・さびれた街・荒廃した大地が背景として描かれる', en: 'Post-collapse dystopian setting — ruined buildings, deserted streets, and desolate landscapes' },
+  'steampunk':             { ja: '蒸気機関・歯車・レトロ科学が共存するヴィクトリア時代風の架空世界観。ゴーグル・革装束・銅の機械が画面を彩る', en: 'Victorian retrofuturism of steam engines and gears — brass, goggles, leather, and copper machinery' },
+  'cyberpunk':             { ja: '高度な技術と荒廃した社会が共存するディストピア世界観。ネオン・雨・サイバネティクス・暗い路地が定番演出', en: 'Near-future dystopia where high tech meets low life — neon, rain, cybernetics, and dark alleys' },
+  'victorian':             { ja: '19世紀英国のヴィクトリア朝様式。コルセット・フロックコート・重厚な内装で荘厳かつエレガントな画面に', en: '19th-century British Victorian aesthetic — corsets, frock coats, heavy ornate interiors' },
+  'rococo':                { ja: '18世紀欧州のロコco美術様式。曲線・花柄・金・パステルを多用したきらびやかで優雅な装飾性', en: '18th-century European decorative style with ornate curves, floral motifs, pastel tones, and gilded detail' },
 
   // ── 品質・安全 ────────────────────────────────────────────────
   'SFW':                   { ja: '安全なコンテンツを指定するタグ。過激な表現を除外し、ネガティブに「nsfw」を自動追加する', en: 'Safe For Work — keeps content appropriate for public use; auto-adds nsfw to negative prompt' },
@@ -247,6 +256,8 @@ export const TAG_DICT = {
   'swept back hair':       { ja: '前髪をかき上げて後ろに流したスッキリスタイル。知的・クール系の印象に', en: 'Hair brushed back from the forehead — clean, cool, or intellectual look' },
   'layered hair':          { ja: 'レイヤーカット。段差をつけて動きと軽さを出したスタイル', en: 'Layered cut with varying lengths for volume and movement' },
   'spiky hair':            { ja: '先端が尖って立ちあがるとがり毛。少年漫画のバトル系キャラに多い', en: 'Sharp upward-pointing spikes — common in shonen battle-anime characters' },
+  'low twintails':         { ja: '低い位置でまとめたツインテール。通常の高めツインテールより落ち着いた印象で、大人っぽさと可愛さを両立する', en: 'Twintails worn low at the back or sides — more mature and calmer than high twintails' },
+  'french braid':          { ja: 'フレンチブレイド。髪を頭皮から少しずつすくいながら三つ編みしていくスタイル。すっきり上品な仕上がり', en: 'Braid woven by progressively adding strands from the scalp — neat, elegant, and polished' },
 
   // ── メイク ────────────────────────────────────────────────────
   'blush stickers':        { ja: '頬に貼られたシール状のデコ頬紅。可愛い・あどけない印象を加える', en: 'Decorative sticker-style blush marks on cheeks — cute, innocent look' },
