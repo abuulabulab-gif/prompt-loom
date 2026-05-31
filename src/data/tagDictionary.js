@@ -64,6 +64,7 @@ export const TAG_DICT = {
   'thigh gap':             { ja: '直立時に太ももの内側に隙間ができる体型表現。細身・スリムさを補完するタグ', en: 'Visible gap between the inner thighs when standing — subtle slim-build emphasis' },
   'collarbone':            { ja: '鎖骨を目立たせた描写。色気や華奢さを演出する', en: 'Prominent, defined collarbone — adds elegance or appeal' },
   'toned':                 { ja: '引き締まった体型。細身だが適度な筋肉感あり', en: 'Lean and defined without being bulky — athletic slim build' },
+  'abs':                   { ja: '腹筋の筋肉がうっすら〜くっきり描かれる。athleticやtonedと組み合わせると効果的', en: 'Visible abdominal muscles — range from subtle definition to a six-pack. Works best with athletic or toned' },
   'loli':                  { ja: '幼い・小柄な体型の指定。成熟・大人タグとは共存できない', en: 'Small, childlike body proportions. Conflicts with adult/mature tags' },
   'mature female':         { ja: '成熟した大人の女性の体型・雰囲気。幼女体型タグとは矛盾する', en: 'Adult, voluptuous female proportions. Conflicts with loli/young' },
   'freckles':              { ja: 'そばかす。健康的・自然体な印象を加える小さな斑点模様', en: 'Small brown spots scattered across the face — natural, fresh look' },

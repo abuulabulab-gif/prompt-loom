@@ -10,6 +10,7 @@ export function useCloudSync({
 }) {
   const [syncStatus, setSyncStatus] = useState('');
   const [syncErrToast, setSyncErrToast] = useState(false);
+  const [syncErrCode, setSyncErrCode] = useState('');
   const [dataSizeToast, setDataSizeToast] = useState(false);
   const cloudPushTimer = useRef(null);
   const isSyncingFromCloud = useRef(false);
@@ -99,6 +100,7 @@ export function useCloudSync({
     const result = await pushToCloud(u.uid, chars, oAt, { theme: t, lang: l, viewMode: vm, activeTool: at, toolSuffixes: ts, history: h }, sAt);
     setSyncStatus(result.ok ? 'synced' : 'error');
     hasPendingPush.current = !result.ok;
+    if (!result.ok) setSyncErrCode(result.code ?? '');
     if (!result.ok && result.tooBig) { setDataSizeToast(true); setTimeout(() => setDataSizeToast(false), 6000); }
   };
 
@@ -133,5 +135,5 @@ export function useCloudSync({
 
   const markRemoteApply = () => { isApplyingRemoteSettings.current = true; };
 
-  return { syncStatus, syncErrToast, setSyncErrToast, dataSizeToast, handleSignIn, handleForcePull, markRemoteApply };
+  return { syncStatus, syncErrToast, setSyncErrToast, syncErrCode, dataSizeToast, handleSignIn, handleForcePull, markRemoteApply };
 }

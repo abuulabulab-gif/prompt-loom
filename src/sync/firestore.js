@@ -46,8 +46,8 @@ export async function pushToCloud(uid, characters, orderUpdatedAt, settings, set
     await setDoc(ref, payload);
     return { ok: true };
   } catch (e) {
-    console.error('pushToCloud failed', e);
-    return { ok: false };
+    console.error('pushToCloud failed', e?.code ?? e?.name, e);
+    return { ok: false, code: e?.code ?? e?.name ?? 'unknown' };
   }
 }
 
@@ -65,7 +65,7 @@ export async function pullFromCloud(uid) {
       settingsUpdatedAt: data.settingsUpdatedAt ?? 0,
     };
   } catch (e) {
-    console.error('pullFromCloud failed', e);
+    console.error('pullFromCloud failed', e?.code ?? e?.name, e);
     return null;
   }
 }

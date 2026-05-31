@@ -236,7 +236,7 @@ export default function Loom() {
   const activeChar = characters.find(c => c.id === activeCharId) || characters[0];
   const blocks = activeChar?.blocks || [];
 
-  const { syncStatus, syncErrToast, setSyncErrToast, dataSizeToast, handleSignIn, handleForcePull, markRemoteApply } = useCloudSync({
+  const { syncStatus, syncErrToast, setSyncErrToast, syncErrCode, dataSizeToast, handleSignIn, handleForcePull, markRemoteApply } = useCloudSync({
     user, signInWithGoogle, loaded,
     characters, orderUpdatedAt, settingsUpdatedAt,
     setCharacters, setOrderUpdatedAt, setSettingsUpdatedAt,
@@ -2884,9 +2884,14 @@ export default function Loom() {
               ⚠ {lang === 'ja' ? '同期に失敗しました' : 'Sync failed'}
             </div>
             <div className="text-muted leading-[1.55]">
-              {lang === 'ja'
-                ? 'ネットワークを確認してください。データはこの端末に保存されています。'
-                : 'Check your network. Data is saved locally on this device.'}
+              {syncErrCode === 'resource-exhausted'
+                ? (lang === 'ja' ? 'Firebaseの無料枠上限に達した可能性があります（日本時間09:00リセット）。' : 'Firebase free quota may be exceeded (resets at 09:00 JST).')
+                : syncErrCode === 'permission-denied'
+                ? (lang === 'ja' ? 'Firestoreのアクセス権限エラーです。ログインし直してみてください。' : 'Firestore permission denied. Try signing out and back in.')
+                : syncErrCode === 'unauthenticated'
+                ? (lang === 'ja' ? '認証が切れています。ログインし直してください。' : 'Authentication expired. Please sign in again.')
+                : (lang === 'ja' ? 'ネットワークを確認してください。データはこの端末に保存されています。' : 'Check your network. Data is saved locally on this device.')}
+              {syncErrCode && <span className="block mt-1 opacity-50 text-[0.6rem]">{syncErrCode}</span>}
             </div>
             <button
               onClick={() => setSyncErrToast(false)}
