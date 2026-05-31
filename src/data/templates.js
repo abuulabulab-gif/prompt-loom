@@ -73,7 +73,6 @@ export const TEMPLATES = [
     descEn: 'Smartphone selfie — high angle, outstretched arm, looking at viewer',
     apply: {
       composition: 'selfie, portrait, from above, looking at viewer, outstretched arm',
-      feature:     'holding smartphone',
     },
   },
   // ── 構図・フェチ特化テンプレート（SFW）──
