@@ -204,11 +204,11 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
     >
       {/* ── Header ─────────────────────────────────────────── */}
       <div
-        className={`flex flex-wrap items-start gap-x-1.5 gap-y-1 px-3 ${focusMode ? 'py-[0.8125rem]' : 'py-[0.5625rem]'}${block.collapsed ? '' : ' bg-surfalt border-b border-line'}`}
+        className={`flex flex-wrap items-center gap-x-1.5 gap-y-1 px-3 ${focusMode ? 'py-[0.8125rem]' : 'py-[0.5625rem]'}${block.collapsed ? '' : ' bg-surfalt border-b border-line'}`}
       >
         {/* LEFT: drag + move + toggle + badge + icon + name — takes all available space */}
         {/* On mobile: w-full forces full row → buttons wrap to row 2 and right-align via ml-auto */}
-        <div className={`flex items-start gap-1.5 ${isMobile ? 'w-full' : 'flex-1 min-w-[8.125rem]'}`}>
+        <div className={`flex items-center gap-1.5 ${isMobile ? 'w-full' : 'flex-1 min-w-[8.125rem]'}`}>
         {/* Drag handle */}
         <button
           {...listeners}
@@ -298,7 +298,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
         </div>{/* END LEFT group */}
 
         {/* RIGHT: action buttons — never shrink, right-align when wrapping to 2nd row */}
-        <div className="flex items-start gap-1.5 flex-shrink-0 ml-auto">
+        <div className="flex items-center gap-1.5 flex-shrink-0 ml-auto">
         {/* Analyze match badge */}
         {analyzedCount > 0 && (
           <span className="text-[0.5625rem] font-mono font-bold px-[0.3125rem] py-0.5 rounded flex-shrink-0"
