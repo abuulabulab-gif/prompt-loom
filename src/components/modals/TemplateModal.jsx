@@ -35,6 +35,9 @@ const TEMPLATE_EXTRA_JA = new Map([
   ['jumping',                  'ジャンプ'],
   ['kicking',                  '蹴り'],
   ['midair',                   '空中'],
+  // 風・シネマティック
+  ['clothes fluttering',       '衣装がなびく'],
+  ['cinematic',                'シネマティック'],
   // 真俯瞰ベッド
   ['hair spread out',          '髪を広げた'],
   ['relaxed pose',             'リラックスポーズ'],
@@ -73,7 +76,7 @@ function toJa(en) {
 }
 
 const FETI_IDS    = new Set(['highangle_armpit','lowangle_legs','midriff_navel','nape_lift','birdseye_lie','skintight_detail','zettairyouiki','napeandback','bare_back','footperspective','armpitsleeveless']);
-const DYNAMIC_IDS = new Set(['dynamic_booster','extreme_perspective','rider_kick']);
+const DYNAMIC_IDS = new Set(['dynamic_booster','extreme_perspective','rider_kick','wind','cinematic']);
 const EXTREME_IDS = new Set(['lip_focus','eye_focus','fisheye','from_below','from_above']);
 
 const STYLE_IDS          = new Set(['anime','photo','fantasy','chibi','pixelart']);

@@ -311,6 +311,29 @@ export const TEMPLATES = [
       effect:      'speed lines, motion blur, dramatic lighting',
     },
   },
+  {
+    id: 'wind',
+    name: '風・なびき',
+    nameEn: 'Wind & Flow',
+    icon: '🌬️',
+    desc: '風で髪・衣装がなびく自然な動き。アクション不要でどんなポーズにも生き生きした動感を与える。dynamic_boosterより穏やか・日常的な動き',
+    descEn: 'Hair and clothes flowing in the wind — organic movement for any pose without needing action. Gentler and more everyday than dynamic_booster',
+    apply: {
+      face:   { mode: 'merge', tags: 'floating hair' },
+      effect: 'wind, clothes fluttering',
+    },
+  },
+  {
+    id: 'cinematic',
+    name: 'シネマティック',
+    nameEn: 'Cinematic',
+    icon: '🎬',
+    desc: '映画の1シーンのような光と奥行き。ポーズ・構図を問わず、どんな絵でも格と雰囲気を引き上げる仕上げ用',
+    descEn: 'Movie-scene lighting and depth — elevates any composition with dramatic production value, regardless of pose or angle',
+    apply: {
+      effect: 'cinematic, cinematic lighting, dramatic lighting, depth of field',
+    },
+  },
   // ── 極限アングル・クローズアップ ──────────────────────────────────────
   {
     id: 'lip_focus',
