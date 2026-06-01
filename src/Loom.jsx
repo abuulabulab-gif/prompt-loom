@@ -14,7 +14,6 @@ import {
   deep, downloadJSON, stripWeights, toNaiWeights, SPECIES_PARTS_MAP,
 } from "./data/constants.js";
 import { detectConflicts } from "./data/conflicts.js";
-import { applyMaterialMakerManual } from "./data/materials.js";
 import { TOOLS } from "./data/tools.js";
 import { makeCharacter, makeCustomBlock, BLOCKS_DEF } from "./data/blocks.js";
 import PresetChip from "./components/PresetChip.jsx";
@@ -24,6 +23,7 @@ import ComparePanel from "./components/modals/ComparePanel.jsx";
 import TemplateModal from "./components/modals/TemplateModal.jsx";
 import ColorPickerModal from "./components/modals/ColorPickerModal.jsx";
 import FeatureMakerModal from "./components/modals/FeatureMakerModal.jsx";
+import MaterialMakerModal from "./components/modals/MaterialMakerModal.jsx";
 import SceneComposeModal from "./components/modals/SceneComposeModal.jsx";
 import SettingsModal from "./components/modals/SettingsModal.jsx";
 import SupportModal from "./components/modals/SupportModal.jsx";
@@ -136,6 +136,7 @@ export default function Loom() {
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
   const [featureMakerOpen, setFeatureMakerOpen] = useState(false);
   const [featureMakerFilterBlock, setFeatureMakerFilterBlock] = useState(null);
+  const [materialMakerOpen, setMaterialMakerOpen] = useState(false);
   const [sceneOpen, setSceneOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
@@ -368,6 +369,13 @@ export default function Loom() {
     const msg = lang === 'ja' ? `🎯 ${blockName}に「${tag}」を追加` : `🎯 "${tag}" added to ${blockName}`;
     setColorToast({ msg });
     setTimeout(() => setColorToast(null), 3000);
+  };
+
+  const applyMaterialText = (newText, blockId) => {
+    setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : {
+      ...c,
+      blocks: c.blocks.map(b => b.id !== blockId ? b : { ...b, text: newText, enabled: true, collapsed: false }),
+    }));
   };
 
   const openColorPicker = (defaultTarget = 'hair', allowedTargets = null) => {
@@ -881,7 +889,8 @@ export default function Loom() {
         if (historyOpen)      { setHistoryOpen(false);      return; }
         if (templateOpen)     { setTemplateOpen(false);     return; }
         if (colorPickerOpen)   { setColorPickerOpen(false);   return; }
-        if (featureMakerOpen)  { setFeatureMakerOpen(false);  return; }
+        if (featureMakerOpen)    { setFeatureMakerOpen(false);    return; }
+        if (materialMakerOpen)   { setMaterialMakerOpen(false);   return; }
         if (sceneOpen)        { setSceneOpen(false);        return; }
         if (analyzeOpen)      { setAnalyzeOpen(false); setAnalyzeText(''); return; }
         if (quickOpen)        { setQuickOpen(false);        return; }
@@ -934,7 +943,7 @@ export default function Loom() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paletteOpen, globalSearchOpen, libraryOpen, analyzeOpen, historyOpen, templateOpen, colorPickerOpen, featureMakerOpen, sceneOpen, settingsOpen, blockStatusOpen, focusBlockId,
+  }, [paletteOpen, globalSearchOpen, libraryOpen, analyzeOpen, historyOpen, templateOpen, colorPickerOpen, featureMakerOpen, materialMakerOpen, sceneOpen, settingsOpen, blockStatusOpen, focusBlockId,
       activeCharId, currentText, posText, negText, activeChar]);
 
   // DALL-E selected → auto-switch to natural language tab; leaving DALL-E → back to positive
@@ -1159,12 +1168,7 @@ export default function Loom() {
     { id: 'open-template', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '✦', label: 'Open templates', labelJa: 'テンプレートを開く', shortcut: 'T', action: () => setTemplateOpen(true) },
     { id: 'open-color',    group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎨', label: 'Open color picker',    labelJa: 'カラーメーカーを開く',    action: () => openColorPicker() },
     { id: 'open-feature',  group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎯', label: 'Open feature maker',   labelJa: '特徴メーカーを開く',     action: () => setFeatureMakerOpen(true) },
-    { id: 'apply-material',group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🧵', label: 'Apply material maker',  labelJa: 'マテリアルメーカーを適用', action: () => {
-      setCharacters(prev => prev.map(c => {
-        if (c.id !== activeCharId) return c;
-        return { ...c, blocks: applyMaterialMakerManual(c.blocks) };
-      }));
-    }},
+    { id: 'open-material', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🧵', label: 'Open material maker', labelJa: 'マテリアルメーカーを開く', action: () => setMaterialMakerOpen(true) },
     ...(characters.length > 1 ? [{ id: 'open-scene', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎬', label: 'Open Collab', labelJa: 'キャラ共演を開く', action: () => setSceneOpen(true) }] : []),
     { id: 'open-settings', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '⚙️', label: 'Open settings / shortcuts', labelJa: '設定・ショートカット', shortcut: '?', action: () => setSettingsOpen(true) },
     // AI Tools
@@ -1273,10 +1277,7 @@ export default function Loom() {
                   style={{ color: 'rgb(var(--c-purple))' }}>
                   🎯 {lang === 'ja' ? (isMobile ? '特徴' : '特徴メーカー') : (isMobile ? 'Feature' : 'Feature Maker')}
                 </button>
-                <button onClick={() => {
-                  setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : { ...c, blocks: applyMaterialMakerManual(c.blocks) }));
-                  setQuickOpen(false);
-                }}
+                <button onClick={() => { setMaterialMakerOpen(true); setQuickOpen(false); }}
                   className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5 whitespace-nowrap"
                   style={{ color: 'rgb(var(--c-purple))' }}>
                   🧵 {lang === 'ja' ? (isMobile ? 'マテリアル' : 'マテリアルメーカー') : (isMobile ? 'Material' : 'Material Maker')}
@@ -1806,7 +1807,7 @@ export default function Loom() {
                   onUndoBackup={templateUndoBuf?.blockTexts[block.id] !== undefined ? () => undoSingleBlock(block.id) : undefined}
                   onColorPicker={BLOCK_TO_COLOR_TARGET[block.id] ? () => openColorPicker(BLOCK_TO_COLOR_TARGET[block.id], BLOCK_TO_ALLOWED_TARGETS[block.id]) : undefined}
                   onFeatureMaker={['face','body','outfit'].includes(block.id) ? () => { setFeatureMakerFilterBlock(block.id); setFeatureMakerOpen(true); } : undefined}
-                  onMaterialMaker={block.id === 'outfit' ? () => setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : { ...c, blocks: applyMaterialMakerManual(c.blocks) })) : undefined}
+                  onMaterialMaker={block.id === 'outfit' ? () => setMaterialMakerOpen(true) : undefined}
                   isLight={theme === 'light'} />
               );
 
@@ -2784,6 +2785,7 @@ export default function Loom() {
       {templateOpen && <TemplateModal lang={lang} isMobile={isMobile} onApply={applyTemplate} onClose={() => setTemplateOpen(false)} />}
       {colorPickerOpen && <ColorPickerModal lang={lang} onApply={applyColorTag} onClose={() => setColorPickerOpen(false)} defaultTarget={colorPickerDefaultTarget} allowedTargets={colorPickerAllowedTargets} />}
       {featureMakerOpen && <FeatureMakerModal lang={lang} blocks={blocks} onApply={applyFeatureTag} onClose={() => setFeatureMakerOpen(false)} filterBlockId={featureMakerFilterBlock} />}
+      {materialMakerOpen && <MaterialMakerModal lang={lang} blocks={blocks} onApply={applyMaterialText} onClose={() => setMaterialMakerOpen(false)} />}
       {sceneOpen && <SceneComposeModal characters={characters} lang={lang} activeTool={activeTool} theme={theme} onClose={() => setSceneOpen(false)} defaultQuality={blocks.find(b => b.id === 'quality')?.text || ''} />}
       {supportOpen && <SupportModal lang={lang} isMobile={isMobile} onClose={() => setSupportOpen(false)} />}
       {settingsOpen && <SettingsModal lang={lang} isMobile={isMobile} defaultTab={settingsTab} onClose={() => { setSettingsOpen(false); setSettingsTab('shortcuts'); }}
