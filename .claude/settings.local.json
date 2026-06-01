@@ -28,7 +28,37 @@
       "PowerShell($content = [System.IO.File]::ReadAllText\\('C:\\\\Users\\\\peony\\\\Desktop\\\\loom-app\\\\src\\\\components\\\\modals\\\\SettingsModal.jsx'\\); $idx = $content.IndexOf\\('              ]\\)}'\\); Write-Host \"Found at index: $idx\"; Write-Host \"Context: $\\(\\($content.Substring\\([Math]::Max\\(0,$idx-20\\), 100\\)\\)\\)\")",
       "PowerShell($content = [System.IO.File]::ReadAllText\\('C:\\\\Users\\\\peony\\\\Desktop\\\\loom-app\\\\src\\\\components\\\\modals\\\\SettingsModal.jsx'\\); $idx = $content.IndexOf\\(']\\)}'\\); Write-Host \"Found at index: $idx\"; if \\($idx -ge 0\\) { Write-Host \"Context: $\\(\\($content.Substring\\([Math]::Max\\(0,$idx-100\\), 200\\)\\)\\)\" })",
       "PowerShell($lines = [System.IO.File]::ReadAllLines\\('C:\\\\Users\\\\peony\\\\Desktop\\\\loom-app\\\\src\\\\components\\\\modals\\\\SettingsModal.jsx'\\); $lines[640..647] | ForEach-Object { Write-Host \"[$\\(\\($_ | Get-Member\\).Count\\)] $_\" }; $lines[640..647] | ForEach-Object { $bytes = [System.Text.Encoding]::UTF8.GetBytes\\($_\\); Write-Host \\($bytes -join ','\\) })",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Skill(update-config)",
+      "Bash(bash -c \"jq -r '.tool_input.file_path // empty' | grep -E 'src/data/.*\\\\\\\\.js$'\")",
+      "Bash(where jq *)",
+      "Bash(powershell -NoProfile -Command '& { $raw = [Console]::In.ReadToEnd\\(\\); if \\($raw -match \"src.data\"\\) { Write-Output \"match\" } else { Write-Output \"no match\" } }')",
+      "Bash(powershell -NoProfile -Command '& { $raw = [Console]::In.ReadToEnd\\(\\); if \\($raw -match \"src.data.*\\\\\\\\.js\"\\) { Write-Output \"match\" } else { Write-Output \"no match\" } }')",
+      "Bash(powershell *)",
+      "Bash(git commit *)",
+      "Bash(curl -s http://localhost:5174/)",
+      "Bash(npx playwright *)",
+      "Bash(npx eslint *)",
+      "Bash(grep -v \"^$\")",
+      "Bash(grep -E \"^C:\\\\\\\\\\\\\\\\|^\\\\s+[0-9]+:[0-9]+\\\\s+warning\")",
+      "Bash(grep -E \"^C:\\\\\\\\\\\\\\\\Users\")",
+      "Bash(grep -E \"\\\\.jsx$|\\\\.js$|15:11|15:17\")"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "& { $raw = [Console]::In.ReadToEnd(); if ($raw -match \"src.data.*\\.js\") { npm run precheck } }",
+            "shell": "powershell",
+            "timeout": 60,
+            "statusMessage": "src/data/*.js 変更検出 → precheck..."
+          }
+        ]
+      }
     ]
   }
 }
