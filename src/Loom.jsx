@@ -726,6 +726,11 @@ export default function Loom() {
     for (const b of activeChar.blocks) {
       if (tmpl.apply[b.id] !== undefined) snapshot[b.id] = b.text;
     }
+    // negHint がある場合、undo 対象に negative ブロックも含める
+    if (tmpl.negHintEn) {
+      const negB = activeChar.blocks.find(b => b.id === 'negative');
+      if (negB) snapshot['negative'] = negB.text;
+    }
     if (templateUndoTimerRef.current) clearTimeout(templateUndoTimerRef.current);
     setTemplateUndoBuf({ blockTexts: snapshot, negHintJa: tmpl.negHintJa, negHintEn: tmpl.negHintEn });
     templateUndoTimerRef.current = setTimeout(() => setTemplateUndoBuf(null), 12000);
@@ -735,19 +740,29 @@ export default function Loom() {
       return {
         ...c,
         blocks: c.blocks.map(b => {
+          // テンプレート指定ブロックを適用
           const v = tmpl.apply[b.id];
-          if (v === undefined) return b;
-          // merge モード: 既存テキストにタグを追記（キャラ本質を消さない）
-          if (typeof v === 'object' && v.mode === 'merge') {
-            let text = b.text || '';
-            for (const seg of splitTags(v.tags || '')) {
-              const tag = bareTag(seg);
-              if (tag && !hasTag(text, tag)) text = appendTag(text, tag, b.strength);
+          if (v !== undefined) {
+            if (typeof v === 'object' && v.mode === 'merge') {
+              let text = b.text || '';
+              for (const seg of splitTags(v.tags || '')) {
+                const tag = bareTag(seg);
+                if (tag && !hasTag(text, tag)) text = appendTag(text, tag, b.strength);
+              }
+              return { ...b, text };
             }
-            return { ...b, text };
+            return { ...b, text: v };
           }
-          // replace モード: 従来通り上書き
-          return { ...b, text: v };
+          // negHint をネガティブブロックに追記（重複スキップ）
+          if (b.id === 'negative' && tmpl.negHintEn) {
+            let text = b.text || '';
+            for (const seg of splitTags(tmpl.negHintEn)) {
+              const tag = bareTag(seg);
+              if (tag && !hasTag(text, tag)) text = appendTag(text, tag, '1.0');
+            }
+            return text !== b.text ? { ...b, text } : b;
+          }
+          return b;
         }),
       };
     }));
