@@ -944,52 +944,52 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             </div>
           )}
 
-          {/* Preset save — ボディ末尾に移動（ヘッダー過密解消） */}
-          {block.isPresetBlock && !isLocked && (
-            <div className="flex justify-end mt-2 pt-1.5 border-t border-dim">
-              <button
-                onClick={() => setSaving(s => !s)}
-                style={saving
-                  ? { background: blockColor + '18', border: `1px solid ${blockColor}`, color: blockColor }
-                  : { border: `1px solid rgb(var(--dim))`, color: 'rgb(var(--muted))' }}
-                className="bg-transparent rounded-[0.3125rem] px-[0.4375rem] py-0.5 text-[0.625rem] cursor-pointer font-mono"
-              >📌 {lang === 'ja' ? 'プリセット保存' : 'Save preset'}</button>
-            </div>
-          )}
-
-          {/* Add custom tag */}
+          {/* ── カスタムエリア（全ブロック共通セパレーター） ─────── */}
           {!search && (
-            addingCustom ? (
-              <div className="flex gap-1.5 items-center mt-1">
-                <input
-                  value={customInput}
-                  onChange={e => setCustomInput(e.target.value)}
-                  autoFocus
-                  onKeyDown={e => { if (e.key === 'Enter') handleAddCustom(); if (e.key === 'Escape') { setAddingCustom(false); setCustomInput(''); } }}
-                  placeholder={lang === 'ja' ? 'タグを入力（英語推奨）...' : 'Enter tag text...'}
-                  style={{ border: `1px solid ${blockColor}60` }}
-                  className="flex-1 rounded-[0.3125rem] text-[0.6875rem] px-[0.5625rem] py-1 outline-none font-mono bg-bg text-fg"
-                />
-                <button onClick={handleAddCustom} style={{ background: blockColor }}
-                  className="border-none rounded-[0.3125rem] text-black px-2.5 py-1 text-[0.6875rem] cursor-pointer font-bold">
-                  {lang === 'ja' ? '追加' : 'Add'}
-                </button>
-                <button onClick={() => { setAddingCustom(false); setCustomInput(''); }}
-                  className="bg-transparent rounded-[0.3125rem] px-[0.4375rem] py-1 text-[0.6875rem] cursor-pointer border border-dim text-muted">×</button>
-              </div>
-            ) : (
-              <button
-                onClick={() => setAddingCustom(true)}
-                disabled={isLocked}
-                onMouseOver={e => { if (!isLocked) e.target.style.borderColor = blockColor; }}
-                onMouseOut={e => e.target.style.borderColor = isLocked ? 'rgb(var(--dim))' : blockColor + '60'}
-                style={{
-                  border: `1px dashed ${isLocked ? 'rgb(var(--dim))' : blockColor + '60'}`,
-                  color: isLocked ? 'rgb(var(--muted))' : blockColor,
-                }}
-                className="bg-transparent rounded-[0.3125rem] px-2.5 py-[0.1875rem] text-[0.625rem] cursor-pointer disabled:cursor-default font-mono mt-1"
-              >+ {lang === 'ja' ? 'カスタムタグ追加' : 'Add custom tag'}</button>
-            )
+            <div className="mt-2 pt-1.5 border-t border-dim">
+              {addingCustom ? (
+                <div className="flex gap-1.5 items-center">
+                  <input
+                    value={customInput}
+                    onChange={e => setCustomInput(e.target.value)}
+                    autoFocus
+                    onKeyDown={e => { if (e.key === 'Enter') handleAddCustom(); if (e.key === 'Escape') { setAddingCustom(false); setCustomInput(''); } }}
+                    placeholder={lang === 'ja' ? 'タグを入力（英語推奨）...' : 'Enter tag text...'}
+                    style={{ border: `1px solid ${blockColor}60` }}
+                    className="flex-1 rounded-[0.3125rem] text-[0.6875rem] px-[0.5625rem] py-1 outline-none font-mono bg-bg text-fg"
+                  />
+                  <button onClick={handleAddCustom} style={{ background: blockColor }}
+                    className="border-none rounded-[0.3125rem] text-black px-2.5 py-1 text-[0.6875rem] cursor-pointer font-bold">
+                    {lang === 'ja' ? '追加' : 'Add'}
+                  </button>
+                  <button onClick={() => { setAddingCustom(false); setCustomInput(''); }}
+                    className="bg-transparent rounded-[0.3125rem] px-[0.4375rem] py-1 text-[0.6875rem] cursor-pointer border border-dim text-muted">×</button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={() => setAddingCustom(true)}
+                    disabled={isLocked}
+                    onMouseOver={e => { if (!isLocked) e.target.style.borderColor = blockColor; }}
+                    onMouseOut={e => e.target.style.borderColor = isLocked ? 'rgb(var(--dim))' : blockColor + '60'}
+                    style={{
+                      border: `1px dashed ${isLocked ? 'rgb(var(--dim))' : blockColor + '60'}`,
+                      color: isLocked ? 'rgb(var(--muted))' : blockColor,
+                    }}
+                    className="bg-transparent rounded-[0.3125rem] px-2.5 py-[0.1875rem] text-[0.625rem] cursor-pointer disabled:cursor-default font-mono"
+                  >+ {lang === 'ja' ? 'カスタムタグ追加' : 'Add custom tag'}</button>
+                  {block.isPresetBlock && !isLocked && (
+                    <button
+                      onClick={() => setSaving(s => !s)}
+                      style={saving
+                        ? { background: blockColor + '18', border: `1px solid ${blockColor}`, color: blockColor }
+                        : { border: `1px solid rgb(var(--dim))`, color: 'rgb(var(--muted))' }}
+                      className="bg-transparent rounded-[0.3125rem] px-[0.4375rem] py-0.5 text-[0.625rem] cursor-pointer font-mono"
+                    >📌 {lang === 'ja' ? 'プリセット保存' : 'Save preset'}</button>
+                  )}
+                </div>
+              )}
+            </div>
           )}
 
         </div>
