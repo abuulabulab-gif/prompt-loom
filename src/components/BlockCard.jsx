@@ -314,18 +314,6 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           className={`bg-transparent rounded-[0.3125rem] ${focusMode ? 'px-[0.5625rem] py-1 text-[0.8125rem]' : 'px-1.5 py-0.5 text-[0.625rem]'} cursor-pointer flex-shrink-0${isLocked ? '' : ' border border-dim text-dim'}`}
         >{isLocked ? '🔒' : '🔓'}</button>
 
-        {/* Preset save */}
-        {block.isPresetBlock && !isLocked && (
-          <button
-            onClick={() => setSaving(s => !s)}
-            style={{
-              background: saving ? blockColor + '22' : 'none',
-              border: `1px solid ${saving ? blockColor : 'rgb(var(--dim))'}`,
-              color: saving ? blockColor : 'rgb(var(--muted))',
-            }}
-            className="rounded-[0.3125rem] px-[0.4375rem] py-0.5 text-[0.625rem] cursor-pointer"
-          >📌 {lang === 'ja' ? '保存' : 'Save'}</button>
-        )}
 
         {/* Tag count — same height as adjacent buttons */}
         {block.text && (
@@ -953,6 +941,19 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Preset save — ボディ末尾に移動（ヘッダー過密解消） */}
+          {block.isPresetBlock && !isLocked && (
+            <div className="flex justify-end mt-2 pt-1.5 border-t border-dim">
+              <button
+                onClick={() => setSaving(s => !s)}
+                style={saving
+                  ? { background: blockColor + '18', border: `1px solid ${blockColor}`, color: blockColor }
+                  : { border: `1px solid rgb(var(--dim))`, color: 'rgb(var(--muted))' }}
+                className="bg-transparent rounded-[0.3125rem] px-[0.4375rem] py-0.5 text-[0.625rem] cursor-pointer font-mono"
+              >📌 {lang === 'ja' ? 'プリセット保存' : 'Save preset'}</button>
             </div>
           )}
 
