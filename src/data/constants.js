@@ -29,7 +29,7 @@ export const LIMIT_LEN = 750;
 // Categories in this set are "optional" for 🎲 (picked with ~45% chance).
 // Categories NOT in this set are "core" and always get a pick first.
 // Categories picked at reduced probability (~15%) — neither core nor standard optional
-export const RARE_OPT_CAT_NAMES = new Set(['肌質感', 'ピアス・刺青', '装備・ケア']);
+export const RARE_OPT_CAT_NAMES = new Set(['肌質感', '着脱・動作', '状態', '傷・装具']);
 
 export const OPTIONAL_CAT_NAMES = new Set([
   // 顔
@@ -39,9 +39,13 @@ export const OPTIONAL_CAT_NAMES = new Set([
   // 体型（肌色はコア化 → 常に1つ選ばれる）
   '肌質感', '細部', 'ボディフォーカス', '状態', '足',
   // 衣装（民族・水着・ランジェリーは任意；フォーマル・制服・コスプレはコア扱い）
-  '素材・装飾', '装飾アクセ', '服装スタイル', 'レッグウェア', '民族・伝統衣装', '水着・スポーツ', 'ランジェリー・部屋着',
-  // 特徴
-  'ピアス・刺青', '装備・ケア', '武器・小物',
+  '服装スタイル', 'レッグウェア', '民族・伝統衣装', '水着・スポーツ', 'ランジェリー・部屋着',
+  // 衣装ディテール（旧 特徴・アクセ）
+  '形状・カット', '素材・生地', '柄・装飾', '着脱・動作', '装飾アクセ',
+  // 体型（追加）
+  '傷・装具',
+  // 構図（武器・小物は構図ブロックに移動）
+  '武器・小物',
   // エフェクト（全て任意）
   '魔法・オーラ', 'パーティクル', '天候・自然', '演出フィルタ',
   // 構図
@@ -292,11 +296,12 @@ export const RANDOM_EXCLUSION_RULES = new Map([
   ['fighting stance', new Set(['lying on back','lying on stomach','all fours','seiza','sitting cross-legged','sleeping'])],
   // 肌色の相互排他（コンボルール追加時に既存肌色をクリーンアップ）
   ['porcelain skin',   new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','blue skin','grey skin','translucent skin'])],
-  ['translucent skin', new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','blue skin','grey skin','porcelain skin'])],
+  // translucent skin は green/blue skin と共存可（スライム表現のため）
+  ['translucent skin', new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','grey skin','porcelain skin'])],
   ['red skin',         new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','blue skin','grey skin','porcelain skin','translucent skin'])],
-  ['blue skin',        new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','grey skin','porcelain skin','translucent skin'])],
+  ['blue skin',        new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','grey skin','porcelain skin'])],
   ['grey skin',        new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','blue skin','green skin','porcelain skin','translucent skin'])],
-  ['green skin',       new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','blue skin','grey skin','porcelain skin','translucent skin'])],
+  ['green skin',       new Set(['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','blue skin','grey skin','porcelain skin'])],
   // 体型の矛盾防止
   ['flat chest',    new Set(['large breasts','huge breasts','medium breasts','breast hold','breast grab','cleavage','sideboob','underboob'])],
   ['large breasts', new Set(['flat chest','small breasts'])],
@@ -416,21 +421,24 @@ export const RANDOM_COMBO_RULES = [
   { trigger: 'beach',          blockId: 'body',        tag: 'barefoot' },
   { trigger: 'rainy',          blockId: 'body',        tag: 'wet hair' },
   { trigger: 'action',         blockId: 'composition', tag: 'fighting stance' },
-  { trigger: 'slime girl',     blockId: 'body',        tag: 'translucent skin' },
-  { trigger: 'slime girl',     blockId: 'body',        tag: 'liquid body' },
+  // slime girl の肌色処理は useRandomGen.js のインライン処理で対応
   { trigger: 'doll',           blockId: 'body',        tag: 'porcelain skin' },
   // レア肌色：種族トリガー時に確率付与
-  { trigger: 'oni',            blockId: 'body',        tag: 'red skin',  prob: 0.25 },
-  { trigger: 'demon',          blockId: 'body',        tag: 'blue skin', prob: 0.25 },
-  { trigger: 'dragon girl',    blockId: 'body',        tag: 'red skin',  prob: 0.10 },
-  { trigger: 'monster girl',   blockId: 'body',        tag: 'red skin',  prob: 0.10 },
-  { trigger: 'elf',            blockId: 'body',        tag: 'grey skin',      prob: 0.25 },
-  { trigger: 'dark elf',       blockId: 'body',        tag: 'grey skin',      prob: 0.25 },
+  { trigger: 'oni',            blockId: 'body',        tag: 'red skin',   prob: 0.25 },
+  { trigger: 'demon',          blockId: 'body',        tag: 'blue skin',  prob: 0.25 },
+  { trigger: 'demon',          blockId: 'body',        tag: 'red skin',   prob: 0.20 },
+  { trigger: 'demon',          blockId: 'body',        tag: 'grey skin',  prob: 0.15 },
+  { trigger: 'dragon girl',    blockId: 'body',        tag: 'red skin',   prob: 0.10 },
+  { trigger: 'monster girl',   blockId: 'body',        tag: 'red skin',   prob: 0.10 },
+  { trigger: 'elf',            blockId: 'body',        tag: 'grey skin',  prob: 0.25 },
+  { trigger: 'dark elf',       blockId: 'body',        tag: 'dark skin',  prob: 0.45 },
+  { trigger: 'dark elf',       blockId: 'body',        tag: 'grey skin',  prob: 0.20 },
   // 裸足のとき低確率でフットネイル付与
   { trigger: 'barefoot',       blockId: 'body',        tag: 'toenail polish', prob: 0.25 },
-  // アンドロイド → 機械パーツのランダム付与
-  { trigger: 'android', blockId: 'attribute', tag: 'robot ears',  prob: 0.50 },
-  { trigger: 'android', blockId: 'attribute', tag: 'ball joints', prob: 0.30 },
+  // アンドロイド → 機械パーツ（ロボット耳は確定、機械翼は低確率）
+  { trigger: 'android', blockId: 'attribute', tag: 'robot ears',       },
+  { trigger: 'android', blockId: 'attribute', tag: 'mechanical wings', prob: 0.15 },
+  { trigger: 'android', blockId: 'attribute', tag: 'ball joints',      prob: 0.30 },
   // 戦闘系衣装 → fighting stance
   { trigger: 'fantasy armor',  blockId: 'composition', tag: 'fighting stance', prob: 0.65 },
   { trigger: 'sci-fi armor',   blockId: 'composition', tag: 'fighting stance', prob: 0.60 },
@@ -456,12 +464,12 @@ export const RANDOM_COMBO_RULES = [
   { trigger: 'nurse',           blockId: 'composition', tag: 'indoors',   prob: 0.50 },
   // コスプレ → 関連装飾品の自動付与
   { trigger: 'jiangshi costume', blockId: 'outfit',   tag: 'jiangshi hat',  prob: 0.90 },
-  { trigger: 'mummy costume',    blockId: 'feature',  tag: 'bandages',      prob: 0.90 },
+  { trigger: 'mummy costume',    blockId: 'body',     tag: 'bandages',      prob: 0.90 },
   { trigger: 'ghost costume',    blockId: 'outfit',   tag: 'veil',          prob: 0.60 },
   { trigger: 'witch outfit',     blockId: 'outfit',   tag: 'hat',           prob: 0.75 },
   { trigger: 'pirate outfit',    blockId: 'outfit',   tag: 'hat',           prob: 0.65 },
   { trigger: 'gothic lolita',    blockId: 'outfit',   tag: 'choker',        prob: 0.65 },
-  { trigger: 'magical girl',     blockId: 'feature',  tag: 'holding wand',  prob: 0.70 },
+  { trigger: 'magical girl',     blockId: 'composition', tag: 'holding wand', prob: 0.70 },
   { trigger: 'shrine maiden',    blockId: 'outfit',   tag: 'kanzashi',      prob: 0.65 },
   { trigger: 'kimono',           blockId: 'outfit',   tag: 'kanzashi',      prob: 0.55 },
   { trigger: 'furisode',         blockId: 'outfit',   tag: 'kanzashi',      prob: 0.70 },
@@ -495,8 +503,8 @@ export const CHARDESIGN_MODE_CONFIG = {
   // 体型ブロック：抽選しないカテゴリ（状態・ボディフォーカス）
   skipBodyCats: new Set(['状態', 'ボディフォーカス', '肌質感']),
 
-  // 特徴ブロック：抽選しないカテゴリ（武器・アクション小物）
-  skipFeatureCats: new Set(['武器・小物']),
+  // 衣装ディテールブロック：キャラデザでは着脱動作は不要
+  skipFeatureCats: new Set(['着脱・動作']),
 
   // コンボルールが変更してはいけないブロックID（固定ブロック）
   fixedBlocks: new Set(['quality', 'artstyle', 'background', 'composition', 'effect', 'lighting']),
@@ -522,10 +530,11 @@ export const ILLUST_MODE_CONFIG = {
     'rain','snowfall','fire','embers','electricity',
     'lens flare','bloom','chromatic aberration','fog','mist','bokeh',
   ]),
-  // イラストモードから除外するタグ（設定画・シンプル背景系）
+  // イラストモードから除外するタグ（設定画・シンプル背景系・写真/未完成スタイル）
   excludedTags: new Set([
     'white background','simple background','gradient background',
     'concept art','character design','character sheet','reference sheet','model sheet',
+    'candid photography','photorealistic','sketch','lineart',
   ]),
   // 色気アクセントタグ — ランダムで同時に複数出た場合に1つだけ残す対象
   subtleSexyTags: new Set([

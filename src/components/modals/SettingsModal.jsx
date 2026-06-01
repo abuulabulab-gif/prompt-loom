@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect } from "react";
 
-const APP_VERSION = 'v2.2';
+const APP_VERSION = 'v2.3';
 const APP_YEAR = '2026';
 
 const SHORTCUTS = (lang) => [

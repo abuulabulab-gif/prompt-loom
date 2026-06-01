@@ -82,14 +82,10 @@ export function toNaturalJa(blocks) {
     parts.push(subject + 'が、');
   }
 
-  // Outfit & accessories
-  if (outfit.length) {
-    parts.push(outfit.map(t => t.ja).join('・') + 'を身に纏い、');
-  }
-
-  // Special features (piercing, weapons, etc.)
-  if (feature.length) {
-    parts.push(feature.map(t => t.ja).join('・') + 'を持ち、');
+  // Outfit & detail accessories（衣装ディテール=featureブロックを衣装に統合）
+  const outfitAll = [...outfit, ...feature];
+  if (outfitAll.length) {
+    parts.push(outfitAll.map(t => t.ja).join('・') + 'を身に纏い、');
   }
 
   // Composition / pose
@@ -173,14 +169,10 @@ export function toNaturalEn(blocks) {
     sentences.push(intro + subject);
   }
 
-  // Outfit
-  if (outfit.length) {
-    sentences.push('Dressed in ' + outfit.map(t => t.en).join(', '));
-  }
-
-  // Features
-  if (feature.length) {
-    sentences.push('Featuring ' + feature.map(t => t.en).join(', '));
+  // Outfit & detail accessories（衣装ディテール=featureブロックを衣装に統合）
+  const outfitAll = [...outfit, ...feature];
+  if (outfitAll.length) {
+    sentences.push('Dressed in ' + outfitAll.map(t => t.en).join(', '));
   }
 
   // Composition + pose

@@ -92,7 +92,7 @@ export const FEATURE_ITEMS = {
     },
     {
       id:'tattoo', ja:'タトゥー', en:'Tattoo',
-      targetBlock:'feature',
+      targetBlock:'body',
       options:[
         { ja:'腕',   en:'small tattoo on arm' },
         { ja:'肩',   en:'tattoo on shoulder' },
@@ -101,7 +101,7 @@ export const FEATURE_ITEMS = {
     },
     {
       id:'bandage', ja:'包帯', en:'Bandage',
-      targetBlock:'feature',
+      targetBlock:'body',
       options:[
         { ja:'腕', en:'bandage on arm' },
         { ja:'脚', en:'bandage on leg' },
@@ -109,7 +109,7 @@ export const FEATURE_ITEMS = {
     },
     {
       id:'bandaid_body', ja:'絆創膏', en:'Bandaid',
-      targetBlock:'feature',
+      targetBlock:'body',
       options:[
         { ja:'腕', en:'bandaid on arm' },
         { ja:'膝', en:'bandaid on knee' },
@@ -120,7 +120,7 @@ export const FEATURE_ITEMS = {
   accessory: [
     {
       id:'piercing_pos', ja:'ピアス', en:'Piercing',
-      targetBlock:'feature',
+      targetBlock:'body',
       lrWarning:true,
       options:[
         { ja:'両耳',   en:'ear piercing' },

@@ -1222,7 +1222,7 @@ export default function Loom() {
           <button onClick={() => {
             if (!quickOpen && quickMenuRef.current) {
               const r = quickMenuRef.current.getBoundingClientRect();
-              const qw = Math.min(170, window.innerWidth - 16);
+              const qw = Math.min(220, window.innerWidth - 16);
               setQuickOpenPos({ top: r.bottom + 4, left: Math.max(8, Math.min(r.right - qw, window.innerWidth - qw - 8)), width: qw });
             }
             setQuickOpen(p => !p);
@@ -1235,51 +1235,51 @@ export default function Loom() {
           {quickOpen && (
             <>
               <div className="fixed inset-0 z-[199]" onClick={() => setQuickOpen(false)} />
-              <div className="fixed z-[200] bg-surface border border-line rounded-[0.5625rem] shadow-xl py-1" style={quickOpenPos}>
+              <div className="fixed z-[200] bg-surface border border-line rounded-[0.5625rem] shadow-xl py-1.5" style={quickOpenPos}>
                 <button onClick={() => { setTemplateOpen(true); setQuickOpen(false); }}
-                  className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt text-accent flex items-center gap-2">
+                  className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt text-accent flex items-center gap-2.5">
                   ✦ {lang === 'ja' ? 'テンプレート' : 'Template'}
                 </button>
                 {apiConfig.apiKey && (
                   <button onClick={() => { setNaturalToTagsTab('text'); setNaturalToTagsOpen(true); setQuickOpen(false); }}
-                    className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
+                    className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5"
                     style={{ color: 'rgb(var(--c-blue))' }}>
                     ✍️ {lang === 'ja' ? '自然文からタグ生成' : 'Text to Tags'}
                   </button>
                 )}
                 {apiConfig.apiKey && (
                   <button onClick={() => { setNaturalToTagsTab('image'); setNaturalToTagsOpen(true); setQuickOpen(false); }}
-                    className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
+                    className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5"
                     style={{ color: 'rgb(var(--c-purple))' }}>
                     👁️ {lang === 'ja' ? '画像からタグ生成' : 'Image to Tags'}
                   </button>
                 )}
                 <button onClick={() => { openColorPicker(); setQuickOpen(false); }}
-                  className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
+                  className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5"
                   style={{ color: 'rgb(var(--c-purple))' }}>
                   🎨 {lang === 'ja' ? 'カラー' : 'Color'}
                 </button>
                 <button onClick={() => { setFeatureMakerFilterBlock(null); setFeatureMakerOpen(true); setQuickOpen(false); }}
-                  className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
+                  className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5"
                   style={{ color: 'rgb(var(--c-purple))' }}>
                   🎯 {lang === 'ja' ? '特徴' : 'Feature'}
                 </button>
                 {characters.length > 1 && (
                   <button onClick={() => { setSceneOpen(true); setQuickOpen(false); }}
-                    className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2"
+                    className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5"
                     style={{ color: 'rgb(var(--c-green))' }}>
                     🎬 {lang === 'ja' ? 'キャラ共演' : 'Collab'}
                   </button>
                 )}
                 {expertMode && (
                   <button onClick={() => { addCustomBlock(); setQuickOpen(false); }}
-                    className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
+                    className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2.5">
                     ✏️ {lang === 'ja' ? '+カスタムブロック' : '+Custom block'}
                   </button>
                 )}
-                <div className="border-t border-line mx-2 my-[0.1875rem]" />
+                <div className="border-t border-line mx-2 my-1" />
                 <button onClick={() => { resetBlockOrder(); setQuickOpen(false); }}
-                  className="w-full text-left px-3 py-[0.4375rem] text-[0.6875rem] font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2">
+                  className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2.5">
                   ↺ {lang === 'ja' ? 'ブロック順をリセット' : 'Reset block order'}
                 </button>
               </div>

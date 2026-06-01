@@ -6,7 +6,7 @@ import {
   CHARDESIGN_MODE_CONFIG, ILLUST_MODE_CONFIG, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS, KEMONOMIMI_PAIRS,
 } from "../data/constants.js";
 
-const RARE_OPT_CAT_PROB = 0.15; // rare optional cats: 15% vs standard 40%
+const RARE_OPT_CAT_PROB = 0.10; // rare optional cats: 10% vs standard 40%
 import { CONFLICT_MAP } from "../data/conflicts.js";
 import { COLOR_PALETTE, SHADES, COLOR_TARGETS, buildColorTag, buildColorName, HUE_GROUPS } from "../data/colors.js";
 
@@ -611,9 +611,15 @@ function applyOutfitStackPenalty(blockMap) {
   const hasCompleteGenre = [...COMPLETE_OUTFIT_GENRES].some(t => hasTag(ob.text, t));
   if (!hasCompleteGenre) return;
   let text = ob.text;
-  for (const tag of OUTFIT_STYLE_TAGS)  { if (hasTag(text, tag) && Math.random() < 0.70) text = removeTag(text, tag); }
-  for (const tag of OUTFIT_ACCENT_TAGS) { if (hasTag(text, tag) && Math.random() < 0.60) text = removeTag(text, tag); }
+  for (const tag of OUTFIT_STYLE_TAGS) { if (hasTag(text, tag) && Math.random() < 0.70) text = removeTag(text, tag); }
   if (text !== ob.text) blockMap.set('outfit', { ...ob, text });
+  // 装飾アクセは衣装ディテール（feature）ブロックに移動したため、そちらも間引く
+  const detailB = blockMap.get('feature');
+  if (detailB?.text && !detailB.locked) {
+    let ftext = detailB.text;
+    for (const tag of OUTFIT_ACCENT_TAGS) { if (hasTag(ftext, tag) && Math.random() < 0.60) ftext = removeTag(ftext, tag); }
+    if (ftext !== detailB.text) blockMap.set('feature', { ...detailB, text: ftext });
+  }
 }
 
 // ── カラーメーカー自動付与レイヤー ─────────────────────────────────────────
@@ -624,11 +630,14 @@ const CM_OUTFIT_SLOTS = [
   ['shirt',      new Set(['shirt','blouse','white shirt','dress shirt','school uniform','sailor uniform','blazer uniform','off shoulder','crop top','tank top','tube top','halter top','sleeveless','sports bra']),                                                                                                                                                                                    0.40, false],
   ['skirt',      new Set(['skirt','pleated skirt','mini skirt','micro skirt','slit skirt']),                                                                                                                                                                                                                                                                                                          0.50, false],
   ['jacket',     new Set(['jacket','coat','trench coat','cardigan','hoodie','sweater','sweater vest','vest','turtleneck']),                                                                                                                                                                                                                                                                            0.40, false],
-  ['ribbon',     new Set(['ribbons','bows','ruffles','frills']),                                                                                                                                                                                                                                                                                                                                      0.65, true ],
-  ['trim',       new Set(['lace trim']),                                                                                                                                                                                                                                                                                                                                                              0.65, true ],
-  ['embroidery', new Set(['embroidery']),                                                                                                                                                                                                                                                                                                                                                             0.65, true ],
-  ['lace',       new Set(['lace']),                                                                                                                                                                                                                                                                                                                                                                   0.55, true ],
   ['footwear',   new Set(['sneakers','loafers','mary janes','sandals','slippers','heels','pumps','high heels','platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots']),                                                                                                                                                                                          0.30, false],
+];
+// ribbon/lace/trim/embroidery は衣装ディテール（feature）ブロックに移動済みのため別スロットで管理
+const CM_DETAIL_SLOTS = [
+  ['ribbon',     new Set(['ribbons','bows','frills']), 0.65, true],
+  ['trim',       new Set(['lace trim']),               0.65, true],
+  ['embroidery', new Set(['embroidery']),              0.65, true],
+  ['lace',       new Set(['lace']),                    0.55, true],
 ];
 const CM_TAIL_TRIGGERS = new Set(['cat tail','fox tail','wolf tail','fluffy tail','bunny tail','dog tail','horse tail','cow tail','demon tail','dragon tail','multiple tails']);
 
@@ -636,9 +645,9 @@ function applyColorMakerLayer(blockMap, mode) {
   const overallProb = mode === 'chardesign' ? 0.70 : 0.55;
   if (Math.random() > overallProb) return;
 
-  const outfitBlock = blockMap.get('outfit');
-  const attrBlock   = blockMap.get('attribute');
-  const featBlock   = blockMap.get('feature');
+  const outfitBlock  = blockMap.get('outfit');
+  const attrBlock    = blockMap.get('attribute');
+  const detailBlock  = blockMap.get('feature'); // 衣装ディテールブロック（旧 feature）
 
   const mainColorObj  = COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
   const mainShade     = pickWeightedShade();
@@ -669,6 +678,19 @@ function applyColorMakerLayer(blockMap, mode) {
     if (text !== (outfitBlock.text || '')) blockMap.set('outfit', { ...outfitBlock, text });
   }
 
+  // 衣装ディテールブロック: ribbon/lace/trim/embroidery の色付与
+  if (added < MAX_TAGS && detailBlock && !detailBlock.locked) {
+    let dtext = detailBlock.text || '';
+    for (const [targetEn, keys, prob, isDetail] of CM_DETAIL_SLOTS) {
+      if (added >= MAX_TAGS) break;
+      if (![...keys].some(k => hasTag(dtext, k))) continue;
+      if (Math.random() > prob) continue;
+      const tag = makeTag(isDetail, targetEn);
+      if (!hasTag(dtext, tag)) { dtext = appendTag(dtext, tag, detailBlock.strength); added++; }
+    }
+    if (dtext !== (detailBlock.text || '')) blockMap.set('feature', { ...detailBlock, text: dtext });
+  }
+
   if (added < MAX_TAGS && attrBlock && !attrBlock.locked) {
     const t = attrBlock.text || '';
     if ([...CM_TAIL_TRIGGERS].some(k => hasTag(t, k)) && Math.random() < 0.55) {
@@ -677,10 +699,11 @@ function applyColorMakerLayer(blockMap, mode) {
     }
   }
 
-  if (added < MAX_TAGS && featBlock && !featBlock.locked && Math.random() < 0.15) {
-    const t = featBlock.text || '';
+  const bodyBlock2 = blockMap.get('body');
+  if (added < MAX_TAGS && bodyBlock2 && !bodyBlock2.locked && Math.random() < 0.15) {
+    const t = bodyBlock2.text || '';
     const tag = makeTag(true, 'nails');
-    if (!hasTag(t, tag)) blockMap.set('feature', { ...featBlock, text: appendTag(t, tag, featBlock.strength) });
+    if (!hasTag(t, tag)) blockMap.set('body', { ...bodyBlock2, text: appendTag(t, tag, bodyBlock2.strength) });
   }
 }
 
@@ -882,6 +905,19 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
             const added = splitTags(text).map(bareTag).filter(en => en && !hasTag(textBefore, en) && !picks.some(p => p.en.toLowerCase() === en.toLowerCase()));
             picks = added.length ? [...picks, ...added.map(en => ({ en, ja: en }))] : picks;
           }
+          // メイク補助表現（illust モード: 基本表情 → 物理演出の自動ペア付与）
+          if (mode === 'illust' && block.id === 'face') {
+            if (hasTag(text, 'crying') && Math.random() < 0.80)
+              text = appendTag(text, 'tear', block.strength);
+            else if ((hasTag(text, 'sad') || hasTag(text, 'wistful')) && Math.random() < 0.45)
+              text = appendTag(text, 'teardrop', block.strength);
+            if (hasTag(text, 'nervous') && Math.random() < 0.50)
+              text = appendTag(text, 'sweating', block.strength);
+            if (hasTag(text, 'angry') && Math.random() < 0.30)
+              text = appendTag(text, 'steam', block.strength);
+            if (hasTag(text, 'blushing') && !hasTag(text, 'heavy blush') && Math.random() < 0.35)
+              text = appendTag(text, 'heavy blush', block.strength);
+          }
           newBlock = { ...block, text, enabled: true, collapsed: false, lastRandomPicks: picks };
         }
 
@@ -899,6 +935,22 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
           if (!hasTag(bodyB.text || '', 'green skin')) {
             blockMap.set('body', { ...bodyB, text: appendTag(bodyB.text || '', 'green skin', bodyB.strength) });
           }
+        }
+      }
+
+      // スライム娘 → translucent skin + green or blue（50/50）+ liquid body 確定
+      {
+        const attrB = blockMap.get('attribute');
+        const bodyB = blockMap.get('body');
+        if (attrB && !attrB.locked && bodyB && !bodyB.locked && hasTag(attrB.text || '', 'slime girl')) {
+          const normalSkins = ['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','grey skin','porcelain skin'];
+          let bodyText = bodyB.text || '';
+          for (const s of normalSkins) bodyText = removeTag(bodyText, s);
+          if (!hasTag(bodyText, 'translucent skin')) bodyText = appendTag(bodyText, 'translucent skin', bodyB.strength);
+          if (!hasTag(bodyText, 'green skin') && !hasTag(bodyText, 'blue skin'))
+            bodyText = appendTag(bodyText, Math.random() < 0.50 ? 'green skin' : 'blue skin', bodyB.strength);
+          if (!hasTag(bodyText, 'liquid body')) bodyText = appendTag(bodyText, 'liquid body', bodyB.strength);
+          blockMap.set('body', { ...bodyB, text: bodyText });
         }
       }
 
@@ -928,6 +980,10 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
       applyOutfitStackPenalty(blockMap);
       // カラーメーカー・特徴メーカーの条件付き自動付与レイヤー
       applyColorMakerLayer(blockMap, mode);
+      // ── マテリアルメーカー（未実装）─────────────────────────────
+      // import { applyMaterialMakerLayer } from '../data/materials.js';
+      // applyMaterialMakerLayer(blockMap, mode);
+      // ────────────────────────────────────────────────────────────
       applyFeatureMakerLayer(blockMap);
       applyAtmosphereLayer(blockMap, mode);
 
