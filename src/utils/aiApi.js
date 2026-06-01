@@ -1,3 +1,24 @@
+// APIエラーメッセージを日本語に変換
+export function localizeApiError(message, lang) {
+  if (lang !== 'ja') return message;
+  const m = (message || '').toLowerCase();
+  if (m.includes('quota') || m.includes('exceeded') || m.includes('billing') || m.includes('insufficient_quota'))
+    return 'APIの利用上限に達しています。プランと請求設定をご確認ください';
+  if (m.includes('invalid') && m.includes('key') || m.includes('incorrect api key') || m.includes('authentication'))
+    return 'APIキーが正しくありません。設定を確認してください';
+  if (m.includes('rate limit') || m.includes('too many requests') || m.includes('rate_limit'))
+    return 'リクエストが多すぎます。しばらく待ってから再試行してください';
+  if (m.includes('overloaded') || m.includes('529'))
+    return 'APIサーバーが混雑しています。しばらく待ってから再試行してください';
+  if (m.includes('timeout') || m.includes('network') || m.includes('fetch'))
+    return 'ネットワークエラーが発生しました。接続を確認してください';
+  if (m.includes('context_length') || m.includes('maximum context'))
+    return 'テキストが長すぎます。内容を短くして再試行してください';
+  if (m.includes('content_filter') || m.includes('content policy') || m.includes('safety'))
+    return 'コンテンツポリシーによりリクエストがブロックされました';
+  return message;
+}
+
 const SYSTEM_POLISH = {
   ja: 'あなたはAIイラスト生成の専門家です。以下はAIイラストツール用のタグから生成した日本語の自然文です。これをより自然で読みやすい描写文章に整えてください。元の内容・意味は変えず、余分な説明や解釈は加えないでください。文章のみを返してください。',
   en: 'You are an expert in AI image generation. The following is natural language text generated from illustration tags. Rewrite it as more natural, flowing descriptive prose. Keep the original meaning intact and do not add extra details or interpretations. Return only the rewritten text.',

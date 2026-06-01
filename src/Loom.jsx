@@ -30,7 +30,7 @@ import SupportModal from "./components/modals/SupportModal.jsx";
 import CommandPalette from "./components/CommandPalette.jsx";
 import GlobalTagSearch from "./components/GlobalTagSearch.jsx";
 import { toNaturalJa, toNaturalEn } from "./utils/naturalLanguage.js";
-import { callAI, callTagSuggest } from "./utils/aiApi.js";
+import { callAI, callTagSuggest, localizeApiError } from "./utils/aiApi.js";
 import NaturalToTagsModal from "./components/modals/NaturalToTagsModal.jsx";
 import CharacterNote from "./CharacterNote/index.jsx";
 import { useAuth } from "./hooks/useAuth.js";
@@ -557,7 +557,7 @@ export default function Loom() {
       setTagSuggestions(res);
       setTagSuggestOpen(true);
     } catch (e) {
-      setTagSuggestError(e.message);
+      setTagSuggestError(localizeApiError(e.message, lang));
       setTagSuggestOpen(true);
     } finally {
       setTagSuggestBusy(false);
@@ -572,7 +572,7 @@ export default function Loom() {
       const result = await callAI({ provider: apiConfig.provider, apiKey: apiConfig.apiKey, text: naturalText, naturalLang });
       setAiResult(result);
     } catch (e) {
-      setAiError(e.message);
+      setAiError(localizeApiError(e.message, lang));
     } finally {
       setAiBusy(false);
     }

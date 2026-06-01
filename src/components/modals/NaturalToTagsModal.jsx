@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { callNaturalToTags, callImageToTags } from "../../utils/aiApi.js";
+import { callNaturalToTags, callImageToTags, localizeApiError } from "../../utils/aiApi.js";
 
 const BLOCK_LABELS = {
   face:        { ja: '顔・髪',         en: 'Face / Hair' },
@@ -57,7 +57,7 @@ export default function NaturalToTagsModal({ lang, apiConfig, blocks: _blocks, o
       const res = await callNaturalToTags({ provider: apiConfig.provider, apiKey: apiConfig.apiKey, text: input.trim(), lang });
       applyResult(res);
     } catch (e) {
-      setError(e.message);
+      setError(localizeApiError(e.message, lang));
     } finally {
       setBusy(false);
     }
@@ -82,7 +82,7 @@ export default function NaturalToTagsModal({ lang, apiConfig, blocks: _blocks, o
       const res = await callImageToTags({ provider: apiConfig.provider, apiKey: apiConfig.apiKey, ...imageData, lang });
       applyResult(res);
     } catch (e) {
-      setError(e.message);
+      setError(localizeApiError(e.message, lang));
     } finally {
       setBusy(false);
     }
