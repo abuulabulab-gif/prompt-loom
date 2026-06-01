@@ -371,11 +371,18 @@ export default function Loom() {
     setTimeout(() => setColorToast(null), 3000);
   };
 
-  const applyMaterialText = (newText, blockId) => {
+  const applyMaterialTag = (tag, blockId) => {
+    const resolvedId = blockId || 'outfit';
     setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : {
       ...c,
-      blocks: c.blocks.map(b => b.id !== blockId ? b : { ...b, text: newText, enabled: true, collapsed: false }),
+      blocks: c.blocks.map(b => b.id !== resolvedId ? b : {
+        ...b, text: appendTag(b.text, tag, '1.0'), enabled: true, collapsed: false,
+      }),
     }));
+    const blockName = blocks.find(b => b.id === resolvedId)?.[lang === 'ja' ? 'name' : 'nameEn'] ?? resolvedId;
+    const msg = lang === 'ja' ? `🧵 ${blockName}に「${tag}」を追加` : `🧵 "${tag}" added to ${blockName}`;
+    setColorToast({ msg });
+    setTimeout(() => setColorToast(null), 3000);
   };
 
   const openColorPicker = (defaultTarget = 'hair', allowedTargets = null) => {
@@ -2801,7 +2808,7 @@ export default function Loom() {
       {templateOpen && <TemplateModal lang={lang} isMobile={isMobile} onApply={applyTemplate} onClose={() => setTemplateOpen(false)} />}
       {colorPickerOpen && <ColorPickerModal lang={lang} onApply={applyColorTag} onClose={() => setColorPickerOpen(false)} defaultTarget={colorPickerDefaultTarget} allowedTargets={colorPickerAllowedTargets} />}
       {featureMakerOpen && <FeatureMakerModal lang={lang} blocks={blocks} onApply={applyFeatureTag} onClose={() => setFeatureMakerOpen(false)} filterBlockId={featureMakerFilterBlock} />}
-      {materialMakerOpen && <MaterialMakerModal lang={lang} blocks={blocks} onApply={applyMaterialText} onClose={() => setMaterialMakerOpen(false)} />}
+      {materialMakerOpen && <MaterialMakerModal lang={lang} blocks={blocks} onApply={applyMaterialTag} onClose={() => setMaterialMakerOpen(false)} />}
       {sceneOpen && <SceneComposeModal characters={characters} lang={lang} activeTool={activeTool} theme={theme} onClose={() => setSceneOpen(false)} defaultQuality={blocks.find(b => b.id === 'quality')?.text || ''} />}
       {supportOpen && <SupportModal lang={lang} isMobile={isMobile} onClose={() => setSupportOpen(false)} />}
       {settingsOpen && <SettingsModal lang={lang} isMobile={isMobile} defaultTab={settingsTab} onClose={() => { setSettingsOpen(false); setSettingsTab('shortcuts'); }}

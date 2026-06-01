@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { MATERIAL_PALETTE, MATERIAL_TARGETS, buildMaterialTag } from "../../data/materials.js";
-import { hasTag, appendTag, removeTag } from "../../data/constants.js";
+import { hasTag } from "../../data/constants.js";
 
 const ACCENT = '#6c8fff';
 
-// 素材グループ（アクセントカラー付き）
 const MAT_GROUPS = [
   { label: { ja: '光沢・高級',    en: 'Luxury'        }, acc: '#f59e0b', ids: ['silk','satin','velvet'] },
   { label: { ja: 'レース・装飾',  en: 'Lace & Trim'   }, acc: '#ec4899', ids: ['lace','lace-trimmed','embroidered','sequined'] },
@@ -26,15 +25,15 @@ function resolveBlockId(target, outfitText, featureText) {
 function groupOf(matEn) { return MAT_GROUPS.find(g => g.ids.includes(matEn)); }
 
 export default function MaterialMakerModal({ lang, blocks, onApply, onClose }) {
-  const [selectedMat, setSelectedMat] = useState(null);
+  const [selectedMat,    setSelectedMat]    = useState(null);
+  const [selectedTarget, setSelectedTarget] = useState(null);
 
   const outfitText  = getBlockText(blocks, 'outfit');
   const featureText = getBlockText(blocks, 'feature');
-  const ja = lang === 'ja';
-
+  const ja  = lang === 'ja';
   const acc = groupOf(selectedMat)?.acc ?? ACCENT;
 
-  // Step 2: 現在の衣装に合う部位
+  // 選択中素材に対応する部位リスト
   const availableTargets = selectedMat
     ? MATERIAL_TARGETS.filter(t => {
         const bId = resolveBlockId(t, outfitText, featureText);
@@ -45,28 +44,28 @@ export default function MaterialMakerModal({ lang, blocks, onApply, onClose }) {
     : [];
 
   const currentText = (bId) => bId === 'outfit' ? outfitText : featureText;
-  const isApplied = (t) => selectedMat ? hasTag(currentText(t.blockId), buildMaterialTag(selectedMat, t.en)) : false;
 
-  const handleTarget = (target) => {
-    const tag  = buildMaterialTag(selectedMat, target.en);
-    const bId  = target.blockId;
-    const text = currentText(bId);
-    onApply(hasTag(text, tag) ? removeTag(text, tag) : appendTag(text, tag, '1.0'), bId);
+  const preview    = selectedMat && selectedTarget
+    ? buildMaterialTag(selectedMat, selectedTarget.en)
+    : null;
+  const isReady    = Boolean(preview);
+  const alreadyHas = isReady && hasTag(currentText(selectedTarget.blockId), preview);
+
+  const blockLabel = selectedTarget
+    ? (blocks?.find(b => b.id === selectedTarget.blockId)?.[ja ? 'name' : 'nameEn'] ?? selectedTarget.blockId)
+    : null;
+
+  const handleApply = () => {
+    if (!isReady) return;
+    onApply(preview, selectedTarget.blockId);
   };
 
-  // 全適用済みタグの一覧（プレビュー用）
-  const appliedTags = MATERIAL_TARGETS.flatMap(t => {
-    const bId = resolveBlockId(t, outfitText, featureText);
-    if (!bId) return [];
-    return MATERIAL_PALETTE
-      .filter(m => hasTag(currentText(bId), buildMaterialTag(m.en, t.en)))
-      .map(m => buildMaterialTag(m.en, t.en));
-  });
+  const selectMat = (en) => {
+    setSelectedMat(en === selectedMat ? null : en);
+    setSelectedTarget(null);
+  };
 
   const noOutfit = !outfitText && !featureText;
-  const previewTag = selectedMat && availableTargets.length > 0
-    ? buildMaterialTag(selectedMat, availableTargets[0].en)
-    : null;
 
   return (
     <div className="fixed inset-0 bg-black/80 z-[300] flex items-center justify-center p-4" onClick={onClose}>
@@ -87,7 +86,7 @@ export default function MaterialMakerModal({ lang, blocks, onApply, onClose }) {
           </p>
         ) : (
           <>
-            {/* Step 1: 素材を選ぶ */}
+            {/* Step 1: 素材 */}
             <div className="text-muted text-[0.625rem] font-mono mb-1.5 tracking-[0.07em]">
               {ja ? '① 素材を選ぶ' : '① Pick a material'}
             </div>
@@ -103,7 +102,7 @@ export default function MaterialMakerModal({ lang, blocks, onApply, onClose }) {
                       const active = selectedMat === mat.en;
                       return (
                         <button key={mat.en}
-                          onClick={() => setSelectedMat(active ? null : mat.en)}
+                          onClick={() => selectMat(mat.en)}
                           style={active ? { background: group.acc+'22', borderColor: group.acc, color: group.acc } : {}}
                           className={`${chipCls(active)}${mat.adult ? ' opacity-75' : ''}`}>
                           {ja ? mat.ja : mat.en}
@@ -116,59 +115,56 @@ export default function MaterialMakerModal({ lang, blocks, onApply, onClose }) {
               );
             })}
 
-            {/* Step 2: 部位を選ぶ */}
+            {/* Step 2: 部位 */}
             <div className="text-muted text-[0.625rem] font-mono mb-1.5 tracking-[0.07em]">
-              {ja ? '② 適用する部位を選ぶ' : '② Pick target parts'}
+              {ja ? '② 適用する部位を選ぶ' : '② Pick a target part'}
             </div>
             <div className="flex flex-wrap gap-[0.3125rem] mb-3.5 min-h-[2rem]">
               {!selectedMat ? (
                 <span className="text-dim text-[0.625rem] font-mono self-center">
-                  {ja ? '↑ 素材を選ぶと適用できる部位が表示されます' : '↑ Select a material to see available targets'}
+                  {ja ? '↑ 素材を選ぶと部位が表示されます' : '↑ Select a material to see targets'}
                 </span>
               ) : availableTargets.length === 0 ? (
                 <span className="text-dim text-[0.625rem] font-mono self-center">
-                  {ja ? 'この素材に対応する衣装タグが見当たりません' : `No outfit tags found for "${selectedMat}"`}
+                  {ja ? 'この素材に対応する衣装タグが見当たりません' : `No outfit tags found for this material`}
                 </span>
-              ) : (
-                availableTargets.map(target => {
-                  const applied = isApplied(target);
-                  return (
-                    <button key={target.id}
-                      onClick={() => handleTarget(target)}
-                      style={applied ? { background: acc+'22', borderColor: acc, color: acc } : {}}
-                      className={chipCls(applied)}
-                      title={buildMaterialTag(selectedMat, target.en)}>
-                      {applied ? '✓ ' : ''}{ja ? target.ja : target.en}
-                      <span className="ml-1 text-[0.5rem] opacity-40">
-                        ({target.blockId === 'feature' ? (ja ? 'D' : 'D') : (ja ? '衣' : 'O')})
-                      </span>
-                    </button>
-                  );
-                })
-              )}
+              ) : availableTargets.map(target => {
+                const active   = selectedTarget?.id === target.id;
+                const appended = hasTag(currentText(target.blockId), buildMaterialTag(selectedMat, target.en));
+                return (
+                  <button key={target.id}
+                    onClick={() => setSelectedTarget(active ? null : target)}
+                    style={active ? { background: acc+'22', borderColor: acc, color: acc } : {}}
+                    className={chipCls(active)}
+                    title={buildMaterialTag(selectedMat, target.en)}>
+                    {appended ? '✓ ' : ''}{ja ? target.ja : target.en}
+                  </button>
+                );
+              })}
             </div>
 
             {/* プレビュー */}
-            <div className={`bg-bg border border-line rounded-lg p-3 mb-3.5 ${(selectedMat && availableTargets.length > 0) || appliedTags.length > 0 ? '' : 'opacity-40'}`}>
+            <div className={`bg-bg border border-line rounded-lg p-3 mb-3.5 ${isReady ? '' : 'opacity-40'}`}>
               <div className="text-muted text-[0.5625rem] font-mono mb-[0.1875rem]">
-                {ja ? '生成されるタグ' : 'Generated tags'}
+                {ja ? '生成されるタグ' : 'Generated tag'}
               </div>
               <code className="text-prompt text-[0.8125rem] font-mono break-all">
-                {appliedTags.length > 0
-                  ? appliedTags.join(', ')
-                  : (previewTag
-                    ? previewTag
-                    : (ja ? '← 素材・部位を選んでください' : '← Select material and target'))}
+                {preview ?? (ja ? '← 素材・部位を選んでください' : '← Select material and target')}
               </code>
             </div>
 
-            {/* 凡例 */}
-            <div className="text-dim text-[0.5625rem] font-mono mb-3">
-              {ja ? '▲ = 成人向け寄りの素材 　(衣/D) = 適用先ブロック' : '▲ = Adult-oriented material 　(O/D) = target block'}
-            </div>
-
-            <div className="text-dim text-[0.625rem] font-mono text-center">
-              {ja ? '※ 部位チップをタップで追加・解除できます' : '※ Tap a target to toggle it on / off'}
+            {/* 適用ボタン */}
+            <button onClick={handleApply} disabled={!isReady}
+              className="w-full border-none rounded-[0.5625rem] py-[0.6875rem] text-white text-[0.8125rem] font-bold tracking-[0.03em] bg-[linear-gradient(135deg,#4a6fff,#8a4fff)]"
+              style={{ opacity: isReady ? 1 : 0.45, cursor: isReady ? 'pointer' : 'not-allowed' }}>
+              {isReady && blockLabel
+                ? (alreadyHas
+                  ? (ja ? `+ 「${blockLabel}」ブロックに再追加` : `+ Add again to ${blockLabel}`)
+                  : (ja ? `+ 「${blockLabel}」ブロックに追加` : `+ Add to ${blockLabel}`))
+                : (ja ? '素材・部位を選んでください' : 'Select material and target')}
+            </button>
+            <div className="text-dim text-[0.625rem] font-mono text-center mt-2">
+              {ja ? '※ 連続で追加できます　▲ = 成人向け寄りの素材' : '※ Add multiple in a row　▲ = Adult-oriented material'}
             </div>
           </>
         )}
