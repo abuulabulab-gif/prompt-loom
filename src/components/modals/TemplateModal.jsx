@@ -221,11 +221,20 @@ export default function TemplateModal({ lang, isMobile, onApply, onClose }) {
         </div>
 
         <div className="px-[1.125rem] py-3.5 overflow-y-auto max-h-[75vh]">
-          <p className="text-muted text-[0.6875rem] font-mono mb-1">
-            {lang === 'ja' ? '対象ブロックに上書き適用されます。' : 'Applies directly to the target blocks.'}
+          <p className="text-muted text-[0.6875rem] font-mono mb-1.5">
+            {lang === 'ja'
+              ? '構図・スタイル・効果などを複数ブロックにまとめてセットできる型です。カードをタップするとすぐ適用されます。'
+              : 'Presets that set composition, style, effects, and more across multiple blocks at once. Tap a card to apply instantly.'}
           </p>
-          <p className="text-[#f87171] text-[0.625rem] font-mono mb-4">
-            {lang === 'ja' ? '⚠ 対象ブロックにすでに入っているタグは消えます。' : '⚠ Existing tags in the target blocks will be cleared.'}
+          <p className="text-[#f87171] text-[0.625rem] font-mono mb-1">
+            {lang === 'ja'
+              ? '⚠ 構図・衣装・背景などのブロックは上書き（既存タグが消えます）。体型・顔ブロックは既存タグに追記。'
+              : '⚠ Composition / outfit / background blocks are overwritten (existing tags cleared). Body / face blocks append to existing tags.'}
+          </p>
+          <p className="text-[0.5625rem] font-mono mb-4" style={{ color: 'rgb(var(--c-blue))' }}>
+            {lang === 'ja'
+              ? '💡 ネガ推奨タグ（💡）はネガティブブロックに自動追記。適用直後は「元に戻す」が12秒間使えます。'
+              : '💡 Negative hints (💡) are auto-appended to the Negative block. An Undo button appears for 12 seconds after applying.'}
           </p>
 
           <div className="text-muted text-[0.625rem] font-mono tracking-widest mb-2 uppercase">{lang === 'ja' ? 'スタイル' : 'Style'}</div>
