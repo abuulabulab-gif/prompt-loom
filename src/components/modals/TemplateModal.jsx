@@ -35,6 +35,13 @@ const TEMPLATE_EXTRA_JA = new Map([
   ['jumping',                  'ジャンプ'],
   ['kicking',                  '蹴り'],
   ['midair',                   '空中'],
+  // 真俯瞰ベッド
+  ['hair spread out',          '髪を広げた'],
+  ['relaxed pose',             'リラックスポーズ'],
+  ['on bed',                   'ベッドの上'],
+  ['white sheets',             '白いシーツ'],
+  ['bed sheet',                'ベッドシーツ'],
+  ['soft lighting',            '柔らかい光'],
   // 撮影スタイル
   ['selfie',                   '自撮り'],
   // 構図・視点
