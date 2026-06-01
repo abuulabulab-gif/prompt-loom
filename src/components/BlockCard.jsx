@@ -375,28 +375,6 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           >{focused ? '⊗' : '⊕'}</button>
         )}
 
-        {/* Transfer to other character — 3列コンパクト時は非表示 */}
-        {otherChars?.length > 0 && !isCompact && (
-          <div className="relative flex-shrink-0 flex items-center">
-            <button
-              onClick={() => setTransferOpen(o => !o)}
-              title={lang === 'ja' ? '他のキャラへ転送' : 'Transfer to character'}
-              className="bg-transparent border border-dim rounded-[0.3125rem] px-[0.3125rem] py-0.5 text-dim text-[0.625rem] cursor-pointer"
-            >→</button>
-            {transferOpen && (
-              <div className="absolute right-0 top-full mt-1 z-50 bg-surface border border-linebright rounded-lg overflow-hidden shadow-lg min-w-[7.5rem] max-w-[10rem]">
-                {otherChars.map(c => (
-                  <button key={c.id} onClick={() => { onTransfer?.(block.id, c.id); setTransferOpen(false); }}
-                    className="w-full text-left px-2.5 py-1.5 text-[0.6875rem] text-fg cursor-pointer flex items-center gap-1"
-                    onMouseOver={e => e.currentTarget.style.background = 'rgb(var(--surface-alt))'}
-                    onMouseOut={e => e.currentTarget.style.background = ''}>
-                    <span className="flex-shrink-0">{c.emoji}</span><span style={{ color: c.color }} className="truncate">{c.name}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
 
         {/* Remove custom block */}
         {block.isCustomBlock && onRemove && (
@@ -978,15 +956,40 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                     }}
                     className="bg-transparent rounded-[0.3125rem] px-2.5 py-[0.1875rem] text-[0.625rem] cursor-pointer disabled:cursor-default font-mono"
                   >+ {lang === 'ja' ? 'カスタムタグ追加' : 'Add custom tag'}</button>
-                  {block.isPresetBlock && !isLocked && (
-                    <button
-                      onClick={() => setSaving(s => !s)}
-                      style={saving
-                        ? { background: blockColor + '18', border: `1px solid ${blockColor}`, color: blockColor }
-                        : { border: `1px solid rgb(var(--dim))`, color: 'rgb(var(--muted))' }}
-                      className="bg-transparent rounded-[0.3125rem] px-[0.4375rem] py-0.5 text-[0.625rem] cursor-pointer font-mono"
-                    >📌 {lang === 'ja' ? 'プリセット保存' : 'Save preset'}</button>
-                  )}
+                  <div className="flex items-center gap-1.5">
+                    {/* 転送ボタン */}
+                    {otherChars?.length > 0 && (
+                      <div className="relative">
+                        <button
+                          onClick={() => setTransferOpen(o => !o)}
+                          title={lang === 'ja' ? '他のキャラへ転送' : 'Transfer to character'}
+                          className="bg-transparent border border-dim rounded-[0.3125rem] px-[0.3125rem] py-0.5 text-dim text-[0.625rem] cursor-pointer"
+                        >→</button>
+                        {transferOpen && (
+                          <div className="absolute right-0 bottom-full mb-1 z-50 bg-surface border border-linebright rounded-lg overflow-hidden shadow-lg min-w-[7.5rem] max-w-[10rem]">
+                            {otherChars.map(c => (
+                              <button key={c.id} onClick={() => { onTransfer?.(block.id, c.id); setTransferOpen(false); }}
+                                className="w-full text-left px-2.5 py-1.5 text-[0.6875rem] text-fg cursor-pointer flex items-center gap-1"
+                                onMouseOver={e => e.currentTarget.style.background = 'rgb(var(--surface-alt))'}
+                                onMouseOut={e => e.currentTarget.style.background = ''}>
+                                <span className="flex-shrink-0">{c.emoji}</span><span style={{ color: c.color }} className="truncate">{c.name}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {/* プリセット保存 */}
+                    {block.isPresetBlock && !isLocked && (
+                      <button
+                        onClick={() => setSaving(s => !s)}
+                        style={saving
+                          ? { background: blockColor + '18', border: `1px solid ${blockColor}`, color: blockColor }
+                          : { border: `1px solid rgb(var(--dim))`, color: 'rgb(var(--muted))' }}
+                        className="bg-transparent rounded-[0.3125rem] px-[0.4375rem] py-0.5 text-[0.625rem] cursor-pointer font-mono"
+                      >📌 {lang === 'ja' ? 'プリセット保存' : 'Save preset'}</button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
