@@ -1231,7 +1231,7 @@ export default function Loom() {
           <button onClick={() => {
             if (!quickOpen && quickMenuRef.current) {
               const r = quickMenuRef.current.getBoundingClientRect();
-              const qw = Math.min(260, window.innerWidth - 16);
+              const qw = Math.min(300, window.innerWidth - 16);
               setQuickOpenPos({ top: r.bottom + 4, left: Math.max(8, Math.min(r.right - qw, window.innerWidth - qw - 8)), width: qw });
             }
             setQuickOpen(p => !p);
@@ -1266,12 +1266,20 @@ export default function Loom() {
                 <button onClick={() => { openColorPicker(); setQuickOpen(false); }}
                   className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5 whitespace-nowrap"
                   style={{ color: 'rgb(var(--c-purple))' }}>
-                  🎨 {lang === 'ja' ? 'カラー' : 'Color'}
+                  🎨 {lang === 'ja' ? 'カラーメーカー' : 'Color Maker'}
                 </button>
                 <button onClick={() => { setFeatureMakerFilterBlock(null); setFeatureMakerOpen(true); setQuickOpen(false); }}
                   className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5 whitespace-nowrap"
                   style={{ color: 'rgb(var(--c-purple))' }}>
-                  🎯 {lang === 'ja' ? '特徴' : 'Feature'}
+                  🎯 {lang === 'ja' ? '特徴メーカー' : 'Feature Maker'}
+                </button>
+                <button onClick={() => {
+                  setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : { ...c, blocks: applyMaterialMakerManual(c.blocks) }));
+                  setQuickOpen(false);
+                }}
+                  className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5 whitespace-nowrap"
+                  style={{ color: 'rgb(var(--c-purple))' }}>
+                  🧵 {lang === 'ja' ? 'マテリアルメーカー' : 'Material Maker'}
                 </button>
                 {characters.length > 1 && (
                   <button onClick={() => { setSceneOpen(true); setQuickOpen(false); }}
