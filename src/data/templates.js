@@ -5,8 +5,8 @@ export const TEMPLATES = [
     desc:'アニメ・セルシェード塗りの定番ベース。品質底上げと塗りスタイルを同時に設定',
     descEn:'Standard cel-shaded anime baseline — sets quality floor and shading style at once',
     apply: {
-      quality:  'masterpiece, best quality, ultra-detailed, highres, absurdres',
-      artstyle: 'anime, cel shading, smooth shading, vibrant colors',
+      quality:  'masterpiece, best quality, ultra-detailed, highres',
+      artstyle: 'anime, cel shading, vibrant colors',
     },
   },
   {
@@ -15,7 +15,7 @@ export const TEMPLATES = [
     descEn:'Draws out photographic texture — SSS skin, depth of field, and bokeh create a "shot by camera" feel',
     apply: {
       quality:  'masterpiece, best quality, ultra-detailed, highres, sharp focus, detailed skin',
-      artstyle: 'realistic, photorealistic, subsurface scattering, depth of field, bokeh',
+      artstyle: 'realistic, photorealistic, realistic skin, depth of field, bokeh',
     },
   },
   {
