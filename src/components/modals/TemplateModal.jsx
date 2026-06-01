@@ -2,7 +2,7 @@ import { useState } from "react";
 import { TEMPLATES } from "../../data/templates.js";
 import { BLOCKS_DEF } from "../../data/blocks.js";
 
-// en → ja 逆引きマップ
+// ブロック登録タグの en→ja 逆引きマップ
 const TAG_JA_MAP = new Map();
 for (const block of BLOCKS_DEF) {
   for (const cat of block.cats) {
@@ -10,6 +10,38 @@ for (const block of BLOCKS_DEF) {
       if (tag.en && tag.ja) TAG_JA_MAP.set(tag.en.toLowerCase(), tag.ja);
     }
   }
+}
+
+// テンプレート専用タグ（ブロック未登録）の日本語マップ
+const TEMPLATE_EXTRA_JA = new Map([
+  // 撮影スタイル
+  ['selfie',                   '自撮り'],
+  // 構図・視点
+  ['foreshortening',           '短縮遠近法'],
+  ['extreme perspective',      '超パース'],
+  ['fisheye lens',             '魚眼レンズ'],
+  ['wide angle view',          '広角'],
+  ['lower body',               '下半身'],
+  ['lower half of face',       '顔の下半分'],
+  ['extreme close-up on eyes', '目の超アップ'],
+  ['macro shot',               'マクロショット'],
+  // ボディ
+  ['armpit focus',             '脇アップ'],
+  ['midriff focus',            'お腹アップ'],
+  ['eye focus',                '目フォーカス'],
+  // フェイス
+  ['detailed lips',            '詳細な唇'],
+  ['detailed pupils',          '詳細な瞳'],
+  // エフェクト
+  ['flying debris',            '飛散する破片'],
+  ['distorted background',     '歪んだ背景'],
+  ['motion blur',              'モーションブラー'],
+]);
+
+// en → ja (ブロック + テンプレート専用の両方を検索)
+function toJa(en) {
+  const key = en.toLowerCase();
+  return TAG_JA_MAP.get(key) ?? TEMPLATE_EXTRA_JA.get(key) ?? null;
 }
 
 const FETI_IDS    = new Set(['highangle_armpit','lowangle_legs','midriff_navel','nape_lift','birdseye_lie','skintight_detail','zettairyouiki','napeandback','bare_back','footperspective','armpitsleeveless']);
@@ -33,10 +65,12 @@ const BLOCK_LABEL = {
   effect:      { ja: '効果',   en: 'Effect'  },
 };
 
+// 全ブロックのタグを結合してプレビュー文字列を生成
 function previewText(tmpl) {
-  const first = Object.values(tmpl.apply)[0] ?? '';
-  const text = typeof first === 'object' ? (first.tags ?? '') : first;
-  return text.length > 50 ? text.slice(0, 50) + '…' : text;
+  const parts = Object.values(tmpl.apply)
+    .map(val => (typeof val === 'object' ? val.tags ?? '' : val).trim())
+    .filter(Boolean);
+  return parts.join(', ');
 }
 
 function TagDetailPopup({ tmpl, lang, onClose }) {
@@ -63,7 +97,7 @@ function TagDetailPopup({ tmpl, lang, onClose }) {
               <div className="text-[0.5625rem] font-mono text-muted mb-1 uppercase tracking-widest">{label}</div>
               <div className="flex flex-wrap gap-1">
                 {tagList.map(tag => {
-                  const ja = TAG_JA_MAP.get(tag.toLowerCase());
+                  const ja = toJa(tag);
                   return (
                     <span key={tag}
                       className="text-[0.625rem] font-mono px-1.5 py-0.5 rounded border border-dim"
@@ -100,7 +134,13 @@ function TemplateCard({ tmpl, lang, onApply, onShowDetail }) {
         onClick={e => { e.stopPropagation(); onShowDetail(tmpl); }}
         onMouseOver={e => { e.currentTarget.style.borderColor = '#6c8fff80'; e.currentTarget.style.background = 'rgb(var(--surface-alt))'; }}
         onMouseOut={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.background = ''; }}
-        className="text-accent text-[0.625rem] font-mono bg-bg px-2 py-[0.3125rem] rounded-[0.3125rem] break-all leading-[1.5] mb-2 cursor-pointer border border-transparent transition-colors"
+        className="text-accent text-[0.625rem] font-mono bg-bg px-2 py-[0.3125rem] rounded-[0.3125rem] leading-[1.5] mb-2 cursor-pointer border border-transparent transition-colors overflow-hidden"
+        style={{
+          display: '-webkit-box',
+          WebkitLineClamp: 3,
+          WebkitBoxOrient: 'vertical',
+          wordBreak: 'break-all',
+        }}
         title={lang === 'ja' ? 'タップでタグ一覧' : 'Tap to view tags'}
       >
         {previewText(tmpl)}
