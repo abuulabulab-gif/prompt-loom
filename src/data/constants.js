@@ -37,7 +37,7 @@ export const OPTIONAL_CAT_NAMES = new Set([
   // 属性
   '年齢感', 'ケモ耳・しっぽ・角', '幻想パーツ',
   // 体型（肌色はコア化 → 常に1つ選ばれる）
-  '肌質感', '細部', 'ボディフォーカス', '状態', '足',
+  '肌質感', '細部', '状態', '足',
   // 衣装（民族・水着・ランジェリーは任意；フォーマル・制服・コスプレはコア扱い）
   '服装スタイル', 'レッグウェア', '民族・伝統衣装', '水着・スポーツ', 'ランジェリー・部屋着',
   // 衣装ディテール（旧 特徴・アクセ）
@@ -173,8 +173,8 @@ export const TIER3_TAGS = new Set([
   'holding fan','holding key','holding lantern','holding torch',
   // 極端なポーズ
   'all fours','split','lying on back','lying on stomach','on side',
-  // 極端な表情・口
-  'crying','drunk','saliva','tongue out','tongue between teeth','licking lips',
+  // 極端な表情・口（tongue/licking は ttr で低確率付与に変更済み）
+  'crying','drunk','saliva',
   // センシティブアクセサリー
   'collar','garter belt',
   // タトゥー
@@ -214,7 +214,7 @@ const LOWER_BODY_FRAME_OUT = new Set([
   'sneakers','loafers','mary janes','sandals','slippers','heels','pumps',
   'high heels','platform shoes','ankle boots','boots','knee-high boots',
   'thigh-high boots','platform boots','leg warmers','ankle socks','socks',
-  'knee-high socks','thighhighs','white thighhighs','black thighhighs','tights','pantyhose','stirrup leggings',
+  'knee-high socks','thighhighs','white thighhighs','black thighhighs','tights','pantyhose','stirrup leggings','fishnet legwear',
   'barefoot','soles','toes','foot focus','pointed toes','toenail polish',
   'crossed legs','thigh gap','thigh strap',
   'mini skirt','micro skirt','hot pants','shorts','leggings',

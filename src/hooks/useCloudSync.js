@@ -28,6 +28,7 @@ export function useCloudSync({
 
   useEffect(() => {
     if (syncStatus !== 'error') return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSyncErrToast(true);
     const t = setTimeout(() => setSyncErrToast(false), 7000);
     return () => clearTimeout(t);
@@ -77,6 +78,7 @@ export function useCloudSync({
   // Pull on login
   useEffect(() => {
     if (!user || !loaded) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     execPull();
   }, [user?.uid, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -112,7 +114,7 @@ export function useCloudSync({
       if (isSyncingFromCloud.current) return;
       await execPush();
     }, 3000);
-  }, [characters, orderUpdatedAt, settingsUpdatedAt, user, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [characters, orderUpdatedAt, settingsUpdatedAt, user, loaded]);
 
   // Online recovery: retry failed push when connection is restored
   useEffect(() => {

@@ -242,6 +242,7 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
     try {
       const raw = localStorage.getItem(`loom_note_sections_${char.id}`);
       const parsed = raw ? JSON.parse(raw) : null;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) { setOpenSecs(parsed); return; }
     } catch {}
     const s = { _custom: true };

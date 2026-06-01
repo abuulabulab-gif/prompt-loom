@@ -73,6 +73,7 @@ export default function GlobalTagSearch({ open, onClose, blocks, lang, onToggleT
   const inputRef = useRef(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (open) { setQuery(''); setTimeout(() => inputRef.current?.focus(), 50); }
   }, [open]);
 

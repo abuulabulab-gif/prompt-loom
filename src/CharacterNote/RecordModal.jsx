@@ -17,7 +17,7 @@ export default function RecordModal({ char, lang, activeTool, posText, negText, 
   };
 
   const handleSave = () => {
-    const slimBlocks = char.blocks.map(b => { const { cats, lastRandomPicks, ...r } = b; return r; });
+    const slimBlocks = char.blocks.map(b => { const { cats: _cats, lastRandomPicks: _lrp, ...r } = b; return r; });
     onSave({
       id: uid(), ts: Date.now(),
       title: title.trim(), tool, labels,

@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 
-const DONATE_URL = 'https://buymeacoffee.com/prompt_loom';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import CharVersions from "./components/CharVersions.jsx";
 import { useOutputDrag } from "./hooks/useOutputDrag.js";
@@ -15,6 +14,7 @@ import {
   deep, downloadJSON, stripWeights, toNaiWeights, SPECIES_PARTS_MAP,
 } from "./data/constants.js";
 import { detectConflicts } from "./data/conflicts.js";
+import { applyMaterialMakerManual } from "./data/materials.js";
 import { TOOLS } from "./data/tools.js";
 import { makeCharacter, makeCustomBlock, BLOCKS_DEF } from "./data/blocks.js";
 import PresetChip from "./components/PresetChip.jsx";
@@ -396,6 +396,7 @@ export default function Loom() {
   // ── Auto-rename default character names on language switch ──
   useEffect(() => {
     if (!loaded) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCharacters(prev => prev.map(c => {
       const jaMatch = c.name.match(/^キャラ (\d+)$/);
       const enMatch = c.name.match(/^Character (\d+)$/);
@@ -414,6 +415,7 @@ export default function Loom() {
     const sfwOn     = hasTag(qualBlock.text, 'SFW');
     const nsfwInNeg = hasTag(negBlock.text, 'nsfw');
     if (sfwOn === nsfwInNeg) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (sfwOn) updateBlock('negative', { text: appendTag(negBlock.text, 'nsfw', '1.0') });
     else       updateBlock('negative', { text: removeTag(negBlock.text, 'nsfw') });
   }, [blocks, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -789,7 +791,8 @@ export default function Loom() {
 
   const naturalText = naturalLang === 'ja' ? toNaturalJa(blocks) : toNaturalEn(blocks);
   // Reset AI result when source text or language changes
-  useEffect(() => { setAiResult(''); setAiError(''); }, [naturalText, naturalLang]); // eslint-disable-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setAiResult(''); setAiError(''); }, [naturalText, naturalLang]);
   // Auto-call AI when switching TO natural tab (not on every tag change)
   const prevOutputTabRef = useRef('positive');
   useEffect(() => {
@@ -940,7 +943,7 @@ export default function Loom() {
     const prev = prevToolRef.current;
     prevToolRef.current = activeTool;
     if (activeTool === 'dalle') {
-      setOutputTab('natural');
+      setOutputTab('natural'); // eslint-disable-line react-hooks/set-state-in-effect
     } else if (prev === 'dalle') {
       setOutputTab('positive');
     }
@@ -971,7 +974,7 @@ export default function Loom() {
           setTimeout(() => setAutoLogToast(false), 2800);
         } else {
           const autoTitle = textToCopy.split(',')[0]?.trim().slice(0, 30) || '';
-          const slimBlocks = activeChar.blocks.map(b => { const { cats, lastRandomPicks, ...r } = b; return r; });
+          const slimBlocks = activeChar.blocks.map(b => { const { cats: _cats, lastRandomPicks: _lrp, ...r } = b; return r; });
           addToPromptLog({ id: uid(), ts: Date.now(), title: autoTitle, tool: activeTool, labels: [], posText: textToCopy, negText, memo: '', blocks: slimBlocks });
           setAutoLogToast('saved');
           setTimeout(() => setAutoLogToast(false), 2200);
@@ -1154,8 +1157,14 @@ export default function Loom() {
     { id: 'image-to-tags', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🖼️', label: 'Image → tags (AI)', labelJa: '画像からタグ生成（AI）', action: () => { setNaturalToTagsTab('image'); setNaturalToTagsOpen(true); } },
     { id: 'open-history', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🕐', label: 'Open history', labelJa: '履歴を開く', shortcut: 'H', action: () => setHistoryOpen(true) },
     { id: 'open-template', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '✦', label: 'Open templates', labelJa: 'テンプレートを開く', shortcut: 'T', action: () => setTemplateOpen(true) },
-    { id: 'open-color',   group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎨', label: 'Open color picker',   labelJa: 'カラーメーカーを開く',  action: () => openColorPicker() },
-    { id: 'open-feature', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎯', label: 'Open feature maker',  labelJa: '特徴メーカーを開く',   action: () => setFeatureMakerOpen(true) },
+    { id: 'open-color',    group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎨', label: 'Open color picker',    labelJa: 'カラーメーカーを開く',    action: () => openColorPicker() },
+    { id: 'open-feature',  group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎯', label: 'Open feature maker',   labelJa: '特徴メーカーを開く',     action: () => setFeatureMakerOpen(true) },
+    { id: 'apply-material',group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🧵', label: 'Apply material maker',  labelJa: 'マテリアルメーカーを適用', action: () => {
+      setCharacters(prev => prev.map(c => {
+        if (c.id !== activeCharId) return c;
+        return { ...c, blocks: applyMaterialMakerManual(c.blocks) };
+      }));
+    }},
     ...(characters.length > 1 ? [{ id: 'open-scene', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎬', label: 'Open Collab', labelJa: 'キャラ共演を開く', action: () => setSceneOpen(true) }] : []),
     { id: 'open-settings', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '⚙️', label: 'Open settings / shortcuts', labelJa: '設定・ショートカット', shortcut: '?', action: () => setSettingsOpen(true) },
     // AI Tools
@@ -1222,7 +1231,7 @@ export default function Loom() {
           <button onClick={() => {
             if (!quickOpen && quickMenuRef.current) {
               const r = quickMenuRef.current.getBoundingClientRect();
-              const qw = Math.min(220, window.innerWidth - 16);
+              const qw = Math.min(260, window.innerWidth - 16);
               setQuickOpenPos({ top: r.bottom + 4, left: Math.max(8, Math.min(r.right - qw, window.innerWidth - qw - 8)), width: qw });
             }
             setQuickOpen(p => !p);
@@ -1237,49 +1246,49 @@ export default function Loom() {
               <div className="fixed inset-0 z-[199]" onClick={() => setQuickOpen(false)} />
               <div className="fixed z-[200] bg-surface border border-line rounded-[0.5625rem] shadow-xl py-1.5" style={quickOpenPos}>
                 <button onClick={() => { setTemplateOpen(true); setQuickOpen(false); }}
-                  className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt text-accent flex items-center gap-2.5">
+                  className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt text-accent flex items-center gap-2.5 whitespace-nowrap">
                   ✦ {lang === 'ja' ? 'テンプレート' : 'Template'}
                 </button>
                 {apiConfig.apiKey && (
                   <button onClick={() => { setNaturalToTagsTab('text'); setNaturalToTagsOpen(true); setQuickOpen(false); }}
-                    className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5"
+                    className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5 whitespace-nowrap"
                     style={{ color: 'rgb(var(--c-blue))' }}>
                     ✍️ {lang === 'ja' ? '自然文からタグ生成' : 'Text to Tags'}
                   </button>
                 )}
                 {apiConfig.apiKey && (
                   <button onClick={() => { setNaturalToTagsTab('image'); setNaturalToTagsOpen(true); setQuickOpen(false); }}
-                    className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5"
+                    className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5 whitespace-nowrap"
                     style={{ color: 'rgb(var(--c-purple))' }}>
                     👁️ {lang === 'ja' ? '画像からタグ生成' : 'Image to Tags'}
                   </button>
                 )}
                 <button onClick={() => { openColorPicker(); setQuickOpen(false); }}
-                  className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5"
+                  className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5 whitespace-nowrap"
                   style={{ color: 'rgb(var(--c-purple))' }}>
                   🎨 {lang === 'ja' ? 'カラー' : 'Color'}
                 </button>
                 <button onClick={() => { setFeatureMakerFilterBlock(null); setFeatureMakerOpen(true); setQuickOpen(false); }}
-                  className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5"
+                  className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5 whitespace-nowrap"
                   style={{ color: 'rgb(var(--c-purple))' }}>
                   🎯 {lang === 'ja' ? '特徴' : 'Feature'}
                 </button>
                 {characters.length > 1 && (
                   <button onClick={() => { setSceneOpen(true); setQuickOpen(false); }}
-                    className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5"
+                    className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5 whitespace-nowrap"
                     style={{ color: 'rgb(var(--c-green))' }}>
                     🎬 {lang === 'ja' ? 'キャラ共演' : 'Collab'}
                   </button>
                 )}
                 {expertMode && (
                   <button onClick={() => { addCustomBlock(); setQuickOpen(false); }}
-                    className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2.5">
+                    className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2.5 whitespace-nowrap">
                     ✏️ {lang === 'ja' ? '+カスタムブロック' : '+Custom block'}
                   </button>
                 )}
                 <div className="border-t border-line mx-2 my-1" />
                 <button onClick={() => { resetBlockOrder(); setQuickOpen(false); }}
-                  className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2.5">
+                  className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt text-muted flex items-center gap-2.5 whitespace-nowrap">
                   ↺ {lang === 'ja' ? 'ブロック順をリセット' : 'Reset block order'}
                 </button>
               </div>

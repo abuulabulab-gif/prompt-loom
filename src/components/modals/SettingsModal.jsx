@@ -130,6 +130,12 @@ const MOBILE_TIPS = (lang) => [
       : '✦ Tools → 🎯 Feature Maker to add moles, scars, glasses, bandaids, piercings and more in three steps. Launch from a block\'s 🎯 button for block-specific features',
   },
   {
+    icon: '🧵',
+    text: lang === 'ja'
+      ? '✦ツール → 🧵マテリアルメーカーで衣装の素材感を自動付与（例：シルクスカート・レザージャケット・レースストッキング）。ランダム生成時にも確率で自動発動'
+      : '✦ Tools → 🧵 Material Maker auto-applies fabric textures to outfits (e.g. silk skirt, leather jacket, lace stockings). Also activates automatically during random generation',
+  },
+  {
     icon: '💡',
     text: lang === 'ja'
       ? 'テンプレートに「💡 ネガ推奨:」が表示される場合、記載のタグをネガティブブロックに追加すると構図が安定します（例：魚眼レンズ → simple background をネガに追加）'
@@ -284,6 +290,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
   const [deleteState, setDeleteState] = useState('idle'); // 'idle' | 'confirm' | 'deleting' | 'done' | 'error'
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocalInput({ openai: '', claude: '' });
     setApiKeyVisible(false);
   }, [apiConfig]);

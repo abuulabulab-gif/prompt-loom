@@ -32,7 +32,7 @@ const compressToBase64 = (file) => new Promise((resolve, reject) => {
   img.src = url;
 });
 
-export default function NaturalToTagsModal({ lang, apiConfig, blocks, onAddTags, onClose, initialTab = 'text' }) {
+export default function NaturalToTagsModal({ lang, apiConfig, blocks: _blocks, onAddTags, onClose, initialTab = 'text' }) {
   const [mode, setMode] = useState(initialTab); // 'text' | 'image'
   const [input, setInput]     = useState('');
   const [imagePreview, setImagePreview] = useState(null);

@@ -12,7 +12,7 @@ const sanitize = (obj) => JSON.parse(JSON.stringify(obj));
 // `cats` is always rebuilt from BLOCKS_DEF via mergeCharacterBlocks on restore.
 // `lastRandomPicks` is ephemeral UI state, not needed in cloud storage.
 const slimVersionBlock = (b) => {
-  const { cats, lastRandomPicks, ...rest } = b;
+  const { cats: _cats, lastRandomPicks: _lrp, ...rest } = b;
   return rest;
 };
 

@@ -57,7 +57,7 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
   const handleLeave = () => { setH(false); setTipPos(null); };
 
   // Long-press tooltip for touch devices
-  const handleTouchStart = (e) => {
+  const handleTouchStart = (_e) => {
     if (!desc || !wrapRef.current) return;
     longFired.current = false;
     longPressTimer.current = setTimeout(() => {

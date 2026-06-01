@@ -9,6 +9,7 @@ import {
 const RARE_OPT_CAT_PROB = 0.10; // rare optional cats: 10% vs standard 40%
 import { CONFLICT_MAP } from "../data/conflicts.js";
 import { COLOR_PALETTE, SHADES, COLOR_TARGETS, buildColorTag, buildColorName, HUE_GROUPS } from "../data/colors.js";
+import { applyMaterialMakerLayer } from "../data/materials.js";
 
 // ── 種族パーツ系統管理 ───────────────────────────────────────────────────
 // 動物耳+尻尾のペア定義（両方が同系統であるべき）
@@ -749,6 +750,54 @@ function applyFeatureMakerLayer(blockMap) {
   }
 }
 
+// ── ボディフォーカス自動付与レイヤー ─────────────────────────────────────
+// OPTIONAL_CAT_NAMESから除外したbody_focusを衣装・髪型条件つきで後処理付与する。
+// chardesign: skipBodyCatsで既にスキップ済みのため低確率のみ。
+// illust: 15%確率で bare shoulders / nape / zettai ryouiki / abs から1つ選出。
+const BF_SKIRT_TAGS  = new Set(['skirt','pleated skirt','mini skirt','micro skirt','slit skirt','flared skirt','pencil skirt']);
+const BF_LEGWEAR_TAGS = new Set(['thighhighs','knee-high socks','over-knee socks','fishnet tights']);
+const BF_OFFSHOULDER = new Set(['off shoulder','sleeveless','dress','sundress','evening gown','bikini','swimsuit','one-piece swimsuit','micro bikini','lingerie','camisole','halter top','tube top']);
+const BF_UPDO_HAIR   = new Set(['short hair','bob cut','pixie cut','very short hair','ponytail','high ponytail','low ponytail','side ponytail','hair updo','half updo','hair bun','double bun']);
+
+function applyBodyFocusLayer(blockMap, mode) {
+  const bodyBlock = blockMap.get('body');
+  if (!bodyBlock || bodyBlock.locked) return;
+  const bodyFocusCat = bodyBlock.cats?.find(c => c.n === 'ボディフォーカス');
+  if (!bodyFocusCat) return;
+
+  // 既にbody_focusタグが入っていたらスキップ
+  const currentBodyText = bodyBlock.text || '';
+  const alreadyHasFocus = bodyFocusCat.t.some(t => hasTag(currentBodyText, t.en));
+  if (alreadyHasFocus) return;
+
+  const prob = mode === 'chardesign' ? 0.07 : 0.15;
+  if (Math.random() > prob) return;
+
+  const outfitText = blockMap.get('outfit')?.text || '';
+  const faceText   = blockMap.get('face')?.text || '';
+
+  const hasSkirt      = [...BF_SKIRT_TAGS].some(t => hasTag(outfitText, t));
+  const hasLegwear    = [...BF_LEGWEAR_TAGS].some(t => hasTag(outfitText, t));
+  const hasOffShoulder = [...BF_OFFSHOULDER].some(t => hasTag(outfitText, t));
+  const hasUpdoHair   = [...BF_UPDO_HAIR].some(t => hasTag(faceText, t));
+
+  const candidates = [
+    { en: 'bare shoulders', w: hasOffShoulder ? 55 : 35 },
+    { en: 'nape',           w: hasUpdoHair    ? 55 : 35 },
+    { en: 'zettai ryouiki', w: (hasSkirt && hasLegwear) ? 20 : 2 },
+    { en: 'abs',            w: 10 },
+  ];
+
+  const total = candidates.reduce((s, c) => s + c.w, 0);
+  let r = Math.random() * total;
+  let chosen = candidates[candidates.length - 1];
+  for (const c of candidates) { r -= c.w; if (r <= 0) { chosen = c; break; } }
+
+  if (!hasTag(currentBodyText, chosen.en)) {
+    blockMap.set('body', { ...bodyBlock, text: appendTag(currentBodyText, chosen.en, bodyBlock.strength) });
+  }
+}
+
 // ── 雰囲気タグ自動付与レイヤー ────────────────────────────────────────────
 // chardesign: 5% / illust: 55% の確率で背景ブロックに雰囲気タグを1つ付与。
 // シンプル背景が選ばれている場合はスキップ。
@@ -978,12 +1027,10 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
 
       // 衣装スタック Soft Penalty: 強いジャンル衣装 + スタイル/装飾の重ねすぎを間引く
       applyOutfitStackPenalty(blockMap);
-      // カラーメーカー・特徴メーカーの条件付き自動付与レイヤー
+      // カラーメーカー・マテリアルメーカー・特徴メーカーの条件付き自動付与レイヤー
       applyColorMakerLayer(blockMap, mode);
-      // ── マテリアルメーカー（未実装）─────────────────────────────
-      // import { applyMaterialMakerLayer } from '../data/materials.js';
-      // applyMaterialMakerLayer(blockMap, mode);
-      // ────────────────────────────────────────────────────────────
+      applyMaterialMakerLayer(blockMap, mode);
+      applyBodyFocusLayer(blockMap, mode);
       applyFeatureMakerLayer(blockMap);
       applyAtmosphereLayer(blockMap, mode);
 

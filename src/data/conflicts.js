@@ -88,6 +88,9 @@ export const CONFLICT_RULES = [
   { tags:['sleeping','dancing'],         ja:'眠りとダンスが矛盾',             en:'sleeping + dancing' },
   { tags:['sleeping','fighting stance'], ja:'眠りと戦闘ポーズが矛盾',         en:'sleeping + fighting stance' },
   { tags:['sleeping','arms up'],         ja:'眠りと両腕上げが矛盾',           en:'sleeping + arms up' },
+  { tags:['sleeping','skirt lift'],      ja:'眠りとスカートめくりが矛盾',     en:'sleeping + skirt lift' },
+  { tags:['sleeping','adjusting clothes'],ja:'眠りと服を直す動作が矛盾',     en:'sleeping + adjusting clothes' },
+  { tags:['sleeping','jacket on shoulders'],ja:'眠りと肩掛けジャケットが矛盾',en:'sleeping + jacket on shoulders' },
   { tags:['contrapposto','sitting'],     ja:'S字立ちと座りが矛盾',            en:'contrapposto + sitting' },
   { tags:['contrapposto','lying on back'],ja:'S字立ちと仰向けが矛盾',         en:'contrapposto + lying on back' },
   { tags:['contrapposto','lying on stomach'],ja:'S字立ちとうつ伏せが矛盾',   en:'contrapposto + lying on stomach' },
@@ -262,6 +265,7 @@ export const CONFLICT_RULES = [
   { tags:['mermaid','frilled socks'],    ja:'人魚とフリルソックスが矛盾（脚がない）',        en:'mermaid + frilled socks' },
   { tags:['mermaid','single thighhigh'],ja:'人魚と片方ニーハイが矛盾（脚がない）',          en:'mermaid + single thighhigh' },
   { tags:['mermaid','mismatched legwear'],ja:'人魚と左右違い靴下が矛盾（脚がない）',        en:'mermaid + mismatched legwear' },
+  { tags:['mermaid','fishnet legwear'],  ja:'人魚と網レッグウェアが矛盾（脚がない）',      en:'mermaid + fishnet legwear' },
 
   // ── 種族×衣装（ラミア）─────────────────────────────────────────
   { tags:['lamia','thighhighs'],          ja:'ラミアとニーハイが矛盾（蛇の下半身）',        en:'lamia + thighhighs' },
@@ -289,6 +293,7 @@ export const CONFLICT_RULES = [
   { tags:['lamia','frilled socks'],      ja:'ラミアとフリルソックスが矛盾（蛇の下半身）',    en:'lamia + frilled socks' },
   { tags:['lamia','single thighhigh'],  ja:'ラミアと片方ニーハイが矛盾（蛇の下半身）',      en:'lamia + single thighhigh' },
   { tags:['lamia','mismatched legwear'],ja:'ラミアと左右違い靴下が矛盾（蛇の下半身）',      en:'lamia + mismatched legwear' },
+  { tags:['lamia','fishnet legwear'],  ja:'ラミアと網レッグウェアが矛盾（蛇の下半身）',    en:'lamia + fishnet legwear' },
 
   // ── 髪型 × 髪の長さ ───────────────────────────────────────────
   { tags:['drill hair','short hair'],     ja:'ドリルヘアとショートが矛盾（長さが必要）',    en:'drill hair + short hair' },

@@ -1,8 +1,8 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { TEMPLATES } from "../../data/templates.js";
 import { BLOCKS_DEF } from "../../data/blocks.js";
 
-// en → ja 逆引きマップ（全ブロック・全カテゴリを走査）
+// en → ja 逆引きマップ
 const TAG_JA_MAP = new Map();
 for (const block of BLOCKS_DEF) {
   for (const cat of block.cats) {
@@ -33,76 +33,79 @@ const BLOCK_LABEL = {
   effect:      { ja: '効果',   en: 'Effect'  },
 };
 
-function TagDetail({ apply, lang }) {
+function previewText(tmpl) {
+  const first = Object.values(tmpl.apply)[0] ?? '';
+  const text = typeof first === 'object' ? (first.tags ?? '') : first;
+  return text.length > 50 ? text.slice(0, 50) + '…' : text;
+}
+
+function TagDetailPopup({ tmpl, lang, onClose }) {
   return (
-    <div
-      onClick={e => e.stopPropagation()}
-      className="mt-2 pt-2 border-t border-dim flex flex-col gap-1.5"
-    >
-      {Object.entries(apply).map(([blockId, val]) => {
-        const rawTags = typeof val === 'string' ? val : (val.tags ?? '');
-        const tagList = rawTags.split(',').map(t => t.trim()).filter(Boolean);
-        if (!tagList.length) return null;
-        const label = BLOCK_LABEL[blockId]?.[lang] ?? blockId;
-        return (
-          <div key={blockId}>
-            <div className="text-[0.5625rem] font-mono text-muted mb-0.5 uppercase tracking-widest">{label}</div>
-            <div className="flex flex-wrap gap-1">
-              {tagList.map(tag => {
-                const ja = TAG_JA_MAP.get(tag.toLowerCase());
-                return (
-                  <span
-                    key={tag}
-                    className="text-[0.5625rem] font-mono px-1.5 py-0.5 rounded border border-dim"
-                    style={{ color: 'rgb(var(--text))', background: 'rgb(var(--bg))' }}
-                  >
-                    {ja ? `${ja}` : tag}
-                    {ja && <span className="text-muted ml-0.5 opacity-60">({tag})</span>}
-                  </span>
-                );
-              })}
+    <>
+      <div className="fixed inset-0 z-[310]" onClick={onClose} />
+      <div className="fixed z-[311] inset-x-4 top-1/2 -translate-y-1/2 bg-surface border border-linebright rounded-xl shadow-2xl p-5 max-h-[70vh] overflow-y-auto"
+        style={{ maxWidth: '28rem', margin: '0 auto' }}
+        onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-fg text-sm font-bold">{tmpl.icon} {lang === 'ja' ? tmpl.name : tmpl.nameEn}</span>
+          <button onClick={onClose}
+            className="bg-transparent border border-dim rounded-md px-2.5 py-1 text-muted cursor-pointer text-xs">
+            {lang === 'ja' ? '閉じる' : 'Close'}
+          </button>
+        </div>
+        {Object.entries(tmpl.apply).map(([blockId, val]) => {
+          const rawTags = typeof val === 'string' ? val : (val.tags ?? '');
+          const tagList = rawTags.split(',').map(t => t.trim()).filter(Boolean);
+          if (!tagList.length) return null;
+          const label = BLOCK_LABEL[blockId]?.[lang] ?? blockId;
+          return (
+            <div key={blockId} className="mb-3">
+              <div className="text-[0.5625rem] font-mono text-muted mb-1 uppercase tracking-widest">{label}</div>
+              <div className="flex flex-wrap gap-1">
+                {tagList.map(tag => {
+                  const ja = TAG_JA_MAP.get(tag.toLowerCase());
+                  return (
+                    <span key={tag}
+                      className="text-[0.625rem] font-mono px-1.5 py-0.5 rounded border border-dim"
+                      style={{ color: 'rgb(var(--text))', background: 'rgb(var(--bg))' }}>
+                      {ja ?? tag}
+                      {ja && <span className="text-muted ml-0.5 opacity-50">({tag})</span>}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        );
-      })}
-    </div>
+          );
+        })}
+      </div>
+    </>
   );
 }
 
-function TemplateCard({ tmpl, lang, onApply }) {
-  const [showTags, setShowTags] = useState(false);
-  const pressTimer  = useRef(null);
-  const didLongPress = useRef(false);
-
-  const onTouchStart = () => {
-    didLongPress.current = false;
-    pressTimer.current = setTimeout(() => {
-      didLongPress.current = true;
-      setShowTags(s => !s);
-    }, 500);
-  };
-  const onTouchEnd = () => clearTimeout(pressTimer.current);
-  const handleClick = () => {
-    if (didLongPress.current) return;
-    onApply(tmpl);
-  };
-
+function TemplateCard({ tmpl, lang, onApply, onShowDetail }) {
   const targetBlocks = Object.keys(tmpl.apply);
-
   return (
     <div
-      onClick={handleClick}
-      onMouseEnter={() => setShowTags(true)}
-      onMouseLeave={() => setShowTags(false)}
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
-      onTouchCancel={onTouchEnd}
-      className="bg-surfalt border border-line rounded-[0.625rem] p-3.5 cursor-pointer transition-all duration-150 select-none"
-      style={showTags ? { border: '1px solid #6c8fff60', background: 'rgb(var(--dim))' } : {}}
+      onClick={() => onApply(tmpl)}
+      onMouseOver={e => { e.currentTarget.style.border = '1px solid #6c8fff60'; e.currentTarget.style.background = 'rgb(var(--dim))'; }}
+      onMouseOut={e => { e.currentTarget.style.border = ''; e.currentTarget.style.background = ''; }}
+      className="bg-surfalt border border-line rounded-[0.625rem] p-3.5 cursor-pointer transition-all duration-150"
     >
       <div className="text-2xl mb-1.5">{tmpl.icon}</div>
       <div className="text-fg text-[0.8125rem] font-bold mb-[0.1875rem]">{lang === 'ja' ? tmpl.name : tmpl.nameEn}</div>
       <div className="text-muted text-[0.6875rem] mb-2">{lang === 'ja' ? tmpl.desc : tmpl.descEn}</div>
+
+      {/* プレビューボックス — クリックでタグ詳細ポップアップ */}
+      <div
+        onClick={e => { e.stopPropagation(); onShowDetail(tmpl); }}
+        onMouseOver={e => { e.currentTarget.style.borderColor = '#6c8fff80'; e.currentTarget.style.background = 'rgb(var(--surface-alt))'; }}
+        onMouseOut={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.background = ''; }}
+        className="text-accent text-[0.625rem] font-mono bg-bg px-2 py-[0.3125rem] rounded-[0.3125rem] break-all leading-[1.5] mb-2 cursor-pointer border border-transparent transition-colors"
+        title={lang === 'ja' ? 'タップでタグ一覧' : 'Tap to view tags'}
+      >
+        {previewText(tmpl)}
+      </div>
+
       {(lang === 'ja' ? tmpl.sizeHintJa : tmpl.sizeHintEn) && (
         <div className="text-[0.5625rem] font-mono leading-[1.5] mb-2 px-1.5 py-1 rounded"
           style={{ background: 'rgb(var(--c-warn) / 0.08)', color: 'rgb(var(--c-warn))', border: '1px solid rgb(var(--c-warn) / 0.25)' }}>
@@ -115,26 +118,25 @@ function TemplateCard({ tmpl, lang, onApply }) {
           💡 {lang === 'ja' ? 'ネガ推奨: ' : 'Neg hint: '}{lang === 'ja' ? tmpl.negHintJa : tmpl.negHintEn}
         </div>
       )}
-      <div className="flex flex-wrap gap-1 mb-1">
+      <div className="flex flex-wrap gap-1">
         {targetBlocks.map(id => (
           <span key={id} className="text-[0.5625rem] font-mono px-[0.3125rem] py-0.5 rounded-[0.1875rem] border border-dim text-muted">
             {BLOCK_LABEL[id]?.[lang] ?? id}
           </span>
         ))}
       </div>
-      {!showTags && (
-        <div className="text-muted text-[0.5rem] font-mono opacity-40 mt-0.5">
-          {lang === 'ja' ? 'ホバーでタグを確認' : 'Hover to preview tags'}
-        </div>
-      )}
-      {showTags && <TagDetail apply={tmpl.apply} lang={lang} />}
     </div>
   );
 }
 
 export default function TemplateModal({ lang, isMobile, onApply, onClose }) {
+  const [detailTmpl, setDetailTmpl] = useState(null);
   const gridCls = isMobile ? 'grid grid-cols-2 gap-2' : 'grid gap-2';
   const gridStyle = isMobile ? {} : { gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))' };
+
+  const card = (tmpl) => (
+    <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} onShowDetail={setDetailTmpl} />
+  );
 
   return (
     <div className="fixed inset-0 bg-black/85 z-[300] flex items-center justify-center p-5">
@@ -154,50 +156,33 @@ export default function TemplateModal({ lang, isMobile, onApply, onClose }) {
             {lang === 'ja' ? '⚠ 対象ブロックにすでに入っているタグは消えます。' : '⚠ Existing tags in the target blocks will be cleared.'}
           </p>
 
-          <div className="text-muted text-[0.625rem] font-mono tracking-widest mb-2 uppercase">
-            {lang === 'ja' ? 'スタイル' : 'Style'}
-          </div>
-          <div className={`${gridCls} mb-4`} style={gridStyle}>
-            {styleTemplates.map(tmpl => <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />)}
-          </div>
+          <div className="text-muted text-[0.625rem] font-mono tracking-widest mb-2 uppercase">{lang === 'ja' ? 'スタイル' : 'Style'}</div>
+          <div className={`${gridCls} mb-4`} style={gridStyle}>{styleTemplates.map(card)}</div>
 
           <div className="border-t border-dim mb-4" />
 
-          <div className="text-muted text-[0.625rem] font-mono tracking-widest mb-2 uppercase">
-            {lang === 'ja' ? '構図・設定資料（SFW）' : 'Composition / Reference'}
-          </div>
-          <div className={`${gridCls} mb-4`} style={gridStyle}>
-            {basicCompTemplates.map(tmpl => <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />)}
-          </div>
+          <div className="text-muted text-[0.625rem] font-mono tracking-widest mb-2 uppercase">{lang === 'ja' ? '構図・設定資料（SFW）' : 'Composition / Reference'}</div>
+          <div className={`${gridCls} mb-4`} style={gridStyle}>{basicCompTemplates.map(card)}</div>
 
           <div className="border-t border-dim mb-4" />
 
-          <div className="text-muted text-[0.625rem] font-mono tracking-widest mb-2 uppercase">
-            {lang === 'ja' ? 'フェチ構図（SFW）' : 'Flair / Feti Composition'}
-          </div>
-          <div className={`${gridCls} mb-4`} style={gridStyle}>
-            {fetiTemplates.map(tmpl => <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />)}
-          </div>
+          <div className="text-muted text-[0.625rem] font-mono tracking-widest mb-2 uppercase">{lang === 'ja' ? 'フェチ構図（SFW）' : 'Flair / Feti Composition'}</div>
+          <div className={`${gridCls} mb-4`} style={gridStyle}>{fetiTemplates.map(card)}</div>
 
           <div className="border-t border-dim mb-4" />
 
-          <div className="text-muted text-[0.625rem] font-mono tracking-widest mb-2 uppercase">
-            {lang === 'ja' ? 'ダイナミック' : 'Dynamic'}
-          </div>
-          <div className={`${gridCls} mb-4`} style={gridStyle}>
-            {dynamicTemplates.map(tmpl => <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />)}
-          </div>
+          <div className="text-muted text-[0.625rem] font-mono tracking-widest mb-2 uppercase">{lang === 'ja' ? 'ダイナミック' : 'Dynamic'}</div>
+          <div className={`${gridCls} mb-4`} style={gridStyle}>{dynamicTemplates.map(card)}</div>
 
           <div className="border-t border-dim mb-4" />
 
-          <div className="text-muted text-[0.625rem] font-mono tracking-widest mb-2 uppercase">
-            {lang === 'ja' ? '極限アングル・クローズアップ' : 'Extreme Close-Up'}
-          </div>
-          <div className={gridCls} style={gridStyle}>
-            {extremeTemplates.map(tmpl => <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} />)}
-          </div>
+          <div className="text-muted text-[0.625rem] font-mono tracking-widest mb-2 uppercase">{lang === 'ja' ? '極限アングル・クローズアップ' : 'Extreme Close-Up'}</div>
+          <div className={gridCls} style={gridStyle}>{extremeTemplates.map(card)}</div>
         </div>
       </div>
+
+      {/* タグ詳細ポップアップ */}
+      {detailTmpl && <TagDetailPopup tmpl={detailTmpl} lang={lang} onClose={() => setDetailTmpl(null)} />}
     </div>
   );
 }
