@@ -1084,7 +1084,7 @@ export default function Loom() {
   const tagCount = textToCopy ? countTags(textToCopy) : 0;
 
   // ── Block visibility ──
-  const SIMPLE_BLOCK_IDS = ['quality', 'artstyle', 'face', 'outfit', 'composition', 'negative'];
+  const SIMPLE_BLOCK_IDS = ['quality', 'artstyle', 'attribute', 'face', 'body', 'outfit', 'background', 'negative'];
   const hiddenBlockIds = new Set(activeChar.hiddenBlocks || []);
   const toggleHideBlock = (blockId) => {
     const hidden = activeChar.hiddenBlocks || [];
@@ -1094,6 +1094,7 @@ export default function Loom() {
   };
   const visibleBlocks = simpleMode
     ? blocks.filter(b => (SIMPLE_BLOCK_IDS.includes(b.id) || b.isCustomBlock) && !hiddenBlockIds.has(b.id))
+           .map(b => ({ ...b, collapsed: false }))
     : blocks.filter(b => !hiddenBlockIds.has(b.id));
 
   // ── Balance meter ──
