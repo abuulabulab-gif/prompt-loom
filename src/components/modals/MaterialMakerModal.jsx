@@ -161,7 +161,7 @@ export default function MaterialMakerModal({ lang, blocks, onApply, onClose }) {
                 ? (alreadyHas
                   ? (ja ? `+ 「${blockLabel}」ブロックに再追加` : `+ Add again to ${blockLabel}`)
                   : (ja ? `+ 「${blockLabel}」ブロックに追加` : `+ Add to ${blockLabel}`))
-                : (ja ? '素材・部位を選んでください' : 'Select material and target')}
+                : (ja ? '+ 素材・部位を選んでください' : '+ Select material and target')}
             </button>
             <div className="text-dim text-[0.625rem] font-mono text-center mt-2">
               {ja ? '※ 連続で追加できます　▲ = 成人向け寄りの素材' : '※ Add multiple in a row　▲ = Adult-oriented material'}
