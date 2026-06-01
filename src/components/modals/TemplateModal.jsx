@@ -17,6 +17,24 @@ const TEMPLATE_EXTRA_JA = new Map([
   // 品質・レンダリング
   ['smooth shading',           'スムースシェード'],
   ['intricate details',        '緻密な描写'],
+  // ちびキャラ
+  ['super deformed',           'スーパーデフォルメ'],
+  ['kawaii',                   'かわいい'],
+  ['simple shading',           'シンプルシェード'],
+  // ドット絵
+  ['pixel perfect',            'ピクセルパーフェクト'],
+  ['retro game',               'レトロゲーム'],
+  ['8-bit',                    '8ビット'],
+  // 壁紙
+  ['scenery',                  '情景・風景'],
+  ['cinematic lighting',       'シネマティック照明'],
+  ['volumetric lighting',      'ボリューメトリックライト'],
+  ['dramatic lighting',        'ドラマチック照明'],
+  ['detailed background',      '詳細な背景'],
+  // ライダーキック
+  ['jumping',                  'ジャンプ'],
+  ['kicking',                  '蹴り'],
+  ['midair',                   '空中'],
   // 撮影スタイル
   ['selfie',                   '自撮り'],
   // 構図・視点
@@ -48,10 +66,10 @@ function toJa(en) {
 }
 
 const FETI_IDS    = new Set(['highangle_armpit','lowangle_legs','midriff_navel','nape_lift','birdseye_lie','skintight_detail','zettairyouiki','napeandback','bare_back','footperspective','armpitsleeveless']);
-const DYNAMIC_IDS = new Set(['dynamic_booster','extreme_perspective']);
+const DYNAMIC_IDS = new Set(['dynamic_booster','extreme_perspective','rider_kick']);
 const EXTREME_IDS = new Set(['lip_focus','eye_focus','fisheye','from_below','from_above']);
 
-const STYLE_IDS          = new Set(['anime','photo','fantasy']);
+const STYLE_IDS          = new Set(['anime','photo','fantasy','chibi','pixelart']);
 const styleTemplates     = TEMPLATES.filter(t => STYLE_IDS.has(t.id));
 const basicCompTemplates = TEMPLATES.filter(t => !STYLE_IDS.has(t.id) && !FETI_IDS.has(t.id) && !DYNAMIC_IDS.has(t.id) && !EXTREME_IDS.has(t.id));
 const fetiTemplates      = TEMPLATES.filter(t => FETI_IDS.has(t.id));

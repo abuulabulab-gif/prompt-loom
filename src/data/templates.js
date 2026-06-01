@@ -11,8 +11,8 @@ export const TEMPLATES = [
   },
   {
     id:'photo', name:'フォトリアル', nameEn:'Photorealistic', icon:'📷',
-    desc:'写真・実写系の質感を引き出す。肌のSSS・被写界深度・ボケで「撮影された感」を出す',
-    descEn:'Draws out photographic texture — SSS skin, depth of field, and bokeh create a "shot by camera" feel',
+    desc:'写真・実写系の質感を引き出す。リアルな肌・被写界深度・ボケで「撮影された感」を出す',
+    descEn:'Draws out photographic texture — realistic skin, depth of field, and bokeh create a "shot by camera" feel',
     apply: {
       quality:  'masterpiece, best quality, ultra-detailed, highres, sharp focus, detailed skin',
       artstyle: 'realistic, photorealistic, realistic skin, depth of field, bokeh',
@@ -27,7 +27,25 @@ export const TEMPLATES = [
       artstyle: 'concept art, painterly, atmospheric, glowing, vibrant colors',
     },
   },
-  // ── 設定資料・素材 ─────────────────────────────────────────────────────
+  {
+    id:'chibi', name:'ちびキャラ', nameEn:'Chibi', icon:'🧸',
+    desc:'2〜3頭身のデフォルメ体型。丸い頭・大きな目・小さな体。ultra-detailedを外してちびらしさを維持',
+    descEn:'2-3 head chibi proportions — big eyes, rounded forms. Quality tags kept minimal to preserve the deformed aesthetic',
+    apply: {
+      quality:  'masterpiece, best quality, highres',
+      artstyle: 'chibi, super deformed, kawaii, cute, simple shading',
+    },
+  },
+  {
+    id:'pixelart', name:'ドット絵', nameEn:'Pixel Art', icon:'🎮',
+    desc:'レトロゲーム風のドット絵スタイル。品質タグを最小限にすることでドット感と戦わせない',
+    descEn:'Retro pixel-art style — quality tags intentionally minimal to preserve pixelated look',
+    apply: {
+      quality:  'best quality, sharp focus',
+      artstyle: 'pixel art, pixel perfect, retro game, 8-bit',
+    },
+  },
+  // ── 設定資料・素材・撮影スタイル ─────────────────────────────────────
   {
     id:'asset', name:'素材・白背景', nameEn:'Clean Asset', icon:'🎨',
     desc:'立ち絵・透過素材向け。ノイズなし・色固定のクリーンな単体素材用。他テンプレと用途が明確に違う',
@@ -68,7 +86,6 @@ export const TEMPLATES = [
       background:  'white background, simple background',
     },
   },
-  // ── 撮影スタイル ──────────────────────────────────────────────────────
   {
     id: 'selfie',
     name: '自撮り',
@@ -80,20 +97,22 @@ export const TEMPLATES = [
       composition: 'selfie, portrait, from above, looking at viewer, outstretched arm, smartphone',
     },
   },
-  // ── フェチ構図（SFW）─────────────────────────────────────────────────
   {
-    id: 'zettairyouiki',
-    name: '絶対領域・太もも',
-    nameEn: 'Zettai Ryouiki',
-    icon: '🦵',
-    desc: 'ニーハイとスカートの間に生まれる「絶対領域」フォーカス。太もも露出と境界線の美しさが主役',
-    descEn: 'Focuses on the skin between thighhighs and skirt hem — the "absolute territory" strip and thigh contour',
+    id: 'wallpaper',
+    name: '壁紙向け構図',
+    nameEn: 'Wallpaper',
+    icon: '🖼️',
+    desc: 'スマホ・PC壁紙に仕上げる構図。詳細な背景＋映画的な光で世界観ごと描き出す。既存スタイルの上に重ねるだけでOK',
+    descEn: 'Frame-filling wallpaper composition — detailed background and cinematic lighting. Layer on top of any existing style',
+    sizeHintJa: '【推奨サイズ】縦長 9:16（スマホ壁紙）/ 横長 16:9（PC壁紙）',
+    sizeHintEn: '[Recommended] 9:16 portrait (mobile) / 16:9 landscape (desktop)',
     apply: {
-      composition: 'cowboy shot',
-      body:        { mode: 'merge', tags: 'thighs, bare thighs, zettai ryouiki, thigh gap' },
-      outfit:      'skirt, thighhighs',
+      composition: 'full body',
+      background:  'detailed background, scenery',
+      effect:      'cinematic lighting, volumetric lighting, dramatic lighting',
     },
   },
+  // ── フェチ構図（SFW）— 上から下に配置 ──────────────────────────────
   {
     id: 'napeandback',
     name: 'うなじ・首フォーカス',
@@ -110,6 +129,21 @@ export const TEMPLATES = [
     },
   },
   {
+    id: 'nape_lift',
+    name: '首筋・髪かき上げ',
+    nameEn: 'Nape & Hair Lift',
+    icon: '🌺',
+    desc: '横顔から髪をかき上げる仕草で首筋を見せる。動きと色気が同時に出る。napeandbackとの違い：正面寄り・動作が主役',
+    descEn: 'Hair-lifting gesture revealing nape from a side angle — combines movement and sensuality. Unlike napeandback, the gesture itself is the focus',
+    negHintJa: 'back view, hair down, covering neck, turtleneck',
+    negHintEn: 'back view, hair down, covering neck, turtleneck',
+    apply: {
+      composition: 'upper body, side view, hand in hair',
+      body:        { mode: 'merge', tags: 'nape, bare shoulders, collarbone' },
+      face:        { mode: 'merge', tags: 'floating hair, sidelocks' },
+    },
+  },
+  {
     id: 'bare_back',
     name: '背中フォーカス',
     nameEn: 'Bare Back Focus',
@@ -122,20 +156,6 @@ export const TEMPLATES = [
       composition: 'upper body, back view',
       body:        { mode: 'merge', tags: 'bare back, bare shoulders' },
       outfit:      'open back',
-    },
-  },
-  {
-    id: 'footperspective',
-    name: '足先・俯瞰パース',
-    nameEn: 'Feet Overhead',
-    icon: '🦶',
-    desc: '真上から見下ろし、足裏・足先を大きく捉えるパース構図。ローアングル脚とは逆方向（上から）',
-    descEn: 'Overhead downward view with feet prominent — foreshortening from above. Opposite direction to lowangle_legs',
-    negHintJa: 'standing, low angle, from below, feet cut off',
-    negHintEn: 'standing, low angle, from below, feet cut off',
-    apply: {
-      composition: 'from above, high angle, foreshortening, lying on back',
-      body:        { mode: 'merge', tags: 'barefoot, foot focus, soles, toes' },
     },
   },
   {
@@ -167,6 +187,45 @@ export const TEMPLATES = [
     },
   },
   {
+    id: 'midriff_navel',
+    name: 'ミドリフ・へそ',
+    nameEn: 'Midriff & Navel',
+    icon: '✨',
+    desc: 'お腹・へそ周りを主役にしたカジュアル露出構図。ローアングル気味でへそをフレームの中心に',
+    descEn: 'Midriff and navel as the visual center — casual crop-top exposure with a slight upward angle',
+    apply: {
+      composition: 'cowboy shot, from below, low angle',
+      body:        { mode: 'merge', tags: 'midriff, navel' },
+      outfit:      'crop top, shorts',
+    },
+  },
+  {
+    id: 'zettairyouiki',
+    name: '絶対領域・太もも',
+    nameEn: 'Zettai Ryouiki',
+    icon: '🦵',
+    desc: 'ニーハイとスカートの間に生まれる「絶対領域」フォーカス。太もも露出と境界線の美しさが主役',
+    descEn: 'Focuses on the skin between thighhighs and skirt hem — the "absolute territory" strip and thigh contour',
+    apply: {
+      composition: 'cowboy shot',
+      body:        { mode: 'merge', tags: 'thighs, bare thighs, zettai ryouiki, thigh gap' },
+      outfit:      'skirt, thighhighs',
+    },
+  },
+  {
+    id: 'skintight_detail',
+    name: '肉感・食い込みディテール',
+    nameEn: 'Skin-Tight Detail',
+    icon: '🔥',
+    desc: 'ぴったりした衣装が体に食い込む立体感を最大化。zettairyoukiより下半身全体・素材感フォーカス',
+    descEn: 'Maximizes skin-tight fabric tension against body contour — broader lower-body focus vs zettairyouiki which targets the thigh gap strip',
+    apply: {
+      composition: 'lower body, close-up',
+      body:        { mode: 'merge', tags: 'thighs, bare thighs, thigh gap, zettai ryouiki' },
+      outfit:      'thighhighs, skintight',
+    },
+  },
+  {
     id: 'lowangle_legs',
     name: 'ローアングル・踏みつけ脚',
     nameEn: 'Low Angle Legs',
@@ -181,31 +240,17 @@ export const TEMPLATES = [
     },
   },
   {
-    id: 'midriff_navel',
-    name: 'ミドリフ・へそ',
-    nameEn: 'Midriff & Navel',
-    icon: '✨',
-    desc: 'お腹・へそ周りを主役にしたカジュアル露出構図。ローアングル気味でへそをフレームの中心に',
-    descEn: 'Midriff and navel as the visual center — casual crop-top exposure with a slight upward angle',
+    id: 'footperspective',
+    name: '足先・俯瞰パース',
+    nameEn: 'Feet Overhead',
+    icon: '🦶',
+    desc: '真上から見下ろし、足裏・足先を大きく捉えるパース構図。ローアングル脚とは逆方向（上から）',
+    descEn: 'Overhead downward view with feet prominent — foreshortening from above. Opposite angle to lowangle_legs',
+    negHintJa: 'standing, low angle, from below, feet cut off',
+    negHintEn: 'standing, low angle, from below, feet cut off',
     apply: {
-      composition: 'cowboy shot, from below, low angle',
-      body:        { mode: 'merge', tags: 'midriff, navel' },
-      outfit:      'crop top, shorts',
-    },
-  },
-  {
-    id: 'nape_lift',
-    name: '首筋・髪かき上げ',
-    nameEn: 'Nape & Hair Lift',
-    icon: '🌺',
-    desc: '横顔から髪をかき上げる仕草で首筋を見せる。動きと色気が同時に出る。napeandbackとの違い：正面寄り・動作が主役',
-    descEn: 'Hair-lifting gesture revealing nape from a side angle — combines movement and sensuality. Unlike napeandback, the gesture itself is the focus',
-    negHintJa: 'back view, hair down, covering neck, turtleneck',
-    negHintEn: 'back view, hair down, covering neck, turtleneck',
-    apply: {
-      composition: 'upper body, side view, hand in hair',
-      body:        { mode: 'merge', tags: 'nape, bare shoulders, collarbone' },
-      face:        { mode: 'merge', tags: 'floating hair, sidelocks' },
+      composition: 'from above, high angle, foreshortening, lying on back',
+      body:        { mode: 'merge', tags: 'barefoot, foot focus, soles, toes' },
     },
   },
   {
@@ -221,19 +266,6 @@ export const TEMPLATES = [
       composition: "bird's-eye view, lying on back, full body",
       body:        { mode: 'merge', tags: 'floating hair' },
       face:        { mode: 'merge', tags: 'eyes closed' },
-    },
-  },
-  {
-    id: 'skintight_detail',
-    name: '肉感・食い込みディテール',
-    nameEn: 'Skin-Tight Detail',
-    icon: '🔥',
-    desc: 'ぴったりした衣装が体に食い込む立体感を最大化。zettairyoukiより下半身全体・素材感フォーカス',
-    descEn: 'Maximizes skin-tight fabric tension against body contour — broader lower-body focus vs zettairyouiki which targets the thigh gap strip',
-    apply: {
-      composition: 'lower body, close-up',
-      body:        { mode: 'merge', tags: 'thighs, bare thighs, thigh gap, zettai ryouiki' },
-      outfit:      'thighhighs, skintight',
     },
   },
   // ── ダイナミック ──────────────────────────────────────────────────────
@@ -262,6 +294,20 @@ export const TEMPLATES = [
     negHintEn: 'flat perspective, symmetrical body, front view, simple background',
     apply: {
       composition: 'extreme perspective, foreshortening, dynamic angle',
+    },
+  },
+  {
+    id: 'rider_kick',
+    name: 'ライダーキック',
+    nameEn: 'Rider Kick',
+    icon: '🦵',
+    desc: '空中からの蹴りを真下から捉えるトクサツ定番アングル。lowangle_legsより全身の空中感・蹴りの迫力が強い',
+    descEn: 'Classic tokusatsu flying-kick shot from extreme below — more airborne and full-body impact than lowangle_legs',
+    negHintJa: 'standing still, sitting, lying, from above, static pose',
+    negHintEn: 'standing still, sitting, lying, from above, static pose',
+    apply: {
+      composition: "from below, worm's-eye view, dynamic angle, jumping, legs up, action pose",
+      effect:      'speed lines, motion blur, dramatic lighting',
     },
   },
   // ── 極限アングル・クローズアップ ──────────────────────────────────────
