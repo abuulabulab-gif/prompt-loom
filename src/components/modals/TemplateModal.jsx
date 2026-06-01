@@ -14,6 +14,9 @@ for (const block of BLOCKS_DEF) {
 
 // テンプレート専用タグ（ブロック未登録）の日本語マップ
 const TEMPLATE_EXTRA_JA = new Map([
+  // 品質・レンダリング
+  ['smooth shading',           'スムースシェード'],
+  ['intricate details',        '緻密な描写'],
   // 撮影スタイル
   ['selfie',                   '自撮り'],
   // 構図・視点
