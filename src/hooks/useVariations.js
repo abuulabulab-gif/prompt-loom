@@ -2,6 +2,7 @@ import { useState } from "react";
 import { splitTags, bareTag, appendTag, removeTag, hasTag, stripWeights, OPTIONAL_CAT_NAMES, RARE_OPT_CAT_NAMES, BLOCK_RANDOM_RULES, TIER3_TAGS, RANDOM_EXCLUDE_TAGS, RANDOM_EXCLUSION_RULES, RANDOM_COMBO_RULES, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS } from "../data/constants.js";
 import { CONFLICT_MAP } from "../data/conflicts.js";
 import { applyMaterialMakerLayer } from "../data/materials.js";
+import { applyOutfitStackPenalty, applyColorMakerLayer, applyFeatureMakerLayer, applyAtmosphereLayer } from "./useRandomGen.js";
 
 // Blocks whose content is fixed across all variations (character identity)
 const VAR_FIXED_BLOCKS = new Set(['quality', 'artstyle', 'attribute', 'face', 'body', 'negative']);
@@ -184,9 +185,13 @@ export function useVariations(blocks, tool, mode = 'illust') {
         if (rerolledMap[b.id] !== undefined) b.text = rerolledMap[b.id];
       }
 
-      // マテリアルメーカー自動付与
+      // 自動付与レイヤー（全ランダムと同じセット、bodyFocusは体型固定のためスキップ）
       const varBlockMap = new Map(varBlocks.map(b => [b.id, b]));
+      applyOutfitStackPenalty(varBlockMap);
+      applyColorMakerLayer(varBlockMap, mode);
       applyMaterialMakerLayer(varBlockMap, mode);
+      applyFeatureMakerLayer(varBlockMap);
+      applyAtmosphereLayer(varBlockMap, mode);
       for (const b of varBlocks) {
         if (varBlockMap.has(b.id)) b.text = varBlockMap.get(b.id).text;
       }

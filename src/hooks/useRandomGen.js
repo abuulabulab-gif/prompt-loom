@@ -606,7 +606,7 @@ function cleanupAnimalParts(text, picks, speciesCat, strength, hybridChance) {
 }
 
 // 衣装スタックSoft Penalty: 主張の強いジャンルがある場合にスタイル・装飾アクセを間引く
-function applyOutfitStackPenalty(blockMap) {
+export function applyOutfitStackPenalty(blockMap) {
   const ob = blockMap.get('outfit');
   if (!ob?.text || ob.locked) return;
   const hasCompleteGenre = [...COMPLETE_OUTFIT_GENRES].some(t => hasTag(ob.text, t));
@@ -642,7 +642,7 @@ const CM_DETAIL_SLOTS = [
 ];
 const CM_TAIL_TRIGGERS = new Set(['cat tail','fox tail','wolf tail','fluffy tail','bunny tail','dog tail','horse tail','cow tail','demon tail','dragon tail','multiple tails']);
 
-function applyColorMakerLayer(blockMap, mode) {
+export function applyColorMakerLayer(blockMap, mode) {
   const overallProb = mode === 'chardesign' ? 0.70 : 0.55;
   if (Math.random() > overallProb) return;
 
@@ -720,7 +720,7 @@ const FM_POSITIONS = new Map([
 ]);
 const FM_FACE_NEUTRAL = new Set(['neck','collarbone','shoulder','back','thigh','arm']);
 
-function applyFeatureMakerLayer(blockMap) {
+export function applyFeatureMakerLayer(blockMap) {
   const allText = [...blockMap.values()].map(b => b.text || '').join(', ');
   let faceUsed = hasTag(allText, 'mole under eye') ? 1 : 0;
 
@@ -808,7 +808,7 @@ const ATMOSPHERE_TAGS = [
 ];
 const SIMPLE_BG_SET = new Set(['white background', 'simple background', 'gradient background', 'bokeh background', 'abstract background']);
 
-function applyAtmosphereLayer(blockMap, mode) {
+export function applyAtmosphereLayer(blockMap, mode) {
   const prob = mode === 'chardesign' ? 0.05 : 0.55;
   if (Math.random() > prob) return;
   const bgBlock = blockMap.get('background');
