@@ -375,8 +375,8 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           >{focused ? '⊗' : '⊕'}</button>
         )}
 
-        {/* Transfer to other character */}
-        {otherChars?.length > 0 && (
+        {/* Transfer to other character — 3列コンパクト時は非表示 */}
+        {otherChars?.length > 0 && !isCompact && (
           <div className="relative flex-shrink-0 flex items-center">
             <button
               onClick={() => setTransferOpen(o => !o)}
