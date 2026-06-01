@@ -51,8 +51,9 @@ const FETI_IDS    = new Set(['highangle_armpit','lowangle_legs','midriff_navel',
 const DYNAMIC_IDS = new Set(['dynamic_booster','extreme_perspective']);
 const EXTREME_IDS = new Set(['lip_focus','eye_focus','fisheye','from_below','from_above']);
 
-const styleTemplates     = TEMPLATES.filter(t => t.apply.quality);
-const basicCompTemplates = TEMPLATES.filter(t => !t.apply.quality && !FETI_IDS.has(t.id) && !DYNAMIC_IDS.has(t.id) && !EXTREME_IDS.has(t.id));
+const STYLE_IDS          = new Set(['anime','photo','fantasy']);
+const styleTemplates     = TEMPLATES.filter(t => STYLE_IDS.has(t.id));
+const basicCompTemplates = TEMPLATES.filter(t => !STYLE_IDS.has(t.id) && !FETI_IDS.has(t.id) && !DYNAMIC_IDS.has(t.id) && !EXTREME_IDS.has(t.id));
 const fetiTemplates      = TEMPLATES.filter(t => FETI_IDS.has(t.id));
 const dynamicTemplates   = TEMPLATES.filter(t => DYNAMIC_IDS.has(t.id));
 const extremeTemplates   = TEMPLATES.filter(t => EXTREME_IDS.has(t.id));
