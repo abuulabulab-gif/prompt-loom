@@ -1231,7 +1231,7 @@ export default function Loom() {
           <button onClick={() => {
             if (!quickOpen && quickMenuRef.current) {
               const r = quickMenuRef.current.getBoundingClientRect();
-              const qw = Math.min(300, window.innerWidth - 16);
+              const qw = Math.min(320, window.innerWidth - 16);
               setQuickOpenPos({ top: r.bottom + 4, left: Math.max(8, Math.min(r.right - qw, window.innerWidth - qw - 8)), width: qw });
             }
             setQuickOpen(p => !p);
@@ -1266,12 +1266,12 @@ export default function Loom() {
                 <button onClick={() => { openColorPicker(); setQuickOpen(false); }}
                   className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5 whitespace-nowrap"
                   style={{ color: 'rgb(var(--c-purple))' }}>
-                  🎨 {lang === 'ja' ? 'カラーメーカー' : 'Color Maker'}
+                  🎨 {lang === 'ja' ? (isMobile ? 'カラー' : 'カラーメーカー') : (isMobile ? 'Color' : 'Color Maker')}
                 </button>
                 <button onClick={() => { setFeatureMakerFilterBlock(null); setFeatureMakerOpen(true); setQuickOpen(false); }}
                   className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5 whitespace-nowrap"
                   style={{ color: 'rgb(var(--c-purple))' }}>
-                  🎯 {lang === 'ja' ? '特徴メーカー' : 'Feature Maker'}
+                  🎯 {lang === 'ja' ? (isMobile ? '特徴' : '特徴メーカー') : (isMobile ? 'Feature' : 'Feature Maker')}
                 </button>
                 <button onClick={() => {
                   setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : { ...c, blocks: applyMaterialMakerManual(c.blocks) }));
@@ -1279,7 +1279,7 @@ export default function Loom() {
                 }}
                   className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5 whitespace-nowrap"
                   style={{ color: 'rgb(var(--c-purple))' }}>
-                  🧵 {lang === 'ja' ? 'マテリアルメーカー' : 'Material Maker'}
+                  🧵 {lang === 'ja' ? (isMobile ? 'マテリアル' : 'マテリアルメーカー') : (isMobile ? 'Material' : 'Material Maker')}
                 </button>
                 {characters.length > 1 && (
                   <button onClick={() => { setSceneOpen(true); setQuickOpen(false); }}
@@ -1805,7 +1805,8 @@ export default function Loom() {
                   allBlocks={blocks}
                   onUndoBackup={templateUndoBuf?.blockTexts[block.id] !== undefined ? () => undoSingleBlock(block.id) : undefined}
                   onColorPicker={BLOCK_TO_COLOR_TARGET[block.id] ? () => openColorPicker(BLOCK_TO_COLOR_TARGET[block.id], BLOCK_TO_ALLOWED_TARGETS[block.id]) : undefined}
-                  onFeatureMaker={['face','feature','body','outfit'].includes(block.id) ? () => { setFeatureMakerFilterBlock(block.id); setFeatureMakerOpen(true); } : undefined}
+                  onFeatureMaker={['face','body','outfit'].includes(block.id) ? () => { setFeatureMakerFilterBlock(block.id); setFeatureMakerOpen(true); } : undefined}
+                  onMaterialMaker={block.id === 'outfit' ? () => setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : { ...c, blocks: applyMaterialMakerManual(c.blocks) })) : undefined}
                   isLight={theme === 'light'} />
               );
 

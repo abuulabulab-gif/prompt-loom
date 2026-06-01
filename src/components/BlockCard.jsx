@@ -40,7 +40,7 @@ const CATS_CLOSED = new Set([
 
 const SCENE_MANAGED_TAGS = new Set(['2girls', '2boys', 'multiple girls', 'multiple boys', '1other']);
 
-export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isFirst, isLast, onSavePreset, onFocus, focused, otherChars, onTransfer, conflictTags, onRemove, onHide, isMobile, isCompact, focusMode, sceneActive, analyzeText, allBlocks, onUndoBackup, isLight, onColorPicker, onFeatureMaker }) {
+export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isFirst, isLast, onSavePreset, onFocus, focused, otherChars, onTransfer, conflictTags, onRemove, onHide, isMobile, isCompact, focusMode, sceneActive, analyzeText, allBlocks, onUndoBackup, isLight, onColorPicker, onFeatureMaker, onMaterialMaker }) {
   const [search, setSearch] = useState('');
   const [saving, setSaving] = useState(false);
   const [pName, setPName] = useState('');
@@ -362,6 +362,15 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             title={lang === 'ja' ? '特徴メーカーで特徴を追加' : 'Add feature with Feature Maker'}
             className={`bg-transparent border border-dim rounded-[0.3125rem] text-muted cursor-pointer flex-shrink-0 ${focusMode ? 'px-[0.5625rem] py-1 text-[0.8125rem]' : 'px-1.5 py-0.5 text-[0.625rem]'}`}
           >🎯</button>
+        )}
+
+        {/* Material maker shortcut */}
+        {onMaterialMaker && !isLocked && (
+          <button
+            onClick={onMaterialMaker}
+            title={lang === 'ja' ? 'マテリアルメーカーで素材感を付与' : 'Apply material textures'}
+            className={`bg-transparent border border-dim rounded-[0.3125rem] text-muted cursor-pointer flex-shrink-0 ${focusMode ? 'px-[0.5625rem] py-1 text-[0.8125rem]' : 'px-1.5 py-0.5 text-[0.625rem]'}`}
+          >🧵</button>
         )}
 
         {/* Focus mode */}
