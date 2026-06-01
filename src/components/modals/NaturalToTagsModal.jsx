@@ -121,7 +121,7 @@ export default function NaturalToTagsModal({ lang, apiConfig, blocks: _blocks, o
   const resultBlocks = result ? blockOrder.filter(b => result[b]?.length) : [];
 
   return (
-    <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/80"
+    <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
       onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="bg-surface border border-linebright rounded-[0.875rem] w-full max-w-[30rem] max-h-[86vh] flex flex-col shadow-2xl">
 

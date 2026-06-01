@@ -29,7 +29,7 @@ export default function RecordModal({ char, lang, activeTool, posText, negText, 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="bg-surface border border-linebright rounded-xl p-5 w-[26.25rem] max-w-[92vw] shadow-xl">
         <div className="text-fg text-[0.8125rem] font-bold mb-3.5">
           📋 {lang === 'ja' ? 'プロンプトを記録' : 'Record Prompt'}

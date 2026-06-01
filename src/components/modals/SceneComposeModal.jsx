@@ -82,7 +82,7 @@ export default function SceneComposeModal({ characters, lang, theme, onClose, de
   };
 
   return (
-    <div className="fixed inset-0 bg-black/[0.82] z-[300] flex items-center justify-center p-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[300] flex items-center justify-center p-4" onClick={onClose}>
       <div onClick={e => e.stopPropagation()}
         className="bg-surface border border-linebright rounded-[0.875rem] w-full max-w-[38.75rem] max-h-[90vh] overflow-y-auto p-[1.125rem]">
 

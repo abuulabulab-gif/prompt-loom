@@ -25,7 +25,7 @@ export default function LibraryModal({ characters, activeCharId, lang, onClose, 
   const nonArchivedCount = characters.filter(c => !c.archived).length;
 
   return (
-    <div className="fixed inset-0 bg-black/80 z-[300] flex items-center justify-center p-3"
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[300] flex items-center justify-center p-3"
       onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="bg-surface border border-linebright rounded-[0.875rem] w-full max-w-[41.25rem] flex flex-col max-h-[88vh] overflow-hidden">
 

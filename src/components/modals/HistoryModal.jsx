@@ -2,7 +2,7 @@ import { countTags, fmtTime } from "../../data/constants.js";
 
 export default function HistoryModal({ history, lang, onClose, onRestore, onDelete }) {
   return (
-    <div className="fixed inset-0 bg-black/85 z-[300] flex items-center justify-center p-5">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[300] flex items-center justify-center p-5">
       <div className="bg-surface border border-linebright rounded-[0.875rem] w-full max-w-[38.75rem] max-h-[80vh] flex flex-col overflow-hidden">
         <div className="px-[1.125rem] py-3.5 border-b border-line flex items-center justify-between">
           <span className="text-fg text-sm font-bold">📋 {lang === 'ja' ? 'プロンプト履歴' : 'Prompt History'}</span>

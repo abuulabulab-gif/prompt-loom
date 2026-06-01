@@ -211,7 +211,7 @@ export default function TemplateModal({ lang, isMobile, onApply, onClose }) {
   );
 
   return (
-    <div className="fixed inset-0 bg-black/85 z-[300] flex items-center justify-center p-5">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[300] flex items-center justify-center p-5">
       <div className="bg-surface border border-linebright rounded-[0.875rem] w-full max-w-[57.5rem] overflow-hidden">
         <div className="px-[1.125rem] py-3.5 border-b border-line flex items-center justify-between">
           <span className="text-fg text-sm font-bold">✦ {lang === 'ja' ? 'ブロックテンプレート' : 'Block Templates'}</span>

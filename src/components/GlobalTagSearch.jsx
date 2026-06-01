@@ -112,8 +112,7 @@ export default function GlobalTagSearch({ open, onClose, blocks, lang, onToggleT
   };
 
   return (
-    <div className="fixed inset-0 z-[300] flex items-start justify-center pt-[5rem] px-4"
-      style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
+    <div className="fixed inset-0 z-[300] flex items-start justify-center pt-[5rem] px-4 bg-black/80 backdrop-blur-sm"
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className="bg-surface border border-line rounded-xl shadow-[0_8px_40px_rgba(0,0,0,0.6)] w-full max-w-[35rem] flex flex-col max-h-[70vh]">

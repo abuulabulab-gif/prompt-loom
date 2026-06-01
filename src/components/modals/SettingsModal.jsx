@@ -313,7 +313,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/80 z-[300] flex items-start justify-center px-4 pt-[6dvh] pb-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[300] flex items-start justify-center px-4 pt-[6dvh] pb-4" onClick={onClose}>
       <div onClick={e => e.stopPropagation()}
         className="bg-surface border border-linebright rounded-[0.875rem] w-full max-w-[33.75rem] overflow-hidden flex flex-col h-[80dvh]">
 

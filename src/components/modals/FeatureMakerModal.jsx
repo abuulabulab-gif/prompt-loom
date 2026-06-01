@@ -39,7 +39,7 @@ export default function FeatureMakerModal({ lang, blocks, onApply, onClose, filt
   const sOption  = sSteps[base + (hasSubtypes ? 2 : 1)];
 
   return (
-    <div className="fixed inset-0 bg-black/80 z-[300] flex items-center justify-center p-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[300] flex items-center justify-center p-4" onClick={onClose}>
       <div onClick={e => e.stopPropagation()}
         className="bg-surface border border-linebright rounded-[0.875rem] w-full max-w-[27.5rem] max-h-[88vh] overflow-y-auto p-[1.125rem]">
 

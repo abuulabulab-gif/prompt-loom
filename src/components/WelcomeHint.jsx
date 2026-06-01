@@ -39,8 +39,7 @@ export default function WelcomeHint({ lang, theme, onSetLang, onSetTheme, onDism
 
   return (
     <div
-      className="fixed inset-0 z-[400] flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.72)' }}
+      className="fixed inset-0 z-[400] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
       onClick={e => e.target === e.currentTarget && onDismiss()}
     >
       <div className="bg-surface border border-linebright rounded-[0.875rem] shadow-2xl w-full max-w-[26.25rem] overflow-y-auto max-h-[90vh]">

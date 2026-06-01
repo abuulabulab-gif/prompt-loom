@@ -44,7 +44,7 @@ export default function CommandPalette({ commands, lang, onClose }) {
   const groups = [...new Set(filtered.map(c => c.group))];
 
   return (
-    <div className="fixed inset-0 bg-black/75 z-[400] flex items-start justify-center pt-[12vh]" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[400] flex items-start justify-center pt-[12vh]" onClick={onClose}>
       <div onClick={e => e.stopPropagation()}
         className="bg-surface border border-linebright rounded-[0.875rem] w-full max-w-[33.75rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.7)]">
 
