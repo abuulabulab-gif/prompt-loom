@@ -1042,8 +1042,7 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
               text = appendTag(text, 'tear', block.strength);
             else if ((hasTag(text, 'sad') || hasTag(text, 'wistful')) && Math.random() < 0.45)
               text = appendTag(text, 'teardrop', block.strength);
-            if (hasTag(text, 'nervous') && Math.random() < 0.50)
-              text = appendTag(text, 'sweating', block.strength);
+            // sweating はボディブロックへ → RANDOM_COMBO_RULES で付与
             if (hasTag(text, 'angry') && Math.random() < 0.30)
               text = appendTag(text, 'steam', block.strength);
             if (hasTag(text, 'blushing') && !hasTag(text, 'heavy blush') && Math.random() < 0.35)

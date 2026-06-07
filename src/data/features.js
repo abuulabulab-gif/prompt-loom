@@ -216,3 +216,111 @@ export const FEATURE_ITEMS = {
     },
   ],
 };
+
+// ── 特徴メーカー生成タグの日本語変換マップ ──────────────────────────────
+// applyFeatureMakerLayer / FeatureMakerModal が生成する位置付き特殊タグ → ja ラベル
+export const FEATURE_TAG_JA = {
+  // ほくろ（顔）
+  'mole under left eye':        '左目の下にほくろ',
+  'mole under right eye':       '右目の下にほくろ',
+  'mole near mouth':            '口元にほくろ',
+  'mole on cheek':              '頬にほくろ',
+  'mole on neck':               '首にほくろ',
+  'mole on collarbone':         '鎖骨にほくろ',
+  'small mole under left eye':  '左目の下に小さなほくろ',
+  'small mole under right eye': '右目の下に小さなほくろ',
+  'small mole on left cheek':   '左頬にほくろ',
+  'small mole on right cheek':  '右頬にほくろ',
+  'beauty mark near mouth':     '口元に泣きぼくろ',
+  // ほくろ（ボディ）
+  'small mole on neck':         '首にほくろ',
+  'small mole on collarbone':   '鎖骨にほくろ',
+  'small mole on shoulder':     '肩にほくろ',
+  'small mole on upper chest':  '胸元にほくろ',
+  'small mole on thigh':        '太ももにほくろ',
+  // そばかす
+  'freckles on cheeks':         '頬にそばかす',
+  'light freckles across nose': '鼻に薄いそばかす',
+  'subtle freckles':            'うっすらそばかす',
+  // 傷跡（顔）
+  'facial scar':                '顔の傷',
+  'scar above eyebrow':         '眉上の傷',
+  'scar on cheek':              '頬の傷',
+  'scar on neck':               '首の傷',
+  'small scar on left cheek':   '左頬に傷',
+  'small scar on right cheek':  '右頬に傷',
+  'subtle scar over left eyebrow':  '左眉上に傷',
+  'subtle scar over right eyebrow': '右眉上に傷',
+  'scar on nose':               '鼻に傷',
+  // 傷跡（ボディ）
+  'small scar on shoulder':     '肩に傷',
+  'small scar on arm':          '腕に傷',
+  'small scar on thigh':        '太ももに傷',
+  // あざ（顔）
+  'birthmark on cheek':         '頬のあざ',
+  'birthmark on neck':          '首のあざ',
+  'birthmark on shoulder':      '肩のあざ',
+  'small birthmark on cheek':   '頬に小さなあざ',
+  'subtle birthmark on neck':   '首にあざ',
+  // あざ（ボディ）
+  'subtle birthmark on shoulder':   '肩にあざ',
+  'subtle birthmark on upper thigh':'太ももにあざ',
+  'birthmark on back':          '背中にあざ',
+  // タトゥー
+  'small tattoo on arm':        '腕にタトゥー',
+  'tattoo on shoulder':         '肩にタトゥー',
+  'back tattoo':                '背中にタトゥー',
+  'tattoo on upper arm':        '上腕にタトゥー',
+  'tattoo on back':             '背中にタトゥー',
+  'tattoo on thigh':            '太ももにタトゥー',
+  // 絆創膏（顔）
+  'bandaid on cheek':           '頬に絆創膏',
+  'bandaid on left cheek':      '左頬に絆創膏',
+  'bandaid on right cheek':     '右頬に絆創膏',
+  'bandaid on nose':            '鼻に絆創膏',
+  'bandaid on forehead':        '額に絆創膏',
+  // 絆創膏（ボディ）
+  'bandaid on arm':             '腕に絆創膏',
+  'bandaid on knee':            '膝に絆創膏',
+  'bandaid on leg':             '脚に絆創膏',
+  // 包帯
+  'bandage on arm':             '腕に包帯',
+  'bandage on leg':             '脚に包帯',
+  // 眼帯
+  'eyepatch over left eye':     '左目に眼帯',
+  'eyepatch over right eye':    '右目に眼帯',
+  // ピアス
+  'ear piercing':               '耳ピアス',
+  'ear piercing left ear':      '左耳ピアス',
+  'ear piercing right ear':     '右耳ピアス',
+  'eyebrow piercing':           '眉ピアス',
+  'navel piercing':             'へそピアス',
+  'lip piercing':               'リップピアス',
+  'nose piercing':              '鼻ピアス',
+  // 眼鏡・サングラス
+  'wearing glasses':            '眼鏡着用',
+  'glasses on head':            '眼鏡を頭に乗せる',
+  'under-rim glasses':          'アンダーリム眼鏡',
+  'under-rim glasses on head':  'アンダーリム眼鏡を頭に',
+  'half-rim glasses':           'ハーフリム眼鏡',
+  'half-rim glasses on head':   'ハーフリム眼鏡を頭に',
+  'round eyewear':              '丸メガネ',
+  'round eyewear on head':      '丸メガネを頭に乗せる',
+  'square eyewear':             'スクエアメガネ',
+  'square eyewear on head':     'スクエアメガネを頭に乗せる',
+  'goggles on head':            'ゴーグルを頭に乗せる',
+  'wearing sunglasses':         'サングラス着用',
+  'sunglasses on head':         'サングラスを頭に乗せる',
+  'sunglasses hanging from collar': 'サングラスを首元にかける',
+  // ヘッドフォン・マスク
+  'wearing headphones':         'ヘッドフォン着用',
+  'headphones around neck':     'ヘッドフォンを首にかける',
+  'wearing face mask':          'マスク着用',
+  'face mask pulled down':      'マスクを下げる',
+};
+
+export function resolveFeatureLabel(tagEn) {
+  if (!tagEn) return null;
+  const ja = FEATURE_TAG_JA[tagEn.trim().toLowerCase()];
+  return ja ? { en: tagEn.trim(), ja } : null;
+}

@@ -200,6 +200,21 @@ export function applyMaterialMakerLayer(blockMap, mode) {
   }
 }
 
+// ── マテリアルメーカー生成タグの日本語変換 ──────────────────────────
+// "[素材] [部位]" パターンを日本語ラベルに変換
+export function resolveMaterialLabel(tagEn) {
+  if (!tagEn) return null;
+  const lower = tagEn.trim().toLowerCase();
+  for (const mat of MATERIAL_PALETTE) {
+    const prefix = mat.en.toLowerCase() + ' ';
+    if (!lower.startsWith(prefix)) continue;
+    const targetEn = lower.slice(prefix.length);
+    const target = MATERIAL_TARGETS.find(t => t.en.toLowerCase() === targetEn);
+    if (target) return { en: tagEn.trim(), ja: `${mat.ja}の${target.ja}` };
+  }
+  return null;
+}
+
 // ── 手動適用（CommandPalette等から呼び出し）──────────────────────
 // blockMap は Map<id, block> 形式で渡す。変更後のblocks配列を返す。
 export function applyMaterialMakerManual(blocks) {

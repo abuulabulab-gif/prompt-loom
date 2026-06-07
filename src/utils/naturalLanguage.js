@@ -1,5 +1,7 @@
 import { splitTags, bareTag } from '../data/constants.js';
 import { resolveColorLabel } from '../data/colors.js';
+import { resolveFeatureLabel } from '../data/features.js';
+import { resolveMaterialLabel } from '../data/materials.js';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function getTagLabels(blockText, cats) {
@@ -9,6 +11,8 @@ function getTagLabels(blockText, cats) {
   return active.map(en =>
     allDefs.find(d => d.en.toLowerCase() === en.toLowerCase())
     || resolveColorLabel(en)
+    || resolveFeatureLabel(en)
+    || resolveMaterialLabel(en)
     || { en, ja: en }
   );
 }
