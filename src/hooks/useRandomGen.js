@@ -8,7 +8,10 @@ import {
 
 const RARE_OPT_CAT_PROB = 0.10; // rare optional cats: 10% vs standard 40%
 import { CONFLICT_MAP } from "../data/conflicts.js";
-import { COLOR_PALETTE, SHADES, COLOR_TARGETS, buildColorTag, buildColorName, HUE_GROUPS } from "../data/colors.js";
+import { COLOR_PALETTE, SHADES, COLOR_TARGETS, buildColorTag, buildColorName, HUE_GROUPS,
+  CM_PRIMARY_OUTFIT_TAGS, CM_COMPLETE_OUTFITS,
+  CM_OUTFIT_TOPS, CM_OUTFIT_BOTTOMS, CM_OUTFIT_OUTER, CM_OUTFIT_FOOTWEAR, CM_OUTFIT_LEGWEAR,
+} from "../data/colors.js";
 import { applyMaterialMakerLayer } from "../data/materials.js";
 
 // ── 種族パーツ系統管理 ───────────────────────────────────────────────────
@@ -625,15 +628,9 @@ export function applyOutfitStackPenalty(blockMap) {
 
 // ── カラーメーカー自動付与レイヤー ─────────────────────────────────────────
 // 衣装・キャラパーツが存在するとき条件付きで色タグを付与する
-const CM_OUTFIT_SLOTS = [
-  // [targetEn, trigger tags or null, probability, isDetail]
-  ['dress',      new Set(['dress','sundress','sweater dress','wedding dress','evening gown','cheongsam','hanfu','furisode','kimono','yukata','shrine maiden','maid outfit','witch outfit','magical girl','gothic lolita','idol costume','cheerleader','race queen','fantasy armor','bikini armor','bunny suit','bodysuit','leotard','swimsuit','one-piece swimsuit','school swimsuit','tracksuit']), 0.55, false],
-  ['shirt',      new Set(['shirt','blouse','white shirt','dress shirt','school uniform','sailor uniform','blazer uniform','off shoulder','crop top','tank top','tube top','halter top','sleeveless','sports bra']),                                                                                                                                                                                    0.40, false],
-  ['skirt',      new Set(['skirt','pleated skirt','mini skirt','micro skirt','slit skirt']),                                                                                                                                                                                                                                                                                                          0.50, false],
-  ['jacket',     new Set(['jacket','coat','trench coat','cardigan','hoodie','sweater','sweater vest','vest','turtleneck']),                                                                                                                                                                                                                                                                            0.40, false],
-  ['footwear',   new Set(['sneakers','loafers','mary janes','sandals','slippers','heels','pumps','high heels','platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots']),                                                                                                                                                                                          0.30, false],
-  ['stockings',  new Set(['thighhighs','knee-high socks','over-knee socks','tights','pantyhose','fishnet tights','fishnet stockings']),                                                                                                                                                                                                                                                               0.45, false],
-];
+// 衣装着色は動的検出：実際の衣装タグをそのまま色ターゲットにする
+// （CM_PRIMARY_OUTFIT_TAGS等はcolors.jsからimport済み）
+
 // メイクアップ（フェイスブロック対象）
 const CM_MAKEUP_SLOTS = [
   ['eyeshadow', new Set(['eyeshadow','makeup']), 0.60],
@@ -674,14 +671,46 @@ export function applyColorMakerLayer(blockMap, mode) {
 
   if (outfitBlock && !outfitBlock.locked) {
     let text = outfitBlock.text || '';
-    for (const [targetEn, keys, prob, isDetail] of CM_OUTFIT_SLOTS) {
-      if (added >= MAX_TAGS) break;
-      if (keys !== null && ![...keys].some(k => hasTag(text, k))) continue;
-      if (keys === null && !text) continue;
-      if (Math.random() > prob) continue;
-      const tag = makeTag(isDetail, targetEn);
-      if (!hasTag(text, tag)) { text = appendTag(text, tag, outfitBlock.strength); added++; }
+    const str = outfitBlock.strength;
+
+    // [1] メイン衣装：実際の衣装タグに直接色を付ける
+    const primaryTag = CM_PRIMARY_OUTFIT_TAGS.find(t => hasTag(text, t));
+    if (primaryTag && added < MAX_TAGS && Math.random() < 0.55) {
+      const tag = makeTag(false, primaryTag);
+      if (!hasTag(text, tag)) { text = appendTag(text, tag, str); added++; }
     }
+    const isComplete = primaryTag && CM_COMPLETE_OUTFITS.has(primaryTag);
+
+    // [2] トップス（完成系衣装がない場合のみ）
+    if (!isComplete && added < MAX_TAGS && Math.random() < 0.40) {
+      const t = CM_OUTFIT_TOPS.find(k => hasTag(text, k));
+      if (t) { const tag = makeTag(false, t); if (!hasTag(text, tag)) { text = appendTag(text, tag, str); added++; } }
+    }
+
+    // [3] ボトムス（完成系衣装がない場合のみ）
+    if (!isComplete && added < MAX_TAGS && Math.random() < 0.50) {
+      const t = CM_OUTFIT_BOTTOMS.find(k => hasTag(text, k));
+      if (t) { const tag = makeTag(false, t); if (!hasTag(text, tag)) { text = appendTag(text, tag, str); added++; } }
+    }
+
+    // [4] アウター（常に試みる）
+    if (added < MAX_TAGS && Math.random() < 0.40) {
+      const t = CM_OUTFIT_OUTER.find(k => hasTag(text, k));
+      if (t) { const tag = makeTag(false, t); if (!hasTag(text, tag)) { text = appendTag(text, tag, str); added++; } }
+    }
+
+    // [5] フットウェア（常に試みる）
+    if (added < MAX_TAGS && Math.random() < 0.30) {
+      const t = CM_OUTFIT_FOOTWEAR.find(k => hasTag(text, k));
+      if (t) { const tag = makeTag(false, t); if (!hasTag(text, tag)) { text = appendTag(text, tag, str); added++; } }
+    }
+
+    // [6] レッグウェア（常に試みる）
+    if (added < MAX_TAGS && Math.random() < 0.45) {
+      const t = CM_OUTFIT_LEGWEAR.find(k => hasTag(text, k));
+      if (t) { const tag = makeTag(false, t); if (!hasTag(text, tag)) { text = appendTag(text, tag, str); added++; } }
+    }
+
     if (text !== (outfitBlock.text || '')) blockMap.set('outfit', { ...outfitBlock, text });
   }
 

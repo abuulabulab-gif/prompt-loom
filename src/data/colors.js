@@ -42,21 +42,21 @@ export const COLOR_TARGETS = [
   // ── キャラパーツ ──────────────────────────────────────────────
   { id:'nails',         ja:'爪',            en:'nails'       },
   { id:'tail_color',    ja:'しっぽ',        en:'tail'        },
-  // ── 衣装 ──────────────────────────────────────────────────────
-  { id:'dress',         ja:'服',            en:'dress'       },
-  { id:'shirt',         ja:'シャツ',        en:'shirt'       },
-  { id:'skirt',         ja:'スカート',      en:'skirt'       },
-  { id:'jacket',        ja:'上着',          en:'jacket'      },
-  { id:'ribbon',        ja:'リボン',        en:'ribbon'      },
-  { id:'accents',       ja:'アクセント色',  en:'accents'     },
-  { id:'trim',          ja:'縁取り',        en:'trim'        },
-  { id:'embroidery',    ja:'刺繍',          en:'embroidery'  },
-  { id:'lace',          ja:'レース',        en:'lace'        },
-  { id:'shoes',         ja:'靴',            en:'footwear'    },
-  { id:'stockings',    ja:'ストッキング',   en:'stockings'   },
+  // ── 衣装（動的検出：実際の衣装タグをそのまま色ターゲットにする）──
+  { id:'outfit_main',   ja:'衣装メイン',     en:'outfit'      },
+  { id:'top',           ja:'トップス',       en:'top'         },
+  { id:'bottom',        ja:'ボトムス',       en:'skirt'       },
+  { id:'outer',         ja:'アウター',       en:'jacket'      },
+  { id:'footwear',      ja:'フットウェア',   en:'shoes'       },
+  { id:'legwear',       ja:'レッグウェア',   en:'stockings'   },
+  { id:'ribbon',        ja:'リボン',         en:'ribbon'      },
+  { id:'accents',       ja:'アクセント色',   en:'accents'     },
+  { id:'trim',          ja:'縁取り',         en:'trim'        },
+  { id:'embroidery',    ja:'刺繍',           en:'embroidery'  },
+  { id:'lace',          ja:'レース',         en:'lace'        },
   // ── メイク ────────────────────────────────────────────────────
-  { id:'eyeshadow',    ja:'アイシャドウ',   en:'eyeshadow'   },
-  { id:'lipstick',     ja:'口紅',           en:'lipstick'    },
+  { id:'eyeshadow',     ja:'アイシャドウ',   en:'eyeshadow'   },
+  { id:'lipstick',      ja:'口紅',           en:'lipstick'    },
   // ── その他 ────────────────────────────────────────────────────
   { id:'bg_color',      ja:'背景カラー',    en:'background'  },
 ];
@@ -100,6 +100,64 @@ export const buildColorTag = (shadeEn, colorEn, targetEn) => {
   if (targetEn === 'inner hair') return `inner ${name} hair`;
   return `${name} ${targetEn}`.trim();
 };
+
+// ── 衣装カラー動的検出リスト ──────────────────────────────────────────────
+// 優先順位順にスキャンし、最初にヒットした衣装タグを色のターゲットにする。
+// 自動生成レイヤー（useRandomGen）と手動カラーピッカー（ColorPickerModal）で共有。
+
+export const CM_PRIMARY_OUTFIT_TAGS = [
+  // 完成系（民族・制服・コスプレ・特殊衣装）
+  'shrine maiden','maid outfit','witch outfit','magical girl','gothic lolita',
+  'idol costume','cheerleader','race queen','nurse','nun',
+  'school uniform','sailor uniform','blazer uniform',
+  'fantasy armor','bikini armor','sci-fi armor',
+  'wedding dress','evening gown','cheongsam','hanfu','furisode','kimono','yukata',
+  // 水着
+  'micro bikini','string bikini','frilled bikini','monokini',
+  'bikini','swimsuit','one-piece swimsuit','school swimsuit',
+  // ランジェリー・ボディスーツ
+  'lingerie','babydoll','leotard','bodysuit','bunny suit','reverse bunny suit','corset',
+  // コスプレ・その他完成系
+  'santa costume','ninja','pirate outfit','clown costume','tracksuit','sportswear',
+  // 汎用ドレス（フォールバック）
+  'sundress','sweater dress','dress',
+];
+
+// 完成系衣装セット（一致したらトップス・ボトムスは別途着色しない）
+export const CM_COMPLETE_OUTFITS = new Set([
+  'shrine maiden','maid outfit','witch outfit','magical girl','gothic lolita',
+  'idol costume','cheerleader','race queen','nurse','nun',
+  'school uniform','sailor uniform','blazer uniform',
+  'fantasy armor','bikini armor','sci-fi armor',
+  'wedding dress','evening gown','cheongsam','hanfu','furisode','kimono','yukata',
+  'micro bikini','string bikini','frilled bikini','monokini',
+  'bikini','swimsuit','one-piece swimsuit','school swimsuit',
+  'lingerie','babydoll','leotard','bodysuit','bunny suit','reverse bunny suit','corset',
+  'santa costume','ninja','pirate outfit','clown costume','tracksuit','sportswear',
+  'sundress','sweater dress',
+]);
+
+export const CM_OUTFIT_TOPS = [
+  'crop top','tank top','tube top','camisole','halter top',
+  'blouse','white shirt','dress shirt','off shoulder',
+  'sports bra','turtleneck','sweater','cardigan','hoodie',
+];
+export const CM_OUTFIT_BOTTOMS = [
+  'pleated skirt','mini skirt','micro skirt','pencil skirt','slit skirt','flared skirt',
+  'skirt','hot pants','shorts','jeans','leggings','cargo pants','pants',
+];
+export const CM_OUTFIT_OUTER = [
+  'trench coat','coat','jacket','blazer','vest',
+];
+export const CM_OUTFIT_FOOTWEAR = [
+  'thigh-high boots','knee-high boots','platform boots','ankle boots','boots',
+  'high heels','platform shoes','heels','pumps',
+  'sneakers','loafers','mary janes','sandals','slippers',
+];
+export const CM_OUTFIT_LEGWEAR = [
+  'fishnet tights','fishnet stockings','fishnet legwear',
+  'thighhighs','over-knee socks','knee-high socks','tights','pantyhose',
+];
 
 // Hue groups for heterochromia random gen — picks from different groups to avoid same-hue pairs
 export const HUE_GROUPS = [

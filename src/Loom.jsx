@@ -218,6 +218,7 @@ export default function Loom() {
   const [colorToast, setColorToast] = useState(null); // null | { msg }
   const [colorPickerAllowedTargets, setColorPickerAllowedTargets] = useState(null);
   const [colorPickerDefaultTarget, setColorPickerDefaultTarget] = useState('hair');
+  const [colorPickerBlockText, setColorPickerBlockText] = useState(null);
   const [orderUpdatedAt, setOrderUpdatedAt] = useState(0);
   const [settingsUpdatedAt, setSettingsUpdatedAt] = useState(0);
   const [blockStatusOpen, setBlockStatusOpen] = useState(false);
@@ -328,9 +329,13 @@ export default function Loom() {
   }, [characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight, orderUpdatedAt, settingsUpdatedAt, loaded]);
 
   // ── Color picker apply ──
-  const TARGET_TO_BLOCK = { hair: 'face', inner_hair: 'face', bangs: 'face', bang_streak: 'face', forelock: 'face', hair_tips: 'face', sidelocks: 'face', eyes: 'face', heterochromia: 'face', dress: 'outfit', shirt: 'outfit', skirt: 'outfit', jacket: 'outfit', ribbon: 'outfit', accents: 'outfit', trim: 'outfit', embroidery: 'outfit', lace: 'outfit', shoes: 'outfit', bg_color: 'background' };
-  const BLOCK_TO_COLOR_TARGET   = { face: 'hair', outfit: 'dress', background: 'bg_color' };
-  const BLOCK_TO_ALLOWED_TARGETS = { face: ['hair','inner_hair','bangs','bang_streak','forelock','hair_tips','sidelocks','eyes','heterochromia'], outfit: ['dress','shirt','skirt','jacket','ribbon','accents','trim','embroidery','lace','shoes'], background: ['bg_color'] };
+  const TARGET_TO_BLOCK = { hair: 'face', inner_hair: 'face', bangs: 'face', bang_streak: 'face', forelock: 'face', hair_tips: 'face', sidelocks: 'face', eyes: 'face', heterochromia: 'face', nails: 'body', outfit_main: 'outfit', top: 'outfit', bottom: 'outfit', outer: 'outfit', footwear: 'outfit', legwear: 'outfit', ribbon: 'outfit', accents: 'outfit', trim: 'outfit', embroidery: 'outfit', lace: 'outfit', eyeshadow: 'face', lipstick: 'face', bg_color: 'background' };
+  const BLOCK_TO_COLOR_TARGET   = { face: 'hair', outfit: 'outfit_main', background: 'bg_color' };
+  const BLOCK_TO_ALLOWED_TARGETS = {
+    face:       ['hair','inner_hair','bangs','bang_streak','forelock','hair_tips','sidelocks','eyes','heterochromia','eyeshadow','lipstick'],
+    outfit:     ['outfit_main','top','bottom','outer','footwear','legwear','ribbon','accents','trim','embroidery','lace'],
+    background: ['bg_color'],
+  };
 
   // 新API: applyColorTag(tags[], targetId) — ColorPickerModalから配列で渡される
   const applyColorTag = (tags, targetId) => {
@@ -385,9 +390,10 @@ export default function Loom() {
     setTimeout(() => setColorToast(null), 3000);
   };
 
-  const openColorPicker = (defaultTarget = 'hair', allowedTargets = null) => {
+  const openColorPicker = (defaultTarget = 'hair', allowedTargets = null, blockText = null) => {
     setColorPickerDefaultTarget(defaultTarget);
     setColorPickerAllowedTargets(allowedTargets);
+    setColorPickerBlockText(blockText);
     setColorPickerOpen(true);
   };
 
@@ -1828,7 +1834,7 @@ export default function Loom() {
                   analyzeText={analyzeText}
                   allBlocks={blocks}
                   onUndoBackup={templateUndoBuf?.blockTexts[block.id] !== undefined ? () => undoSingleBlock(block.id) : undefined}
-                  onColorPicker={BLOCK_TO_COLOR_TARGET[block.id] ? () => openColorPicker(BLOCK_TO_COLOR_TARGET[block.id], BLOCK_TO_ALLOWED_TARGETS[block.id]) : undefined}
+                  onColorPicker={BLOCK_TO_COLOR_TARGET[block.id] ? () => openColorPicker(BLOCK_TO_COLOR_TARGET[block.id], BLOCK_TO_ALLOWED_TARGETS[block.id], block.text) : undefined}
                   onFeatureMaker={['face','body','outfit'].includes(block.id) ? () => { setFeatureMakerFilterBlock(block.id); setFeatureMakerOpen(true); } : undefined}
                   onMaterialMaker={block.id === 'outfit' ? () => setMaterialMakerOpen(true) : undefined}
                   isLight={theme === 'light'} />
@@ -2806,7 +2812,7 @@ export default function Loom() {
       {historyOpen && <HistoryModal history={history} lang={lang} onClose={() => setHistoryOpen(false)} onRestore={restoreFromHistory} onDelete={id => setHistory(prev => prev.filter(h => h.id !== id))} />}
       {naturalToTagsOpen && <NaturalToTagsModal lang={lang} apiConfig={apiConfig} blocks={blocks} onAddTags={handleAddTagsFromNatural} onClose={() => setNaturalToTagsOpen(false)} initialTab={naturalToTagsTab} />}
       {templateOpen && <TemplateModal lang={lang} isMobile={isMobile} onApply={applyTemplate} onClose={() => setTemplateOpen(false)} />}
-      {colorPickerOpen && <ColorPickerModal lang={lang} onApply={applyColorTag} onClose={() => setColorPickerOpen(false)} defaultTarget={colorPickerDefaultTarget} allowedTargets={colorPickerAllowedTargets} />}
+      {colorPickerOpen && <ColorPickerModal lang={lang} onApply={applyColorTag} onClose={() => setColorPickerOpen(false)} defaultTarget={colorPickerDefaultTarget} allowedTargets={colorPickerAllowedTargets} blockText={colorPickerBlockText} />}
       {featureMakerOpen && <FeatureMakerModal lang={lang} blocks={blocks} onApply={applyFeatureTag} onClose={() => setFeatureMakerOpen(false)} filterBlockId={featureMakerFilterBlock} />}
       {materialMakerOpen && <MaterialMakerModal lang={lang} blocks={blocks} onApply={applyMaterialTag} onClose={() => setMaterialMakerOpen(false)} />}
       {sceneOpen && <SceneComposeModal characters={characters} lang={lang} activeTool={activeTool} theme={theme} onClose={() => setSceneOpen(false)} defaultQuality={blocks.find(b => b.id === 'quality')?.text || ''} />}

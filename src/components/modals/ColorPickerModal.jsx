@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { COLOR_PALETTE, SHADES, COLOR_TARGETS, HAIR_TYPES, FRONT_HAIR_TYPES, buildColorTag, buildColorName } from "../../data/colors.js";
+import { COLOR_PALETTE, SHADES, COLOR_TARGETS, HAIR_TYPES, FRONT_HAIR_TYPES, buildColorTag, buildColorName,
+  CM_PRIMARY_OUTFIT_TAGS, CM_OUTFIT_TOPS, CM_OUTFIT_BOTTOMS, CM_OUTFIT_OUTER, CM_OUTFIT_FOOTWEAR, CM_OUTFIT_LEGWEAR,
+} from "../../data/colors.js";
+import { hasTag } from "../../data/constants.js";
 
 const ACCENT   = '#6c8fff';
 const HAIR_ACC = '#a78bfa';
@@ -48,7 +51,21 @@ function ShadeButtons({ sel, set, lang, acc }) {
 
 const STEP = ['①','②','③','④','⑤','⑥'];
 
-export default function ColorPickerModal({ lang, onApply, onClose, defaultTarget, allowedTargets }) {
+const DYNAMIC_TARGET_MAP = {
+  outfit_main: CM_PRIMARY_OUTFIT_TAGS,
+  top:         CM_OUTFIT_TOPS,
+  bottom:      CM_OUTFIT_BOTTOMS,
+  outer:       CM_OUTFIT_OUTER,
+  footwear:    CM_OUTFIT_FOOTWEAR,
+  legwear:     CM_OUTFIT_LEGWEAR,
+};
+function getDynamicTag(targetId, blockText) {
+  const list = DYNAMIC_TARGET_MAP[targetId];
+  if (!list || !blockText) return null;
+  return list.find(t => hasTag(blockText, t)) || null;
+}
+
+export default function ColorPickerModal({ lang, onApply, onClose, defaultTarget, allowedTargets, blockText }) {
   const available = allowedTargets
     ? COLOR_TARGETS.filter(t => allowedTargets.includes(t.id))
     : COLOR_TARGETS;
@@ -85,16 +102,17 @@ export default function ColorPickerModal({ lang, onApply, onClose, defaultTarget
   const c1Name = buildColorName(sh1, color.en);
   const c2Name = buildColorName(sh2, color2.en);
 
+  const effectiveEn = getDynamicTag(target?.id, blockText) ?? target?.en ?? '';
   const preview = isHetero
     ? `${c1Name} and ${c2Name} eyes, heterochromia`
     : ((isFull || isFront) && hairType !== 'single')
       ? buildHairTags(hairType, target.en, c1Name, c2Name).join(', ')
-      : buildColorTag(sh1, color.en, target?.en || '');
+      : buildColorTag(sh1, color.en, effectiveEn);
 
   const handleApply = () => {
     if (isHetero) { onApply([`${c1Name} and ${c2Name} eyes`, 'heterochromia'], target.id); return; }
     if ((isFull || isFront) && hairType !== 'single') { onApply(buildHairTags(hairType, target.en, c1Name, c2Name), target.id); return; }
-    onApply([buildColorTag(sh1, color.en, target?.en || '')], target.id);
+    onApply([buildColorTag(sh1, color.en, effectiveEn)], target.id);
   };
 
   const setTgt = (t) => { setTarget(t); if (t.hairGroup !== 'full' && t.hairGroup !== 'front') setHairType('single'); };
