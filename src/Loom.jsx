@@ -2164,10 +2164,14 @@ export default function Loom() {
                 // ── 一貫性チェック（生成ごとに同じキャラが出るか）──
                 const faceB = c.blocks.find(b => b.id === 'face');
                 const faceT = (faceB?.enabled !== false ? faceB?.text : '') || '';
-                const hasHairColor = allText ? /\b(?:red|pink|orange|yellow|blonde|brown|black|white|gray|grey|silver|purple|blue|green|teal|gold|lavender|crimson|amber|cobalt|coral|rose|ash|dark|light|pale)[\w ]*\bhair\b/i.test(faceT) : true;
-                const hasEyeColor  = allText ? /\b(?:red|pink|orange|yellow|brown|black|white|gray|grey|silver|purple|blue|green|teal|gold|lavender|amber|violet|dark|light|pale)[\w ]*\beyes\b/i.test(faceT) : true;
+                const hasHairColor = allText ? /\b(?:red|pink|orange|yellow|blonde|brown|black|white|gray|grey|silver|purple|blue|green|teal|gold|lavender|crimson|amber|cobalt|coral|rose|ash|dark|light|pale|navy|aqua|lime|magenta|violet|ivory|platinum|chocolate|strawberry)[\w ]*\bhair\b/i.test(faceT) : true;
+                const hasEyeColor  = allText ? /\b(?:red|pink|orange|yellow|brown|black|white|gray|grey|silver|purple|blue|green|teal|gold|lavender|amber|violet|dark|light|pale|aqua|navy|lime|crimson)[\w ]*\beyes\b/i.test(faceT) : true;
                 const hasEnoughTags = !allText || tags >= 8;
-                const consistIssues = [!hasHairColor, !hasEyeColor, !hasEnoughTags].filter(Boolean).length;
+                // 女性キャラ＋胸サイズなしチェック
+                const isFemaleChar = allText && /\b(?:1girl|2girls|girl|female|woman|wife|sister|mother)\b/i.test(allText);
+                const hasBustSize  = allText && /\b(?:flat chest|small breasts|medium breasts|large breasts|huge breasts)\b/i.test(allText);
+                const missingBust  = isFemaleChar && !hasBustSize;
+                const consistIssues = [!hasHairColor, !hasEyeColor, !hasEnoughTags, missingBust].filter(Boolean).length;
                 const totalWarn = warnCount + (maxBlock >= 14 ? 1 : 0) + consistIssues;
                 const risk = !allText            ? null
                            : errCount >= 2       ? { label: '大', color: '#f87171' }
@@ -2236,6 +2240,7 @@ export default function Loom() {
                                 if (!hasHairColor) parts.push(lang === 'ja' ? '髪色未設定' : 'Hair color missing');
                                 if (!hasEyeColor)  parts.push(lang === 'ja' ? '目の色未設定' : 'Eye color missing');
                                 if (!hasEnoughTags) parts.push(lang === 'ja' ? 'タグ不足' : 'Too few tags');
+                                if (missingBust)   parts.push(lang === 'ja' ? '胸サイズ未設定' : 'Bust size missing');
                                 return parts.length ? parts.join(' / ') : (lang === 'ja' ? '問題なし' : 'No issues');
                               })()}
                               style={{

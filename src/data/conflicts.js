@@ -268,6 +268,13 @@ export const CONFLICT_RULES = [
   { tags:['mermaid','single thighhigh'],ja:'人魚と片方ニーハイが矛盾（脚がない）',          en:'mermaid + single thighhigh' },
   { tags:['mermaid','mismatched legwear'],ja:'人魚と左右違い靴下が矛盾（脚がない）',        en:'mermaid + mismatched legwear' },
   { tags:['mermaid','fishnet legwear'],  ja:'人魚と網レッグウェアが矛盾（脚がない）',      en:'mermaid + fishnet legwear' },
+  // 追加: geta・zettai ryouiki・スカート系・ボディフォーカス脚系
+  { tags:['mermaid','geta'],            ja:'人魚と下駄が矛盾（脚がない）',                en:'mermaid + geta' },
+  { tags:['mermaid','zettai ryouiki'],  ja:'人魚と絶対領域が矛盾（脚がない）',             en:'mermaid + zettai ryouiki' },
+  { tags:['mermaid','tights'],          ja:'人魚とタイツが矛盾（脚がない）',               en:'mermaid + tights' },
+  { tags:['mermaid','fishnet tights'],  ja:'人魚とフィッシュネットタイツが矛盾（脚がない）', en:'mermaid + fishnet tights' },
+  ...mk('mermaid', ['flared skirt','mini skirt','micro skirt','slit skirt','pencil skirt'], '人魚とスカート類が矛盾（脚がない）'),
+  ...mk('mermaid', ['bare thighs','thighs','thigh gap','thick thighs','long legs'], '人魚と脚部ボディフォーカスが矛盾（脚がない）'),
 
   // ── 種族×衣装（ラミア）─────────────────────────────────────────
   { tags:['lamia','thighhighs'],          ja:'ラミアとニーハイが矛盾（蛇の下半身）',        en:'lamia + thighhighs' },
@@ -296,6 +303,19 @@ export const CONFLICT_RULES = [
   { tags:['lamia','single thighhigh'],  ja:'ラミアと片方ニーハイが矛盾（蛇の下半身）',      en:'lamia + single thighhigh' },
   { tags:['lamia','mismatched legwear'],ja:'ラミアと左右違い靴下が矛盾（蛇の下半身）',      en:'lamia + mismatched legwear' },
   { tags:['lamia','fishnet legwear'],  ja:'ラミアと網レッグウェアが矛盾（蛇の下半身）',    en:'lamia + fishnet legwear' },
+  // 追加
+  { tags:['lamia','geta'],            ja:'ラミアと下駄が矛盾（蛇の下半身）',              en:'lamia + geta' },
+  { tags:['lamia','slippers'],        ja:'ラミアとスリッパが矛盾（蛇の下半身）',           en:'lamia + slippers' },
+  { tags:['lamia','zettai ryouiki'],  ja:'ラミアと絶対領域が矛盾（蛇の下半身）',           en:'lamia + zettai ryouiki' },
+  { tags:['lamia','tights'],          ja:'ラミアとタイツが矛盾（蛇の下半身）',             en:'lamia + tights' },
+  { tags:['lamia','fishnet tights'],  ja:'ラミアとフィッシュネットタイツが矛盾（蛇の下半身）', en:'lamia + fishnet tights' },
+  ...mk('lamia', ['flared skirt','mini skirt','micro skirt','slit skirt','pencil skirt'], 'ラミアとスカート類が矛盾（蛇の下半身）'),
+  ...mk('lamia', ['bare thighs','thighs','thigh gap','thick thighs','long legs'], 'ラミアと脚部ボディフォーカスが矛盾（蛇の下半身）'),
+
+  // ── 男性 × 胸サイズ ──────────────────────────────────────────
+  { tags:['1boy','large breasts'],   ja:'男性と大きめ胸サイズが矛盾',  en:'1boy + large breasts' },
+  { tags:['1boy','huge breasts'],    ja:'男性と大きめ胸サイズが矛盾',  en:'1boy + huge breasts' },
+  { tags:['1boy','medium breasts'],  ja:'男性と中程度胸サイズが矛盾',  en:'1boy + medium breasts', level:'warn' },
 
   // ── 髪型 × 髪の長さ ───────────────────────────────────────────
   { tags:['drill hair','short hair'],     ja:'ドリルヘアとショートが矛盾（長さが必要）',    en:'drill hair + short hair' },

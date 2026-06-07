@@ -241,19 +241,26 @@ export const RANDOM_EXCLUSION_RULES = new Map([
   ['cowboy shot',      LOWER_BODY_FRAME_OUT],
   // 種族 × 衣装・足元（下半身がない種族）
   ['mermaid', new Set([
-    'sneakers','loafers','mary janes','sandals','slippers','heels','pumps','high heels',
+    'sneakers','loafers','mary janes','sandals','slippers','geta','heels','pumps','high heels',
     'platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
     'ankle socks','socks','knee-high socks','thighhighs','white thighhighs','black thighhighs',
-    'tights','pantyhose','stirrup leggings','leg warmers','barefoot',
-    'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','slit skirt','pants','jeans','leggings',
+    'tights','pantyhose','fishnet tights','fishnet stockings','fishnet legwear','stirrup leggings','leg warmers','barefoot',
+    'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','slit skirt','flared skirt','pencil skirt','pants','jeans','leggings',
+    'zettai ryouiki','bare thighs','thighs','thigh gap','thick thighs','long legs','garter belt',
+    'soles','toes','foot focus','toenail polish','pointed toes',
   ])],
   ['lamia', new Set([
-    'sneakers','loafers','mary janes','sandals','slippers','heels','pumps','high heels',
+    'sneakers','loafers','mary janes','sandals','slippers','geta','heels','pumps','high heels',
     'platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
     'ankle socks','socks','knee-high socks','thighhighs','white thighhighs','black thighhighs',
-    'tights','pantyhose','stirrup leggings','leg warmers','barefoot',
-    'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','slit skirt','pants','jeans','leggings',
+    'tights','pantyhose','fishnet tights','fishnet stockings','fishnet legwear','stirrup leggings','leg warmers','barefoot',
+    'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','slit skirt','flared skirt','pencil skirt','pants','jeans','leggings',
+    'zettai ryouiki','bare thighs','thighs','thigh gap','thick thighs','long legs','garter belt',
+    'soles','toes','foot focus','toenail polish','pointed toes',
   ])],
+  // 男性 → 胸サイズを flat chest 以外から排除
+  ['1boy', new Set(['small breasts','medium breasts','large breasts','huge breasts'])],
+  ['androgynous', new Set(['large breasts','huge breasts'])],
   // 裸足 → フットウェア全般を除外
   ['barefoot', new Set([
     'sneakers','loafers','mary janes','sandals','slippers','heels','pumps','high heels',
