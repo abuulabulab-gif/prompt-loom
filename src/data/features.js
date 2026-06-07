@@ -126,6 +126,7 @@ export const FEATURE_ITEMS = {
         { ja:'両耳',   en:'ear piercing' },
         { ja:'左耳',   en:'ear piercing left ear' },
         { ja:'右耳',   en:'ear piercing right ear' },
+        { ja:'眉',     en:'eyebrow piercing' },
         { ja:'へそ',   en:'navel piercing' },
         { ja:'リップ', en:'lip piercing' },
         { ja:'鼻',     en:'nose piercing' },

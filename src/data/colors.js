@@ -53,6 +53,10 @@ export const COLOR_TARGETS = [
   { id:'embroidery',    ja:'刺繍',          en:'embroidery'  },
   { id:'lace',          ja:'レース',        en:'lace'        },
   { id:'shoes',         ja:'靴',            en:'footwear'    },
+  { id:'stockings',    ja:'ストッキング',   en:'stockings'   },
+  // ── メイク ────────────────────────────────────────────────────
+  { id:'eyeshadow',    ja:'アイシャドウ',   en:'eyeshadow'   },
+  { id:'lipstick',     ja:'口紅',           en:'lipstick'    },
   // ── その他 ────────────────────────────────────────────────────
   { id:'bg_color',      ja:'背景カラー',    en:'background'  },
 ];

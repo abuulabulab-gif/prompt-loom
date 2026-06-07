@@ -632,6 +632,12 @@ const CM_OUTFIT_SLOTS = [
   ['skirt',      new Set(['skirt','pleated skirt','mini skirt','micro skirt','slit skirt']),                                                                                                                                                                                                                                                                                                          0.50, false],
   ['jacket',     new Set(['jacket','coat','trench coat','cardigan','hoodie','sweater','sweater vest','vest','turtleneck']),                                                                                                                                                                                                                                                                            0.40, false],
   ['footwear',   new Set(['sneakers','loafers','mary janes','sandals','slippers','heels','pumps','high heels','platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots']),                                                                                                                                                                                          0.30, false],
+  ['stockings',  new Set(['thighhighs','knee-high socks','over-knee socks','tights','pantyhose','fishnet tights','fishnet stockings']),                                                                                                                                                                                                                                                               0.45, false],
+];
+// メイクアップ（フェイスブロック対象）
+const CM_MAKEUP_SLOTS = [
+  ['eyeshadow', new Set(['eyeshadow','makeup']), 0.60],
+  ['lipstick',  new Set(['lipstick', 'makeup']), 0.50],
 ];
 // ribbon/lace/trim/embroidery は衣装ディテール（feature）ブロックに移動済みのため別スロットで管理
 const CM_DETAIL_SLOTS = [
@@ -705,6 +711,20 @@ export function applyColorMakerLayer(blockMap, mode) {
     const t = bodyBlock2.text || '';
     const tag = makeTag(true, 'nails');
     if (!hasTag(t, tag)) blockMap.set('body', { ...bodyBlock2, text: appendTag(t, tag, bodyBlock2.strength) });
+  }
+
+  // フェイスブロック: メイクアップの色付与
+  const faceBlock = blockMap.get('face');
+  if (added < MAX_TAGS && faceBlock && !faceBlock.locked) {
+    let ftext = faceBlock.text || '';
+    for (const [targetEn, keys, prob] of CM_MAKEUP_SLOTS) {
+      if (added >= MAX_TAGS) break;
+      if (![...keys].some(k => hasTag(ftext, k))) continue;
+      if (Math.random() > prob) continue;
+      const tag = makeTag(true, targetEn);
+      if (!hasTag(ftext, tag)) { ftext = appendTag(ftext, tag, faceBlock.strength); added++; }
+    }
+    if (ftext !== (faceBlock.text || '')) blockMap.set('face', { ...faceBlock, text: ftext });
   }
 }
 
