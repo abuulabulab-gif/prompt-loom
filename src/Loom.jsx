@@ -2161,7 +2161,14 @@ export default function Loom() {
                 const errCount  = conflicts.filter(r => !r.level || r.level === 'error').length;
                 const warnCount = conflicts.filter(r => r.level === 'warn').length;
                 const maxBlock  = nonNeg.reduce((m, b) => Math.max(m, countTags(b.text)), 0);
-                const totalWarn = warnCount + (maxBlock >= 14 ? 1 : 0);
+                // ── 一貫性チェック（生成ごとに同じキャラが出るか）──
+                const faceB = c.blocks.find(b => b.id === 'face');
+                const faceT = (faceB?.enabled !== false ? faceB?.text : '') || '';
+                const hasHairColor = allText ? /\b(?:red|pink|orange|yellow|blonde|brown|black|white|gray|grey|silver|purple|blue|green|teal|gold|lavender|crimson|amber|cobalt|coral|rose|ash|dark|light|pale)[\w ]*\bhair\b/i.test(faceT) : true;
+                const hasEyeColor  = allText ? /\b(?:red|pink|orange|yellow|brown|black|white|gray|grey|silver|purple|blue|green|teal|gold|lavender|amber|violet|dark|light|pale)[\w ]*\beyes\b/i.test(faceT) : true;
+                const hasEnoughTags = !allText || tags >= 8;
+                const consistIssues = [!hasHairColor, !hasEyeColor, !hasEnoughTags].filter(Boolean).length;
+                const totalWarn = warnCount + (maxBlock >= 14 ? 1 : 0) + consistIssues;
                 const risk = !allText            ? null
                            : errCount >= 2       ? { label: '大', color: '#f87171' }
                            : errCount === 1      ? { label: '中', color: '#fb923c' }
@@ -2221,12 +2228,16 @@ export default function Loom() {
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           {risk && (
                             <div
-                              title={
-                                errCount >= 2  ? (lang === 'ja' ? `競合タグ ${errCount}件` : `${errCount} conflicts`)
-                              : errCount === 1 ? (lang === 'ja' ? '競合タグ 1件' : '1 conflict')
-                              : totalWarn >= 1 ? (lang === 'ja' ? `注意タグ ${totalWarn}件` : `${totalWarn} soft issues`)
-                              :                  (lang === 'ja' ? '問題なし' : 'No issues')
-                              }
+                              title={(() => {
+                                const parts = [];
+                                if (errCount > 0) parts.push(lang === 'ja' ? `競合 ${errCount}件` : `${errCount} conflict${errCount > 1 ? 's' : ''}`);
+                                const baseWarn = warnCount + (maxBlock >= 14 ? 1 : 0);
+                                if (baseWarn > 0) parts.push(lang === 'ja' ? `注意 ${baseWarn}件` : `${baseWarn} soft`);
+                                if (!hasHairColor) parts.push(lang === 'ja' ? '髪色未設定' : 'Hair color missing');
+                                if (!hasEyeColor)  parts.push(lang === 'ja' ? '目の色未設定' : 'Eye color missing');
+                                if (!hasEnoughTags) parts.push(lang === 'ja' ? 'タグ不足' : 'Too few tags');
+                                return parts.length ? parts.join(' / ') : (lang === 'ja' ? '問題なし' : 'No issues');
+                              })()}
                               style={{
                                 fontSize: '0.625rem', fontFamily: 'monospace', fontWeight: 800,
                                 color: risk.color,
