@@ -120,6 +120,18 @@ export const CONFLICT_RULES = [
   { tags:['slime girl',   '1boy'], level:'warn', ja:'スライム系タグは人型女性寄りの表現になりやすい', en:'slime girl + 1boy (may render feminine)' },
   { tags:['goblin girl',  '1boy'], level:'warn', ja:'ゴブリン系タグは人型女性寄りの表現になりやすい', en:'goblin girl + 1boy (may render feminine)' },
 
+  // ── 翼の種類（同時指定）───────────────────────────────────────────
+  { tags:['fairy wings',    'demon wings'],      ja:'妖精翼と悪魔翼が同時指定で矛盾',          en:'fairy wings + demon wings' },
+  { tags:['fairy wings',    'angel wings'],      ja:'妖精翼と天使翼が同時指定で矛盾',          en:'fairy wings + angel wings' },
+  { tags:['fairy wings',    'feathered wings'],  ja:'妖精翼と鳥翼が同時指定で矛盾',            en:'fairy wings + feathered wings' },
+  { tags:['fairy wings',    'mechanical wings'], ja:'妖精翼と機械翼が同時指定で矛盾',          en:'fairy wings + mechanical wings' },
+  { tags:['fairy wings',    'dragon tail'],      level:'warn', ja:'妖精翼とドラゴン翼が混在（ハイブリッド）', en:'fairy wings + dragon tail (hybrid)' },
+  { tags:['angel wings',    'demon wings'],      ja:'天使翼と悪魔翼が同時指定で矛盾',          en:'angel wings + demon wings' },
+  { tags:['angel wings',    'mechanical wings'], ja:'天使翼と機械翼が同時指定で矛盾',          en:'angel wings + mechanical wings' },
+  { tags:['feathered wings','demon wings'],      level:'warn', ja:'鳥翼と悪魔翼が同時指定（混在）',           en:'feathered wings + demon wings (mixed)' },
+  { tags:['feathered wings','mechanical wings'], ja:'鳥翼と機械翼が同時指定で矛盾',            en:'feathered wings + mechanical wings' },
+  { tags:['demon wings',    'mechanical wings'], ja:'悪魔翼と機械翼が同時指定で矛盾',          en:'demon wings + mechanical wings' },
+
   // ── カメラ距離 ─────────────────────────────────────────────────
   { tags:['close-up','full body'],             ja:'クローズアップと全身が矛盾',      en:'close-up + full body' },
   { tags:['face close-up','full body'],        ja:'顔アップと全身が矛盾',            en:'face close-up + full body' },
