@@ -19,6 +19,8 @@ export const CONFLICT_RULES = [
   { tags:['slim','curvy'],              ja:'スリムとグラマーが矛盾',          en:'slim + curvy' },
   { tags:['petite','tall'],             ja:'小柄と高身長が矛盾',              en:'petite + tall' },
   { tags:['toned','chubby'],            ja:'引き締まりとぽっちゃりが矛盾',    en:'toned + chubby' },
+  { tags:['thick thighs','thigh gap'],  ja:'ムチムチ太ももと太もも隙間は反対の体型なので矛盾', en:'thick thighs + thigh gap' },
+  { tags:['long legs','petite'],        ja:'長い脚と小柄な体型が矛盾',        en:'long legs + petite', level:'warn' },
 
   // ── 胸サイズ ───────────────────────────────────────────────────
   { tags:['flat chest','huge breasts'],   ja:'胸サイズが矛盾',               en:'flat chest + huge breasts' },
@@ -371,7 +373,7 @@ export const CONFLICT_RULES = [
   // ③ 視点×ボディフォーカス（前後の同時指定）
   // ══════════════════════════════════════════════════════════════════
   ...mk('back view',
-    ['cleavage','sideboob','underboob','midriff','navel cutout','cleavage cutout'],
+    ['cleavage','sideboob','underboob','midriff','navel','collarbone','navel cutout','cleavage cutout'],
     '後ろ姿と前面ボディフォーカスの同時指定が矛盾'),
 
   // ══════════════════════════════════════════════════════════════════
@@ -396,6 +398,8 @@ export const CONFLICT_RULES = [
   ...mk('underwater',
     ['holding umbrella','fire','explosion','embers','electricity'],
     '水中環境と相容れないアイテム・エフェクトが矛盾'),
+  // 首元カバー衣装 × 鎖骨フォーカス
+  ...mk('collarbone', ['turtleneck','high neck'], '首元が隠れる衣装と鎖骨フォーカスが矛盾'),
 
   // ══════════════════════════════════════════════════════════════════
   // ⑥ 髪型の物理法則（短い髪×結ぶ・編む系スタイル）

@@ -66,10 +66,15 @@ export const TAG_DICT = {
   'licking lips':          { ja: '唇を舐める仕草。艶やかな印象に', en: 'Tongue touching the lips — sensual or playful gesture' },
 
   // ── 体型 ──────────────────────────────────────────────────────
-  'thigh gap':             { ja: '直立時に太ももの内側に隙間ができる体型表現。細身・スリムさを補完するタグ', en: 'Visible gap between the inner thighs when standing — subtle slim-build emphasis' },
-  'collarbone':            { ja: '鎖骨を目立たせた描写。色気や華奢さを演出する', en: 'Prominent, defined collarbone — adds elegance or appeal' },
   'toned':                 { ja: '引き締まった体型。細身だが適度な筋肉感あり', en: 'Lean and defined without being bulky — athletic slim build' },
   'abs':                   { ja: '腹筋の筋肉がうっすら〜くっきり描かれる。athleticやtonedと組み合わせると効果的', en: 'Visible abdominal muscles — range from subtle definition to a six-pack. Works best with athletic or toned' },
+
+  // ── 体型・骨格 ────────────────────────────────────────────────
+  'wide hips':             { ja: '腰幅を広く描写する体型タグ。女性らしいシルエットの強調に。thick thighsと組み合わせるとグラマラスな体型になる', en: 'Wide hip silhouette — accentuates a feminine figure. Pairs with thick thighs for a glamorous build' },
+  'thick thighs':          { ja: '太ももに肉感・ボリュームを持たせる体型タグ。ライザ（アトリエシリーズ）のようなムチムチした太ももの描写に。wide hipsと組み合わせると相乗効果あり。thigh gapとは反対の体型', en: 'Adds volume and plumpness to the thighs — creates the chunky thigh look seen in games like Atelier Ryza. Pairs with wide hips; conflicts with thigh gap' },
+  'long legs':             { ja: '脚の長さ・スラリとした縦のラインを強調する体型タグ。モデル体型や妖艶な雰囲気を出したいときに', en: 'Elongated leg proportions — tall, model-like vertical lines. Great for elegant or femme-fatale looks' },
+  'thigh gap':             { ja: '直立したとき太ももの内側に隙間ができる体型描写。スレンダーなシルエットを補強する。thick thighsとは反対の体型なので同時に使わない', en: 'Visible gap between inner thighs when standing — emphasizes a slender build. Opposite of thick thighs; do not combine' },
+  'broad shoulders':       { ja: '肩幅を広く描写する体型タグ。たくましさ・スポーツ系・戦士系キャラに向いている。女性キャラに使うと力強さが出る', en: 'Wide shoulder width — conveys strength and athleticism. Effective for warrior or sporty female characters' },
   'loli':                  { ja: '幼い・小柄な体型の指定。成熟・大人タグとは共存できない', en: 'Small, childlike body proportions. Conflicts with adult/mature tags' },
   'mature female':         { ja: '成熟した大人の女性の体型・雰囲気。幼女体型タグとは矛盾する', en: 'Adult, voluptuous female proportions. Conflicts with loli/young' },
   'freckles':              { ja: 'そばかす。健康的・自然体な印象を加える小さな斑点模様', en: 'Small brown spots scattered across the face — natural, fresh look' },
@@ -79,13 +84,14 @@ export const TAG_DICT = {
   'bare thighs':           { ja: '素の太もも。肌の露出を強調する', en: 'Exposed bare thighs — heightens sense of skin exposure' },
   'armpits':               { ja: '脇の下が見える構図・衣装。ノースリーブや水着との相性が良い', en: 'Visible armpits — suits sleeveless outfits or swimwear' },
   'nape':                  { ja: 'うなじ。首の後ろの肌。髪アップや後ろ向き構図で映える', en: 'Nape of the neck — elegant when hair is up or seen from behind' },
-  'midriff':               { ja: 'お腹・腹部の露出。クロップトップや水着でよく使われる', en: 'Exposed midriff/abdomen — common with crop tops or swimwear' },
+  'midriff':               { ja: 'お腹・腹部の露出。クロップトップや水着でよく使われる。navelと一緒に使うとへそ周りの描写が強化される', en: 'Exposed midriff/abdomen — common with crop tops or swimwear. Combine with navel to emphasize the belly button area' },
+  'navel':                 { ja: 'へそを画面に見せる描写。midriffと組み合わせると腹部フォーカスがより具体的になる。後ろ向き構図では見えないので注意', en: 'Draws attention to the navel — combine with midriff for a focused belly exposure. Incompatible with back view' },
   'bare back':             { ja: '背中の素肌を見せる。バックレスドレスや後ろ向き構図で効果的', en: 'Exposed bare back — effective with back-view compositions or backless dresses' },
   'bare shoulders':        { ja: '肩が出た状態。オフショルダーや水着と組み合わせると自然に出る', en: 'Exposed bare shoulders — natural with off-shoulder tops or swimwear' },
+  'collarbone':            { ja: '鎖骨を目立たせた描写。bare shouldersやnapeと相性が良い。ハイネックやタートルネックと同時に使うと矛盾する', en: 'Prominent collarbone — pairs naturally with bare shoulders or nape. Conflicts with turtleneck or high-neck collars' },
   'cleavage':              { ja: '胸の谷間。ローカットやドレスで生まれる胸元の影', en: 'Visible cleavage between the chest — from low-cut tops or dresses' },
   'sideboob':              { ja: '横から胸の側面が見える状態。⚠️サービスによってはNSFW判定される', en: 'Breast visible from the side — ⚠️ may be flagged as NSFW depending on the service' },
   'underboob':             { ja: '胸の下側が見える状態。⚠️サービスによってはNSFW判定される', en: 'Underside of breast visible — ⚠️ borderline SFW; may be flagged NSFW by some services' },
-  'wide hips':             { ja: '広めのヒップラインを強調。女性らしいシルエットを際立たせる', en: 'Wide hip silhouette — accentuates a feminine figure' },
 
   // ── 衣装 ──────────────────────────────────────────────────────
   'off shoulder':          { ja: '肩が出るデザインのトップス。鎖骨・肩ラインを強調する', en: 'Top with exposed shoulders and collarbone' },
