@@ -37,7 +37,7 @@ export const OPTIONAL_CAT_NAMES = new Set([
   // 属性
   '年齢感', 'ケモ耳・しっぽ・角', '幻想パーツ',
   // 体型（肌色はコア化 → 常に1つ選ばれる）
-  '肌質感', '細部', '状態', '足',
+  '体型・骨格', '肌質感', '細部', '状態', '足',
   // 衣装（民族・水着・ランジェリーは任意；フォーマル・制服・コスプレはコア扱い）
   '服装スタイル', 'レッグウェア', '民族・伝統衣装', '水着・スポーツ', 'ランジェリー・部屋着',
   // 衣装ディテール（旧 特徴・アクセ）
@@ -164,7 +164,7 @@ export const BLOCK_RANDOM_RULES = {
 export const TIER3_TAGS = new Set([
   // ボディフォーカス（センシティブ寄り）
   'cleavage','sideboob','underboob','bare back','armpits','armpit focus','midriff','midriff focus',
-  'bare thighs','thighs','leg focus','wide hips',
+  'bare thighs','thighs','leg focus',
   // 足フォーカス
   'soles','toes','foot focus','toenail polish',
   // アイテム系保持タグ（武器はWEAPON_TAGSへ移動）

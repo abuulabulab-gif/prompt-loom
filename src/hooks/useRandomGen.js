@@ -66,7 +66,7 @@ const COLOR_CAT_TARGET = { face_haircolor: 'hair', face_eyecolor: 'eyes' };
 // 直近の生成で使ったタグを記憶し、しばらく出にくくする
 const COOLDOWN_CAT_IDS = new Set([
   'attr_species', 'face_haircolor', 'face_hairstyle', 'face_eyecolor',
-  'body_shape', 'body_bust', 'outfit_formal', 'outfit_uniform', 'outfit_ethnic', 'outfit_cosplay', 'outfit_swim', 'outfit_lingerie',
+  'body_shape', 'body_structure', 'body_bust', 'outfit_formal', 'outfit_uniform', 'outfit_ethnic', 'outfit_cosplay', 'outfit_swim', 'outfit_lingerie',
   'comp_distance', 'comp_angle', 'face_expression',
   'bg_simple', 'bg_outdoor', 'bg_indoor',
 ]);
@@ -753,11 +753,23 @@ export function applyFeatureMakerLayer(blockMap) {
 // ── ボディフォーカス自動付与レイヤー ─────────────────────────────────────
 // OPTIONAL_CAT_NAMESから除外したbody_focusを衣装・髪型条件つきで後処理付与する。
 // chardesign: skipBodyCatsで既にスキップ済みのため低確率のみ。
-// illust: 15%確率で bare shoulders / nape / zettai ryouiki / abs から1つ選出。
+// illust: 20%確率で候補プール（SFW寄り＋ソシャゲ系低確率）から1つ選出。
 const BF_SKIRT_TAGS  = new Set(['skirt','pleated skirt','mini skirt','micro skirt','slit skirt','flared skirt','pencil skirt']);
 const BF_LEGWEAR_TAGS = new Set(['thighhighs','knee-high socks','over-knee socks','fishnet tights']);
 const BF_OFFSHOULDER = new Set(['off shoulder','sleeveless','dress','sundress','evening gown','bikini','swimsuit','one-piece swimsuit','micro bikini','lingerie','camisole','halter top','tube top']);
 const BF_UPDO_HAIR   = new Set(['short hair','bob cut','pixie cut','very short hair','ponytail','high ponytail','low ponytail','side ponytail','hair updo','half updo','hair bun','double bun']);
+// ソシャゲ系ボディフォーカス — 衣装との組み合わせ文脈で重み上昇
+const BF_CLEAVAGE_TRIGGERS = new Set([
+  'bikini','micro bikini','bikini armor','lingerie','bra','babydoll','bunny suit',
+  'reverse bunny suit','corset','virgin killer sweater','naked hoodie','monokini','string bikini',
+]);
+const BF_MIDRIFF_TRIGGERS = new Set([
+  'bikini','micro bikini','crop top','tank top','tube top','halter top',
+  'sports bra','camisole','naked hoodie','string bikini','monokini',
+]);
+const BF_THIGH_TRIGGERS = new Set([
+  'micro bikini','string bikini','monokini','bikini','mini skirt','micro skirt','sarashi',
+]);
 
 function applyBodyFocusLayer(blockMap, mode) {
   const bodyBlock = blockMap.get('body');
@@ -770,22 +782,34 @@ function applyBodyFocusLayer(blockMap, mode) {
   const alreadyHasFocus = bodyFocusCat.t.some(t => hasTag(currentBodyText, t.en));
   if (alreadyHasFocus) return;
 
-  const prob = mode === 'chardesign' ? 0.07 : 0.15;
+  const prob = mode === 'chardesign' ? 0.07 : 0.20;
   if (Math.random() > prob) return;
 
   const outfitText = blockMap.get('outfit')?.text || '';
   const faceText   = blockMap.get('face')?.text || '';
 
-  const hasSkirt      = [...BF_SKIRT_TAGS].some(t => hasTag(outfitText, t));
-  const hasLegwear    = [...BF_LEGWEAR_TAGS].some(t => hasTag(outfitText, t));
-  const hasOffShoulder = [...BF_OFFSHOULDER].some(t => hasTag(outfitText, t));
-  const hasUpdoHair   = [...BF_UPDO_HAIR].some(t => hasTag(faceText, t));
+  const hasSkirt           = [...BF_SKIRT_TAGS].some(t => hasTag(outfitText, t));
+  const hasLegwear         = [...BF_LEGWEAR_TAGS].some(t => hasTag(outfitText, t));
+  const hasOffShoulder     = [...BF_OFFSHOULDER].some(t => hasTag(outfitText, t));
+  const hasUpdoHair        = [...BF_UPDO_HAIR].some(t => hasTag(faceText, t));
+  const hasCleavageTrigger = [...BF_CLEAVAGE_TRIGGERS].some(t => hasTag(outfitText, t));
+  const hasMidriffTrigger  = [...BF_MIDRIFF_TRIGGERS].some(t => hasTag(outfitText, t));
+  const hasThighTrigger    = [...BF_THIGH_TRIGGERS].some(t => hasTag(outfitText, t));
 
   const candidates = [
     { en: 'bare shoulders', w: hasOffShoulder ? 55 : 35 },
     { en: 'nape',           w: hasUpdoHair    ? 55 : 35 },
     { en: 'zettai ryouiki', w: (hasSkirt && hasLegwear) ? 20 : 2 },
     { en: 'abs',            w: 10 },
+    // ソシャゲ系ボディフォーカス — 低確率、衣装トリガーで重み上昇
+    { en: 'cleavage',    w: hasCleavageTrigger ? 14 : 4 },
+    { en: 'sideboob',    w: hasCleavageTrigger ? 6  : 2 },
+    { en: 'midriff',     w: hasMidriffTrigger  ? 14 : 4 },
+    { en: 'bare thighs', w: hasThighTrigger    ? 14 : 4 },
+    { en: 'underboob',   w: hasCleavageTrigger ? 4  : 1 },
+    // 細部から移動 — 露出文脈と紐づいた自然なセット
+    { en: 'navel',       w: hasMidriffTrigger  ? 10 : 3 },
+    { en: 'collarbone',  w: hasOffShoulder     ? 10 : 3 },
   ];
 
   const total = candidates.reduce((s, c) => s + c.w, 0);
@@ -848,9 +872,17 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
       const blockMap = new Map();
 
       const newBlocks = c.blocks.map(block => {
-        if (block.locked || block.id === 'negative') {
+        if (block.locked) {
           blockMap.set(block.id, { ...block });
           return block;
+        }
+        if (block.id === 'negative') {
+          const negText   = block.text || '';
+          const negBlock  = hasTag(negText, 'nsfw')
+            ? { ...block }
+            : { ...block, text: appendTag(negText, 'nsfw', block.strength) };
+          blockMap.set(block.id, negBlock);
+          return negBlock;
         }
 
         if (TIER2_BLOCK_IDS.has(block.id)) {
@@ -867,9 +899,10 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
 
         // Quality: chardesign uses illustration-spec fixed tags; illust uses standard quality
         if (block.id === 'quality') {
-          const qText = mode === 'chardesign'
+          const base = mode === 'chardesign'
             ? CHARDESIGN_MODE_CONFIG.qualityText
             : 'masterpiece, best quality, ultra-detailed, highres, absurdres';
+          const qText = appendTag(base, 'SFW', block.strength);
           newBlock = { ...block, text: qText, enabled: true, collapsed: false, lastRandomPicks: [] };
         } else if (mode === 'chardesign') {
           const cfg = CHARDESIGN_MODE_CONFIG;
