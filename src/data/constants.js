@@ -428,7 +428,7 @@ export const RANDOM_COMBO_RULES = [
   { trigger: 'micro bikini',   blockId: 'body',        tag: 'cleavage' },
   { trigger: 'swimsuit',       blockId: 'body',        tag: 'bare back' },
   { trigger: 'beach',          blockId: 'body',        tag: 'barefoot' },
-  { trigger: 'rainy',          blockId: 'body',        tag: 'wet hair' },
+  { trigger: 'rainy',          blockId: 'body',        tag: 'wet' },
   { trigger: 'action',         blockId: 'composition', tag: 'fighting stance' },
   // slime girl の肌色処理は useRandomGen.js のインライン処理で対応
   { trigger: 'doll',           blockId: 'body',        tag: 'porcelain skin' },

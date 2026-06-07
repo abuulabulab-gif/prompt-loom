@@ -37,7 +37,7 @@ const ALL_ANIMAL_TAIL_TAGS = new Set(ANIMAL_EAR_TAIL_PAIRS.map(p => p.tail).conc
 const NON_ANIMAL_SPECIES_TAGS = new Set([
   'elf','dark elf','angel','demon','vampire','witch','fairy',
   'ghost','slime girl','mermaid','lamia','dragon girl','oni','doll','android',
-  'human','harpy','succubus','goblin girl','monster girl',
+  'human','harpy','succubus','goblin girl','monster girl','demi-human',
 ]);
 // ハイブリッド確率（モード別）— この確率で例外的に動物パーツを許可
 const HYBRID_CHANCE_CHARDESIGN = 0.05; // 5%
@@ -520,6 +520,13 @@ function buildSpeciesText(picks, block, speciesCat, text) {
     if (en === 'kemonomimi girl') {
       const pair = KEMONOMIMI_PAIRS[Math.floor(Math.random() * KEMONOMIMI_PAIRS.length)];
       for (const partEn of pair) { if (!hasTag(text, partEn)) text = appendTag(text, partEn, block.strength); }
+      continue;
+    }
+    if (en === 'demi-human') {
+      // 亜人: わずかに非人間的なパーツをプールからランダムに1つ付与
+      const pool = ['pointy ears', 'elf ears', 'small horns', 'heterochromia'];
+      const part = pool[Math.floor(Math.random() * pool.length)];
+      if (!hasTag(text, part)) text = appendTag(text, part, block.strength);
       continue;
     }
     if (en === 'monster girl') {
