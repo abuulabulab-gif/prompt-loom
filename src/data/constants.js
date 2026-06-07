@@ -412,6 +412,7 @@ export const RANDOM_COMBO_RULES = [
   { trigger: 'holding gun',    blockId: 'composition', tag: 'fighting stance' },
   { trigger: 'holding rifle',  blockId: 'composition', tag: 'fighting stance' },
   { trigger: 'holding shield', blockId: 'composition', tag: 'fighting stance' },
+  { trigger: 'mermaid',        blockId: 'attribute',   tag: 'fin ears',   prob: 0.30 },
   { trigger: 'mermaid',        blockId: 'background',  tag: 'underwater' },
   { trigger: 'mermaid tail',   blockId: 'background',  tag: 'underwater' },
   { trigger: 'mermaid',        blockId: 'lighting',    tag: 'caustics' },
