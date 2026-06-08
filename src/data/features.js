@@ -58,6 +58,18 @@ export const FEATURE_ITEMS = {
         { ja:'額',   en:'bandaid on forehead' },
       ],
     },
+    {
+      id:'forehead_mark', ja:'額のマーク', en:'Forehead Mark',
+      targetBlock:'face',
+      options:[
+        { ja:'宝石',     en:'forehead jewel' },
+        { ja:'星紋',     en:'star mark on forehead' },
+        { ja:'三日月紋', en:'crescent mark on forehead' },
+        { ja:'ルーン',   en:'rune mark on forehead' },
+        { ja:'魔法陣',   en:'magic seal on forehead' },
+        { ja:'呪印',     en:'curse mark on forehead' },
+      ],
+    },
   ],
   body: [
     {
@@ -312,6 +324,13 @@ export const FEATURE_TAG_JA = {
   'wearing sunglasses':         'サングラス着用',
   'sunglasses on head':         'サングラスを頭に乗せる',
   'sunglasses hanging from collar': 'サングラスを首元にかける',
+  // 額のマーク
+  'forehead jewel':             '額に宝石',
+  'star mark on forehead':      '額に星紋',
+  'crescent mark on forehead':  '額に三日月紋',
+  'rune mark on forehead':      '額にルーン',
+  'magic seal on forehead':     '額に魔法陣',
+  'curse mark on forehead':     '額に呪印',
   // ヘッドフォン・マスク
   'wearing headphones':         'ヘッドフォン着用',
   'headphones around neck':     'ヘッドフォンを首にかける',

@@ -11,6 +11,7 @@ import { CONFLICT_MAP } from "../data/conflicts.js";
 import { COLOR_PALETTE, SHADES, COLOR_TARGETS, buildColorTag, buildColorName, HUE_GROUPS,
   CM_PRIMARY_OUTFIT_TAGS, CM_COMPLETE_OUTFITS,
   CM_OUTFIT_TOPS, CM_OUTFIT_BOTTOMS, CM_OUTFIT_OUTER, CM_OUTFIT_FOOTWEAR, CM_OUTFIT_LEGWEAR,
+  CM_ANIMAL_EAR_TAGS, CM_HORN_TAGS, CM_WING_TAGS,
 } from "../data/colors.js";
 import { applyMaterialMakerLayer } from "../data/materials.js";
 
@@ -176,7 +177,7 @@ function pickHairColorExpression(hist, mode) {
   const baseShade   = pickWeightedShade();
   const baseEn      = buildColorName(baseShade.en, baseColor.en) + ' hair';
   const baseJa      = baseShade.id !== 'normal' ? `${baseShade.ja}${baseColor.ja}` : baseColor.ja;
-  const base        = { en: baseEn, _tk: baseColor.en, _ci: 'face_haircolor' };
+  const base        = { en: baseEn, _tk: baseColor.en, _shade: baseShade.id, _ci: 'face_haircolor' };
 
   const exprW  = HAIR_EXPR_WEIGHTS[mode] ?? HAIR_EXPR_WEIGHTS.illust;
   const expr   = HAIR_EXPR_TYPES[wIdx(exprW)];
@@ -188,9 +189,9 @@ function pickHairColorExpression(hist, mode) {
   const tag2En  = buildColorName(shade2.en, c2En) + ' hair';
   const c2Obj   = COLOR_PALETTE.find(c => c.en === c2En) || { ja: c2En };
   const c2Ja    = shade2.id !== 'normal' ? `${shade2.ja}${c2Obj.ja}` : c2Obj.ja;
-  if (expr === 'gradient') return { ...base, extraEn: ['gradient hair', tag2En],     ja: `${baseJa}→${c2Ja}グラデ` };
-  if (expr === 'twotone')  return { ...base, extraEn: ['two-tone hair', tag2En],     ja: `${baseJa}×${c2Ja}ツートン` };
-  if (expr === 'split')    return { ...base, extraEn: ['split-color hair', tag2En],  ja: `${baseJa}×${c2Ja}スプリット` };
+  if (expr === 'gradient') return { ...base, extraEn: ['gradient hair', tag2En],    _color2: c2En, _shade2: shade2.id, ja: `${baseJa}→${c2Ja}グラデ` };
+  if (expr === 'twotone')  return { ...base, extraEn: ['two-tone hair', tag2En],    _color2: c2En, _shade2: shade2.id, ja: `${baseJa}×${c2Ja}ツートン` };
+  if (expr === 'split')    return { ...base, extraEn: ['split-color hair', tag2En], _color2: c2En, _shade2: shade2.id, ja: `${baseJa}×${c2Ja}スプリット` };
 
   // 部分カラー
   const accentColorEn = pickContrastingColor(baseColor.en);
@@ -650,9 +651,10 @@ const CM_DETAIL_SLOTS = [
   ['embroidery', new Set(['embroidery']),              0.65, true],
   ['lace',       new Set(['lace']),                    0.55, true],
 ];
-const CM_TAIL_TRIGGERS = new Set(['cat tail','fox tail','wolf tail','fluffy tail','bunny tail','dog tail','horse tail','cow tail','demon tail','dragon tail','multiple tails']);
+const CM_KEMONO_TAILS  = new Set(['cat tail','fox tail','wolf tail','fluffy tail','bunny tail','dog tail','tiger tail','squirrel tail','mouse tail','horse tail','cow tail','multiple tails']);
+const CM_FANTASY_TAILS = new Set(['demon tail','dragon tail']);
 
-export function applyColorMakerLayer(blockMap, mode) {
+export function applyColorMakerLayer(blockMap, mode, hairCtx = null) {
   const overallProb = mode === 'chardesign' ? 0.70 : 0.55;
   if (Math.random() > overallProb) return;
 
@@ -674,7 +676,7 @@ export function applyColorMakerLayer(blockMap, mode) {
   };
 
   let added = 0;
-  const MAX_TAGS = 5;
+  const MAX_TAGS = 7;
 
   if (outfitBlock && !outfitBlock.locked) {
     let text = outfitBlock.text || '';
@@ -734,12 +736,77 @@ export function applyColorMakerLayer(blockMap, mode) {
     if (dtext !== (detailBlock.text || '')) blockMap.set('feature', { ...detailBlock, text: dtext });
   }
 
-  if (added < MAX_TAGS && attrBlock && !attrBlock.locked) {
-    const t = attrBlock.text || '';
-    if ([...CM_TAIL_TRIGGERS].some(k => hasTag(t, k)) && Math.random() < 0.55) {
-      const tag = makeTag(true, 'tail');
-      if (!hasTag(t, tag)) { blockMap.set('attribute', { ...attrBlock, text: appendTag(t, tag, attrBlock.strength) }); added++; }
+  if (attrBlock && !attrBlock.locked) {
+    let t = attrBlock.text || '';
+    const str = attrBlock.strength;
+
+    // ── ケモ耳: 髪色に合わせる ──
+    const earTag = CM_ANIMAL_EAR_TAGS.find(k => hasTag(t, k));
+    if (earTag && added < MAX_TAGS && Math.random() < 0.65) {
+      const earColorEn = hairCtx?.baseColor ?? mainColorObj.en;
+      const earShade   = SHADES.find(s => s.id === (hairCtx?.baseShadeId ?? 'normal')) ?? SHADES[1];
+      const tag        = buildColorTag(earShade.en, earColorEn, earTag);
+      if (!hasTag(t, tag)) { t = appendTag(t, tag, str); added++; }
     }
+
+    // ── ケモしっぽ: 髪色基準、2色髪＋ケモ耳ならグラデ ──
+    const kemonoTail = [...CM_KEMONO_TAILS].find(k => hasTag(t, k));
+    if (kemonoTail && added < MAX_TAGS && Math.random() < 0.60) {
+      const hasDual   = hairCtx?.isDual && hairCtx.color2;
+      const hasEar    = Boolean(earTag);
+      if (hasDual && hasEar && Math.random() < 0.70) {
+        const s1 = SHADES.find(s => s.id === (hairCtx.baseShadeId ?? 'normal')) ?? SHADES[1];
+        const s2 = SHADES.find(s => s.id === (hairCtx.color2ShadeId ?? 'normal')) ?? SHADES[1];
+        const gradTag = `gradient ${kemonoTail}`;
+        const t1 = buildColorTag(s1.en, hairCtx.baseColor, kemonoTail);
+        const t2 = buildColorTag(s2.en, hairCtx.color2, kemonoTail);
+        if (!hasTag(t, gradTag) && added < MAX_TAGS) { t = appendTag(t, gradTag, str); added++; }
+        if (!hasTag(t, t1) && added < MAX_TAGS) { t = appendTag(t, t1, str); added++; }
+        if (!hasTag(t, t2) && added < MAX_TAGS) { t = appendTag(t, t2, str); added++; }
+      } else {
+        const tailColorEn = hairCtx?.baseColor ?? mainColorObj.en;
+        const tailShade   = SHADES.find(s => s.id === (hairCtx?.baseShadeId ?? 'normal')) ?? SHADES[1];
+        const tag = buildColorTag(tailShade.en, tailColorEn, kemonoTail);
+        if (!hasTag(t, tag)) { t = appendTag(t, tag, str); added++; }
+      }
+    }
+
+    // ── マーメイドテール: アクセント色 → ヒレ耳に引き継ぐ ──
+    const merColorObj = accentColorEn ? accentColorObj : mainColorObj;
+    const merShade    = accentColorEn ? accentShade    : mainShade;
+    if (hasTag(t, 'mermaid tail') && added < MAX_TAGS && Math.random() < 0.65) {
+      const tag = buildColorTag(merShade.en, merColorObj.en, 'mermaid tail');
+      if (!hasTag(t, tag)) { t = appendTag(t, tag, str); added++; }
+    }
+    if (hasTag(t, 'fin ears') && added < MAX_TAGS && Math.random() < 0.70) {
+      const tag = buildColorTag(merShade.en, merColorObj.en, 'fin ears');
+      if (!hasTag(t, tag)) { t = appendTag(t, tag, str); added++; }
+    }
+
+    // ── ファンタジーテール（悪魔・竜）: アクセント色 ──
+    for (const ft of CM_FANTASY_TAILS) {
+      if (added >= MAX_TAGS) break;
+      if (hasTag(t, ft) && Math.random() < 0.55) {
+        const tag = makeTag(true, ft);
+        if (!hasTag(t, tag)) { t = appendTag(t, tag, str); added++; }
+      }
+    }
+
+    // ── 角: アクセント色（コントラスト）──
+    const hornTag = CM_HORN_TAGS.find(k => hasTag(t, k));
+    if (hornTag && added < MAX_TAGS && Math.random() < 0.55) {
+      const tag = makeTag(true, hornTag);
+      if (!hasTag(t, tag)) { t = appendTag(t, tag, str); added++; }
+    }
+
+    // ── 翼: アクセント色 ──
+    const wingTag = CM_WING_TAGS.find(k => hasTag(t, k));
+    if (wingTag && added < MAX_TAGS && Math.random() < 0.50) {
+      const tag = makeTag(true, wingTag);
+      if (!hasTag(t, tag)) { t = appendTag(t, tag, str); added++; }
+    }
+
+    if (t !== (attrBlock.text || '')) blockMap.set('attribute', { ...attrBlock, text: t });
   }
 
   const bodyBlock2 = blockMap.get('body');
@@ -1093,6 +1160,17 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
 
       applyComboRules(blockMap, mode === 'chardesign' ? CHARDESIGN_MODE_CONFIG.fixedBlocks : null);
 
+      // 髪色コンテキスト取得（ケモ耳/しっぽの色連携に使用）
+      const faceBlk = blockMap.get('face');
+      const hp = faceBlk?.lastRandomPicks?.find(p => p._ci === 'face_haircolor');
+      const hairCtx = hp ? {
+        baseColor:    hp._tk ?? null,
+        baseShadeId:  hp._shade ?? 'normal',
+        isDual:       Boolean(hp._color2),
+        color2:       hp._color2 ?? null,
+        color2ShadeId: hp._shade2 ?? 'normal',
+      } : null;
+
       // 最終クリーンアップ: 全ブロックまたがりの矛盾を除去
       // 例: back view（構図）→ smile（顔）を消す、mermaid tail（キャラ）→ boots（衣装）を消す
       // キャラ特化モードの固定ブロックは書き換え禁止
@@ -1116,7 +1194,7 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
       // 衣装スタック Soft Penalty: 強いジャンル衣装 + スタイル/装飾の重ねすぎを間引く
       applyOutfitStackPenalty(blockMap);
       // カラーメーカー・マテリアルメーカー・特徴メーカーの条件付き自動付与レイヤー
-      applyColorMakerLayer(blockMap, mode);
+      applyColorMakerLayer(blockMap, mode, hairCtx);
       applyMaterialMakerLayer(blockMap, mode);
       applyBodyFocusLayer(blockMap, mode);
       applyFeatureMakerLayer(blockMap);

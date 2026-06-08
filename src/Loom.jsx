@@ -329,12 +329,14 @@ export default function Loom() {
   }, [characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight, orderUpdatedAt, settingsUpdatedAt, loaded]);
 
   // ── Color picker apply ──
-  const TARGET_TO_BLOCK = { hair: 'face', inner_hair: 'face', bangs: 'face', bang_streak: 'face', forelock: 'face', hair_tips: 'face', sidelocks: 'face', eyes: 'face', heterochromia: 'face', nails: 'body', outfit_main: 'outfit', top: 'outfit', bottom: 'outfit', outer: 'outfit', footwear: 'outfit', legwear: 'outfit', ribbon: 'outfit', accents: 'outfit', trim: 'outfit', embroidery: 'outfit', lace: 'outfit', eyeshadow: 'face', lipstick: 'face', bg_color: 'background' };
-  const BLOCK_TO_COLOR_TARGET   = { face: 'hair', outfit: 'outfit_main', background: 'bg_color' };
+  const TARGET_TO_BLOCK = { hair: 'face', inner_hair: 'face', bangs: 'face', bang_streak: 'face', forelock: 'face', hair_tips: 'face', sidelocks: 'face', eyes: 'face', heterochromia: 'face', nails: 'body', outfit_main: 'outfit', top: 'outfit', bottom: 'outfit', outer: 'outfit', footwear: 'outfit', legwear: 'outfit', ribbon: 'outfit', accents: 'outfit', trim: 'outfit', embroidery: 'outfit', lace: 'outfit', eyeshadow: 'face', lipstick: 'face', bg_color: 'background', animal_ears: 'attribute', horns: 'attribute', wings: 'attribute', tail_color: 'attribute', glasses_frame: 'feature', earrings: 'feature', necklace: 'feature' };
+  const BLOCK_TO_COLOR_TARGET   = { face: 'hair', outfit: 'outfit_main', background: 'bg_color', attribute: 'animal_ears', feature: 'glasses_frame' };
   const BLOCK_TO_ALLOWED_TARGETS = {
     face:       ['hair','inner_hair','bangs','bang_streak','forelock','hair_tips','sidelocks','eyes','heterochromia','eyeshadow','lipstick'],
     outfit:     ['outfit_main','top','bottom','outer','footwear','legwear','ribbon','accents','trim','embroidery','lace'],
     background: ['bg_color'],
+    attribute:  ['animal_ears','horns','wings','tail_color'],
+    feature:    ['glasses_frame','earrings','necklace'],
   };
 
   // 新API: applyColorTag(tags[], targetId) — ColorPickerModalから配列で渡される
@@ -393,7 +395,7 @@ export default function Loom() {
   const openColorPicker = (defaultTarget = 'hair', allowedTargets = null, blockText = null) => {
     setColorPickerDefaultTarget(defaultTarget);
     setColorPickerAllowedTargets(allowedTargets);
-    setColorPickerBlockText(blockText);
+    setColorPickerBlockText(blockText ?? Object.fromEntries(blocks.map(b => [b.id, b.text])));
     setColorPickerOpen(true);
   };
 

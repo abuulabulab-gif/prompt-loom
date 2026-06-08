@@ -29,19 +29,28 @@ export const COLOR_TARGETS = [
   // ── 髪全体（カラータイプ選択あり）─────────────────────────────
   { id:'hair',          ja:'髪全体',        en:'hair',           hairGroup:'full'    },
   // ── 前髪系（カラータイプ選択あり）──────────────────────────────
-  { id:'bangs',         ja:'前髪',          en:'bangs',          hairGroup:'front'   },
-  { id:'forelock',      ja:'前髪の一束',    en:'forelock',       hairGroup:'front'   },
+  { id:'bangs',         ja:'前髪',          en:'bangs',          hairGroup:'front',   side: true },
+  { id:'forelock',      ja:'前髪の一束',    en:'forelock',       hairGroup:'front',   side: true },
   // ── 部分カラー（単色のみ）──────────────────────────────────────
   { id:'inner_hair',    ja:'インナー',      en:'inner hair',     hairGroup:'partial' },
-  { id:'bang_streak',   ja:'メッシュ',      en:'streak in bangs',hairGroup:'partial' },
+  { id:'bang_streak',   ja:'メッシュ',      en:'streak in bangs',hairGroup:'partial', side: true },
   { id:'hair_tips',     ja:'毛先',          en:'hair tips',      hairGroup:'partial' },
-  { id:'sidelocks',     ja:'サイドヘア',    en:'sidelocks',      hairGroup:'partial' },
+  { id:'sidelocks',     ja:'サイドヘア',    en:'sidelocks',      hairGroup:'partial', side: true },
   // ── 瞳 ────────────────────────────────────────────────────────
   { id:'eyes',          ja:'瞳',            en:'eyes'             },
   { id:'heterochromia', ja:'オッドアイ',    en:'heterochromia'    },
   // ── キャラパーツ ──────────────────────────────────────────────
   { id:'nails',         ja:'爪',            en:'nails'       },
-  { id:'tail_color',    ja:'しっぽ',        en:'tail'        },
+  { id:'tail_color',    ja:'しっぽ',        en:'tail',       gradientable: true },
+  // ── ケモ系・幻想パーツ（動的検出）─────────────────────────────────
+  { id:'animal_ears',  ja:'ケモ耳',        en:'animal ears' },
+  { id:'horns',        ja:'角',            en:'horns'       },
+  { id:'wings',        ja:'翼',            en:'wings'       },
+  { id:'fin_ears',     ja:'ヒレ耳',        en:'fin ears'    },
+  // ── アクセサリー ────────────────────────────────────────────────
+  { id:'glasses_frame', ja:'眼鏡',       en:'glasses'  },
+  { id:'earrings',      ja:'イヤリング', en:'earrings' },
+  { id:'necklace',      ja:'ネックレス', en:'necklace' },
   // ── 衣装（動的検出：実際の衣装タグをそのまま色ターゲットにする）──
   { id:'outfit_main',   ja:'衣装メイン',     en:'outfit'      },
   { id:'top',           ja:'トップス',       en:'top'         },
@@ -100,6 +109,19 @@ export const buildColorTag = (shadeEn, colorEn, targetEn) => {
   if (targetEn === 'inner hair') return `inner ${name} hair`;
   return `${name} ${targetEn}`.trim();
 };
+
+// ── ケモ系・幻想パーツ 動的検出リスト ────────────────────────────────────
+export const CM_ANIMAL_EAR_TAGS = [
+  'cat ears','bunny ears','fox ears','wolf ears','dog ears',
+  'tiger ears','squirrel ears','mouse ears','sheep ears','deer ears',
+  'goat ears','horse ears','cow ears',
+];
+export const CM_HORN_TAGS = [
+  'oni horns','dragon horns','demon horns','sheep horns','deer antlers','goat horns','small horns',
+];
+export const CM_WING_TAGS = [
+  'fairy wings','angel wings','feathered wings','demon wings','mechanical wings',
+];
 
 // ── 衣装カラー動的検出リスト ──────────────────────────────────────────────
 // 優先順位順にスキャンし、最初にヒットした衣装タグを色のターゲットにする。

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { COLOR_PALETTE, SHADES, COLOR_TARGETS, HAIR_TYPES, FRONT_HAIR_TYPES, buildColorTag, buildColorName,
   CM_PRIMARY_OUTFIT_TAGS, CM_OUTFIT_TOPS, CM_OUTFIT_BOTTOMS, CM_OUTFIT_OUTER, CM_OUTFIT_FOOTWEAR, CM_OUTFIT_LEGWEAR,
+  CM_ANIMAL_EAR_TAGS, CM_HORN_TAGS, CM_WING_TAGS,
 } from "../../data/colors.js";
 import { hasTag } from "../../data/constants.js";
 
@@ -58,11 +59,21 @@ const DYNAMIC_TARGET_MAP = {
   outer:       CM_OUTFIT_OUTER,
   footwear:    CM_OUTFIT_FOOTWEAR,
   legwear:     CM_OUTFIT_LEGWEAR,
+  animal_ears: CM_ANIMAL_EAR_TAGS,
+  horns:       CM_HORN_TAGS,
+  wings:       CM_WING_TAGS,
+};
+const DYNAMIC_TARGET_BLOCK = {
+  outfit_main: 'outfit', top: 'outfit', bottom: 'outfit',
+  outer: 'outfit', footwear: 'outfit', legwear: 'outfit',
+  animal_ears: 'attribute', horns: 'attribute', wings: 'attribute', fin_ears: 'attribute', tail_color: 'attribute',
+  glasses_frame: 'feature', earrings: 'feature', necklace: 'feature',
 };
 function getDynamicTag(targetId, blockText) {
   const list = DYNAMIC_TARGET_MAP[targetId];
   if (!list || !blockText) return null;
-  return list.find(t => hasTag(blockText, t)) || null;
+  const text = typeof blockText === 'string' ? blockText : (blockText[DYNAMIC_TARGET_BLOCK[targetId]] ?? '');
+  return list.find(t => hasTag(text, t)) || null;
 }
 
 export default function ColorPickerModal({ lang, onApply, onClose, defaultTarget, allowedTargets, blockText }) {
@@ -84,38 +95,45 @@ export default function ColorPickerModal({ lang, onApply, onClose, defaultTarget
 
   const [target,   setTarget]   = useState(getInitial);
   const [hairType, setHairType] = useState('single');
+  const [tailType, setTailType] = useState('single');
+  const [side,     setSide]     = useState('none');
   const [shade,    setShade]    = useState('normal');
   const [color,    setColor]    = useState(COLOR_PALETTE[7]);
   const [shade2,   setShade2]   = useState('normal');
   const [color2,   setColor2]   = useState(COLOR_PALETTE[0]);
 
-  const tg       = target?.hairGroup;
-  const isHetero = target?.id === 'heterochromia';
-  const isFull   = tg === 'full';
-  const isFront  = tg === 'front';
-  const isPart   = tg === 'partial';
-  const isDual   = isHetero || ((isFull || isFront) && hairType !== 'single');
-  const types    = isFull ? HAIR_TYPES : isFront ? FRONT_HAIR_TYPES : null;
+  const tg             = target?.hairGroup;
+  const isHetero       = target?.id === 'heterochromia';
+  const isGradientable = Boolean(target?.gradientable);
+  const hasSide        = Boolean(target?.side);
+  const isFull  = tg === 'full';
+  const isFront = tg === 'front';
+  const isPart  = tg === 'partial';
+  const activeType = isGradientable ? tailType : hairType;
+  const isDual   = isHetero || ((isFull || isFront || isGradientable) && activeType !== 'single');
+  const types    = isFull ? HAIR_TYPES : (isFront || isGradientable) ? FRONT_HAIR_TYPES : null;
 
   const sh1 = SHADES.find(s => s.id === shade)?.en  || '';
   const sh2 = SHADES.find(s => s.id === shade2)?.en || '';
   const c1Name = buildColorName(sh1, color.en);
   const c2Name = buildColorName(sh2, color2.en);
 
-  const effectiveEn = getDynamicTag(target?.id, blockText) ?? target?.en ?? '';
+  const baseEn      = getDynamicTag(target?.id, blockText) ?? target?.en ?? '';
+  const sidePrefix  = (hasSide && side !== 'none') ? `${side} ` : '';
+  const effectiveEn = `${sidePrefix}${baseEn}`;
   const preview = isHetero
     ? `${c1Name} and ${c2Name} eyes, heterochromia`
-    : ((isFull || isFront) && hairType !== 'single')
-      ? buildHairTags(hairType, target.en, c1Name, c2Name).join(', ')
+    : ((isFull || isFront || isGradientable) && activeType !== 'single')
+      ? buildHairTags(activeType, effectiveEn, c1Name, c2Name).join(', ')
       : buildColorTag(sh1, color.en, effectiveEn);
 
   const handleApply = () => {
     if (isHetero) { onApply([`${c1Name} and ${c2Name} eyes`, 'heterochromia'], target.id); return; }
-    if ((isFull || isFront) && hairType !== 'single') { onApply(buildHairTags(hairType, target.en, c1Name, c2Name), target.id); return; }
+    if ((isFull || isFront || isGradientable) && activeType !== 'single') { onApply(buildHairTags(activeType, effectiveEn, c1Name, c2Name), target.id); return; }
     onApply([buildColorTag(sh1, color.en, effectiveEn)], target.id);
   };
 
-  const setTgt = (t) => { setTarget(t); if (t.hairGroup !== 'full' && t.hairGroup !== 'front') setHairType('single'); };
+  const setTgt = (t) => { setTarget(t); setSide('none'); if (t.hairGroup !== 'full' && t.hairGroup !== 'front') setHairType('single'); if (!t.gradientable) setTailType('single'); };
   const acc    = isHairMode && (isFull || isFront || isPart) ? HAIR_ACC : ACCENT;
   const singleMode = !isHairMode && available.length === 1;
 
@@ -124,10 +142,12 @@ export default function ColorPickerModal({ lang, onApply, onClose, defaultTarget
   const showAreaStep   = !singleMode;
   const showFrontSub   = isFront && hairFront.length > 1;
   const showPartSub    = isPart;
+  const showSideStep   = hasSide;
   const showTypeStep   = Boolean(types);
   const areaStep  = showAreaStep   ? STEP[si++] : null;
   const frontStep = showFrontSub   ? STEP[si++] : null;
   const partStep  = showPartSub    ? STEP[si++] : null;
+  const sideStep  = showSideStep   ? STEP[si++] : null;
   const typeStep  = showTypeStep   ? STEP[si++] : null;
   const col1Step  = STEP[si++];
   const shd1Step  = isDual ? null : STEP[si++];
@@ -195,7 +215,7 @@ export default function ColorPickerModal({ lang, onApply, onClose, defaultTarget
             </div>
             <div className="flex flex-wrap gap-[0.3125rem] mb-3.5">
               {hairFront.map(t => (
-                <button key={t.id} onClick={() => setTarget(t)}
+                <button key={t.id} onClick={() => { setTarget(t); setSide('none'); }}
                   style={target?.id === t.id ? { background: HAIR_ACC+'22', borderColor: HAIR_ACC, color: HAIR_ACC } : {}}
                   className={chipCls(target?.id === t.id)}>
                   {lang === 'ja' ? t.ja : t.en}
@@ -213,13 +233,42 @@ export default function ColorPickerModal({ lang, onApply, onClose, defaultTarget
             </div>
             <div className="flex flex-wrap gap-[0.3125rem] mb-3.5">
               {hairPartial.map(t => (
-                <button key={t.id} onClick={() => setTarget(t)}
+                <button key={t.id} onClick={() => { setTarget(t); setSide('none'); }}
                   style={target?.id === t.id ? { background: HAIR_ACC+'22', borderColor: HAIR_ACC, color: HAIR_ACC } : {}}
                   className={chipCls(target?.id === t.id)}>
                   {lang === 'ja' ? t.ja : t.en}
                 </button>
               ))}
             </div>
+          </>
+        )}
+
+        {/* 左右 */}
+        {showSideStep && (
+          <>
+            <div className="text-muted text-[0.625rem] font-mono mb-1.5 tracking-[0.07em]">
+              {lang === 'ja' ? `${sideStep} 左右` : `${sideStep} Side`}
+            </div>
+            <div className="flex flex-wrap gap-[0.3125rem] mb-1">
+              {[
+                { id: 'none',  ja: '両方', en: 'Both'  },
+                { id: 'left',  ja: '左',   en: 'Left'  },
+                { id: 'right', ja: '右',   en: 'Right' },
+              ].map(s => (
+                <button key={s.id} onClick={() => setSide(s.id)}
+                  style={side === s.id ? { background: HAIR_ACC+'22', borderColor: HAIR_ACC, color: HAIR_ACC } : {}}
+                  className={chipCls(side === s.id)}>
+                  {lang === 'ja' ? s.ja : s.en}
+                </button>
+              ))}
+            </div>
+            {side !== 'none' ? (
+              <div className="text-dim text-[0.5625rem] font-mono mb-3">
+                ⚠️ {lang === 'ja' ? '左右はAIによって反転する場合があります' : 'Left/right may be reversed by AI'}
+              </div>
+            ) : (
+              <div className="mb-3" />
+            )}
           </>
         )}
 
@@ -231,19 +280,19 @@ export default function ColorPickerModal({ lang, onApply, onClose, defaultTarget
             </div>
             <div className="flex flex-wrap gap-[0.3125rem] mb-1">
               {types.map(ht => (
-                <button key={ht.id} onClick={() => setHairType(ht.id)}
-                  style={hairType === ht.id ? { background: HAIR_ACC+'22', borderColor: HAIR_ACC, color: HAIR_ACC } : {}}
-                  className={chipCls(hairType === ht.id)} title={ht.desc}>
+                <button key={ht.id} onClick={() => isGradientable ? setTailType(ht.id) : setHairType(ht.id)}
+                  style={activeType === ht.id ? { background: HAIR_ACC+'22', borderColor: HAIR_ACC, color: HAIR_ACC } : {}}
+                  className={chipCls(activeType === ht.id)} title={ht.desc}>
                   {lang === 'ja' ? ht.ja : ht.en}
                 </button>
               ))}
             </div>
-            {hairType !== 'single' && types.find(t => t.id === hairType)?.desc && (
+            {activeType !== 'single' && types.find(t => t.id === activeType)?.desc && (
               <div className="text-dim text-[0.5625rem] font-mono mb-3">
-                💡 {types.find(t => t.id === hairType).desc}
+                💡 {types.find(t => t.id === activeType).desc}
               </div>
             )}
-            {hairType === 'single' && <div className="mb-3" />}
+            {activeType === 'single' && <div className="mb-3" />}
           </>
         )}
 
@@ -256,6 +305,9 @@ export default function ColorPickerModal({ lang, onApply, onClose, defaultTarget
             <div className="text-[0.625rem] font-mono mb-1.5 font-bold tracking-[0.07em]" style={{ color: EYE2_ACC }}>{lang === 'ja' ? `${col2Step} 右目の色` : `${col2Step} Right eye`}</div>
             <ColorSwatch sel={color2} set={setColor2} lang={lang} acc={EYE2_ACC} />
             <ShadeButtons sel={shade2} set={setShade2} lang={lang} acc={EYE2_ACC} />
+            <div className="text-dim text-[0.5625rem] font-mono mb-2">
+              ⚠️ {lang === 'ja' ? '左右はAIによって反転する場合があります' : 'Left/right may be reversed by AI'}
+            </div>
           </>
         ) : isDual ? (
           <>
