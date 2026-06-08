@@ -228,6 +228,7 @@ export default function Loom() {
   const [blockStatusOpen, setBlockStatusOpen] = useState(false);
   const [blockStatusPos, setBlockStatusPos] = useState(null);
   const blockStatusRef = useRef(null);
+  const charBarRef = useRef(null);
   const gridIconRef = useRef(null);
   const [tagSuggestOpen, setTagSuggestOpen] = useState(false);
   const [tagSuggestions, setTagSuggestions] = useState([]);
@@ -951,6 +952,18 @@ export default function Loom() {
 
   const startOutputDrag = useOutputDrag(outputHeight, setOutputHeight);
 
+  useEffect(() => {
+    const el = charBarRef.current;
+    if (!el) return;
+    const onWheel = e => {
+      if (e.deltaY === 0) return;
+      e.preventDefault();
+      el.scrollLeft += e.deltaY;
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, []);
+
   const addToPromptLog = (entry) =>
     setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, promptLog: [entry, ...(c.promptLog || [])].slice(0, 100) } : c));
 
@@ -1381,7 +1394,7 @@ export default function Loom() {
 
       {/* ── CHARACTER BAR ── */}
       <div className="bg-surface border-b border-line">
-        <div className="max-w-[58.33rem] mx-auto px-3.5 py-[0.4375rem] flex items-center gap-[0.3125rem] overflow-x-auto">
+        <div ref={charBarRef} className="max-w-[58.33rem] mx-auto px-3.5 py-[0.4375rem] flex items-center gap-[0.3125rem] overflow-x-auto">
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleCharDragEnd}>
           <SortableContext
             items={characters.filter(c => !c.archived || c.id === activeCharId).map(c => c.id)}
