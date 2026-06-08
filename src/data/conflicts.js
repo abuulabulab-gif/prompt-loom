@@ -467,6 +467,13 @@ export const CONFLICT_RULES = [
   ...mk('very short hair', ['hair spread out'], '超ショートヘアでは広がる髪が矛盾'),
   ...mk('short hair',      ['hair spread out'], 'ショートヘアでは広がる髪が矛盾'),
   ...mk('pixie cut',       ['hair spread out'], 'ピクシーカットでは広がる髪が矛盾'),
+
+  // ── 額のマーク（同時指定は描画が破綻する）──────────────────────
+  ...mk('forehead jewel',            ['star mark on forehead','crescent mark on forehead','rune mark on forehead','magic seal on forehead','occult mark on forehead'], '額のマークが重複'),
+  ...mk('star mark on forehead',     ['crescent mark on forehead','rune mark on forehead','magic seal on forehead','occult mark on forehead'], '額のマークが重複'),
+  ...mk('crescent mark on forehead', ['rune mark on forehead','magic seal on forehead','occult mark on forehead'], '額のマークが重複'),
+  ...mk('rune mark on forehead',     ['magic seal on forehead','occult mark on forehead'], '額のマークが重複'),
+  ...mk('magic seal on forehead',    ['occult mark on forehead'], '額のマークが重複'),
 ];
 
 export const detectConflicts = text => {

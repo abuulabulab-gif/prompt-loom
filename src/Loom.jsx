@@ -30,6 +30,7 @@ import SupportModal from "./components/modals/SupportModal.jsx";
 import CommandPalette from "./components/CommandPalette.jsx";
 import GlobalTagSearch from "./components/GlobalTagSearch.jsx";
 import { toNaturalJa, toNaturalEn } from "./utils/naturalLanguage.js";
+import { CM_ANIMAL_EAR_TAGS, CM_HORN_TAGS, CM_WING_TAGS, CM_TAIL_TAGS } from "./data/colors.js";
 import { callAI, callTagSuggest, localizeApiError } from "./utils/aiApi.js";
 import NaturalToTagsModal from "./components/modals/NaturalToTagsModal.jsx";
 import CharacterNote from "./CharacterNote/index.jsx";
@@ -339,16 +340,25 @@ export default function Loom() {
     feature:    ['glasses_frame','earrings','necklace'],
   };
 
+  // アクセサリーカラー適用後に素タグ（色なし版）を除去するマップ
+  const COLOR_BASE_REMOVE = { glasses_frame: 'glasses', earrings: 'earrings', necklace: 'necklace' };
+
   // 新API: applyColorTag(tags[], targetId) — ColorPickerModalから配列で渡される
   const applyColorTag = (tags, targetId) => {
     const blockId = targetId === 'heterochromia' ? 'face' : (TARGET_TO_BLOCK[targetId] || 'outfit');
     const tagArray = Array.isArray(tags) ? tags : [tags];
+    const baseToRemove = COLOR_BASE_REMOVE[targetId];
 
+    pushHistory(makeHistoryEntry(false));
     setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : ({
       ...c,
       blocks: c.blocks.map(b => b.id !== blockId ? b : ({
         ...b,
-        text: tagArray.reduce((t, tag) => appendTag(t, tag, '1.0'), b.text),
+        text: (() => {
+          let t = tagArray.reduce((acc, tag) => appendTag(acc, tag, '1.0'), b.text);
+          if (baseToRemove) t = removeTag(t, baseToRemove);
+          return t;
+        })(),
         enabled: true, collapsed: false,
       })),
     })));
@@ -366,6 +376,7 @@ export default function Loom() {
 
   const applyFeatureTag = (tag, blockId) => {
     const resolvedId = blockId || 'feature';
+    pushHistory(makeHistoryEntry(false));
     setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : {
       ...c,
       blocks: c.blocks.map(b => b.id !== resolvedId ? b : {
@@ -380,6 +391,7 @@ export default function Loom() {
 
   const applyMaterialTag = (tag, blockId) => {
     const resolvedId = blockId || 'outfit';
+    pushHistory(makeHistoryEntry(false));
     setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : {
       ...c,
       blocks: c.blocks.map(b => b.id !== resolvedId ? b : {
@@ -392,10 +404,29 @@ export default function Loom() {
     setTimeout(() => setColorToast(null), 3000);
   };
 
+  const _pickColorDefault = (allowedTargets, blockText, fallback) => {
+    if (!allowedTargets || typeof blockText !== 'string') return fallback;
+    const checks = {
+      animal_ears:   t => CM_ANIMAL_EAR_TAGS.some(k => hasTag(t, k)),
+      horns:         t => CM_HORN_TAGS.some(k => hasTag(t, k)),
+      wings:         t => CM_WING_TAGS.some(k => hasTag(t, k)),
+      tail_color:    t => CM_TAIL_TAGS.some(k => hasTag(t, k)),
+      glasses_frame: t => hasTag(t,'glasses') || hasTag(t,'wearing glasses') || hasTag(t,'goggles'),
+      earrings:      t => hasTag(t,'earrings'),
+      necklace:      t => hasTag(t,'necklace') || hasTag(t,'pendant') || hasTag(t,'choker'),
+    };
+    for (const targetId of allowedTargets) {
+      if (checks[targetId]?.(blockText)) return targetId;
+    }
+    return fallback;
+  };
+
   const openColorPicker = (defaultTarget = 'hair', allowedTargets = null, blockText = null) => {
-    setColorPickerDefaultTarget(defaultTarget);
+    const resolvedText = blockText ?? Object.fromEntries(blocks.map(b => [b.id, b.text]));
+    const smartDefault = _pickColorDefault(allowedTargets, resolvedText, defaultTarget);
+    setColorPickerDefaultTarget(smartDefault);
     setColorPickerAllowedTargets(allowedTargets);
-    setColorPickerBlockText(blockText ?? Object.fromEntries(blocks.map(b => [b.id, b.text])));
+    setColorPickerBlockText(resolvedText);
     setColorPickerOpen(true);
   };
 

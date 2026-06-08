@@ -122,6 +122,11 @@ export const CM_HORN_TAGS = [
 export const CM_WING_TAGS = [
   'fairy wings','angel wings','feathered wings','demon wings','mechanical wings',
 ];
+export const CM_TAIL_TAGS = [
+  'cat tail','fox tail','wolf tail','bunny tail','dog tail','tiger tail',
+  'squirrel tail','mouse tail','horse tail','cow tail','multiple tails',
+  'demon tail','dragon tail','mermaid tail',
+];
 
 // ── 衣装カラー動的検出リスト ──────────────────────────────────────────────
 // 優先順位順にスキャンし、最初にヒットした衣装タグを色のターゲットにする。

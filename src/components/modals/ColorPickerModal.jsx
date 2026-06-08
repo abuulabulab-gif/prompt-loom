@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { COLOR_PALETTE, SHADES, COLOR_TARGETS, HAIR_TYPES, FRONT_HAIR_TYPES, buildColorTag, buildColorName,
   CM_PRIMARY_OUTFIT_TAGS, CM_OUTFIT_TOPS, CM_OUTFIT_BOTTOMS, CM_OUTFIT_OUTER, CM_OUTFIT_FOOTWEAR, CM_OUTFIT_LEGWEAR,
-  CM_ANIMAL_EAR_TAGS, CM_HORN_TAGS, CM_WING_TAGS,
+  CM_ANIMAL_EAR_TAGS, CM_HORN_TAGS, CM_WING_TAGS, CM_TAIL_TAGS,
 } from "../../data/colors.js";
 import { hasTag } from "../../data/constants.js";
 
@@ -62,6 +62,7 @@ const DYNAMIC_TARGET_MAP = {
   animal_ears: CM_ANIMAL_EAR_TAGS,
   horns:       CM_HORN_TAGS,
   wings:       CM_WING_TAGS,
+  tail_color:  CM_TAIL_TAGS,
 };
 const DYNAMIC_TARGET_BLOCK = {
   outfit_main: 'outfit', top: 'outfit', bottom: 'outfit',

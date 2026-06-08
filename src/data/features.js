@@ -67,7 +67,7 @@ export const FEATURE_ITEMS = {
         { ja:'三日月紋', en:'crescent mark on forehead' },
         { ja:'ルーン',   en:'rune mark on forehead' },
         { ja:'魔法陣',   en:'magic seal on forehead' },
-        { ja:'呪印',     en:'curse mark on forehead' },
+        { ja:'呪印',     en:'occult mark on forehead' },
       ],
     },
   ],
@@ -330,7 +330,7 @@ export const FEATURE_TAG_JA = {
   'crescent mark on forehead':  '額に三日月紋',
   'rune mark on forehead':      '額にルーン',
   'magic seal on forehead':     '額に魔法陣',
-  'curse mark on forehead':     '額に呪印',
+  'occult mark on forehead':    '額に呪印',
   // ヘッドフォン・マスク
   'wearing headphones':         'ヘッドフォン着用',
   'headphones around neck':     'ヘッドフォンを首にかける',
