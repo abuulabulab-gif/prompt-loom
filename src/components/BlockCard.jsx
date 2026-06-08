@@ -1255,7 +1255,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                         <button
                           onClick={() => setTransferOpen(o => !o)}
                           title={lang === 'ja' ? '他のキャラへ転送' : 'Transfer to character'}
-                          className="bg-transparent border border-dim rounded-[0.3125rem] px-[0.3125rem] py-0.5 text-dim text-[0.625rem] cursor-pointer"
+                          className="bg-transparent border border-dim rounded-[0.3125rem] px-[0.3125rem] py-[0.1875rem] text-dim text-[0.625rem] cursor-pointer"
                         >→</button>
                         {transferOpen && (
                           <div className="absolute right-0 bottom-full mb-1 z-50 bg-surface border border-linebright rounded-lg overflow-hidden shadow-lg min-w-[7.5rem] max-w-[10rem]">
@@ -1278,7 +1278,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                         style={saving
                           ? { background: blockColor + '18', border: `1px solid ${blockColor}`, color: blockColor }
                           : { border: `1px solid rgb(var(--dim))`, color: 'rgb(var(--muted))' }}
-                        className="bg-transparent rounded-[0.3125rem] px-[0.4375rem] py-0.5 text-[0.625rem] cursor-pointer font-mono"
+                        className="bg-transparent rounded-[0.3125rem] px-[0.4375rem] py-[0.1875rem] text-[0.625rem] cursor-pointer font-mono"
                       >📌 {lang === 'ja' ? 'プリセット保存' : 'Save preset'}</button>
                     )}
                   </div>
