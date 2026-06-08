@@ -275,8 +275,8 @@ export default function TemplateModal({ lang, isMobile, onApply, onClose }) {
           </p>
           <p className="text-[#f87171] text-[0.625rem] font-mono mb-1">
             {lang === 'ja'
-              ? '⚠ 構図・衣装・背景などは上書き。体型・顔は追記。「クリアして適用」モードでは追記ブロックも先に空にしてから適用します。'
-              : '⚠ Composition / outfit / BG blocks are overwritten. Body / face blocks append. In "Clear & apply" mode, append-blocks are also cleared first.'}
+              ? '⚠ 構図・背景は上書き。衣装・体型・顔は追記。「クリアして適用」モードでは追記ブロックも先に空にしてから適用します。'
+              : '⚠ Composition / BG blocks are overwritten. Outfit / body / face blocks append. In "Clear & apply" mode, append-blocks are also cleared first.'}
           </p>
           <p className="text-[0.5625rem] font-mono mb-4" style={{ color: 'rgb(var(--c-blue))' }}>
             {lang === 'ja'

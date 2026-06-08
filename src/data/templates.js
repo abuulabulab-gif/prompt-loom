@@ -142,7 +142,7 @@ export const TEMPLATES = [
     apply: {
       composition: 'upper body, back view, looking over shoulder, looking at viewer',
       body:        { mode: 'merge', tags: 'bare back, bare shoulders' },
-      outfit:      'open back',
+      outfit:      { mode: 'merge', tags: 'open back' },
     },
   },
   {
@@ -155,7 +155,7 @@ export const TEMPLATES = [
     apply: {
       composition: 'cowboy shot, arms behind head',
       body:        { mode: 'merge', tags: 'armpits' },
-      outfit:      'sleeveless',
+      outfit:      { mode: 'merge', tags: 'sleeveless' },
     },
   },
   {
@@ -170,7 +170,7 @@ export const TEMPLATES = [
     apply: {
       composition: 'bust shot, high angle, from above, arms behind head',
       body:        { mode: 'merge', tags: 'armpits' },
-      outfit:      'sleeveless',
+      outfit:      { mode: 'merge', tags: 'sleeveless' },
     },
   },
   {
@@ -183,7 +183,7 @@ export const TEMPLATES = [
     apply: {
       composition: 'cowboy shot, from below, low angle',
       body:        { mode: 'merge', tags: 'midriff, navel' },
-      outfit:      'crop top, shorts',
+      outfit:      { mode: 'merge', tags: 'crop top, shorts' },
     },
   },
   {
@@ -196,7 +196,7 @@ export const TEMPLATES = [
     apply: {
       composition: 'cowboy shot',
       body:        { mode: 'merge', tags: 'thighs, bare thighs, zettai ryouiki, thigh gap' },
-      outfit:      'skirt, thighhighs',
+      outfit:      { mode: 'merge', tags: 'skirt, thighhighs' },
     },
   },
   {
@@ -209,7 +209,7 @@ export const TEMPLATES = [
     apply: {
       composition: 'lower body, close-up',
       body:        { mode: 'merge', tags: 'thick thighs, plump, wide hips, voluptuous, thighs, bare thighs, thigh gap, zettai ryouiki' },
-      outfit:      'thighhighs, skintight',
+      outfit:      { mode: 'merge', tags: 'thighhighs, skintight' },
     },
   },
   {
