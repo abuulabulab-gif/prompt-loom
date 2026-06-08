@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { DndContext, closestCenter, MouseSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
 import CharVersions from "./components/CharVersions.jsx";
 import { useOutputDrag } from "./hooks/useOutputDrag.js";
 import { useVariations } from "./hooks/useVariations.js";
@@ -27,6 +27,7 @@ import FeatureMakerModal from "./components/modals/FeatureMakerModal.jsx";
 import MaterialMakerModal from "./components/modals/MaterialMakerModal.jsx";
 import SceneComposeModal from "./components/modals/SceneComposeModal.jsx";
 import SettingsModal from "./components/modals/SettingsModal.jsx";
+import CharListModal from "./components/modals/CharListModal.jsx";
 import SupportModal from "./components/modals/SupportModal.jsx";
 import CommandPalette from "./components/CommandPalette.jsx";
 import GlobalTagSearch from "./components/GlobalTagSearch.jsx";
@@ -207,6 +208,7 @@ export default function Loom() {
 
   // ── Feature states ──
   const [libraryOpen, setLibraryOpen] = useState(false);
+  const [charListOpen, setCharListOpen] = useState(false);
   const [globalSearchOpen, setGlobalSearchOpen] = useState(false);
   const [analyzeOpen, setAnalyzeOpen] = useState(false);
   const [analyzeText, setAnalyzeText] = useState('');
@@ -332,7 +334,8 @@ export default function Loom() {
 
   // ── Drag-and-drop ──
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
   );
   const handleDragEnd = ({ active, over }) => {
     if (!over || active.id === over.id) return;
@@ -342,6 +345,12 @@ export default function Loom() {
       const newIdx = c.blocks.findIndex(b => b.id === over.id);
       return { ...c, blocks: arrayMove(c.blocks, oldIdx, newIdx) };
     }));
+  };
+
+  const handleCharReorder = (reorderedVisible) => {
+    const archived = characters.filter(c => c.archived);
+    setCharacters([...reorderedVisible, ...archived]);
+    setOrderUpdatedAt(Date.now());
   };
 
   const handleCharDragEnd = ({ active, over }) => {
@@ -864,6 +873,7 @@ export default function Loom() {
         if (paletteOpen)      { setPaletteOpen(false);      return; }
         if (blockStatusOpen)  { setBlockStatusOpen(false);  return; }
         if (globalSearchOpen) { setGlobalSearchOpen(false); return; }
+        if (charListOpen)     { setCharListOpen(false);     return; }
         if (libraryOpen)      { setLibraryOpen(false);      return; }
         if (supportOpen)      { setSupportOpen(false);      return; }
         if (settingsOpen)     { setSettingsOpen(false);     return; }
@@ -1398,6 +1408,11 @@ export default function Loom() {
           title={lang === 'ja' ? 'キャラクター格納庫' : 'Character Library'}
           className="bg-transparent border border-dim rounded-[1.25rem] px-[0.5625rem] py-1 text-muted cursor-pointer text-[0.6875rem] flex-shrink-0 whitespace-nowrap">
           📚{characters.some(c => c.archived) ? ` ${characters.filter(c => c.archived).length}` : ''}
+        </button>
+        <button onClick={() => setCharListOpen(true)}
+          title={lang === 'ja' ? 'キャラ一覧・並べ替え' : 'Character list & reorder'}
+          className="bg-transparent border border-dim rounded-[1.25rem] px-[0.5625rem] py-1 text-muted cursor-pointer text-[0.6875rem] flex-shrink-0 whitespace-nowrap">
+          ≡
         </button>
         <div className="flex-1" />
         {characters.length > 1 && (
@@ -2768,6 +2783,7 @@ export default function Loom() {
       </div>}
 
       {/* ── MODALS ── */}
+      {charListOpen && <CharListModal open={charListOpen} onClose={() => setCharListOpen(false)} characters={characters} activeCharId={activeCharId} lang={lang} onSelect={id => { setActiveCharId(id); setCharPanelOpen(true); }} onReorder={handleCharReorder} />}
       {libraryOpen && <LibraryModal characters={characters} activeCharId={activeCharId} lang={lang} onClose={() => setLibraryOpen(false)}
         onActivate={id => { setActiveCharId(id); setCharPanelOpen(true); }}
         onArchive={archiveCharacter}
