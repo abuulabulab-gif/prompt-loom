@@ -2,13 +2,13 @@ import { useState } from "react";
 import { splitTags, bareTag, appendTag, removeTag, hasTag, stripWeights, OPTIONAL_CAT_NAMES, RARE_OPT_CAT_NAMES, BLOCK_RANDOM_RULES, TIER3_TAGS, RANDOM_EXCLUDE_TAGS, RANDOM_EXCLUSION_RULES, RANDOM_COMBO_RULES, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS } from "../data/constants.js";
 import { CONFLICT_MAP } from "../data/conflicts.js";
 import { applyMaterialMakerLayer } from "../data/materials.js";
-import { applyOutfitStackPenalty, applyColorMakerLayer, applyFeatureMakerLayer, applyAtmosphereLayer } from "./useRandomGen.js";
+import { applyOutfitStackPenalty, applyColorMakerLayer, applyFeatureMakerLayer, applyAtmosphereLayer } from "../utils/randomLayers.js";
 
 // Blocks whose content is fixed across all variations (character identity)
 const VAR_FIXED_BLOCKS = new Set(['quality', 'artstyle', 'attribute', 'face', 'body', 'negative']);
 
 // Reroll blocks in sequential exclusion order (outfit picks constrain feature, etc.)
-const VAR_REROLL_ORDER = ['outfit', 'feature', 'effect', 'composition', 'background', 'lighting'];
+const VAR_REROLL_ORDER = ['outfit', 'outfit_detail', 'effect', 'composition', 'background', 'lighting'];
 
 // Pick tags for one reroll block.
 // sharedExcluded is pre-populated with fixed-block exclusions and previous reroll picks;

@@ -51,7 +51,7 @@ export function toNaturalJa(blocks) {
   const face    = getBlock(blocks, 'face');
   const body    = getBlock(blocks, 'body');
   const outfit  = getBlock(blocks, 'outfit');
-  const feature = getBlock(blocks, 'feature');
+  const feature = getBlock(blocks, 'outfit_detail');
   const comp    = getBlock(blocks, 'composition');
   const bg      = getBlock(blocks, 'background');
   const light   = getBlock(blocks, 'lighting');
@@ -145,7 +145,7 @@ export function toNaturalEn(blocks) {
   const face    = getBlock(blocks, 'face');
   const body    = getBlock(blocks, 'body');
   const outfit  = getBlock(blocks, 'outfit');
-  const feature = getBlock(blocks, 'feature');
+  const feature = getBlock(blocks, 'outfit_detail');
   const comp    = getBlock(blocks, 'composition');
   const bg      = getBlock(blocks, 'background');
   const light   = getBlock(blocks, 'lighting');

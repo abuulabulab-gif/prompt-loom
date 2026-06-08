@@ -86,7 +86,7 @@ export default function GlobalTagSearch({ open, onClose, blocks, lang, onToggleT
 
   if (!open) return null;
 
-  const results = query.trim().length < 1 ? [] : blocks
+  const catResults = query.trim().length < 1 ? [] : blocks
     .filter(b => b.id !== 'negative')
     .flatMap(block =>
       block.cats.flatMap(cat =>
@@ -94,7 +94,18 @@ export default function GlobalTagSearch({ open, onClose, blocks, lang, onToggleT
           .filter(tag => tagMatches(tag, query))
           .map(tag => ({ tag, block, cat }))
       )
-    )
+    );
+
+  const customResults = query.trim().length < 1 ? [] : blocks
+    .filter(b => b.id !== 'negative')
+    .flatMap(block =>
+      (block.customTags || [])
+        .map(ct => ({ en: ct.text, ja: ct.label || ct.text, isCustom: true }))
+        .filter(tag => tagMatches(tag, query))
+        .map(tag => ({ tag, block, cat: null }))
+    );
+
+  const results = [...catResults, ...customResults]
     .filter((item, i, arr) =>
       arr.findIndex(x => x.tag.en === item.tag.en && x.block.id === item.block.id) === i
     );
@@ -159,9 +170,10 @@ export default function GlobalTagSearch({ open, onClose, blocks, lang, onToggleT
                 <div className="flex flex-wrap gap-1 pl-[1.125rem]">
                   {items.map(({ tag }) => {
                     const isActive = hasTag(block.text, tag.en);
+                    const label = lang === 'ja' ? tag.ja : tag.en;
                     return (
                       <button
-                        key={tag.en}
+                        key={tag.en + (tag.isCustom ? '__c' : '')}
                         onClick={() => { onToggleTag(block.id, tag.en); scrollToBlock(block.id); }}
                         title={isActive
                           ? (lang === 'ja' ? `クリックで削除 / ${tag.en}` : `Click to remove / ${tag.ja}`)
@@ -169,12 +181,12 @@ export default function GlobalTagSearch({ open, onClose, blocks, lang, onToggleT
                         className="rounded-[0.3125rem] px-2 py-[0.1875rem] text-[0.6875rem] font-mono cursor-pointer transition-all duration-100 border"
                         style={{
                           background: isActive ? block.color + '22' : 'rgb(var(--surface-alt))',
-                          borderColor: isActive ? block.color + '90' : 'rgb(var(--border))',
+                          borderColor: isActive ? block.color + '90' : (tag.isCustom ? block.color + '50' : 'rgb(var(--border))'),
                           color: isActive ? block.color : 'rgb(var(--text) / 0.8)',
                           fontWeight: isActive ? 700 : 400,
                         }}
                       >
-                        {isActive ? '✓ ' : ''}{lang === 'ja' ? tag.ja : tag.en}
+                        {isActive ? '✓ ' : ''}{label}{tag.isCustom && <span className="opacity-40 ml-0.5 text-[0.5rem]">✏</span>}
                       </button>
                     );
                   })}

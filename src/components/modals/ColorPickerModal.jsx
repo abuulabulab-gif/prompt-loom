@@ -69,8 +69,8 @@ const DYNAMIC_TARGET_MAP = {
 const DYNAMIC_TARGET_BLOCK = {
   outfit_main: 'outfit', top: 'outfit', bottom: 'outfit',
   outer: 'outfit', footwear: 'outfit', legwear: 'outfit',
-  animal_ears: 'attribute', horns: 'attribute', wings: 'attribute', fin_ears: 'attribute', tail_color: 'attribute',
-  glasses_frame: 'feature', earrings: 'feature', necklace: 'feature',
+  animal_ears: 'attribute', horns: 'attribute', wings: 'attribute', tail_color: 'attribute',
+  glasses_frame: 'outfit_detail', earrings: 'outfit_detail', necklace: 'outfit_detail',
 };
 function getDynamicTag(targetId, blockText) {
   const list = DYNAMIC_TARGET_MAP[targetId];

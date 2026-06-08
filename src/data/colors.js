@@ -46,7 +46,6 @@ export const COLOR_TARGETS = [
   { id:'animal_ears',  ja:'ケモ耳',        en:'animal ears' },
   { id:'horns',        ja:'角',            en:'horns'       },
   { id:'wings',        ja:'翼',            en:'wings'       },
-  { id:'fin_ears',     ja:'ヒレ耳',        en:'fin ears'    },
   // ── アクセサリー ────────────────────────────────────────────────
   { id:'glasses_frame', ja:'眼鏡',       en:'glasses'  },
   { id:'earrings',      ja:'イヤリング', en:'earrings' },
@@ -290,3 +289,36 @@ export function resolveColorLabel(tagEn) {
 
   return null;
 }
+
+// ── Color picker apply maps (used by Loom.jsx / useColorPicker) ──────────────
+
+export const TARGET_TO_BLOCK = {
+  hair: 'face', inner_hair: 'face', bangs: 'face', bang_streak: 'face',
+  forelock: 'face', hair_tips: 'face', sidelocks: 'face',
+  eyes: 'face', heterochromia: 'face',
+  nails: 'body',
+  outfit_main: 'outfit', top: 'outfit', bottom: 'outfit', outer: 'outfit',
+  footwear: 'outfit', legwear: 'outfit', ribbon: 'outfit', accents: 'outfit',
+  trim: 'outfit', embroidery: 'outfit', lace: 'outfit',
+  eyeshadow: 'face', lipstick: 'face',
+  bg_color: 'background',
+  animal_ears: 'attribute', horns: 'attribute', wings: 'attribute', tail_color: 'attribute',
+  glasses_frame: 'outfit_detail', earrings: 'outfit_detail', necklace: 'outfit_detail',
+};
+
+export const BLOCK_TO_COLOR_TARGET = {
+  face: 'hair', outfit: 'outfit_main', background: 'bg_color',
+  attribute: 'animal_ears', outfit_detail: 'glasses_frame',
+};
+
+export const BLOCK_TO_ALLOWED_TARGETS = {
+  face:         ['hair','inner_hair','bangs','bang_streak','forelock','hair_tips','sidelocks','eyes','heterochromia','eyeshadow','lipstick'],
+  outfit:       ['outfit_main','top','bottom','outer','footwear','legwear','ribbon','accents','trim','embroidery','lace'],
+  background:   ['bg_color'],
+  attribute:    ['animal_ears','horns','wings','tail_color'],
+  outfit_detail:['glasses_frame','earrings','necklace'],
+};
+
+export const COLOR_BASE_REMOVE = {
+  glasses_frame: 'glasses', earrings: 'earrings', necklace: 'necklace',
+};

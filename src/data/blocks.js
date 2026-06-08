@@ -56,7 +56,7 @@ export const BLOCKS_DEF = [
     {n:'レッグウェア',nEn:'Legwear',id:'outfit_legwear',t:[tt('thighhighs','ニーハイ'),tt('tights','タイツ'),tt('pantyhose','パンスト'),ttr('fishnet legwear','網レッグウェア'),tt('stirrup leggings','トレンカ'),tt('leg warmers','レッグウォーマー'),tt('ankle socks','アンクルソックス'),tt('socks','ソックス'),tt('knee-high socks','ニーソックス'),tt('frilled socks','フリルソックス'),tt('single thighhigh','片方ニーハイ'),tt('mismatched legwear','左右違い靴下')]},
     {n:'フットウェア',nEn:'Footwear',id:'outfit_footwear',t:[tt('sneakers','スニーカー'),tt('loafers','ローファー'),tt('oxford shoes','オックスフォード'),tt('ballet flats','バレエシューズ'),tt('mary janes','ストラップシューズ'),tt('sandals','サンダル'),tt('geta','下駄'),tt('slippers','スリッパ'),tt('heels','ヒール'),tt('pumps','パンプス'),tt('mules','ミュール'),tt('high heels','ハイヒール'),tt('platform shoes','厚底'),tt('ankle boots','アンクルブーツ'),tt('boots','ブーツ'),tt('knee-high boots','ニーハイブーツ'),tt('thigh-high boots','太もも丈ブーツ'),tt('platform boots','厚底ブーツ')]},
   ]},
-  {id:'feature',name:'衣装ディテール',nameEn:'Outfit Detail',icon:'🧵',color:'#fb7185',colorLight:'#e11d48',collapsed:true,strength:'1.0',text:'',customTags:[],favTags:[],locked:false,cats:[
+  {id:'outfit_detail',name:'衣装ディテール',nameEn:'Outfit Detail',icon:'🧵',color:'#fb7185',colorLight:'#e11d48',collapsed:true,strength:'1.0',text:'',customTags:[],favTags:[],locked:false,cats:[
     {n:'形状・カット',nEn:'Shape/Cut',id:'outfit_shape',t:[tt('skintight','ぴったり'),tt('high neck','ハイネック'),tt('open collar','開けた衿'),tt('low-rise','ローライズ'),tt('cleavage cutout','胸元カット'),tt('navel cutout','へそ出しカット'),tt('side slit','サイドスリット'),tt('high slit','ハイスリット'),tt('open back','背中開き'),tt('side cutout','サイドカット'),tt('torn clothes','破れた服'),tt('see-through','シースルー')]},
     {n:'素材・生地',nEn:'Fabric',id:'outfit_material',t:[tt('silk','シルク'),tt('satin','サテン'),tt('velvet','ベルベット'),tt('lace','レース'),tt('leather','レザー'),tt('fur','ファー'),tt('knit','ニット'),tt('embroidered','刺繍入り'),tt('mesh','メッシュ'),ttr('sequined','スパンコール入り'),ttr('sheer','シアー'),ttr('fishnet','フィッシュネット'),ttr('latex','ラテックス')]},
     {n:'柄・装飾',nEn:'Pattern/Deco',id:'outfit_pattern',t:[tt('frills','フリル'),tt('lace','レース'),tt('lace trim','レーストリム'),tt('ribbons','リボン'),tt('bows','リボン飾り'),tt('embroidery','刺繍'),tt('floral print','花柄'),tt('plaid','チェック'),tt('striped','ストライプ'),tt('polka dot','水玉'),tt('sequins','スパンコール')]},
@@ -97,6 +97,23 @@ export const BLOCKS_DEF = [
     {n:'その他NG',nEn:'Other NG',id:'neg_other',t:[tt('nsfw','NSFW（SFWと連動）'),tt('text','テキスト'),tt('watermark','透かし'),tt('signature','署名'),tt('logo','ロゴ'),tt('username','ユーザー名'),tt('cropped','トリミング'),tt('out of frame','画面外'),tt('duplicate','重複'),tt('censored','検閲')]},
   ]},
 ];
+
+// ブロックごとのタグ追加ルール。AIが将来タグを追加する際のガイドとして使用する。
+// ttr()=R指定(restricted)タグ / tt()=通常タグ。英語名はDanbooru準拠を基本とする。
+export const BLOCK_RULES = {
+  quality:      '品質修飾語・セーフティのみ。masterpiece/best quality等のAI品質系、SFW/rating:safe。スタイル・キャラ要素は不可。',
+  artstyle:     '描画スタイル・色調・レンダリング方式。「どう描くか」を決めるブロック。キャラや服装タグは入れない。',
+  attribute:    'キャラの種族・性別・人数・ケモ耳/幻想パーツ。「誰が」いるかを決めるブロック。服装・ポーズは不可。ケモ耳系はattr_kemono、幻想系(翼・角・尾ひれ等)はattr_partsに分類。',
+  face:         '顔・髪・表情・メイク。「顔がどう見えるか」全般。カラーメーカーで色指定されるターゲット(hair/bangs/eye等)はこのブロックに適用される。',
+  body:         '体型・肌色・肌質感・ボディフォーカス。首から下・衣装より内側の身体特徴。足(barefoot等)もbody_feetに含む。',
+  outfit:       '衣装の種類・スタイル選択。「何を着るか」ブロック。素材・柄・アクセサリー等の詳細はoutfit_detailへ。カラーメーカーのoutfit系ターゲットはこのブロックに適用。',
+  outfit_detail:'衣装の形状/素材/柄/着脱動作+装飾アクセサリー(眼鏡・イヤリング・ネックレス等)。outfitが「何を着るか」ならここは「どう見えるか」。カラーメーカーのglasses_frame/earrings/necklaceターゲットはこのブロックに適用。',
+  effect:       '魔法・パーティクル・天候・フィルムエフェクト。キャラや背景自体ではなく「演出として重なるもの」。背景要素はbackgroundへ。',
+  composition:  'カメラ距離・角度・ポーズ・手の形・視線・小物持ち。「どう構図するか」ブロック。背景は含まない。excludeFromRandom:trueはランダム生成から除外(シート系など)。',
+  background:   '背景の場所・時間・天気・季節・雰囲気。カラーメーカーのbg_colorターゲットはこのブロックに適用。',
+  lighting:     '光源種類と照明スタイル。単独で機能するが背景・雰囲気と連携が多い。',
+  negative:     'ネガティブプロンプト(生成から除外したいタグ)。品質NG/身体NG/その他NG。SFWタグ(nsfw)はここに入れてquality_safetyと連動させる。',
+};
 
 export const makeCustomBlock = (label = 'カスタム', labelEn = 'Custom') => ({
   id: uid(),

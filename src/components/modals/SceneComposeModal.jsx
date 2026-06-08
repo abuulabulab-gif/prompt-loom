@@ -28,7 +28,7 @@ const COLLAB_REMOVE_TAGS = new Set([
   'androgynous','femboy','tomboy',
 ]);
 const charBodyText = char => {
-  const ids = ['attribute', 'face', 'body', 'outfit', 'feature', 'effect'];
+  const ids = ['attribute', 'face', 'body', 'outfit', 'outfit_detail', 'effect'];
   const segs = char.blocks
     .filter(b => b.enabled !== false && ids.includes(b.id) && b.text?.trim())
     .flatMap(b => b.text.trim().split(',').map(s => s.trim()).filter(Boolean));

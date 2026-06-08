@@ -19,7 +19,7 @@ function getBlockText(blocks, id) { return blocks?.find(b => b.id === id)?.text 
 
 function resolveBlockId(target, outfitText, featureText) {
   if ([...target.triggers].some(k => hasTag(outfitText,  k))) return 'outfit';
-  if ([...target.triggers].some(k => hasTag(featureText, k))) return 'feature';
+  if ([...target.triggers].some(k => hasTag(featureText, k))) return 'outfit_detail';
   return null;
 }
 
@@ -30,7 +30,7 @@ export default function MaterialMakerModal({ lang, blocks, onApply, onClose }) {
   const [selectedTarget, setSelectedTarget] = useState(null);
 
   const outfitText  = getBlockText(blocks, 'outfit');
-  const featureText = getBlockText(blocks, 'feature');
+  const featureText = getBlockText(blocks, 'outfit_detail');
   const ja  = lang === 'ja';
   const accVal = groupOf(selectedMat)?.acc;
   const acc    = accVal ?? ACCENT;

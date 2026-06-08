@@ -144,7 +144,7 @@ export function applyMaterialMakerLayer(blockMap, mode) {
   if (Math.random() > overallProb) return;
 
   const outfitBlock  = blockMap.get('outfit');
-  const detailBlock  = blockMap.get('feature');
+  const detailBlock  = blockMap.get('outfit_detail');
   if (!outfitBlock && !detailBlock) return;
 
   const outfitText = outfitBlock?.text || '';
@@ -170,7 +170,7 @@ export function applyMaterialMakerLayer(blockMap, mode) {
       ? (outfitBlock && !outfitBlock.locked ? outfitBlock : null)
       : (detailBlock && !detailBlock.locked ? detailBlock : null);
     if (!targetBlock) continue;
-    const blockId = triggerInOutfit ? 'outfit' : 'feature';
+    const blockId = triggerInOutfit ? 'outfit' : 'outfit_detail';
 
     // 使用可能な素材プール構築
     let pool = target.combinable

@@ -30,7 +30,8 @@ import SupportModal from "./components/modals/SupportModal.jsx";
 import CommandPalette from "./components/CommandPalette.jsx";
 import GlobalTagSearch from "./components/GlobalTagSearch.jsx";
 import { toNaturalJa, toNaturalEn } from "./utils/naturalLanguage.js";
-import { CM_ANIMAL_EAR_TAGS, CM_HORN_TAGS, CM_WING_TAGS, CM_TAIL_TAGS } from "./data/colors.js";
+import { BLOCK_TO_COLOR_TARGET, BLOCK_TO_ALLOWED_TARGETS } from "./data/colors.js";
+import { useColorPicker } from "./hooks/useColorPicker.js";
 import { callAI, callTagSuggest, localizeApiError } from "./utils/aiApi.js";
 import NaturalToTagsModal from "./components/modals/NaturalToTagsModal.jsx";
 import CharacterNote from "./CharacterNote/index.jsx";
@@ -77,15 +78,19 @@ function migrateAliasesInText(text) {
 
 // Merge saved blocks with current BLOCKS_DEF so newly added/removed tags
 // are always reflected in existing characters without wiping user data.
+// ブロックIDのリネーム履歴。旧IDで保存されたデータを新IDに移行する。
+const LEGACY_BLOCK_IDS = { feature: 'outfit_detail' };
+
 function mergeCharacterBlocks(savedBlocks) {
   const defById = Object.fromEntries(BLOCKS_DEF.map(def => [def.id, def]));
   const processedIds = new Set();
 
   const merged = (savedBlocks || []).map(saved => {
     if (saved.isCustomBlock) return saved;
-    const def = defById[saved.id];
+    const resolvedId = LEGACY_BLOCK_IDS[saved.id] ?? saved.id;
+    const def = defById[resolvedId];
     if (!def) return null;
-    processedIds.add(saved.id);
+    processedIds.add(resolvedId);
     return {
       ...deep(def),
       text:            migrateAliasesInText(saved.text ?? def.text),
@@ -134,7 +139,6 @@ export default function Loom() {
   const [loaded, setLoaded] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
   const [theme, setTheme] = useState('light');
-  const [colorPickerOpen, setColorPickerOpen] = useState(false);
   const [featureMakerOpen, setFeatureMakerOpen] = useState(false);
   const [featureMakerFilterBlock, setFeatureMakerFilterBlock] = useState(null);
   const [materialMakerOpen, setMaterialMakerOpen] = useState(false);
@@ -216,10 +220,6 @@ export default function Loom() {
   const [naturalToTagsTab, setNaturalToTagsTab] = useState('text'); // 'text' | 'image'
   const [importToast, setImportToast] = useState(null); // null | { name: string }
   const [autoLogToast, setAutoLogToast] = useState(false);
-  const [colorToast, setColorToast] = useState(null); // null | { msg }
-  const [colorPickerAllowedTargets, setColorPickerAllowedTargets] = useState(null);
-  const [colorPickerDefaultTarget, setColorPickerDefaultTarget] = useState('hair');
-  const [colorPickerBlockText, setColorPickerBlockText] = useState(null);
   const [orderUpdatedAt, setOrderUpdatedAt] = useState(0);
   const [settingsUpdatedAt, setSettingsUpdatedAt] = useState(0);
   const [blockStatusOpen, setBlockStatusOpen] = useState(false);
@@ -328,107 +328,6 @@ export default function Loom() {
       } catch { setSaveStatus('err'); }
     }, 800);
   }, [characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight, orderUpdatedAt, settingsUpdatedAt, loaded]);
-
-  // ── Color picker apply ──
-  const TARGET_TO_BLOCK = { hair: 'face', inner_hair: 'face', bangs: 'face', bang_streak: 'face', forelock: 'face', hair_tips: 'face', sidelocks: 'face', eyes: 'face', heterochromia: 'face', nails: 'body', outfit_main: 'outfit', top: 'outfit', bottom: 'outfit', outer: 'outfit', footwear: 'outfit', legwear: 'outfit', ribbon: 'outfit', accents: 'outfit', trim: 'outfit', embroidery: 'outfit', lace: 'outfit', eyeshadow: 'face', lipstick: 'face', bg_color: 'background', animal_ears: 'attribute', horns: 'attribute', wings: 'attribute', tail_color: 'attribute', glasses_frame: 'feature', earrings: 'feature', necklace: 'feature' };
-  const BLOCK_TO_COLOR_TARGET   = { face: 'hair', outfit: 'outfit_main', background: 'bg_color', attribute: 'animal_ears', feature: 'glasses_frame' };
-  const BLOCK_TO_ALLOWED_TARGETS = {
-    face:       ['hair','inner_hair','bangs','bang_streak','forelock','hair_tips','sidelocks','eyes','heterochromia','eyeshadow','lipstick'],
-    outfit:     ['outfit_main','top','bottom','outer','footwear','legwear','ribbon','accents','trim','embroidery','lace'],
-    background: ['bg_color'],
-    attribute:  ['animal_ears','horns','wings','tail_color'],
-    feature:    ['glasses_frame','earrings','necklace'],
-  };
-
-  // アクセサリーカラー適用後に素タグ（色なし版）を除去するマップ
-  const COLOR_BASE_REMOVE = { glasses_frame: 'glasses', earrings: 'earrings', necklace: 'necklace' };
-
-  // 新API: applyColorTag(tags[], targetId) — ColorPickerModalから配列で渡される
-  const applyColorTag = (tags, targetId) => {
-    const blockId = targetId === 'heterochromia' ? 'face' : (TARGET_TO_BLOCK[targetId] || 'outfit');
-    const tagArray = Array.isArray(tags) ? tags : [tags];
-    const baseToRemove = COLOR_BASE_REMOVE[targetId];
-
-    pushHistory(makeHistoryEntry(false));
-    setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : ({
-      ...c,
-      blocks: c.blocks.map(b => b.id !== blockId ? b : ({
-        ...b,
-        text: (() => {
-          let t = tagArray.reduce((acc, tag) => appendTag(acc, tag, '1.0'), b.text);
-          if (baseToRemove) t = removeTag(t, baseToRemove);
-          return t;
-        })(),
-        enabled: true, collapsed: false,
-      })),
-    })));
-
-    const blockName    = blocks.find(b => b.id === blockId)?.[lang === 'ja' ? 'name' : 'nameEn'] ?? blockId;
-    const labelPreview = tagArray[0] ?? '';
-    const msg = targetId === 'heterochromia'
-      ? (lang === 'ja' ? `🎨 ${blockName}に「オッドアイ」を追加` : `🎨 heterochromia added to ${blockName}`)
-      : (lang === 'ja'
-        ? `🎨 ${blockName}に「${labelPreview}」${tagArray.length > 1 ? `他${tagArray.length - 1}件` : ''}を追加`
-        : `🎨 "${labelPreview}"${tagArray.length > 1 ? ` +${tagArray.length - 1}` : ''} added to ${blockName}`);
-    setColorToast({ msg });
-    setTimeout(() => setColorToast(null), 3000);
-  };
-
-  const applyFeatureTag = (tag, blockId) => {
-    const resolvedId = blockId || 'feature';
-    pushHistory(makeHistoryEntry(false));
-    setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : {
-      ...c,
-      blocks: c.blocks.map(b => b.id !== resolvedId ? b : {
-        ...b, text: appendTag(b.text, tag, '1.0'), enabled: true, collapsed: false,
-      }),
-    }));
-    const blockName = blocks.find(b => b.id === resolvedId)?.[lang === 'ja' ? 'name' : 'nameEn'] ?? resolvedId;
-    const msg = lang === 'ja' ? `🎯 ${blockName}に「${tag}」を追加` : `🎯 "${tag}" added to ${blockName}`;
-    setColorToast({ msg });
-    setTimeout(() => setColorToast(null), 3000);
-  };
-
-  const applyMaterialTag = (tag, blockId) => {
-    const resolvedId = blockId || 'outfit';
-    pushHistory(makeHistoryEntry(false));
-    setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : {
-      ...c,
-      blocks: c.blocks.map(b => b.id !== resolvedId ? b : {
-        ...b, text: appendTag(b.text, tag, '1.0'), enabled: true, collapsed: false,
-      }),
-    }));
-    const blockName = blocks.find(b => b.id === resolvedId)?.[lang === 'ja' ? 'name' : 'nameEn'] ?? resolvedId;
-    const msg = lang === 'ja' ? `🧵 ${blockName}に「${tag}」を追加` : `🧵 "${tag}" added to ${blockName}`;
-    setColorToast({ msg });
-    setTimeout(() => setColorToast(null), 3000);
-  };
-
-  const _pickColorDefault = (allowedTargets, blockText, fallback) => {
-    if (!allowedTargets || typeof blockText !== 'string') return fallback;
-    const checks = {
-      animal_ears:   t => CM_ANIMAL_EAR_TAGS.some(k => hasTag(t, k)),
-      horns:         t => CM_HORN_TAGS.some(k => hasTag(t, k)),
-      wings:         t => CM_WING_TAGS.some(k => hasTag(t, k)),
-      tail_color:    t => CM_TAIL_TAGS.some(k => hasTag(t, k)),
-      glasses_frame: t => hasTag(t,'glasses') || hasTag(t,'wearing glasses') || hasTag(t,'goggles'),
-      earrings:      t => hasTag(t,'earrings'),
-      necklace:      t => hasTag(t,'necklace') || hasTag(t,'pendant') || hasTag(t,'choker'),
-    };
-    for (const targetId of allowedTargets) {
-      if (checks[targetId]?.(blockText)) return targetId;
-    }
-    return fallback;
-  };
-
-  const openColorPicker = (defaultTarget = 'hair', allowedTargets = null, blockText = null) => {
-    const resolvedText = blockText ?? Object.fromEntries(blocks.map(b => [b.id, b.text]));
-    const smartDefault = _pickColorDefault(allowedTargets, resolvedText, defaultTarget);
-    setColorPickerDefaultTarget(smartDefault);
-    setColorPickerAllowedTargets(allowedTargets);
-    setColorPickerBlockText(resolvedText);
-    setColorPickerOpen(true);
-  };
 
   // ── Drag-and-drop ──
   const sensors = useSensors(
@@ -907,6 +806,13 @@ export default function Loom() {
     return { id: uid(), ts: Date.now(), isSnapshot, charId: activeChar.id, charName: activeChar.name, charColor: activeChar.color, charEmoji: activeChar.emoji, blocks: slimBlocks, posText, negText };
   };
   const pushHistory = (entry) => { if (!entry) return; setHistory(prev => [entry, ...prev.filter(e => e.posText !== posText)].slice(0, 20)); };
+
+  const {
+    colorPickerOpen, setColorPickerOpen,
+    colorPickerAllowedTargets, colorPickerDefaultTarget, colorPickerBlockText,
+    colorToast,
+    applyColorTag, applyFeatureTag, applyMaterialTag, openColorPicker,
+  } = useColorPicker({ activeCharId, blocks, setCharacters, pushHistory, makeHistoryEntry, lang });
 
   // ── Keyboard shortcuts ──
   useEffect(() => {

@@ -48,6 +48,17 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
   const [pName, setPName] = useState('');
   const [addingCustom, setAddingCustom] = useState(false);
   const [customInput, setCustomInput] = useState('');
+  const [customLabel, setCustomLabel] = useState('');
+  const [editingCustomId, setEditingCustomId] = useState(null);
+  const [editText, setEditText] = useState('');
+  const [editLabel, setEditLabel] = useState('');
+  const [isAddingSection, setIsAddingSection] = useState(false);
+  const [addingSectionName, setAddingSectionName] = useState('');
+  const [editingSectionId, setEditingSectionId] = useState(null);
+  const [editingSectionName, setEditingSectionName] = useState('');
+  const [addingTagInSection, setAddingTagInSection] = useState(null);
+  const [secTagText, setSecTagText] = useState('');
+  const [secTagLabel, setSecTagLabel] = useState('');
   const [selectMode, setSelectMode] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
   const [transferOpen, setTransferOpen] = useState(false);
@@ -134,8 +145,10 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
 
   const handleAddCustom = () => {
     if (!customInput.trim()) return;
-    onUpdate({ customTags: [...(block.customTags || []), { id: uid(), text: customInput.trim() }] });
-    setCustomInput(''); setAddingCustom(false);
+    const entry = { id: uid(), text: customInput.trim() };
+    if (customLabel.trim()) entry.label = customLabel.trim();
+    onUpdate({ customTags: [...(block.customTags || []), entry] });
+    setCustomInput(''); setCustomLabel(''); setAddingCustom(false);
   };
   const doSave = () => {
     if (!pName.trim()) return;
@@ -847,45 +860,191 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             </div>
           )}
 
-          {/* Category accordion (案A) */}
+          {/* Category accordion */}
           {!search && block.cats.map(cat => {
             const isOpen = isCatOpen(cat);
+            const isUserSec = !!cat.isUserSection;
+            const tagCount = [...new Map(cat.t.map(t => [t.en, t])).values()].length;
             return (
-              <div key={cat.n}>
-                <button
-                  onClick={() => toggleCat(cat)}
-                  className="w-full flex items-center gap-1.5 py-1 bg-transparent border-none cursor-pointer text-left select-none"
-                >
-                  <span style={isOpen ? { color: blockColor } : undefined} className={`text-[0.625rem] flex-shrink-0 font-bold${isOpen ? '' : ' text-muted'}`}>
-                    {isOpen ? '▼' : '▶'}
-                  </span>
-                  <span className={`${focusMode ? 'text-[0.8125rem]' : 'text-[0.6875rem]'} font-mono font-medium ${isOpen ? 'text-fg' : 'text-muted'}`}>
-                    {lang === 'ja' ? cat.n : cat.nEn}
-                  </span>
-                  <span className="text-[0.625rem] font-mono text-muted">({[...new Map(cat.t.map(t => [t.en, t])).values()].length})</span>
-                  <div className="flex-1 h-px bg-line" />
-                </button>
+              <div key={cat.id || cat.n}>
+                {/* Section header */}
+                {isUserSec && editingSectionId === cat.id ? (
+                  <div className="flex gap-1.5 items-center py-1">
+                    <input
+                      value={editingSectionName}
+                      onChange={e => setEditingSectionName(e.target.value)}
+                      autoFocus
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' && editingSectionName.trim()) {
+                          const n = editingSectionName.trim();
+                          onUpdate({ cats: block.cats.map(c => c.id === cat.id ? { ...c, n, nEn: n } : c) });
+                          setEditingSectionId(null);
+                        }
+                        if (e.key === 'Escape') setEditingSectionId(null);
+                      }}
+                      style={{ border: `1px solid ${blockColor}60` }}
+                      className="flex-1 rounded-[0.3125rem] text-[0.6875rem] px-2 py-0.5 outline-none font-mono bg-bg text-fg"
+                    />
+                    <button
+                      onClick={() => {
+                        if (!editingSectionName.trim()) return;
+                        const n = editingSectionName.trim();
+                        onUpdate({ cats: block.cats.map(c => c.id === cat.id ? { ...c, n, nEn: n } : c) });
+                        setEditingSectionId(null);
+                      }}
+                      style={{ background: blockColor }}
+                      className="border-none rounded-[0.3125rem] text-black px-2 py-0.5 text-[0.6875rem] cursor-pointer font-bold"
+                    >{lang === 'ja' ? '保存' : 'Save'}</button>
+                    <button onClick={() => setEditingSectionId(null)}
+                      className="bg-transparent border border-dim rounded-[0.3125rem] text-muted px-1.5 py-0.5 text-[0.6875rem] cursor-pointer">×</button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5 py-1">
+                    <button
+                      onClick={() => toggleCat(cat)}
+                      className="flex items-center gap-1.5 bg-transparent border-none cursor-pointer text-left select-none min-w-0 flex-1"
+                    >
+                      <span style={isOpen ? { color: blockColor } : undefined} className={`text-[0.625rem] flex-shrink-0 font-bold${isOpen ? '' : ' text-muted'}`}>
+                        {isOpen ? '▼' : '▶'}
+                      </span>
+                      <span className={`${focusMode ? 'text-[0.8125rem]' : 'text-[0.6875rem]'} font-mono font-medium ${isOpen ? 'text-fg' : 'text-muted'} truncate`}>
+                        {lang === 'ja' ? cat.n : cat.nEn}
+                      </span>
+                      <span className="text-[0.625rem] font-mono text-muted flex-shrink-0">({tagCount})</span>
+                    </button>
+                    {!isUserSec && <div className="flex-1 h-px bg-line" />}
+                    {isUserSec && (
+                      <>
+                        <div className="flex-1 h-px bg-line" />
+                        <button
+                          onClick={() => { setEditingSectionId(cat.id); setEditingSectionName(cat.n); }}
+                          title={lang === 'ja' ? 'セクション名を変更' : 'Rename section'}
+                          className="bg-transparent border-none text-dim hover:text-fg cursor-pointer text-[0.625rem] px-1 flex-shrink-0"
+                        >✎</button>
+                        <button
+                          onClick={() => {
+                            if (!window.confirm(lang === 'ja' ? `セクション「${cat.n}」を削除しますか？\n（タグはOFFになります）` : `Delete section "${cat.n}"?\n(Active tags will be deselected)`)) return;
+                            let newText = block.text;
+                            for (const tag of cat.t) newText = removeTag(newText, tag.en);
+                            onUpdate({ cats: block.cats.filter(c => c.id !== cat.id), text: newText });
+                          }}
+                          onMouseOver={e => e.currentTarget.style.color = '#f87171'}
+                          onMouseOut={e => e.currentTarget.style.color = ''}
+                          title={lang === 'ja' ? 'セクションを削除' : 'Delete section'}
+                          className="bg-transparent border-none text-dim cursor-pointer text-[0.625rem] px-1 flex-shrink-0"
+                        >✕</button>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {/* Section body */}
                 {isOpen && (
-                  <div className="flex flex-wrap gap-1 pt-[0.1875rem] pb-2">
+                  <div className={`flex flex-wrap gap-1 pt-[0.1875rem] ${isUserSec ? 'pb-1' : 'pb-2'}`}>
                     {(sceneActive && cat.n === '性別・人数'
                       ? cat.t.filter(tag => !SCENE_MANAGED_TAGS.has(tag.en))
                       : cat.t
                     ).filter((tag, i, arr) => arr.findIndex(t => t.en === tag.en) === i)
                     .map(tag => (
-                      <TagBtn key={tag.en} tag={tag} color={blockColor} lang={lang}
-                        isFav={block.favTags?.includes(tag.en)} disabled={isLocked}
-                        active={hasTag(block.text, tag.en)}
-                        analyzed={!!analyzeText && hasTag(analyzeText, tag.en) && !hasTag(block.text, tag.en)}
-                        selectMode={selectMode} selected={selectedTags.includes(tag.en)}
-                        conflict={conflictTags?.has(tag.en.toLowerCase()) && hasTag(block.text, tag.en) ? conflictTags.get(tag.en.toLowerCase()) : false}
-                        desc={TAG_DICT[tag.en]} large={focusMode}
-                        wrapperRef={el => { if (el) tagRefs.current[tag.en.toLowerCase()] = el; else delete tagRefs.current[tag.en.toLowerCase()]; }}
-                        onInsert={() => onTagClick(tag.en)} onToggleFav={() => toggleFav(tag.en)} />
+                      isUserSec ? (
+                        <div
+                          key={tag.en}
+                          style={{
+                            background: hasTag(block.text, tag.en) ? blockColor + '22' : 'rgb(var(--surface-alt))',
+                            border: `1px solid ${hasTag(block.text, tag.en) ? blockColor + '90' : blockColor + '40'}`,
+                          }}
+                          className="inline-flex items-center rounded-[0.3125rem] overflow-hidden"
+                        >
+                          <button
+                            disabled={isLocked}
+                            onClick={() => onUpdate({ text: toggleTag(block.text, tag.en, block.strength) })}
+                            title={tag.ja !== tag.en ? tag.en : undefined}
+                            style={{ color: blockColor }}
+                            className={`bg-transparent border-none px-2 py-[0.1875rem] text-[0.6875rem] cursor-pointer disabled:cursor-default font-mono ${hasTag(block.text, tag.en) ? 'font-bold' : 'font-normal'}`}
+                          >{hasTag(block.text, tag.en) ? '✓ ' : ''}{tag.ja}</button>
+                          <button
+                            onClick={() => {
+                              let newText = hasTag(block.text, tag.en) ? removeTag(block.text, tag.en) : block.text;
+                              onUpdate({ cats: block.cats.map(c => c.id === cat.id ? { ...c, t: c.t.filter(t => t.en !== tag.en) } : c), text: newText });
+                            }}
+                            onMouseOver={e => e.currentTarget.style.color = '#f87171'}
+                            onMouseOut={e => e.currentTarget.style.color = ''}
+                            className="bg-transparent border-l border-dim text-dim px-1.5 py-1 cursor-pointer text-xs flex items-center"
+                          >✕</button>
+                        </div>
+                      ) : (
+                        <TagBtn key={tag.en} tag={tag} color={blockColor} lang={lang}
+                          isFav={block.favTags?.includes(tag.en)} disabled={isLocked}
+                          active={hasTag(block.text, tag.en)}
+                          analyzed={!!analyzeText && hasTag(analyzeText, tag.en) && !hasTag(block.text, tag.en)}
+                          selectMode={selectMode} selected={selectedTags.includes(tag.en)}
+                          conflict={conflictTags?.has(tag.en.toLowerCase()) && hasTag(block.text, tag.en) ? conflictTags.get(tag.en.toLowerCase()) : false}
+                          desc={TAG_DICT[tag.en]} large={focusMode}
+                          wrapperRef={el => { if (el) tagRefs.current[tag.en.toLowerCase()] = el; else delete tagRefs.current[tag.en.toLowerCase()]; }}
+                          onInsert={() => onTagClick(tag.en)} onToggleFav={() => toggleFav(tag.en)} />
+                      )
                     ))}
                     {sceneActive && cat.n === '性別・人数' && (
                       <span className="text-[0.625rem] font-mono text-muted self-center px-1">
                         {lang === 'ja' ? '複数人数はキャラ共演で設定' : 'Multi-person: use Collab'}
                       </span>
+                    )}
+
+                    {/* Add tag to user section */}
+                    {isUserSec && (
+                      <div className="w-full mt-1">
+                        {addingTagInSection === cat.id ? (
+                          <div className="flex flex-col gap-1">
+                            <input
+                              value={secTagLabel}
+                              onChange={e => setSecTagLabel(e.target.value)}
+                              autoFocus
+                              onKeyDown={e => { if (e.key === 'Escape') { setAddingTagInSection(null); setSecTagText(''); setSecTagLabel(''); } }}
+                              placeholder={lang === 'ja' ? '表示名（日本語可・省略可）' : 'Display name (optional)'}
+                              style={{ border: `1px solid ${blockColor}40` }}
+                              className="rounded-[0.3125rem] text-[0.6875rem] px-2 py-1 outline-none font-mono bg-bg text-fg"
+                            />
+                            <div className="flex gap-1.5 items-center">
+                              <input
+                                value={secTagText}
+                                onChange={e => setSecTagText(e.target.value)}
+                                onKeyDown={e => {
+                                  if (e.key === 'Enter' && secTagText.trim()) {
+                                    const tag = { en: secTagText.trim(), ja: secTagLabel.trim() || secTagText.trim() };
+                                    onUpdate({ cats: block.cats.map(c => c.id === cat.id ? { ...c, t: [...c.t, tag] } : c) });
+                                    setSecTagText(''); setSecTagLabel(''); setAddingTagInSection(null);
+                                  }
+                                  if (e.key === 'Escape') { setAddingTagInSection(null); setSecTagText(''); setSecTagLabel(''); }
+                                }}
+                                placeholder={lang === 'ja' ? 'プロンプト（英語推奨）...' : 'Prompt tag (English)...'}
+                                style={{ border: `1px solid ${blockColor}60` }}
+                                className="flex-1 rounded-[0.3125rem] text-[0.6875rem] px-2 py-1 outline-none font-mono bg-bg text-fg"
+                              />
+                              <button
+                                onClick={() => {
+                                  if (!secTagText.trim()) return;
+                                  const tag = { en: secTagText.trim(), ja: secTagLabel.trim() || secTagText.trim() };
+                                  onUpdate({ cats: block.cats.map(c => c.id === cat.id ? { ...c, t: [...c.t, tag] } : c) });
+                                  setSecTagText(''); setSecTagLabel(''); setAddingTagInSection(null);
+                                }}
+                                style={{ background: blockColor }}
+                                className="border-none rounded-[0.3125rem] text-black px-2.5 py-1 text-[0.6875rem] cursor-pointer font-bold"
+                              >{lang === 'ja' ? '追加' : 'Add'}</button>
+                              <button
+                                onClick={() => { setAddingTagInSection(null); setSecTagText(''); setSecTagLabel(''); }}
+                                className="bg-transparent border border-dim rounded-[0.3125rem] text-muted px-1.5 py-1 text-[0.6875rem] cursor-pointer"
+                              >×</button>
+                            </div>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setAddingTagInSection(cat.id)}
+                            disabled={isLocked}
+                            style={{ borderColor: blockColor + '50', color: blockColor }}
+                            className="bg-transparent border border-dashed rounded-[0.3125rem] px-2 py-[0.1875rem] text-[0.625rem] font-mono cursor-pointer disabled:cursor-default disabled:opacity-40"
+                          >+ {lang === 'ja' ? 'タグ追加' : 'Add tag'}</button>
+                        )}
+                      </div>
                     )}
                   </div>
                 )}
@@ -896,34 +1055,103 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           {/* Custom tags */}
           {!search && (block.customTags || []).length > 0 && (
             <div className="mb-2 p-2 rounded-[0.4375rem] bg-bg" style={{ border: `1px solid ${blockColor}30` }}>
-              <div style={{ color: blockColor }} className="text-[0.625rem] font-mono mb-[0.3125rem]">
-                ✏️ {lang === 'ja' ? 'カスタム' : 'Custom'}
+              <div className="flex items-center justify-between mb-[0.3125rem]">
+                <span style={{ color: blockColor }} className="text-[0.625rem] font-mono">
+                  ✏️ {lang === 'ja' ? 'カスタム' : 'Custom'}
+                </span>
+                <button
+                  onClick={() => {
+                    if (!window.confirm(lang === 'ja' ? 'カスタムタグをすべて削除しますか？' : 'Delete all custom tags?')) return;
+                    onUpdate({ customTags: [] });
+                  }}
+                  className="text-[0.5625rem] text-dim hover:text-red-400 bg-transparent border-none cursor-pointer px-1"
+                >{lang === 'ja' ? '全て消す' : 'Clear all'}</button>
               </div>
               <div className="flex flex-wrap gap-1">
                 {(block.customTags || []).map(ct => (
-                  <div
-                    key={ct.id}
-                    style={{
-                      background: hasTag(block.text, ct.text) ? blockColor + '22' : 'rgb(var(--surface-alt))',
-                      border: `1px solid ${hasTag(block.text, ct.text) ? blockColor + '90' : blockColor + '40'}`,
-                    }}
-                    className="inline-flex items-center rounded-[0.3125rem] overflow-hidden"
-                  >
-                    <button
-                      disabled={isLocked}
-                      onClick={() => onUpdate({ text: toggleTag(block.text, ct.text, block.strength) })}
-                      style={{ color: blockColor }}
-                      className={`bg-transparent border-none px-2 py-[0.1875rem] text-[0.6875rem] cursor-pointer disabled:cursor-default font-mono ${hasTag(block.text, ct.text) ? 'font-bold' : 'font-normal'}`}
-                    >{hasTag(block.text, ct.text) ? '✓ ' : ''}{ct.text}</button>
-                    <button
-                      onClick={() => {
-                        if (!window.confirm(lang === 'ja' ? `カスタムタグ「${ct.text}」を削除しますか？` : `Delete custom tag "${ct.text}"?`)) return;
-                        onUpdate({ customTags: (block.customTags || []).filter(x => x.id !== ct.id) });
-                      }}
-                      onMouseOver={e => e.target.style.color = '#f87171'}
-                      onMouseOut={e => e.target.style.color = ''}
-                      className="bg-transparent border-l border-line text-dim px-2 py-1 cursor-pointer text-xs min-w-[1.75rem] flex items-center justify-center"
-                    >✕</button>
+                  <div key={ct.id} className="w-full">
+                    {editingCustomId === ct.id ? (
+                      <div className="flex flex-col gap-1">
+                        <input
+                          value={editLabel}
+                          onChange={e => setEditLabel(e.target.value)}
+                          autoFocus
+                          onKeyDown={e => { if (e.key === 'Escape') setEditingCustomId(null); }}
+                          placeholder={lang === 'ja' ? '表示名（日本語可・省略可）' : 'Display name (optional)'}
+                          style={{ border: `1px solid ${blockColor}40` }}
+                          className="rounded-[0.3125rem] text-[0.6875rem] px-[0.5625rem] py-1 outline-none font-mono bg-surface text-fg"
+                        />
+                        <div className="flex gap-1.5 items-center">
+                          <input
+                            value={editText}
+                            onChange={e => setEditText(e.target.value)}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter' && editText.trim()) {
+                                const updated = { ...ct, text: editText.trim() };
+                                if (editLabel.trim()) updated.label = editLabel.trim(); else delete updated.label;
+                                const newText = ct.text !== updated.text && hasTag(block.text, ct.text)
+                                  ? toggleTag(toggleTag(block.text, ct.text, block.strength), updated.text, block.strength)
+                                  : block.text;
+                                onUpdate({ customTags: (block.customTags || []).map(x => x.id === ct.id ? updated : x), text: newText });
+                                setEditingCustomId(null);
+                              }
+                              if (e.key === 'Escape') setEditingCustomId(null);
+                            }}
+                            placeholder={lang === 'ja' ? 'プロンプト（英語推奨）...' : 'Prompt tag (English)...'}
+                            style={{ border: `1px solid ${blockColor}60` }}
+                            className="flex-1 rounded-[0.3125rem] text-[0.6875rem] px-[0.5625rem] py-1 outline-none font-mono bg-surface text-fg"
+                          />
+                          <button
+                            onClick={() => {
+                              if (!editText.trim()) return;
+                              const updated = { ...ct, text: editText.trim() };
+                              if (editLabel.trim()) updated.label = editLabel.trim(); else delete updated.label;
+                              const newText = ct.text !== updated.text && hasTag(block.text, ct.text)
+                                ? toggleTag(toggleTag(block.text, ct.text, block.strength), updated.text, block.strength)
+                                : block.text;
+                              onUpdate({ customTags: (block.customTags || []).map(x => x.id === ct.id ? updated : x), text: newText });
+                              setEditingCustomId(null);
+                            }}
+                            style={{ background: blockColor }}
+                            className="border-none rounded-[0.3125rem] text-black px-2.5 py-1 text-[0.6875rem] cursor-pointer font-bold"
+                          >{lang === 'ja' ? '保存' : 'Save'}</button>
+                          <button
+                            onClick={() => setEditingCustomId(null)}
+                            className="bg-transparent rounded-[0.3125rem] px-[0.4375rem] py-1 text-[0.6875rem] cursor-pointer border border-dim text-muted"
+                          >×</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div
+                        style={{
+                          background: hasTag(block.text, ct.text) ? blockColor + '22' : 'rgb(var(--surface-alt))',
+                          border: `1px solid ${hasTag(block.text, ct.text) ? blockColor + '90' : blockColor + '40'}`,
+                        }}
+                        className="inline-flex items-center rounded-[0.3125rem] overflow-hidden"
+                      >
+                        <button
+                          disabled={isLocked}
+                          onClick={() => onUpdate({ text: toggleTag(block.text, ct.text, block.strength) })}
+                          title={ct.label ? ct.text : undefined}
+                          style={{ color: blockColor }}
+                          className={`bg-transparent border-none px-2 py-[0.1875rem] text-[0.6875rem] cursor-pointer disabled:cursor-default font-mono ${hasTag(block.text, ct.text) ? 'font-bold' : 'font-normal'}`}
+                        >{hasTag(block.text, ct.text) ? '✓ ' : ''}{ct.label || ct.text}</button>
+                        <button
+                          onClick={() => { setEditingCustomId(ct.id); setEditText(ct.text); setEditLabel(ct.label || ''); }}
+                          title={lang === 'ja' ? '編集' : 'Edit'}
+                          className="bg-transparent border-l border-dim text-dim hover:text-fg px-1.5 py-1 cursor-pointer text-[0.625rem] flex items-center"
+                        >✎</button>
+                        <button
+                          onClick={() => {
+                            if (!window.confirm(lang === 'ja' ? `カスタムタグ「${ct.label || ct.text}」を削除しますか？` : `Delete custom tag "${ct.label || ct.text}"?`)) return;
+                            onUpdate({ customTags: (block.customTags || []).filter(x => x.id !== ct.id) });
+                          }}
+                          onMouseOver={e => e.target.style.color = '#f87171'}
+                          onMouseOut={e => e.target.style.color = ''}
+                          className="bg-transparent border-l border-dim text-dim px-2 py-1 cursor-pointer text-xs min-w-[1.75rem] flex items-center justify-center"
+                        >✕</button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -934,37 +1162,93 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           {!search && (
             <div className="mt-2 pt-1.5 border-t border-dim">
               {addingCustom ? (
-                <div className="flex gap-1.5 items-center">
+                <div className="flex flex-col gap-1">
                   <input
-                    value={customInput}
-                    onChange={e => setCustomInput(e.target.value)}
+                    value={customLabel}
+                    onChange={e => setCustomLabel(e.target.value)}
                     autoFocus
-                    onKeyDown={e => { if (e.key === 'Enter') handleAddCustom(); if (e.key === 'Escape') { setAddingCustom(false); setCustomInput(''); } }}
-                    placeholder={lang === 'ja' ? 'タグを入力（英語推奨）...' : 'Enter tag text...'}
-                    style={{ border: `1px solid ${blockColor}60` }}
-                    className="flex-1 rounded-[0.3125rem] text-[0.6875rem] px-[0.5625rem] py-1 outline-none font-mono bg-bg text-fg"
+                    onKeyDown={e => { if (e.key === 'Escape') { setAddingCustom(false); setCustomInput(''); setCustomLabel(''); } }}
+                    placeholder={lang === 'ja' ? '表示名（日本語可・省略可）' : 'Display name (optional)'}
+                    style={{ border: `1px solid ${blockColor}40` }}
+                    className="rounded-[0.3125rem] text-[0.6875rem] px-[0.5625rem] py-1 outline-none font-mono bg-bg text-fg"
                   />
-                  <button onClick={handleAddCustom} style={{ background: blockColor }}
-                    className="border-none rounded-[0.3125rem] text-black px-2.5 py-1 text-[0.6875rem] cursor-pointer font-bold">
-                    {lang === 'ja' ? '追加' : 'Add'}
-                  </button>
-                  <button onClick={() => { setAddingCustom(false); setCustomInput(''); }}
-                    className="bg-transparent rounded-[0.3125rem] px-[0.4375rem] py-1 text-[0.6875rem] cursor-pointer border border-dim text-muted">×</button>
+                  <div className="flex gap-1.5 items-center">
+                    <input
+                      value={customInput}
+                      onChange={e => setCustomInput(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter') handleAddCustom(); if (e.key === 'Escape') { setAddingCustom(false); setCustomInput(''); setCustomLabel(''); } }}
+                      placeholder={lang === 'ja' ? 'プロンプト（英語推奨）...' : 'Prompt tag (English)...'}
+                      style={{ border: `1px solid ${blockColor}60` }}
+                      className="flex-1 rounded-[0.3125rem] text-[0.6875rem] px-[0.5625rem] py-1 outline-none font-mono bg-bg text-fg"
+                    />
+                    <button onClick={handleAddCustom} style={{ background: blockColor }}
+                      className="border-none rounded-[0.3125rem] text-black px-2.5 py-1 text-[0.6875rem] cursor-pointer font-bold">
+                      {lang === 'ja' ? '追加' : 'Add'}
+                    </button>
+                    <button onClick={() => { setAddingCustom(false); setCustomInput(''); setCustomLabel(''); }}
+                      className="bg-transparent rounded-[0.3125rem] px-[0.4375rem] py-1 text-[0.6875rem] cursor-pointer border border-dim text-muted">×</button>
+                  </div>
                 </div>
               ) : (
-                <div className="flex items-center justify-between">
-                  <button
-                    onClick={() => setAddingCustom(true)}
-                    disabled={isLocked}
-                    onMouseOver={e => { if (!isLocked) e.target.style.borderColor = blockColor; }}
-                    onMouseOut={e => e.target.style.borderColor = isLocked ? 'rgb(var(--dim))' : blockColor + '60'}
-                    style={{
-                      border: `1px dashed ${isLocked ? 'rgb(var(--dim))' : blockColor + '60'}`,
-                      color: isLocked ? 'rgb(var(--muted))' : blockColor,
-                    }}
-                    className="bg-transparent rounded-[0.3125rem] px-2.5 py-[0.1875rem] text-[0.625rem] cursor-pointer disabled:cursor-default font-mono"
-                  >+ {lang === 'ja' ? 'カスタムタグ追加' : 'Add custom tag'}</button>
-                  <div className="flex items-center gap-1.5">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex flex-col gap-1.5 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <button
+                        onClick={() => setAddingCustom(true)}
+                        disabled={isLocked}
+                        onMouseOver={e => { if (!isLocked) e.target.style.borderColor = blockColor; }}
+                        onMouseOut={e => e.target.style.borderColor = isLocked ? 'rgb(var(--dim))' : blockColor + '60'}
+                        style={{
+                          border: `1px dashed ${isLocked ? 'rgb(var(--dim))' : blockColor + '60'}`,
+                          color: isLocked ? 'rgb(var(--muted))' : blockColor,
+                        }}
+                        className="bg-transparent rounded-[0.3125rem] px-2.5 py-[0.1875rem] text-[0.625rem] cursor-pointer disabled:cursor-default font-mono"
+                      >+ {lang === 'ja' ? 'カスタムタグ追加' : 'Add custom tag'}</button>
+                      {block.isCustomBlock && !isAddingSection && (
+                        <button
+                          onClick={() => setIsAddingSection(true)}
+                          disabled={isLocked}
+                          style={{ borderColor: blockColor + '50', color: blockColor }}
+                          className="bg-transparent border border-dashed rounded-[0.3125rem] px-2.5 py-[0.1875rem] text-[0.625rem] cursor-pointer disabled:cursor-default disabled:opacity-40 font-mono"
+                        >+ {lang === 'ja' ? 'セクション追加' : 'Add section'}</button>
+                      )}
+                    </div>
+                    {block.isCustomBlock && isAddingSection && (
+                      <div className="flex gap-1.5 items-center">
+                        <input
+                          value={addingSectionName}
+                          onChange={e => setAddingSectionName(e.target.value)}
+                          autoFocus
+                          onKeyDown={e => {
+                            if (e.key === 'Enter' && addingSectionName.trim()) {
+                              const n = addingSectionName.trim();
+                              onUpdate({ cats: [...(block.cats || []), { id: uid(), n, nEn: n, t: [], isUserSection: true }] });
+                              setAddingSectionName(''); setIsAddingSection(false);
+                            }
+                            if (e.key === 'Escape') { setIsAddingSection(false); setAddingSectionName(''); }
+                          }}
+                          placeholder={lang === 'ja' ? 'セクション名...' : 'Section name...'}
+                          style={{ border: `1px solid ${blockColor}60` }}
+                          className="flex-1 rounded-[0.3125rem] text-[0.6875rem] px-2 py-1 outline-none font-mono bg-bg text-fg"
+                        />
+                        <button
+                          onClick={() => {
+                            if (!addingSectionName.trim()) return;
+                            const n = addingSectionName.trim();
+                            onUpdate({ cats: [...(block.cats || []), { id: uid(), n, nEn: n, t: [], isUserSection: true }] });
+                            setAddingSectionName(''); setIsAddingSection(false);
+                          }}
+                          style={{ background: blockColor }}
+                          className="border-none rounded-[0.3125rem] text-black px-2.5 py-1 text-[0.6875rem] cursor-pointer font-bold"
+                        >{lang === 'ja' ? '追加' : 'Add'}</button>
+                        <button
+                          onClick={() => { setIsAddingSection(false); setAddingSectionName(''); }}
+                          className="bg-transparent border border-dim rounded-[0.3125rem] text-muted px-1.5 py-1 text-[0.6875rem] cursor-pointer"
+                        >×</button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
                     {/* 転送ボタン */}
                     {otherChars?.length > 0 && (
                       <div className="relative">
