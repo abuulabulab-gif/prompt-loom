@@ -968,6 +968,19 @@ export default function Loom() {
     return () => el.removeEventListener('wheel', onWheel);
   }, []);
 
+  // キャラ切り替え時にブロックリストを先頭に戻す
+  useEffect(() => {
+    if (!loaded) return;
+    window.scrollTo(0, 0);
+  }, [activeCharId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // キャラ切り替え時に charBar 内の対応タブをスクロールして見せる
+  const scrollCharBarToActive = (id) => {
+    setTimeout(() => {
+      charBarRef.current?.querySelector(`[data-charid="${id}"]`)?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }, 50);
+  };
+
   const addToPromptLog = (entry) =>
     setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, promptLog: [entry, ...(c.promptLog || [])].slice(0, 100) } : c));
 
@@ -2800,7 +2813,7 @@ export default function Loom() {
       </div>}
 
       {/* ── MODALS ── */}
-      {charListOpen && <CharListModal open={charListOpen} onClose={() => setCharListOpen(false)} characters={characters} activeCharId={activeCharId} lang={lang} onSelect={id => { setActiveCharId(id); setCharPanelOpen(true); }} onReorder={handleCharReorder} />}
+      {charListOpen && <CharListModal open={charListOpen} onClose={() => setCharListOpen(false)} characters={characters} activeCharId={activeCharId} lang={lang} onSelect={id => { setActiveCharId(id); setCharPanelOpen(true); scrollCharBarToActive(id); }} onReorder={handleCharReorder} />}
       {libraryOpen && <LibraryModal characters={characters} activeCharId={activeCharId} lang={lang} onClose={() => setLibraryOpen(false)}
         onActivate={id => { setActiveCharId(id); setCharPanelOpen(true); }}
         onArchive={archiveCharacter}

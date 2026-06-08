@@ -142,7 +142,7 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
       {onToggleFav && !selectMode && ((active && (h || IS_TOUCH)) || isFav) && (
         <button
           onClick={e => { e.stopPropagation(); onToggleFav(); }}
-          className={`bg-transparent border-l border-dim cursor-pointer leading-none ${large ? 'px-[0.4375rem] py-1.5 text-[0.8125rem]' : 'px-[0.3125rem] py-[0.1875rem] text-[0.625rem]'} ${isFav ? 'text-warn' : 'text-muted'}`}
+          className={`bg-transparent border-l border-dim cursor-pointer leading-none ${large ? 'px-[0.4375rem] py-1.5 text-[0.8125rem]' : 'px-[0.3125rem] py-1 text-[0.625rem]'} ${isFav ? 'text-warn' : 'text-muted'}`}
         >★</button>
       )}
     </div>

@@ -16,6 +16,7 @@ export default function CharTab({ c, isActive, isMobile, lang, canDelete, charCo
     return (
       <div
         ref={setNodeRef}
+        data-charid={c.id}
         style={{ ...dragStyle, background: c.color, outline: isActive ? '2px solid white' : '2px solid transparent', outlineOffset: '2px' }}
         className="w-[1.375rem] h-[1.375rem] rounded-full cursor-grab active:cursor-grabbing transition-opacity duration-150 flex-shrink-0"
         title={c.name}
@@ -29,6 +30,7 @@ export default function CharTab({ c, isActive, isMobile, lang, canDelete, charCo
   return (
     <div
       ref={setNodeRef}
+      data-charid={c.id}
       style={{
         ...dragStyle,
         background: isActive ? c.color + '22' : 'rgb(var(--surface-alt))',

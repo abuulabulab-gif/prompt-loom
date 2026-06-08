@@ -25,7 +25,7 @@ export default function CharVersions({ activeChar, lang, onSave, onRestore, onDe
             </button>
           </div>
           {versions.length === 0
-            ? <span className="text-muted text-[0.6875rem] font-mono">{lang === 'ja' ? '（まだバージョンがありません）' : '(no versions saved)'}</span>
+            ? <span className="text-muted text-[0.6875rem] font-mono">{lang === 'ja' ? '名前を入力して「保存」でスナップショットを記録できます' : 'Enter a name and tap Save to record a snapshot'}</span>
             : versions.map(v => (
               <div key={v.id} className="flex items-center gap-[0.3125rem] mb-[0.1875rem]">
                 <span className="text-muted text-[0.625rem] font-mono flex-shrink-0">{fmtTs(v.ts)}</span>

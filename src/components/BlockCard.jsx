@@ -403,7 +403,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
         {/* Clear */}
         <button
           onClick={() => {
-            if (countTags(block.text) >= 3 && !window.confirm(lang === 'ja' ? 'ブロックのタグを一括消去しますか？' : 'Clear all tags in this block?')) return;
+            if (countTags(block.text) >= 1 && !window.confirm(lang === 'ja' ? 'ブロックのタグを一括消去しますか？' : 'Clear all tags in this block?')) return;
             onUpdate({ text: '', collapsed: false, lastRandomPicks: [] });
           }}
           disabled={isLocked}
