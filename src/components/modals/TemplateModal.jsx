@@ -38,13 +38,18 @@ const TEMPLATE_EXTRA_JA = new Map([
   // 風・シネマティック
   ['clothes fluttering',       '衣装がなびく'],
   ['cinematic',                'シネマティック'],
-  // 真俯瞰ベッド
+  // 真俯瞰
   ['hair spread out',          '髪を広げた'],
+  ['hair disheveled',          '髪が乱れた'],
   ['relaxed pose',             'リラックスポーズ'],
-  ['on bed',                   'ベッドの上'],
+  ['white floor',              '白いフロア'],
   ['white sheets',             '白いシーツ'],
   ['bed sheet',                'ベッドシーツ'],
   ['soft lighting',            '柔らかい光'],
+  ['fabric',                   '布地'],
+  ['wrinkles',                 'しわ'],
+  ['empty eyes',               'うつろな目'],
+  ['vacant expression',        '虚ろな表情'],
   // 撮影スタイル
   ['selfie',                   '自撮り'],
   // 構図・視点
@@ -60,13 +65,29 @@ const TEMPLATE_EXTRA_JA = new Map([
   ['armpit focus',             '脇アップ'],
   ['midriff focus',            'お腹アップ'],
   ['eye focus',                '目フォーカス'],
+  ['thick thighs',             '太もも太め'],
+  ['plump',                    'ぽっちゃり'],
+  ['wide hips',                '広い腰'],
+  ['voluptuous',               'グラマラス'],
   // フェイス
   ['detailed lips',            '詳細な唇'],
   ['detailed pupils',          '詳細な瞳'],
+  ['smug',                     '得意げ'],
+  ['looking down at viewer',   '見下ろし目線'],
   // エフェクト
   ['flying debris',            '飛散する破片'],
   ['distorted background',     '歪んだ背景'],
   ['motion blur',              'モーションブラー'],
+  // シチュ構図
+  ['lying on stomach',         'うつ伏せ'],
+  ['on elbows',                '肘をつく'],
+  ['legs up',                  '足を上げる'],
+  ['leg up',                   '足を上げる'],
+  ['foot up',                  '足を上げる'],
+  ['sole facing viewer',       '足裏をカメラへ'],
+  ['hugging own legs',         '膝を抱える'],
+  ['knees up',                 '膝立て'],
+  ['on floor',                 '床の上'],
 ]);
 
 // en → ja (ブロック + テンプレート専用の両方を検索)
@@ -75,14 +96,16 @@ function toJa(en) {
   return TAG_JA_MAP.get(key) ?? TEMPLATE_EXTRA_JA.get(key) ?? null;
 }
 
-const FETI_IDS    = new Set(['highangle_armpit','lowangle_legs','midriff_navel','nape_lift','birdseye_lie','skintight_detail','zettairyouiki','napeandback','bare_back','footperspective','armpitsleeveless']);
+const FETI_IDS    = new Set(['nape_lift','bare_back','armpitsleeveless','highangle_armpit','midriff_navel','zettairyouiki','skintight_detail','lowangle_legs','footperspective','birdseye_lie']);
+const SITU_IDS    = new Set(['prone_elbow','floor_sit']);
 const DYNAMIC_IDS = new Set(['dynamic_booster','extreme_perspective','rider_kick','wind','cinematic']);
 const EXTREME_IDS = new Set(['lip_focus','eye_focus','fisheye','from_below','from_above']);
 
 const STYLE_IDS          = new Set(['anime','photo','fantasy','chibi','pixelart']);
 const styleTemplates     = TEMPLATES.filter(t => STYLE_IDS.has(t.id));
-const basicCompTemplates = TEMPLATES.filter(t => !STYLE_IDS.has(t.id) && !FETI_IDS.has(t.id) && !DYNAMIC_IDS.has(t.id) && !EXTREME_IDS.has(t.id));
+const basicCompTemplates = TEMPLATES.filter(t => !STYLE_IDS.has(t.id) && !FETI_IDS.has(t.id) && !SITU_IDS.has(t.id) && !DYNAMIC_IDS.has(t.id) && !EXTREME_IDS.has(t.id));
 const fetiTemplates      = TEMPLATES.filter(t => FETI_IDS.has(t.id));
+const situTemplates      = TEMPLATES.filter(t => SITU_IDS.has(t.id));
 const dynamicTemplates   = TEMPLATES.filter(t => DYNAMIC_IDS.has(t.id));
 const extremeTemplates   = TEMPLATES.filter(t => EXTREME_IDS.has(t.id));
 
@@ -148,11 +171,11 @@ function TagDetailPopup({ tmpl, lang, onClose }) {
   );
 }
 
-function TemplateCard({ tmpl, lang, onApply, onShowDetail }) {
+function TemplateCard({ tmpl, lang, clearMode, onApply, onShowDetail }) {
   const targetBlocks = Object.keys(tmpl.apply);
   return (
     <div
-      onClick={() => onApply(tmpl)}
+      onClick={() => onApply(tmpl, clearMode)}
       onMouseOver={e => { e.currentTarget.style.border = '1px solid rgb(var(--c-blue) / 0.38)'; e.currentTarget.style.background = 'rgb(var(--dim))'; }}
       onMouseOut={e => { e.currentTarget.style.border = ''; e.currentTarget.style.background = ''; }}
       className="bg-surfalt border border-line rounded-[0.625rem] p-3.5 cursor-pointer transition-all duration-150"
@@ -203,21 +226,45 @@ function TemplateCard({ tmpl, lang, onApply, onShowDetail }) {
 
 export default function TemplateModal({ lang, isMobile, onApply, onClose }) {
   const [detailTmpl, setDetailTmpl] = useState(null);
+  const [clearMode, setClearMode] = useState(false);
   const gridCls = isMobile ? 'grid grid-cols-2 gap-2' : 'grid gap-2';
   const gridStyle = isMobile ? {} : { gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))' };
 
   const card = (tmpl) => (
-    <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} onApply={onApply} onShowDetail={setDetailTmpl} />
+    <TemplateCard key={tmpl.id} tmpl={tmpl} lang={lang} clearMode={clearMode} onApply={onApply} onShowDetail={setDetailTmpl} />
   );
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[300] flex items-center justify-center p-5">
       <div className="bg-surface border border-linebright rounded-[0.875rem] w-full max-w-[57.5rem] overflow-hidden">
-        <div className="px-[1.125rem] py-3.5 border-b border-line flex items-center justify-between">
+        <div className="px-[1.125rem] py-3.5 border-b border-line flex items-center justify-between gap-3 flex-wrap">
           <span className="text-fg text-sm font-bold">✦ {lang === 'ja' ? 'ブロックテンプレート' : 'Block Templates'}</span>
-          <button onClick={onClose} className="bg-transparent border border-dim rounded-md px-2.5 py-1 text-muted cursor-pointer text-xs">
-            {lang === 'ja' ? '閉じる' : 'Close'}
-          </button>
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* 適用モードトグル */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-muted text-[0.625rem] font-mono">{lang === 'ja' ? '適用モード:' : 'Apply:'}</span>
+              <button
+                onClick={() => setClearMode(m => !m)}
+                className="rounded-full px-3 py-[0.1875rem] text-[0.625rem] font-mono font-bold cursor-pointer border transition-all duration-150"
+                style={clearMode
+                  ? { background: 'rgb(var(--c-warn) / 0.12)', borderColor: 'rgb(var(--c-warn) / 0.5)', color: 'rgb(var(--c-warn))' }
+                  : { background: 'rgb(var(--c-blue) / 0.1)', borderColor: 'rgb(var(--c-blue) / 0.4)', color: 'rgb(var(--c-blue))' }
+                }
+                title={lang === 'ja'
+                  ? (clearMode ? '現在: クリアして適用（templateが触るブロックを先に空にする）' : '現在: 追加で適用（既存タグに重ねる）')
+                  : (clearMode ? 'Current: Clear & apply (touched blocks emptied first)' : 'Current: Add to existing tags')
+                }
+              >
+                {clearMode
+                  ? (lang === 'ja' ? '🧹 クリアして適用' : '🧹 Clear & apply')
+                  : (lang === 'ja' ? '＋ 追加で適用' : '＋ Add to existing')
+                }
+              </button>
+            </div>
+            <button onClick={onClose} className="bg-transparent border border-dim rounded-md px-2.5 py-1 text-muted cursor-pointer text-xs">
+              {lang === 'ja' ? '閉じる' : 'Close'}
+            </button>
+          </div>
         </div>
 
         <div className="px-[1.125rem] py-3.5 overflow-y-auto max-h-[75vh]">
@@ -228,8 +275,8 @@ export default function TemplateModal({ lang, isMobile, onApply, onClose }) {
           </p>
           <p className="text-[#f87171] text-[0.625rem] font-mono mb-1">
             {lang === 'ja'
-              ? '⚠ 構図・衣装・背景などのブロックは上書き（既存タグが消えます）。体型・顔ブロックは既存タグに追記。'
-              : '⚠ Composition / outfit / background blocks are overwritten (existing tags cleared). Body / face blocks append to existing tags.'}
+              ? '⚠ 構図・衣装・背景などは上書き。体型・顔は追記。「クリアして適用」モードでは追記ブロックも先に空にしてから適用します。'
+              : '⚠ Composition / outfit / BG blocks are overwritten. Body / face blocks append. In "Clear & apply" mode, append-blocks are also cleared first.'}
           </p>
           <p className="text-[0.5625rem] font-mono mb-4" style={{ color: 'rgb(var(--c-blue))' }}>
             {lang === 'ja'
@@ -249,6 +296,11 @@ export default function TemplateModal({ lang, isMobile, onApply, onClose }) {
 
           <div className="text-muted text-[0.625rem] font-mono tracking-widest mb-2 uppercase">{lang === 'ja' ? 'フェチ構図（SFW）' : 'Flair / Feti Composition'}</div>
           <div className={`${gridCls} mb-4`} style={gridStyle}>{fetiTemplates.map(card)}</div>
+
+          <div className="border-t border-dim mb-4" />
+
+          <div className="text-muted text-[0.625rem] font-mono tracking-widest mb-2 uppercase">{lang === 'ja' ? 'シチュ構図' : 'Situational'}</div>
+          <div className={`${gridCls} mb-4`} style={gridStyle}>{situTemplates.map(card)}</div>
 
           <div className="border-t border-dim mb-4" />
 
