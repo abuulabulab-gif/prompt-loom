@@ -90,7 +90,7 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
       onTouchStart={IS_TOUCH ? handleTouchStart : undefined}
       onTouchEnd={IS_TOUCH ? handleTouchEnd : undefined}
       onTouchMove={IS_TOUCH ? handleTouchMove : undefined}
-      style={{ background: bg, border: `1px solid ${bd}`, opacity: disabled ? 0.4 : 1, boxShadow: active && !selectMode ? `0 0 0 1px ${color}40` : 'none' }}
+      style={{ background: bg, border: `1px solid ${bd}`, opacity: disabled ? 0.4 : 1, boxShadow: active && !selectMode ? `0 0 0 1px ${color}40` : 'none', position: 'relative' }}
       className="inline-flex items-center rounded-[0.3125rem] overflow-hidden transition-all duration-100"
     >
       {/* Tooltip — position:fixed escapes parent overflow:hidden */}
@@ -133,20 +133,17 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
           (lang === 'ja' ? tag.en : tag.ja)
         }
         style={{ color: fg }}
-        className={`bg-transparent border-none cursor-pointer font-mono tracking-tight ${large ? 'px-2.5 py-1.5 text-[0.9375rem]' : 'px-[0.4375rem] py-[0.1875rem] text-xs'} ${(active || selected) ? 'font-bold' : 'font-normal'}`}
+        className={`bg-transparent border-none cursor-pointer font-mono tracking-tight ${large ? `px-2.5 py-1.5 text-[0.9375rem]${onToggleFav && !selectMode ? ' pr-[1.375rem]' : ''}` : `px-[0.4375rem] py-[0.1875rem] text-xs${onToggleFav && !selectMode ? ' pr-[1.125rem]' : ''}`} ${(active || selected) ? 'font-bold' : 'font-normal'}`}
       >
         {conflict === 'error' ? '⚠ ' : conflict === 'warn' ? '〜 ' : (active && !selectMode) ? '✓ ' : (analyzed && !active && !selectMode) ? '◎ ' : ''}
         {selectMode && selected ? '☑ ' : selectMode ? '☐ ' : ''}
         {lang === 'ja' ? tag.ja : tag.en}
       </button>
-      {onToggleFav && !selectMode && (
+      {onToggleFav && !selectMode && ((active && (h || IS_TOUCH)) || isFav) && (
         <button
           onClick={e => { e.stopPropagation(); onToggleFav(); }}
-          style={{
-            visibility: ((active && (h || IS_TOUCH)) || isFav) ? 'visible' : 'hidden',
-            pointerEvents: ((active && (h || IS_TOUCH)) || isFav) ? 'auto' : 'none',
-          }}
-          className={`bg-transparent border-l border-dim cursor-pointer leading-none ${large ? 'px-[0.4375rem] py-1.5 text-[0.8125rem]' : 'px-[0.3125rem] py-1 text-[0.625rem]'} ${isFav ? 'text-warn' : 'text-muted'}`}
+          style={{ position: 'absolute', right: 0, top: 0, bottom: 0, background: bg }}
+          className={`border-l border-dim cursor-pointer leading-none ${large ? 'px-[0.4375rem] text-[0.8125rem]' : 'px-[0.3125rem] text-[0.625rem]'} ${isFav ? 'text-warn' : 'text-muted'}`}
         >★</button>
       )}
     </div>
