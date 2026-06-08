@@ -72,7 +72,7 @@ export default function CommandPalette({ commands, lang, onClose }) {
             const items = filtered.filter(c => c.group === group);
             return (
               <div key={group}>
-                <div className="text-muted text-[0.625rem] font-mono font-semibold tracking-[0.10em] uppercase px-3.5 pt-2 pb-1">
+                <div className={`text-muted text-[0.625rem] font-mono font-semibold px-3.5 pt-2 pb-1 ${/[a-zA-Z]/.test(group[0]) ? 'uppercase tracking-[0.10em]' : 'tracking-[0.05em]'}`}>
                   {group}
                 </div>
                 {items.map(cmd => {
