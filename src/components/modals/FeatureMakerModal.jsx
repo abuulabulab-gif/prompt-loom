@@ -2,7 +2,8 @@ import { useState } from "react";
 import { FEATURE_CATS, FEATURE_ITEMS } from "../../data/features.js";
 import { hasTag } from "../../data/constants.js";
 
-const ACCENT = '#6c8fff';
+const ACCENT    = 'rgb(var(--c-blue))';
+const ACCENT_BG = 'rgb(var(--c-blue) / 0.13)';
 
 const chipCls = (active) =>
   `rounded-md px-2.5 py-1 text-[0.6875rem] cursor-pointer font-mono ${active ? 'font-bold border' : 'bg-surfalt border border-line text-fg'}`;
@@ -61,7 +62,7 @@ export default function FeatureMakerModal({ lang, blocks, onApply, onClose, filt
               {FEATURE_CATS.map(c => (
                 <button key={c.id}
                   onClick={() => handleCatChange(c.id)}
-                  style={catId === c.id ? { background: ACCENT+'22', borderColor: ACCENT, color: ACCENT } : {}}
+                  style={catId === c.id ? { background: ACCENT_BG, borderColor: ACCENT, color: ACCENT } : {}}
                   className={chipCls(catId === c.id)}>
                   {c.icon} {lang === 'ja' ? c.ja : c.en}
                 </button>
@@ -78,7 +79,7 @@ export default function FeatureMakerModal({ lang, blocks, onApply, onClose, filt
           {displayItems.map(item => (
             <button key={item.id}
               onClick={() => handlePartChange(item.id)}
-              style={partId === item.id ? { background: ACCENT+'22', borderColor: ACCENT, color: ACCENT } : {}}
+              style={partId === item.id ? { background: ACCENT_BG, borderColor: ACCENT, color: ACCENT } : {}}
               className={chipCls(partId === item.id)}>
               {lang === 'ja' ? item.ja : item.en}
             </button>
@@ -100,7 +101,7 @@ export default function FeatureMakerModal({ lang, blocks, onApply, onClose, filt
               {part.subtypes.map(st => (
                 <button key={st.id}
                   onClick={() => handleSubtypeChange(st.id)}
-                  style={subtypeId === st.id ? { background: ACCENT+'22', borderColor: ACCENT, color: ACCENT } : {}}
+                  style={subtypeId === st.id ? { background: ACCENT_BG, borderColor: ACCENT, color: ACCENT } : {}}
                   className={chipCls(subtypeId === st.id)}>
                   {lang === 'ja' ? st.ja : (st.en ?? st.ja)}
                 </button>
@@ -121,7 +122,7 @@ export default function FeatureMakerModal({ lang, blocks, onApply, onClose, filt
                 return (
                   <button key={opt.en}
                     onClick={() => setOptionEn(opt.en)}
-                    style={optionEn === opt.en ? { background: ACCENT+'22', borderColor: ACCENT, color: ACCENT } : {}}
+                    style={optionEn === opt.en ? { background: ACCENT_BG, borderColor: ACCENT, color: ACCENT } : {}}
                     className={chipCls(optionEn === opt.en)}>
                     {lang === 'ja' ? opt.ja : opt.en}
                     {alreadyIn && <span className="ml-1 text-[0.5rem] opacity-60">✓</span>}

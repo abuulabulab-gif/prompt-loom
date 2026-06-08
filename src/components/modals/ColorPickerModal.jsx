@@ -5,9 +5,11 @@ import { COLOR_PALETTE, SHADES, COLOR_TARGETS, HAIR_TYPES, FRONT_HAIR_TYPES, bui
 } from "../../data/colors.js";
 import { hasTag } from "../../data/constants.js";
 
-const ACCENT   = '#6c8fff';
-const HAIR_ACC = '#a78bfa';
-const EYE2_ACC = '#ff6ca8';
+const ACCENT     = 'rgb(var(--c-blue))';       // CSS変数（直接スタイル用）
+const ACCENT_BG  = 'rgb(var(--c-blue) / 0.13)';
+const ACCENT_HEX = '#6c8fff';                  // ColorSwatch/ShadeButtons のhex連結用
+const HAIR_ACC   = '#a78bfa';
+const EYE2_ACC   = '#ff6ca8';
 
 function shadeFilter(id) {
   return id === 'dark' ? 'brightness(0.6)' : id === 'light' ? 'brightness(1.4)' : 'none';
@@ -135,7 +137,7 @@ export default function ColorPickerModal({ lang, onApply, onClose, defaultTarget
   };
 
   const setTgt = (t) => { setTarget(t); setSide('none'); if (t.hairGroup !== 'full' && t.hairGroup !== 'front') setHairType('single'); if (!t.gradientable) setTailType('single'); };
-  const acc    = isHairMode && (isFull || isFront || isPart) ? HAIR_ACC : ACCENT;
+  const acc    = isHairMode && (isFull || isFront || isPart) ? HAIR_ACC : ACCENT_HEX;
   const singleMode = !isHairMode && available.length === 1;
 
   // ステップ番号を動的に計算
@@ -199,7 +201,7 @@ export default function ColorPickerModal({ lang, onApply, onClose, defaultTarget
               )}
               {nonHair.map(t => (
                 <button key={t.id} onClick={() => setTgt(t)}
-                  style={target?.id === t.id ? { background: ACCENT+'22', borderColor: ACCENT, color: ACCENT } : {}}
+                  style={target?.id === t.id ? { background: ACCENT_BG, borderColor: ACCENT, color: ACCENT } : {}}
                   className={chipCls(target?.id === t.id)}>
                   {lang === 'ja' ? t.ja : t.en}
                 </button>
@@ -301,8 +303,8 @@ export default function ColorPickerModal({ lang, onApply, onClose, defaultTarget
         {isHetero ? (
           <>
             <div className="text-[0.625rem] font-mono mb-1.5 font-bold tracking-[0.07em]" style={{ color: ACCENT }}>{lang === 'ja' ? `${col1Step} 左目の色` : `${col1Step} Left eye`}</div>
-            <ColorSwatch sel={color} set={setColor} lang={lang} acc={ACCENT} />
-            <ShadeButtons sel={shade} set={setShade} lang={lang} acc={ACCENT} />
+            <ColorSwatch sel={color} set={setColor} lang={lang} acc={ACCENT_HEX} />
+            <ShadeButtons sel={shade} set={setShade} lang={lang} acc={ACCENT_HEX} />
             <div className="text-[0.625rem] font-mono mb-1.5 font-bold tracking-[0.07em]" style={{ color: EYE2_ACC }}>{lang === 'ja' ? `${col2Step} 右目の色` : `${col2Step} Right eye`}</div>
             <ColorSwatch sel={color2} set={setColor2} lang={lang} acc={EYE2_ACC} />
             <ShadeButtons sel={shade2} set={setShade2} lang={lang} acc={EYE2_ACC} />

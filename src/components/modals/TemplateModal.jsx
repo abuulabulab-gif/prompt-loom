@@ -153,7 +153,7 @@ function TemplateCard({ tmpl, lang, onApply, onShowDetail }) {
   return (
     <div
       onClick={() => onApply(tmpl)}
-      onMouseOver={e => { e.currentTarget.style.border = '1px solid #6c8fff60'; e.currentTarget.style.background = 'rgb(var(--dim))'; }}
+      onMouseOver={e => { e.currentTarget.style.border = '1px solid rgb(var(--c-blue) / 0.38)'; e.currentTarget.style.background = 'rgb(var(--dim))'; }}
       onMouseOut={e => { e.currentTarget.style.border = ''; e.currentTarget.style.background = ''; }}
       className="bg-surfalt border border-line rounded-[0.625rem] p-3.5 cursor-pointer transition-all duration-150"
     >
@@ -164,7 +164,7 @@ function TemplateCard({ tmpl, lang, onApply, onShowDetail }) {
       {/* プレビューボックス — クリックでタグ詳細ポップアップ */}
       <div
         onClick={e => { e.stopPropagation(); onShowDetail(tmpl); }}
-        onMouseOver={e => { e.currentTarget.style.borderColor = '#6c8fff80'; e.currentTarget.style.background = 'rgb(var(--surface-alt))'; }}
+        onMouseOver={e => { e.currentTarget.style.borderColor = 'rgb(var(--c-blue) / 0.5)'; e.currentTarget.style.background = 'rgb(var(--surface-alt))'; }}
         onMouseOut={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.background = ''; }}
         className="text-accent text-[0.625rem] font-mono bg-bg px-2 py-[0.3125rem] rounded-[0.3125rem] leading-[1.5] mb-2 cursor-pointer border border-transparent transition-colors overflow-hidden"
         style={{

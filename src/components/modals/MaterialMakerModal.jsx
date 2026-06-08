@@ -2,7 +2,8 @@ import { useState } from "react";
 import { MATERIAL_PALETTE, MATERIAL_TARGETS, buildMaterialTag } from "../../data/materials.js";
 import { hasTag } from "../../data/constants.js";
 
-const ACCENT = '#6c8fff';
+const ACCENT    = 'rgb(var(--c-blue))';
+const ACCENT_BG = 'rgb(var(--c-blue) / 0.13)';
 
 const MAT_GROUPS = [
   { label: { ja: '光沢・高級',    en: 'Luxury'        }, acc: '#f59e0b', ids: ['silk','satin','velvet'] },
@@ -31,7 +32,9 @@ export default function MaterialMakerModal({ lang, blocks, onApply, onClose }) {
   const outfitText  = getBlockText(blocks, 'outfit');
   const featureText = getBlockText(blocks, 'feature');
   const ja  = lang === 'ja';
-  const acc = groupOf(selectedMat)?.acc ?? ACCENT;
+  const accVal = groupOf(selectedMat)?.acc;
+  const acc    = accVal ?? ACCENT;
+  const accBg  = accVal ? accVal + '22' : ACCENT_BG;
 
   // 選択中素材に対応する部位リスト
   const availableTargets = selectedMat
@@ -134,7 +137,7 @@ export default function MaterialMakerModal({ lang, blocks, onApply, onClose }) {
                 return (
                   <button key={target.id}
                     onClick={() => setSelectedTarget(active ? null : target)}
-                    style={active ? { background: acc+'22', borderColor: acc, color: acc } : {}}
+                    style={active ? { background: accBg, borderColor: acc, color: acc } : {}}
                     className={chipCls(active)}
                     title={buildMaterialTag(selectedMat, target.en)}>
                     {appended ? '✓ ' : ''}{ja ? target.ja : target.en}

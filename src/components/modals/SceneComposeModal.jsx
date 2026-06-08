@@ -175,7 +175,8 @@ export default function SceneComposeModal({ characters, lang, theme, onClose, de
             <div className="flex flex-wrap gap-[0.3125rem] mb-3.5">
               {SCENE_RELATIONS.map(r => (
                 <button key={r.ja} onClick={() => setRelation(r)}
-                  className={`rounded-md px-2.5 py-1 text-[0.6875rem] cursor-pointer font-mono ${relation.ja === r.ja ? 'bg-[#6c8fff22] border border-accent text-accent' : 'bg-surfalt border border-line text-fg'}`}>
+                  style={relation.ja === r.ja ? { background: 'rgb(var(--c-blue) / 0.13)' } : undefined}
+                  className={`rounded-md px-2.5 py-1 text-[0.6875rem] cursor-pointer font-mono ${relation.ja === r.ja ? 'border border-accent text-accent' : 'bg-surfalt border border-line text-fg'}`}>
                   {lang === 'ja' ? r.ja : (r.en || 'none')}
                 </button>
               ))}
@@ -187,7 +188,7 @@ export default function SceneComposeModal({ characters, lang, theme, onClose, de
         {selected.length > 1 && (
           <div className="flex items-center gap-2.5 mb-3.5 flex-wrap">
             <label className="flex items-center gap-1.5 cursor-pointer text-fg text-[0.6875rem]">
-              <input type="checkbox" checked={useBreak} onChange={e => setUseBreak(e.target.checked)} style={{ accentColor: '#6c8fff' }} />
+              <input type="checkbox" checked={useBreak} onChange={e => setUseBreak(e.target.checked)} style={{ accentColor: 'rgb(var(--c-blue))' }} />
               {lang === 'ja' ? 'BREAK で区切る（色移り対策・NovelAI/SD推奨）' : 'Separate with BREAK (prevents color bleed, recommended for SD/NAI)'}
             </label>
           </div>
