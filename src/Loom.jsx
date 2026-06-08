@@ -438,7 +438,11 @@ export default function Loom() {
     const suffix = customCount === 0 ? '' : String(customCount + 1);
     const jaLabel = `カスタム${suffix}`;
     const enLabel = `Custom${suffix}`;
-    setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, blocks: [...c.blocks, makeCustomBlock(jaLabel, enLabel)] } : c));
+    const newBlock = makeCustomBlock(jaLabel, enLabel);
+    setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, blocks: [...c.blocks, newBlock] } : c));
+    setTimeout(() => {
+      document.getElementById(`block-${newBlock.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
   };
   const removeBlock = (blockId) => setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, blocks: c.blocks.filter(b => b.id !== blockId) } : c));
   const resetBlockOrder = () => {
