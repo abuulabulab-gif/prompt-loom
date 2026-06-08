@@ -4,7 +4,8 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from 
 import CharVersions from "./components/CharVersions.jsx";
 import { useOutputDrag } from "./hooks/useOutputDrag.js";
 import { useVariations } from "./hooks/useVariations.js";
-import { SortableContext, arrayMove, rectSortingStrategy } from "@dnd-kit/sortable";
+import { SortableContext, arrayMove, rectSortingStrategy, horizontalListSortingStrategy } from "@dnd-kit/sortable";
+import CharTab from "./components/CharTab.jsx";
 import db, { loadState, saveState, saveCharImages, loadCharImages, deleteCharImages } from "./storage.js";
 import WelcomeHint from "./components/WelcomeHint.jsx";
 import LibraryModal from "./components/modals/LibraryModal.jsx";
@@ -341,6 +342,19 @@ export default function Loom() {
       const newIdx = c.blocks.findIndex(b => b.id === over.id);
       return { ...c, blocks: arrayMove(c.blocks, oldIdx, newIdx) };
     }));
+  };
+
+  const handleCharDragEnd = ({ active, over }) => {
+    if (!over || active.id === over.id) return;
+    const visible = characters.filter(c => !c.archived || c.id === activeCharId);
+    const oldIdx = visible.findIndex(c => c.id === active.id);
+    const newIdx = visible.findIndex(c => c.id === over.id);
+    if (oldIdx === -1 || newIdx === -1) return;
+    const reordered = arrayMove(visible, oldIdx, newIdx);
+    // rebuild full characters array preserving archived order for non-visible
+    const archivedOnly = characters.filter(c => c.archived && c.id !== activeCharId);
+    setCharacters([...reordered, ...archivedOnly]);
+    setOrderUpdatedAt(Date.now());
   };
 
   // ── Block helpers ──
@@ -1358,32 +1372,27 @@ export default function Loom() {
       {/* ── CHARACTER BAR ── */}
       <div className="bg-surface border-b border-line">
         <div className="max-w-[58.33rem] mx-auto px-3.5 py-[0.4375rem] flex items-center gap-[0.3125rem] overflow-x-auto">
-        {characters.filter(c => !c.archived || c.id === activeCharId).map(c => (
-          <div key={c.id} className="relative flex-shrink-0">
-            {isMobile ? (
-              <div
-                onClick={() => { setActiveCharId(c.id); setCharPanelOpen(true); setCompareCharId(null); }}
-                title={c.name}
-                style={{ background: c.color, outline: activeCharId === c.id ? `2px solid white` : `2px solid transparent`, outlineOffset: '2px' }}
-                className="w-[1.375rem] h-[1.375rem] rounded-full cursor-pointer transition-all duration-150 flex-shrink-0"
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleCharDragEnd}>
+          <SortableContext
+            items={characters.filter(c => !c.archived || c.id === activeCharId).map(c => c.id)}
+            strategy={horizontalListSortingStrategy}
+          >
+            {characters.filter(c => !c.archived || c.id === activeCharId).map(c => (
+              <CharTab
+                key={c.id}
+                c={c}
+                isActive={activeCharId === c.id}
+                isMobile={isMobile}
+                lang={lang}
+                canDelete={characters.length > 1}
+                charColor={charColor}
+                onSelect={() => { setActiveCharId(c.id); setCharPanelOpen(true); setCompareCharId(null); }}
+                onDuplicate={() => duplicateCharacter(c.id)}
+                onDelete={() => deleteCharacter(c.id)}
               />
-            ) : (
-              <div onClick={() => { setActiveCharId(c.id); setCharPanelOpen(true); setCompareCharId(null); }}
-                style={{ background: activeCharId === c.id ? c.color + '22' : 'rgb(var(--surface-alt))', border: `1px solid ${activeCharId === c.id ? c.color + '70' : 'rgb(var(--border))'}` }}
-                className="flex items-center gap-1 rounded-[1.25rem] px-[0.5625rem] py-1 cursor-pointer transition-all duration-150">
-                <span style={{ background: c.color }} className="w-[0.4375rem] h-[0.4375rem] rounded-full flex-shrink-0" />
-                <span className="text-xs">{c.emoji}</span>
-                <span style={{ color: activeCharId === c.id ? charColor(c.color) : 'rgb(var(--text))' }} className="text-xs font-semibold whitespace-nowrap">{c.name}</span>
-                <span onClick={e => { e.stopPropagation(); duplicateCharacter(c.id); }} title={lang === 'ja' ? '複製' : 'Dup'}
-                  className="text-dim text-[0.625rem] cursor-pointer px-px leading-none"
-                  onMouseOver={e => e.target.style.color = charColor(c.color)} onMouseOut={e => e.target.style.color = 'rgb(var(--dim))'}>⊕</span>
-                {characters.length > 1 && <span onClick={e => { e.stopPropagation(); deleteCharacter(c.id); }}
-                  className="text-dim text-[0.625rem] cursor-pointer px-px leading-none"
-                  onMouseOver={e => e.target.style.color = '#f87171'} onMouseOut={e => e.target.style.color = 'rgb(var(--dim))'}>✕</span>}
-              </div>
-            )}
-          </div>
-        ))}
+            ))}
+          </SortableContext>
+        </DndContext>
         <button onClick={addCharacter} className="bg-transparent border border-dashed border-muted/60 rounded-[1.25rem] px-[0.6875rem] py-1 text-fg/65 cursor-pointer text-[0.6875rem] flex-shrink-0 whitespace-nowrap">+ {lang === 'ja' ? '新キャラ' : 'New'}</button>
         <button onClick={() => setLibraryOpen(true)}
           title={lang === 'ja' ? 'キャラクター格納庫' : 'Character Library'}
