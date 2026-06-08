@@ -8,6 +8,8 @@ import { NEG_PRESETS } from "../data/negSuggestions.js";
 import TagBtn from "./TagBtn.jsx";
 import { TAG_DICT } from "../data/tagDictionary.js";
 import { resolveColorLabel } from "../data/colors.js";
+import { resolveFeatureLabel } from "../data/features.js";
+import { resolveMaterialLabel } from "../data/materials.js";
 
 // Category IDs that start collapsed; all others start open.
 // Uses cat.id (stable, defined in blocks.js) — not cat.n (Japanese name).
@@ -557,19 +559,25 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
             if (randomTags.length === 0 && manualTags.length === 0) return null;
 
             const renderChip = (raw, idx) => {
-              const bare      = bareTag(raw);
-              const bareLower = bare.toLowerCase();
-              const isJumpable = enToJa.has(bareLower);
-              const colorInfo  = !isJumpable ? resolveColorLabel(bare) : null;
-              const label     = lang === 'ja' ? (enToJa.get(bareLower) ?? colorInfo?.ja ?? bare) : bare;
+              const bare         = bareTag(raw);
+              const bareLower    = bare.toLowerCase();
+              const isJumpable   = enToJa.has(bareLower);
+              const colorInfo    = !isJumpable ? resolveColorLabel(bare)    : null;
+              const featureInfo  = !isJumpable ? resolveFeatureLabel(bare)  : null;
+              const materialInfo = !isJumpable ? resolveMaterialLabel(bare) : null;
+              const makerIcon    = colorInfo ? '🎨' : featureInfo ? '🎯' : materialInfo ? '🧵' : null;
+              const label        = lang === 'ja'
+                ? (enToJa.get(bareLower) ?? colorInfo?.ja ?? featureInfo?.ja ?? materialInfo?.ja ?? bare)
+                : bare;
               return (
                 <span
                   key={idx}
                   onClick={isJumpable ? () => handleChipJump(bare) : undefined}
-                  title={isJumpable ? (lang === 'ja' ? 'クリックでジャンプ' : 'Click to jump') : undefined}
+                  title={isJumpable ? (lang === 'ja' ? 'クリックでジャンプ' : 'Click to jump') : (makerIcon ? (lang === 'ja' ? 'メーカーで追加' : 'Added via maker') : undefined)}
                   style={{ background: blockColor + '15', border: `1px solid ${blockColor}50`, color: blockColor }}
-                  className={`inline-flex items-center rounded font-mono ${focusMode ? 'px-2 py-[0.1875rem] text-xs' : 'px-1.5 py-0.5 text-[0.6875rem]'}${isJumpable ? ' cursor-pointer underline underline-offset-2 decoration-1' : ''}`}
+                  className={`inline-flex items-center gap-[0.1875rem] rounded font-mono ${focusMode ? 'px-2 py-[0.1875rem] text-xs' : 'px-1.5 py-0.5 text-[0.6875rem]'}${isJumpable ? ' cursor-pointer underline underline-offset-2 decoration-1' : ''}`}
                 >
+                  {makerIcon && <span className="opacity-70 text-[0.5625rem] leading-none">{makerIcon}</span>}
                   {label}
                 </span>
               );

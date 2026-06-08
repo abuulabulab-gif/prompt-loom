@@ -163,7 +163,9 @@ export default function GlobalTagSearch({ open, onClose, blocks, lang, onToggleT
                       <button
                         key={tag.en}
                         onClick={() => { onToggleTag(block.id, tag.en); scrollToBlock(block.id); }}
-                        title={isActive ? tag.en : (lang === 'ja' ? tag.en : tag.ja)}
+                        title={isActive
+                          ? (lang === 'ja' ? `クリックで削除 / ${tag.en}` : `Click to remove / ${tag.ja}`)
+                          : (lang === 'ja' ? tag.en : tag.ja)}
                         className="rounded-[0.3125rem] px-2 py-[0.1875rem] text-[0.6875rem] font-mono cursor-pointer transition-all duration-100 border"
                         style={{
                           background: isActive ? block.color + '22' : 'rgb(var(--surface-alt))',

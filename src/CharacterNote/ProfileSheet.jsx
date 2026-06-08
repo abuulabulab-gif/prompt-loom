@@ -73,7 +73,7 @@ const SECTIONS = [
     id: 'ai', icon: '🤖', ja: 'AI用メモ', en: 'AI Notes',
     fields: [
       { key: 'ai_tags',        ja: 'よく使うAIタグ',          en: 'Common AI tags', multi: true },
-      { key: 'ai_visual',      ja: 'ビジュアル・構図の指針',   en: 'Visual & composition guidance', multi: true },
+      { key: 'ai_visual',      ja: 'ビジュアル・構図の指針',   en: 'AI visual & composition hints', multi: true },
     ],
   },
   {
@@ -87,7 +87,7 @@ const SECTIONS = [
       { key: 'joy',           ja: '喜びの表現・セリフ',          en: 'Joy expression' },
       { key: 'sadness',       ja: '悲しみの表現',               en: 'Sadness expression' },
       { key: 'excited',       ja: '楽しさの表現',               en: 'Excitement expression' },
-      { key: 'preferences',   ja: 'フェチ・嗜好',               en: 'Preferences / Fetish' },
+      { key: 'preferences',   ja: 'フェチ・嗜好',               en: 'Preferences & interests' },
     ],
   },
   {
@@ -122,7 +122,7 @@ const SECTIONS = [
     fields: [
       { key: 'race_ability',   ja: '種族能力・属性',     en: 'Species ability / Attribute' },
       { key: 'combat',         ja: '戦闘スタイル',       en: 'Combat style' },
-      { key: 'transform',      ja: '変身・解放形態',     en: 'Transformation / Release form', multi: true },
+      { key: 'transform',      ja: '変身・解放形態',     en: 'Transformation / Awakening form', multi: true },
     ],
   },
   {
@@ -185,7 +185,7 @@ function TagRow({ ft, color, blockOptions, charBlockIds, lang, onChange, onInser
           title={
             !blockOk      ? (lang === 'ja' ? 'ブロックが存在しません' : 'Block not found') :
             !tags.trim()  ? (lang === 'ja' ? 'タグを入力してください' : 'Enter tags first') :
-                             (lang === 'ja' ? 'ブロックに挿入（重複スキップ）' : 'Insert to block (dedup)')
+                             (lang === 'ja' ? 'ブロックに挿入（重複スキップ）' : 'Insert to block (skip duplicates)')
           }
           style={canInsert ? { borderColor: color + '60', color } : undefined}
           className="border border-dim rounded px-1.5 py-0.5 text-[0.625rem] font-mono cursor-pointer bg-transparent flex-shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"

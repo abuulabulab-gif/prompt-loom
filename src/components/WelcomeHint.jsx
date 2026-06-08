@@ -119,7 +119,7 @@ export default function WelcomeHint({ lang, theme, onSetLang, onSetTheme, onDism
               <span className="text-[0.625rem] font-bold text-fg leading-tight">
                 {L === 'ja' ? 'クラウド同期' : 'Cloud sync'}
               </span>
-              <span className="text-[0.5625rem] text-muted font-mono leading-tight">
+              <span className="text-[0.5625rem] text-muted font-mono leading-tight whitespace-pre-line">
                 {L === 'ja' ? 'Googleログインで\nPC↔スマホ共有' : 'Sign in to sync\nacross devices'}
               </span>
             </div>
@@ -130,7 +130,7 @@ export default function WelcomeHint({ lang, theme, onSetLang, onSetTheme, onDism
               <span className="text-[0.625rem] font-bold text-fg leading-tight">
                 {L === 'ja' ? 'おまかせ生成' : 'Random gen'}
               </span>
-              <span className="text-[0.5625rem] text-muted font-mono leading-tight">
+              <span className="text-[0.5625rem] text-muted font-mono leading-tight whitespace-pre-line">
                 {L === 'ja' ? '🎲ボタンで全ブロックを\n一括自動生成' : '🎲 button auto-fills\nall blocks at once'}
               </span>
             </div>

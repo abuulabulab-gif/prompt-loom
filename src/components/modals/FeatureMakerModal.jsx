@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FEATURE_CATS, FEATURE_ITEMS } from "../../data/features.js";
+import { hasTag } from "../../data/constants.js";
 
 const ACCENT = '#6c8fff';
 
@@ -23,9 +24,9 @@ export default function FeatureMakerModal({ lang, blocks, onApply, onClose, filt
   const currentOpts = hasSubtypes ? (subtype?.options ?? []) : (part?.options ?? []);
   const option      = optionEn ? currentOpts.find(o => o.en === optionEn) : null;
 
-  const targetBlockName = part
-    ? (blocks?.find(b => b.id === part.targetBlock)?.[lang === 'ja' ? 'name' : 'nameEn'] ?? part.targetBlock)
-    : null;
+  const targetBlock     = part ? blocks?.find(b => b.id === part.targetBlock) : null;
+  const targetBlockName = targetBlock?.[lang === 'ja' ? 'name' : 'nameEn'] ?? part?.targetBlock ?? null;
+  const isAlreadyAdded  = option && targetBlock ? hasTag(targetBlock.text ?? '', option.en) : false;
 
   const handleCatChange     = (id) => { setCatId(id);     setPartId(null); setSubtypeId(null); setOptionEn(null); };
   const handlePartChange    = (id) => { setPartId(id);    setSubtypeId(null); setOptionEn(null); };
@@ -115,14 +116,18 @@ export default function FeatureMakerModal({ lang, blocks, onApply, onClose, filt
               {lang === 'ja' ? `${sOption} 位置・状態` : `${sOption} Position / State`}
             </div>
             <div className="flex flex-wrap gap-[0.3125rem] mb-2">
-              {currentOpts.map(opt => (
-                <button key={opt.en}
-                  onClick={() => setOptionEn(opt.en)}
-                  style={optionEn === opt.en ? { background: ACCENT+'22', borderColor: ACCENT, color: ACCENT } : {}}
-                  className={chipCls(optionEn === opt.en)}>
-                  {lang === 'ja' ? opt.ja : opt.en}
-                </button>
-              ))}
+              {currentOpts.map(opt => {
+                const alreadyIn = targetBlock ? hasTag(targetBlock.text ?? '', opt.en) : false;
+                return (
+                  <button key={opt.en}
+                    onClick={() => setOptionEn(opt.en)}
+                    style={optionEn === opt.en ? { background: ACCENT+'22', borderColor: ACCENT, color: ACCENT } : {}}
+                    className={chipCls(optionEn === opt.en)}>
+                    {lang === 'ja' ? opt.ja : opt.en}
+                    {alreadyIn && <span className="ml-1 text-[0.5rem] opacity-60">✓</span>}
+                  </button>
+                );
+              })}
             </div>
             {part.lrWarning && (
               <div className="text-dim text-[0.5625rem] font-mono mb-2.5">
@@ -142,10 +147,15 @@ export default function FeatureMakerModal({ lang, blocks, onApply, onClose, filt
           </code>
         </div>
 
+        {isAlreadyAdded && (
+          <div className="text-[0.5625rem] font-mono text-center mb-1.5" style={{ color: '#f0a020' }}>
+            ⚠️ {lang === 'ja' ? 'このタグはすでにブロックに追加されています' : 'This tag is already in the block'}
+          </div>
+        )}
         <button onClick={handleApply} disabled={!option}
           className="w-full border-none rounded-[0.5625rem] py-[0.6875rem] text-white text-[0.8125rem] font-bold tracking-[0.03em] bg-[linear-gradient(135deg,#4a6fff,#8a4fff)]"
           style={{ opacity: option ? 1 : 0.45, cursor: option ? 'pointer' : 'not-allowed' }}>
-          + {option && targetBlockName
+          {isAlreadyAdded ? '↩ ' : '+ '}{option && targetBlockName
             ? (lang === 'ja' ? `「${targetBlockName}」ブロックに追加` : `Add to ${targetBlockName}`)
             : (lang === 'ja' ? '位置・状態を選んでください' : 'Select a position / state')}
         </button>

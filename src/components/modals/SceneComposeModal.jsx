@@ -57,8 +57,27 @@ export default function SceneComposeModal({ characters, lang, theme, onClose, de
   const setPos = (charId, position) => setSelected(prev => prev.map(s => s.charId === charId ? { ...s, position } : s));
 
   const countTag = (() => {
-    const girls = selected.length;
-    if (girls === 2) return '2girls'; if (girls === 3) return '3girls'; return '1girl';
+    const genders = selected.map(s => {
+      const char = characters.find(c => c.id === s.charId);
+      const attrText = char?.blocks?.find(b => b.id === 'attribute')?.text ?? '';
+      if (/\b1boy\b|\bmale\b/.test(attrText)) return 'boy';
+      return 'girl';
+    });
+    const girls = genders.filter(g => g === 'girl').length;
+    const boys  = genders.filter(g => g === 'boy').length;
+    if (genders.length === 1) return girls ? '1girl' : '1boy';
+    if (genders.length === 2) {
+      if (girls === 2) return '2girls';
+      if (boys === 2)  return '2boys';
+      return '1girl, 1boy';
+    }
+    if (genders.length === 3) {
+      if (girls === 3) return '3girls';
+      if (boys === 3)  return '3boys';
+      if (girls === 2) return '2girls, 1boy';
+      return '1girl, 2boys';
+    }
+    return '2girls';
   })();
 
   const sep = useBreak ? ' BREAK ' : ', ';
@@ -169,7 +188,7 @@ export default function SceneComposeModal({ characters, lang, theme, onClose, de
           <div className="flex items-center gap-2.5 mb-3.5 flex-wrap">
             <label className="flex items-center gap-1.5 cursor-pointer text-fg text-[0.6875rem]">
               <input type="checkbox" checked={useBreak} onChange={e => setUseBreak(e.target.checked)} style={{ accentColor: '#6c8fff' }} />
-              {lang === 'ja' ? 'BREAK で区切る（色移り対策・NovelAI/SD推奨）' : 'Separate with BREAK'}
+              {lang === 'ja' ? 'BREAK で区切る（色移り対策・NovelAI/SD推奨）' : 'Separate with BREAK (prevents color bleed, recommended for SD/NAI)'}
             </label>
           </div>
         )}

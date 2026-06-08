@@ -61,7 +61,7 @@ export const TEMPLATES = [
   {
     id:'sanmenzu', name:'三面図', nameEn:'3-View Sheet', icon:'📐',
     desc:'正面・横・背面の三面参考図。衣装・体型の構造把握用。横長推奨・縦長だとキメラ化しやすい',
-    descEn:'Front / side / back reference. Landscape strongly recommended — portrait risks body fusion',
+    descEn:'Front / side / back reference. Landscape recommended — portrait risks body fusion',
     sizeHintJa: '【推奨サイズ】横長（Landscape / 16:9等）⚠️ 縦長で生成するとキャラの体が融合（キメラ化）する危険があります！',
     sizeHintEn: '[Recommended] Landscape (16:9 etc.) ⚠️ Portrait orientation may cause body fusion (chimera artifacts)!',
     negHintJa: 'dynamic pose, action pose, overlapping figures',
@@ -93,6 +93,8 @@ export const TEMPLATES = [
     icon: '🤳',
     desc: 'スマホ自撮り構図。高め角度・腕伸ばし・レンズ寄り。近い距離感とカメラ目線が特徴',
     descEn: 'Smartphone selfie — high angle, outstretched arm, close camera distance, direct eye contact',
+    negHintJa: 'full body, back view, from below, action pose',
+    negHintEn: 'full body, back view, from below, action pose',
     apply: {
       composition: 'selfie, portrait, from above, looking at viewer, outstretched arm, smartphone',
     },
