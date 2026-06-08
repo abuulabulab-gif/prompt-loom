@@ -1,6 +1,7 @@
-# LOOM タグ全一覧
+# LOOM タグ全一覧 v2.5
 
-凡例: `*` = rareInRandom（20%確率）、`-` = excludeFromRandom（手動専用）
+> 最終更新: 2026-06-09
+> 凡例: `*` = rareInRandom（20%確率）、`-` = excludeFromRandom（手動専用）、`T3` = Tier3（コンボ経由のみ）
 
 ---
 
@@ -10,10 +11,10 @@
 masterpiece, best quality, ultra-detailed, highres, absurdres, official art
 
 ### 仕上がり
-sharp focus, extremely detailed, intricate details
+sharp focus, extremely detailed
 
 ### 顔の精細化
-detailed face, beautiful detailed eyes, detailed skin, symmetrical eyes, perfect face
+detailed face, beautiful detailed eyes, detailed skin, perfect face
 
 ### セーフティ
 SFW, rating:safe
@@ -23,7 +24,7 @@ SFW, rating:safe
 ## artstyle — 作風
 
 ### スタイル
-anime, retro artstyle, manga style, illustration, light novel illustration, game cg, realistic, semi-realistic, photorealistic, concept art, digital art, watercolor, oil painting, ukiyo-e, sketch, pixel art, 3D rendering, impasto, lineart, chibi, flat design, tarot card
+anime, anime screencap, `*` retro artstyle, manga style, illustration, character design, light novel illustration, game cg, `*` realistic, `*` semi-realistic, photorealistic, candid photography, concept art, digital art, watercolor, oil painting, `*` ukiyo-e, sketch, `*` pixel art, `*` 3D rendering, impasto, lineart, `*` chibi, `*` flat design, `*` tarot card
 
 ### 色調
 vibrant colors, pastel colors, colorful, warm colors, cool colors, high contrast, dark colors, monochrome, sepia, flat color, cel shading, neon colors
@@ -36,81 +37,90 @@ smooth shading, soft shading, hard shading, subsurface scattering, atmospheric, 
 ## attribute — キャラ
 
 ### 年齢感
-young, teenage, young adult, adult, mature female, middle-aged, elderly, loli
+child, teenage, young adult, adult
 
 ### 種族
-human, elf, dark elf, angel, demon, vampire, witch, fairy, catgirl, kemonomimi, oni, dragon girl, android, mermaid, lamia, slime girl, monster girl, ghost, doll
+human, elf, dark elf, angel, demon, vampire, succubus, witch, fairy, harpy, demi-human, goblin girl, catgirl, fox girl, kemonomimi, oni, dragon girl, android, mermaid, lamia, slime girl, ghost, doll
 
 ### 性別・人数
-solo, 1girl, 1boy, 2girls, 2boys, multiple girls, multiple boys, 1other, androgynous, tomboy
+solo, 1girl, 1boy, 2girls, 2boys, multiple girls, multiple boys, 1other, androgynous, tomboy, femboy
 
-### 特殊パーツ
-cat ears, bunny ears, fox ears, wolf ears, dog ears, horse ears, cow ears, animal ears, elf ears, small horns, oni horns, deer antlers, dragon horns, demon horns, halo, tail, cat tail, fox tail, wolf tail, fluffy tail, bunny tail, dog tail, horse tail, cow tail, multiple tails, demon tail, mermaid tail, dragon tail, fairy wings, angel wings, wings, demon wings, mechanical wings, scale skin, third eye, paw pads, ball joints, cybernetics
+### ケモ耳・しっぽ・角
+cat ears, bunny ears, fox ears, wolf ears, dog ears, tiger ears, squirrel ears, mouse ears, sheep ears, deer ears, goat ears, horse ears, cow ears, cat tail, bunny tail, fox tail, wolf tail, dog tail, tiger tail, squirrel tail, mouse tail, horse tail, cow tail, fluffy tail, multiple tails, sheep horns, deer antlers, goat horns
+
+### 幻想パーツ
+elf ears, pointy ears, fin ears, small horns, oni horns, dragon horns, demon horns, halo, demon tail, mermaid tail, lamia tail, dragon tail, fairy wings, angel wings, feathered wings, demon wings, mechanical wings, scale skin, third eye, paw pads, ball joints, cybernetics, robot ears, forehead jewel, star mark on forehead, crescent mark on forehead, rune mark on forehead, magic seal on forehead, occult mark on forehead
 
 ---
 
 ## face — 顔・表情
 
 ### 髪色
-blonde hair, silver hair, grey hair, white hair, black hair, brown hair, blue hair, light blue hair, pink hair, red hair, green hair, purple hair, orange hair, gradient hair, multicolored hair, streaked hair
+blonde hair, silver hair, grey hair, white hair, black hair, brown hair, blue hair, light blue hair, pink hair, red hair, green hair, purple hair, orange hair
 
 ### インナーカラー
 inner hair color, two-tone hair, red inner hair, blue inner hair, white inner hair, underlights, colored tips
 
 ### 髪型
-very short hair, short hair, pixie cut, bob cut, medium hair, shoulder-length hair, wolf cut, hime cut, long hair, layered hair, hair past shoulders, hair past waist, hair past hips, very long hair, floor-length hair, straight hair, wavy hair, curly hair, twin tails, two side up, ponytail, high ponytail, low ponytail, side ponytail, hair updo, half updo, hair bun, double bun, braid, side braid, drill hair, swept back hair, ahoge, spiky hair, messy hair
+very short hair, short hair, pixie cut, bob cut, medium hair, shoulder-length hair, wolf cut, hime cut, long hair, layered hair, very long hair, straight hair, wavy hair, curly hair, flipped hair, twin tails, low twintails, two side up, ponytail, high ponytail, low ponytail, side ponytail, hair updo, half updo, hair bun, double bun, braid, french braid, side braid, drill hair, hair flaps, spiky hair, messy hair
 
 ### 前髪
-bangs, blunt bangs, side swept bangs, parted bangs, hair over one eye, forehead, no bangs
+short bangs, blunt bangs, arched bangs, side swept bangs, diagonal bangs, crossed bangs, parted bangs, hair over one eye, hair over eyes, forehead
 
 ### 目の色
-blue eyes, red eyes, green eyes, golden eyes, purple eyes, brown eyes, silver eyes, grey eyes, aqua eyes, pink eyes, amber eyes, heterochromia, glowing eyes
+blue eyes, red eyes, green eyes, golden eyes, purple eyes, brown eyes, silver eyes, grey eyes, aqua eyes, pink eyes, amber eyes, heterochromia
 
 ### 目つき・形
-big eyes, round eyes, gentle eyes, wide eyes, sparkling eyes, sleepy eyes, half-closed eyes, sharp eyes, upturned eyes, bedroom eyes, dull eyes, empty eyes, long eyelashes, star-shaped pupils, heart-shaped pupils, white pupils, slit pupils, `-` eye focus, `-` detailed pupils
+big eyes, round eyes, gentle eyes, wide eyes, sparkling eyes, sleepy eyes, half-closed eyes, sharp eyes, upturned eyes, bedroom eyes, empty eyes, long eyelashes, star-shaped pupils, heart-shaped pupils, white pupils, slit pupils, glowing eyes, spiral eyes, x eyes, jitome
 
 ### 眉
-thin eyebrows, thick eyebrows, arched eyebrows, straight eyebrows, worried eyebrows, angry eyebrows, eyebrows visible through hair, maromayu, colored eyebrows
+thin eyebrows, thick eyebrows, arched eyebrows, straight eyebrows, eyebrows visible through hair, maromayu, colored eyebrows
 
 ### 表情
-smile, light smile, grin, laughing, wink, excited, smirk, serious, expressionless, sleepy, determined, surprised, nervous, blushing, shy, pout, embarrassed, worried, sad, crying, angry, disgusted, drunk
+smile, light smile, grin, laughing, wink, excited, smug, confident, serious, expressionless, closed eyes, sleepy, determined, surprised, nervous, blushing, shy, pout, embarrassed, worried, sad, `T3` crying, angry, glare, disgusted, calm, indifferent, bored, confused, troubled, exasperated, wistful, closed eyes smile, sultry look, teasing smile
 
 ### 口・歯
-open mouth, closed mouth, parted lips, :d, :3, :o, tongue out, tongue between teeth, teeth, licking lips, biting lip, pursed lips, o-shaped mouth, saliva, `-` detailed lips
+open mouth, closed mouth, parted lips, :d, :3, :o, `T3` tongue out, `T3` tongue between teeth, teeth, fang, sharp teeth, `T3` licking lips, biting lip, pursed lips
 
 ### 髪飾り・毛流れ
-hair ornament, hair flower, hairband, hair bow, hair between eyes, sidelocks, hair intakes, floating hair
+hair ornament, hair flower, flower crown, hairband, hair between eyes, sidelocks, hair intakes, ahoge, floating hair, hair over shoulder
 
 ### メイク・顔演出
-eyeshadow, eyeliner, mascara, lipstick, makeup, heavy blush, nose blush, blush stickers, glitter, tear, teardrop, sweat, fang, freckles, mole under eye
+eyeshadow, eyeliner, mascara, lipstick, makeup, heavy blush, nose blush, blush stickers, glitter, tear, teardrop, steam, freckles, mole under eye
 
 ---
 
 ## body — キャラ・体型
 
 ### 体型
-slim, petite, athletic, tall, short stature, slender, toned, muscular, curvy, chubby
+petite, athletic, tall, slender, toned, curvy, chubby
+
+### 体型・骨格
+wide hips, thick thighs, long legs, `T3` thigh gap, broad shoulders
 
 ### 胸のサイズ
 flat chest, small breasts, medium breasts, large breasts, huge breasts
 
 ### 肌色
-fair skin, pale skin, tan skin, dark skin, olive skin, `*` red skin, `*` blue skin, `*` grey skin, porcelain skin, translucent skin
+pale skin, tan skin, dark skin, olive skin, `*` red skin, `*` blue skin, `*` grey skin, `*` green skin
 
 ### 肌質感
-shiny skin, wet skin
+porcelain skin, translucent skin, shiny skin, wet skin, `*` liquid body
 
 ### 細部
-mole, beauty mark, `*` scar, `*` birthmark, `*` long nails, painted nails, `*` navel, `*` collarbone, `*` thigh gap
+mole, `*` scar, `*` birthmark, `*` tan lines, `*` long nails, painted nails, `*` piercing, `*` tattoo
 
 ### ボディフォーカス
-bare shoulders, cleavage, sideboob, underboob, bare back, nape, armpits, armpit focus, midriff, midriff focus, thighs, bare thighs, zettai ryouiki, wide hips, leg focus, hand focus
+bare shoulders, `T3` cleavage, `T3` sideboob, `T3` underboob, bare back, nape, `T3` armpits, `T3` midriff, `T3` abs, `T3` thighs, `T3` bare thighs, `T3` zettai ryouiki, `T3` navel, collarbone
 
 ### 状態
-wet, wet clothes, wet hair
+wet, dirty, sweating, snow on body, `*` body paint
+
+### 傷・装具
+bandaid, bandages, face mask
 
 ### 足
-barefoot, soles, toes, foot focus, pointed toes, crossed legs, toenail polish
+`T3` barefoot, `T3` soles, `T3` toes, `T3` foot focus, pointed toes, toenail polish
 
 ---
 
@@ -125,68 +135,71 @@ coat, trench coat, jacket, vest, hoodie, cardigan, sweater, sweater vest, turtle
 ### ボトムス
 skirt, pleated skirt, mini skirt, micro skirt, pants, jeans, leggings, shorts, hot pants, thighhighs, white thighhighs, black thighhighs, pantyhose
 
-### 素材・装飾
-skintight, cleavage cutout, navel cutout, open shirt, transparent, see-through, fishnet, frills, lace, lace trim, ribbons, bows, ruffles, embroidery, floral print, plaid, striped, polka dot, sequins
-
-### 装飾アクセ
-hair ribbon, hair clip, earrings, necklace, pendant, choker, bracelet, anklet, ring, belt, arm warmers, thigh strap, gloves, fingerless gloves, glasses, sunglasses, hat, beret, cap, crown, tiara, headband, veil, headphones, over-ear headphones, bag, backpack, scarf, necktie, bowtie
-
 ### フットウェア
 sneakers, loafers, mary janes, sandals, slippers, heels, pumps, high heels, platform shoes, ankle boots, boots, knee-high boots, thigh-high boots, platform boots, leg warmers, ankle socks, socks, knee-high socks
 
 ---
 
-## feature — 特徴・アクセ
+## outfit_detail — 衣装ディテール
 
-### ピアス・刺青
-piercing, ear piercing, navel piercing, tattoo, arm tattoo, back tattoo
+### シルエット・形状
+skintight, high neck, open collar, low-rise, cleavage cutout, navel cutout, side slit, high slit, open back, side cutout, torn clothes, see-through
 
-### 装備・ケア
-eyepatch, bandages, bandaid, mask, face mask, collar, garter belt
+### 素材・生地
+silk, satin, velvet, lace, leather, fur, knit, embroidered, mesh, sequined, sheer, fishnet, latex
 
-### 武器・小物
-holding sword, holding spear, holding dagger, holding knife, holding shield, holding staff, holding wand, holding bow, holding gun, holding rifle, holding flower, holding umbrella, holding cup, holding drink, holding ice cream, holding book, holding plush toy, holding smartphone, holding microphone, holding fan, holding key, holding lantern, holding torch
+### 柄・装飾
+frills, lace trim, ribbons, bows, embroidery, floral print, plaid, striped, polka dot, sequins
+
+### 着脱・動作
+open shirt, partially undressed, adjusting clothes, jacket on shoulders, skirt lift, jacket partially removed, clothes lift, unzipping, strap slip, removing legwear
+
+### 装飾アクセ
+hair ribbon, hair clip, earrings, necklace, pendant, choker, bracelet, anklet, ring, belt, arm warmers, chest harness, thigh strap, gloves, fingerless gloves, elbow gloves, eyepatch, goggles, glasses, sunglasses, monocle, hat, beret, cap, straw hat, crown, tiara, headband, kanzashi, jiangshi hat, veil, face veil, headphones, brooch, bag, backpack, parasol, scarf, necktie, bowtie
 
 ---
 
 ## effect — 効果
 
 ### 魔法・オーラ
-aura, glowing aura, magic circle, magic, glowing tattoo, energy, electricity
+glowing aura, magic circle, magic, glowing tattoo, electricity
 
 ### パーティクル
-floating petals, falling petals, sparkles, light particles, bubbles, feathers, confetti, embers, flying debris
+floating petals, sparkles, light particles, bubbles, feathers, confetti, embers, flying debris
 
 ### 天候・自然
-wind, rain, snowfall, lightning, splashing water, fire, explosion, smoke, mist
+wind, rain, snowfall, lightning, splashing water, fire, smoke, mist
 
 ### 演出フィルタ
-film grain, chromatic aberration, motion blur, lens distortion, vignette, scanlines, halftone, noise texture, `-` distorted background
+film grain, chromatic aberration, motion blur, lens distortion, vignette, silhouette
 
 ---
 
 ## composition — 構図
 
 ### カメラ距離
-extreme close-up, close-up, face close-up, portrait, bust shot, upper body, cowboy shot, full body, wide shot, `-` macro shot, `-` lower half of face
+extreme close-up, close-up, face close-up, portrait, bust shot, upper body, cowboy shot, full body, wide shot
 
 ### カメラ角度
-front view, side view, back view, from below, from above, low angle, high angle, dutch angle, bird's-eye view, worm's-eye view, over the shoulder, fisheye, `-` foreshortening, dynamic angle, wide angle view, `-` fisheye lens, `-` extreme perspective, `-` extreme close-up on eyes
+front view, side view, back view, from below, from above, low angle, high angle, dutch angle, over the shoulder, dynamic angle
 
 ### ポーズ
-standing, sitting, seiza, sitting cross-legged, walking, running, jumping, floating, kneeling, on one knee, crouching, split, leaning, lying, lying on back, lying on stomach, on side, sleeping, all fours, arms crossed, arms behind back, arms behind head, hand on hip, hands on own cheeks, stretching, dancing, pinup, fighting stance, action pose
+standing, contrapposto, arched back, legs together, legs apart, sitting, seiza, sitting cross-legged, w sitting, crossed legs, legs up, walking, running, jumping, floating, kneeling, on one knee, crouching, `T3` split, leaning, leaning forward, leaning to the side, lying, `T3` lying on back, `T3` lying on stomach, `T3` on side, sleeping, `T3` all fours, arms crossed, arms behind back, arms behind head, arms up, hand on hip, hands on own cheeks, stretching, dancing, fighting stance, action pose
 
 ### 手・指
-hand on own face, finger to mouth, finger to chin, finger to cheek, finger to lips, hand up, hands up, thumbs up, thumbs down, raised fist, index finger raised, pointing at viewer, pointing up, pointing to the side, finger gun, ok sign, counting, finger heart, hand heart, outstretched arm, hand behind head, pinky out, open hand, clenched hand, spread fingers, interlocked fingers, grabbing, hand on own chest, hands in pockets, hands on own knees, clapping
+hand on own face, finger to mouth, finger to chin, finger to cheek, finger to lips, hand up, hands up, thumbs up, raised fist, index finger raised, pointing at viewer, pointing up, pointing to the side, finger gun, ok sign, counting, finger heart, hand heart, outstretched arm, hand behind head, open hand, clenched hand, interlocked fingers, grabbing, hand on own chest, hand on neck, hand in hair, hands in pockets, hands on own knees, clapping
 
 ### 視線・演出
-looking at viewer, looking away, looking back, looking down, looking up, eye contact, head tilt, waving, pointing, peace sign, v-sign, reaching toward viewer
+looking at viewer, looking away, looking back, looking over shoulder, looking down, looking up, eye contact, head tilt, waving, pointing, peace sign, reaching toward viewer
 
 ### シチュ
-indoors, at school, on the street, outdoors, at beach, in forest, in rain, at night, dynamic, action
+indoors, at school, on the street, outdoors, at beach, in forest, in rain
+
+### 武器・小物
+holding sword, holding spear, holding dagger, holding knife, holding shield, holding staff, holding wand, holding bow, holding gun, holding rifle, holding flower, holding umbrella, holding cup, holding drink, holding ice cream, holding book, holding plush toy, holding smartphone, holding microphone, holding fan, holding key, holding lantern, holding torch
 
 ### シート・資料（手動専用）
-`-` character sheet, `-` multiple views, `-` turnaround, `-` character design sheet, `-` reference sheet, `-` expression sheet, `-` color palette, `-` notes, `-` text
+`-` character sheet, `-` multiple views, `-` turnaround, `-` reference sheet, `-` expression sheet, `-` color palette
 
 ---
 
@@ -196,23 +209,26 @@ indoors, at school, on the street, outdoors, at beach, in forest, in rain, at ni
 white background, simple background, gradient background, bokeh background, abstract background
 
 ### 屋外
-cityscape, urban, street, alley, park, rooftop, garden, bridge, river, waterfall, forest, field, lake, beach, ocean, underwater, mountain, desert, cave, shrine, ruins, castle, outer space
+cityscape, urban, street, alley, park, rooftop, garden, bridge, river, waterfall, forest, field, lake, beach, pool, ocean, underwater, mountain, desert, cave, shrine, ruins, castle, outer space
 
 ### 屋内
-classroom, bedroom, living room, kitchen, bathroom, onsen, hot spring, cafe, restaurant, library, office, stage, train, dungeon, laboratory, hospital room, church, castle interior, throne room, shop
+classroom, bedroom, living room, kitchen, bathroom, onsen, cafe, restaurant, library, office, stage, train, dungeon, laboratory, hospital room, church, castle interior, throne room, shop
 
 ### 時間・天気
 morning, day, golden hour, sunset, dusk, night, dawn, clear sky, cloudy, rainy, snowy, starry sky, foggy
 
-### 季節・雰囲気
-cherry blossoms, summer, autumn leaves, snow, cozy, romantic, nostalgic, dreamy, mysterious, dark atmosphere, gothic, magical, fantasy world, steampunk, cyberpunk, post-apocalyptic
+### 季節・世界観
+cherry blossoms, summer, autumn leaves, snow, christmas, halloween, fantasy world, post-apocalyptic, steampunk, cyberpunk, victorian, rococo
+
+### 雰囲気
+cozy, romantic, nostalgic, dreamy, mysterious, dark atmosphere
 
 ---
 
 ## lighting — 照明
 
 ### 光源
-sunlight, moonlight, starlight, aurora, backlight, rim light, neon light, candlelight, spotlight, volumetric lighting, lens flare, god rays, bioluminescence, caustics
+sunlight, moonlight, starlight, aurora, backlight, rim light, neon light, candlelight, spotlight, volumetric lighting, lens flare, god rays, bioluminescence
 
 ### 照明スタイル
 dramatic lighting, cinematic lighting, soft light, warm lighting, cold lighting, side lighting, dynamic lighting, studio lighting, global illumination
