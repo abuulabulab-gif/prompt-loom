@@ -140,9 +140,9 @@ export const TEMPLATES = [
     negHintJa: 'front view, covering back, hair covering back',
     negHintEn: 'front view, covering back, hair covering back',
     apply: {
-      composition: 'upper body, back view, looking over shoulder, looking at viewer',
-      body:        { mode: 'merge', tags: 'bare back, bare shoulders' },
-      outfit:      { mode: 'merge', tags: 'open back' },
+      composition:  'upper body, back view, looking over shoulder, looking at viewer',
+      body:         { mode: 'merge', tags: 'bare back, bare shoulders' },
+      outfit_detail: { mode: 'merge', tags: 'open back' },
     },
   },
   {
@@ -153,9 +153,9 @@ export const TEMPLATES = [
     desc: '腕を上げたノースリーブ構図の標準版。カウボーイショットで全体感を残しつつ脇を見せる。ハイアングル版よりも引き気味',
     descEn: 'Standard sleeveless arms-raised shot at cowboy distance — wider framing vs highangle_armpit which is more compressed',
     apply: {
-      composition: 'cowboy shot, arms behind head',
-      body:        { mode: 'merge', tags: 'armpits' },
-      outfit:      { mode: 'merge', tags: 'sleeveless' },
+      composition:  'cowboy shot, arms behind head',
+      body:         { mode: 'merge', tags: 'armpits' },
+      outfit_detail: { mode: 'merge', tags: 'sideless outfit' },
     },
   },
   {
@@ -168,9 +168,9 @@ export const TEMPLATES = [
     negHintJa: "low angle, from below, worm's-eye view, full body",
     negHintEn: "low angle, from below, worm's-eye view, full body",
     apply: {
-      composition: 'bust shot, high angle, from above, arms behind head',
-      body:        { mode: 'merge', tags: 'armpits' },
-      outfit:      { mode: 'merge', tags: 'sleeveless' },
+      composition:  'bust shot, high angle, from above, arms behind head',
+      body:         { mode: 'merge', tags: 'armpits' },
+      outfit_detail: { mode: 'merge', tags: 'sideless outfit' },
     },
   },
   {
@@ -181,9 +181,9 @@ export const TEMPLATES = [
     desc: 'お腹・へそ周りを主役にしたカジュアル露出構図。ローアングル気味でへそをフレームの中心に',
     descEn: 'Midriff and navel as the visual center — casual crop-top exposure with a slight upward angle',
     apply: {
-      composition: 'cowboy shot, from below, low angle',
-      body:        { mode: 'merge', tags: 'midriff, navel' },
-      outfit:      { mode: 'merge', tags: 'crop top, shorts' },
+      composition:  'cowboy shot, from below, low angle',
+      body:         { mode: 'merge', tags: 'midriff, navel' },
+      outfit_detail: { mode: 'merge', tags: 'navel cutout' },
     },
   },
   {
@@ -207,9 +207,10 @@ export const TEMPLATES = [
     desc: 'とにかくキャラをむちむちに。ぷりんとした太もも・ぽっちゃりした脚線美に特化。衣装の食い込みで肉感をさらに強調する',
     descEn: 'All-in on plump, soft thighs and curvy legs — skin-tight clothing amplifies every contour. For maximum thickness',
     apply: {
-      composition: 'lower body, close-up',
-      body:        { mode: 'merge', tags: 'thick thighs, plump, wide hips, voluptuous, thighs, bare thighs, thigh gap, zettai ryouiki' },
-      outfit:      { mode: 'merge', tags: 'thighhighs, skintight' },
+      composition:  'lower body, close-up',
+      body:         { mode: 'merge', tags: 'thick thighs, plump, wide hips, voluptuous, thighs, bare thighs, thigh gap, zettai ryouiki' },
+      outfit:       { mode: 'merge', tags: 'thighhighs' },
+      outfit_detail: { mode: 'merge', tags: 'skintight' },
     },
   },
   {

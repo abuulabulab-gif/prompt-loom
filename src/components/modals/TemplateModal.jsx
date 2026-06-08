@@ -88,6 +88,10 @@ const TEMPLATE_EXTRA_JA = new Map([
   ['hugging own legs',         '膝を抱える'],
   ['knees up',                 '膝立て'],
   ['on floor',                 '床の上'],
+  // カットアウト系ディテール
+  ['sideless outfit',          '脇カット/サイドレス'],
+  ['shoulder cutout',          '肩カット'],
+  ['armpit cutout',            '脇くりぬき'],
 ]);
 
 // en → ja (ブロック + テンプレート専用の両方を検索)
@@ -115,9 +119,10 @@ const BLOCK_LABEL = {
   background:  { ja: '背景',   en: 'BG'      },
   composition: { ja: '構図',   en: 'View'    },
   body:        { ja: '体型',   en: 'Body'    },
-  outfit:      { ja: '衣装',   en: 'Outfit'  },
-  face:        { ja: '顔',     en: 'Face'    },
-  effect:      { ja: '効果',   en: 'Effect'  },
+  outfit:        { ja: '衣装',         en: 'Outfit'  },
+  outfit_detail: { ja: '衣装ディテール', en: 'Detail'  },
+  face:          { ja: '顔',           en: 'Face'    },
+  effect:        { ja: '効果',         en: 'Effect'  },
 };
 
 // 全ブロックのタグを結合してプレビュー文字列を生成
