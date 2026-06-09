@@ -35,23 +35,24 @@ function CharRow({ c, isActive, isDraggable, onSelect }) {
 }
 
 export default function CharListModal({ open, onClose, characters, activeCharId, lang, onSelect, onReorder }) {
+  if (!open) return null;
+  return <CharListModalInner onClose={onClose} characters={characters} activeCharId={activeCharId} lang={lang} onSelect={onSelect} onReorder={onReorder} />;
+}
+
+function CharListModalInner({ onClose, characters, activeCharId, lang, onSelect, onReorder }) {
   const [query, setQuery] = useState('');
   const isFiltering = query.trim().length > 0;
 
-  useEffect(() => { if (open) setQuery(''); }, [open]);
   useEffect(() => {
-    if (!open) return;
     const h = e => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', h);
     return () => window.removeEventListener('keydown', h);
-  }, [open, onClose]);
+  }, [onClose]);
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
   );
-
-  if (!open) return null;
 
   const visible = characters.filter(c => !c.archived);
   const filtered = isFiltering
