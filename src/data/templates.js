@@ -328,15 +328,15 @@ export const TEMPLATES = [
   },
   {
     id: 'floor_sit',
-    name: '横座り・膝抱え視線',
-    nameEn: 'Side Sit Knees Up',
+    name: '横座り・片膝抱え',
+    nameEn: 'Side Sit One Knee Up',
     icon: '🪑',
-    desc: '横からの視点で膝を抱えて座り、こちらへ視線を向けるリラックス構図',
-    descEn: 'Sitting from the side, hugging knees, looking at viewer — a relaxed and intimate pose',
-    negHintJa: 'front view, standing, lying, foot focus dominant',
-    negHintEn: 'front view, standing, lying, foot focus dominant',
+    desc: '横視点で片膝を抱え、もう片足を伸ばす。座り姿と脚線の雰囲気が主役',
+    descEn: 'Side view sitting — one knee hugged to chest, one leg extended. Sitting pose and leg line as the focus',
+    negHintJa: 'front view, standing, lying, hugging both knees, foot focus',
+    negHintEn: 'front view, standing, lying, hugging both knees, foot focus',
     apply: {
-      composition: 'sitting, side view, knees up, hugging own legs, looking at viewer',
+      composition: 'sitting, side view, one knee up, one leg extended, looking at viewer',
     },
   },
   // ── ダイナミック ──────────────────────────────────────────────────────
