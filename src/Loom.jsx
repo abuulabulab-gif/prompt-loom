@@ -693,7 +693,7 @@ export default function Loom() {
   };
 
   // ── Templates ──
-  const applyTemplate = (tmpl) => {
+  const applyTemplate = (tmpl, clearMode = false) => {
     // Save undo snapshot of blocks that will be overwritten
     const snapshot = {};
     for (const b of activeChar.blocks) {
@@ -717,7 +717,7 @@ export default function Loom() {
           const v = tmpl.apply[b.id];
           if (v !== undefined) {
             if (typeof v === 'object' && v.mode === 'merge') {
-              let text = b.text || '';
+              let text = clearMode ? '' : (b.text || '');
               for (const seg of splitTags(v.tags || '')) {
                 const tag = bareTag(seg);
                 if (tag && !hasTag(text, tag)) text = appendTag(text, tag, b.strength);

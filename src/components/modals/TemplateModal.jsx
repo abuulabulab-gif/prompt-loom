@@ -103,7 +103,7 @@ function toJa(en) {
 const FETI_IDS    = new Set(['nape_lift','bare_back','armpitsleeveless','armpit_closeup','midriff_navel','underboob_lowangle','zettairyouiki','skintight_detail','lowangle_legs','footperspective','split_balance']);
 const SITU_IDS    = new Set(['prone_elbow','supine_relax','floor_sit','birdseye_lie']);
 const DYNAMIC_IDS = new Set(['dynamic_booster','extreme_perspective','rider_kick','wind','cinematic']);
-const EXTREME_IDS = new Set(['lip_focus','eye_focus','fisheye','from_below','from_above']);
+const EXTREME_IDS = new Set(['lip_focus','shh_pose','eye_focus','fisheye','from_below','from_above']);
 
 const STYLE_IDS          = new Set(['anime','photo','fantasy','chibi','pixelart']);
 const styleTemplates     = TEMPLATES.filter(t => STYLE_IDS.has(t.id));
