@@ -161,7 +161,7 @@ export const TEMPLATES = [
     },
   },
   {
-    id: 'highangle_armpit',
+    id: 'armpit_closeup',
     name: '脇アップ・全開',
     nameEn: 'Armpit Close-Up',
     icon: '📸',
@@ -181,8 +181,8 @@ export const TEMPLATES = [
     name: 'へそ見せ・乗りかかり',
     nameEn: 'Navel Lean-Over',
     icon: '✨',
-    desc: 'POVでこちらへ四つん這いで乗りかかり、捲れた服からへそ・お腹が見える構図',
-    descEn: 'POV lean-over on all fours — shirt rides up to reveal midriff and navel up close',
+    desc: 'POVでこちらに乗りかかり、捲れた服からへそ・お腹まわりを見せる',
+    descEn: 'POV lean-over on all fours — shirt rides up to reveal midriff and navel',
     negHintJa: 'side view, standing straight, covered stomach, distant shot',
     negHintEn: 'side view, standing straight, covered stomach, distant shot',
     apply: {
@@ -193,8 +193,8 @@ export const TEMPLATES = [
   },
   {
     id: 'underboob_lowangle',
-    name: '下・胸フォーカス煽り',
-    nameEn: 'Underboob Low Angle',
+    name: 'ローアングル・下胸フォーカス',
+    nameEn: 'Low Angle Underboob Focus',
     icon: '👀',
     desc: '真下から見上げてへそ→下乳→顔の順に捉える煽り構図。前傾姿勢では谷間も覗く',
     descEn: "Worm's-eye shot looking up — navel to underboob to face, with cleavage visible when leaning forward",
@@ -255,8 +255,8 @@ export const TEMPLATES = [
     name: '足先フォーカス・座り',
     nameEn: 'Sitting Foot Focus',
     icon: '🦶',
-    desc: '座った状態で足先・足裏をカメラ側へ向ける。全身を映しながら足元を主役にする構図',
-    descEn: 'Sitting with feet stretched toward the camera — full body in frame with foot focus up front',
+    desc: '座った状態で足先をカメラ側へ伸ばし、足先と脚線を主役にしつつ全身を映す',
+    descEn: 'Sitting with legs stretched toward the camera — foot and leg lines as the main focus, full body in frame',
     negHintJa: 'standing, hidden feet, shoes, side view only',
     negHintEn: 'standing, hidden feet, shoes, side view only',
     apply: {
