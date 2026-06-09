@@ -135,7 +135,7 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
         style={{ color: fg }}
         className={`bg-transparent border-none cursor-pointer font-mono tracking-tight ${large ? `px-2.5 py-1.5 text-[0.9375rem]${onToggleFav && !selectMode ? ' pr-[1.375rem]' : ''}` : `px-[0.4375rem] py-[0.1875rem] text-xs${onToggleFav && !selectMode ? ' pr-[1.125rem]' : ''}`} ${(active || selected) ? 'font-bold' : 'font-normal'}`}
       >
-        {conflict === 'error' ? '⚠ ' : conflict === 'warn' ? '〜 ' : (active && !selectMode) ? '✓ ' : (analyzed && !active && !selectMode) ? '◎ ' : ''}
+        {conflict === 'error' ? '⚠ ' : conflict === 'warn' ? '〜 ' : (analyzed && !active && !selectMode) ? '◎ ' : ''}
         {selectMode && selected ? '☑ ' : selectMode ? '☐ ' : ''}
         {lang === 'ja' ? tag.ja : tag.en}
       </button>
