@@ -156,7 +156,7 @@ export const TEMPLATES = [
     negHintEn: 'long sleeves, arms crossed, heavy outerwear',
     apply: {
       composition:   'upper body',
-      body:          { mode: 'merge', tags: 'armpits' },
+      body:          { mode: 'merge', tags: 'armpits, sideboob' },
       outfit_detail: { mode: 'merge', tags: 'sleeveless' },
     },
   },
@@ -187,7 +187,22 @@ export const TEMPLATES = [
     negHintEn: 'side view, standing straight, covered stomach, distant shot',
     apply: {
       composition:   'pov, leaning over viewer, on all fours',
-      body:          { mode: 'merge', tags: 'midriff, navel' },
+      body:          { mode: 'merge', tags: 'midriff, navel, cleavage' },
+      outfit_detail: { mode: 'merge', tags: 'lifted top' },
+    },
+  },
+  {
+    id: 'underboob_lowangle',
+    name: '下・胸フォーカス煽り',
+    nameEn: 'Underboob Low Angle',
+    icon: '👀',
+    desc: '真下から見上げてへそ→下乳→顔の順に捉える煽り構図。前傾姿勢では谷間も覗く',
+    descEn: "Worm's-eye shot looking up — navel to underboob to face, with cleavage visible when leaning forward",
+    negHintJa: 'from above, front view, covered stomach, long top',
+    negHintEn: 'from above, front view, covered stomach, long top',
+    apply: {
+      composition:   "from below, worm's-eye view, low angle, looking down at viewer",
+      body:          { mode: 'merge', tags: 'underboob, navel, midriff, cleavage' },
       outfit_detail: { mode: 'merge', tags: 'lifted top' },
     },
   },
