@@ -139,13 +139,9 @@ export default function TagBtn({ tag, color, lang, isFav, active, analyzed, disa
         {selectMode && selected ? '☑ ' : selectMode ? '☐ ' : ''}
         {lang === 'ja' ? tag.ja : tag.en}
       </button>
-      {onToggleFav && !selectMode && (
+      {onToggleFav && !selectMode && (active || isFav) && (
         <button
           onClick={e => { e.stopPropagation(); onToggleFav(); }}
-          style={{
-            visibility: ((active && (h || IS_TOUCH)) || isFav) ? 'visible' : 'hidden',
-            pointerEvents: ((active && (h || IS_TOUCH)) || isFav) ? 'auto' : 'none',
-          }}
           className={`bg-transparent border-l border-dim cursor-pointer leading-none ${large ? 'px-[0.4375rem] py-1.5 text-[0.8125rem]' : 'px-[0.3125rem] py-1 text-[0.625rem]'} ${isFav ? 'text-warn' : 'text-muted'}`}
         >★</button>
       )}
