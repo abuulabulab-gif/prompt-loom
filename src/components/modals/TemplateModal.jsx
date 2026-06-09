@@ -100,8 +100,8 @@ function toJa(en) {
   return TAG_JA_MAP.get(key) ?? TEMPLATE_EXTRA_JA.get(key) ?? null;
 }
 
-const FETI_IDS    = new Set(['nape_lift','bare_back','armpitsleeveless','highangle_armpit','midriff_navel','zettairyouiki','skintight_detail','lowangle_legs','footperspective','birdseye_lie']);
-const SITU_IDS    = new Set(['prone_elbow','floor_sit']);
+const FETI_IDS    = new Set(['nape_lift','bare_back','armpitsleeveless','armpit_closeup','midriff_navel','underboob_lowangle','zettairyouiki','skintight_detail','lowangle_legs','footperspective','split_balance']);
+const SITU_IDS    = new Set(['prone_elbow','supine_relax','floor_sit','birdseye_lie']);
 const DYNAMIC_IDS = new Set(['dynamic_booster','extreme_perspective','rider_kick','wind','cinematic']);
 const EXTREME_IDS = new Set(['lip_focus','eye_focus','fisheye','from_below','from_above']);
 
@@ -294,7 +294,7 @@ export default function TemplateModal({ lang, isMobile, onApply, onClose }) {
 
           <div className="border-t border-dim mb-4" />
 
-          <div className="text-muted text-[0.625rem] font-mono tracking-widest mb-2 uppercase">{lang === 'ja' ? '構図・設定資料（SFW）' : 'Composition / Reference'}</div>
+          <div className="text-muted text-[0.625rem] font-mono tracking-widest mb-2 uppercase">{lang === 'ja' ? '構図・設定資料' : 'Composition / Reference'}</div>
           <div className={`${gridCls} mb-4`} style={gridStyle}>{basicCompTemplates.map(card)}</div>
 
           <div className="border-t border-dim mb-4" />
