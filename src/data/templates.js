@@ -202,7 +202,7 @@ export const TEMPLATES = [
     negHintEn: 'from above, front view, covered stomach, long top',
     apply: {
       composition:   "from below, worm's-eye view, low angle, looking down at viewer",
-      body:          { mode: 'merge', tags: 'underboob, navel, midriff, cleavage' },
+      body:          { mode: 'merge', tags: 'underboob, navel, midriff' },
       outfit_detail: { mode: 'merge', tags: 'lifted top' },
     },
   },
