@@ -71,6 +71,27 @@ export function useColorPicker({ activeCharId, blocks, setCharacters, pushHistor
     setTimeout(() => setColorToast(null), 3000);
   };
 
+  const applyCutoutTags = (tags) => {
+    const resolvedId = 'outfit_detail';
+    const tagArray = Array.isArray(tags) ? tags : [tags];
+    if (!tagArray.length) return;
+    pushHistory(makeHistoryEntry(false));
+    setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : {
+      ...c,
+      blocks: c.blocks.map(b => b.id !== resolvedId ? b : {
+        ...b,
+        text: tagArray.reduce((acc, tag) => appendTag(acc, tag, '1.0'), b.text),
+        enabled: true, collapsed: false,
+      }),
+    }));
+    const blockName = blocks.find(b => b.id === resolvedId)?.[lang === 'ja' ? 'name' : 'nameEn'] ?? resolvedId;
+    const msg = lang === 'ja'
+      ? `✂️ ${blockName}に「${tagArray[0]}」${tagArray.length > 1 ? `他${tagArray.length - 1}件` : ''}を追加`
+      : `✂️ "${tagArray[0]}"${tagArray.length > 1 ? ` +${tagArray.length - 1}` : ''} added to ${blockName}`;
+    setColorToast({ msg });
+    setTimeout(() => setColorToast(null), 3000);
+  };
+
   const _pickColorDefault = (allowedTargets, blockText, fallback) => {
     if (!allowedTargets || typeof blockText !== 'string') return fallback;
     const checks = {
@@ -103,6 +124,6 @@ export function useColorPicker({ activeCharId, blocks, setCharacters, pushHistor
     colorPickerDefaultTarget,
     colorPickerBlockText,
     colorToast, setColorToast,
-    applyColorTag, applyFeatureTag, applyMaterialTag, openColorPicker,
+    applyColorTag, applyFeatureTag, applyMaterialTag, applyCutoutTags, openColorPicker,
   };
 }

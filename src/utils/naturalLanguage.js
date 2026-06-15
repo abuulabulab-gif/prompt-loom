@@ -2,6 +2,7 @@ import { splitTags, bareTag } from '../data/constants.js';
 import { resolveColorLabel } from '../data/colors.js';
 import { resolveFeatureLabel } from '../data/features.js';
 import { resolveMaterialLabel } from '../data/materials.js';
+import { resolveExtraLabel, resolveCatLabel } from '../data/extraTags.js';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function getTagLabels(blockText, cats) {
@@ -13,6 +14,8 @@ function getTagLabels(blockText, cats) {
     || resolveColorLabel(en)
     || resolveFeatureLabel(en)
     || resolveMaterialLabel(en)
+    || resolveExtraLabel(en)
+    || resolveCatLabel(en)
     || { en, ja: en }
   );
 }

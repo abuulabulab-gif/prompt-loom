@@ -25,6 +25,7 @@ import TemplateModal from "./components/modals/TemplateModal.jsx";
 import ColorPickerModal from "./components/modals/ColorPickerModal.jsx";
 import FeatureMakerModal from "./components/modals/FeatureMakerModal.jsx";
 import MaterialMakerModal from "./components/modals/MaterialMakerModal.jsx";
+import CutoutMakerModal from "./components/modals/CutoutMakerModal.jsx";
 import SceneComposeModal from "./components/modals/SceneComposeModal.jsx";
 import SettingsModal from "./components/modals/SettingsModal.jsx";
 import CharListModal from "./components/modals/CharListModal.jsx";
@@ -144,6 +145,7 @@ export default function Loom() {
   const [featureMakerOpen, setFeatureMakerOpen] = useState(false);
   const [featureMakerFilterBlock, setFeatureMakerFilterBlock] = useState(null);
   const [materialMakerOpen, setMaterialMakerOpen] = useState(false);
+  const [cutoutMakerOpen, setCutoutMakerOpen] = useState(false);
   const [sceneOpen, setSceneOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
@@ -839,7 +841,7 @@ export default function Loom() {
     colorPickerOpen, setColorPickerOpen,
     colorPickerAllowedTargets, colorPickerDefaultTarget, colorPickerBlockText,
     colorToast,
-    applyColorTag, applyFeatureTag, applyMaterialTag, openColorPicker,
+    applyColorTag, applyFeatureTag, applyMaterialTag, applyCutoutTags, openColorPicker,
   } = useColorPicker({ activeCharId, blocks, setCharacters, pushHistory, makeHistoryEntry, lang });
 
   // ── Keyboard shortcuts ──
@@ -887,6 +889,7 @@ export default function Loom() {
         if (colorPickerOpen)   { setColorPickerOpen(false);   return; }
         if (featureMakerOpen)    { setFeatureMakerOpen(false);    return; }
         if (materialMakerOpen)   { setMaterialMakerOpen(false);   return; }
+        if (cutoutMakerOpen)     { setCutoutMakerOpen(false);     return; }
         if (sceneOpen)        { setSceneOpen(false);        return; }
         if (analyzeOpen)      { setAnalyzeOpen(false); setAnalyzeText(''); return; }
         if (quickOpen)        { setQuickOpen(false);        return; }
@@ -939,7 +942,7 @@ export default function Loom() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paletteOpen, globalSearchOpen, libraryOpen, analyzeOpen, historyOpen, templateOpen, colorPickerOpen, featureMakerOpen, materialMakerOpen, sceneOpen, settingsOpen, blockStatusOpen, focusBlockId,
+  }, [paletteOpen, globalSearchOpen, libraryOpen, analyzeOpen, historyOpen, templateOpen, colorPickerOpen, featureMakerOpen, materialMakerOpen, cutoutMakerOpen, sceneOpen, settingsOpen, blockStatusOpen, focusBlockId,
       activeCharId, currentText, posText, negText, activeChar]);
 
   // DALL-E selected → auto-switch to natural language tab; leaving DALL-E → back to positive
@@ -1191,6 +1194,7 @@ export default function Loom() {
     { id: 'open-color',    group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎨', label: 'Open color picker',    labelJa: 'カラーメーカーを開く',    action: () => openColorPicker() },
     { id: 'open-feature',  group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎯', label: 'Open feature maker',   labelJa: '特徴メーカーを開く',     action: () => setFeatureMakerOpen(true) },
     { id: 'open-material', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🧵', label: 'Open material maker', labelJa: 'マテリアルメーカーを開く', action: () => setMaterialMakerOpen(true) },
+    { id: 'open-cutout',   group: lang === 'ja' ? 'パネル' : 'Panels', icon: '✂️', label: 'Open cutout maker',   labelJa: 'カットメーカーを開く',     action: () => setCutoutMakerOpen(true) },
     ...(characters.length > 1 ? [{ id: 'open-scene', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎬', label: 'Open Collab', labelJa: 'キャラ共演を開く', action: () => setSceneOpen(true) }] : []),
     { id: 'open-settings', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '⚙️', label: 'Open settings / shortcuts', labelJa: '設定・ショートカット', shortcut: '?', action: () => setSettingsOpen(true) },
     // AI Tools
@@ -1289,6 +1293,9 @@ export default function Loom() {
                     👁️ {lang === 'ja' ? '画像からタグ生成' : 'Image to Tags'}
                   </button>
                 )}
+                <div className="text-dim text-[0.5625rem] font-mono px-3.5 pt-1.5 pb-0.5 tracking-[0.08em] uppercase">
+                  {lang === 'ja' ? '色・外見' : 'Color & Look'}
+                </div>
                 <button onClick={() => { openColorPicker(); setQuickOpen(false); }}
                   className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5 whitespace-nowrap"
                   style={{ color: 'rgb(var(--c-purple))' }}>
@@ -1299,10 +1306,18 @@ export default function Loom() {
                   style={{ color: 'rgb(var(--c-purple))' }}>
                   🎯 {lang === 'ja' ? (isMobile ? '特徴' : '特徴メーカー') : (isMobile ? 'Feature' : 'Feature Maker')}
                 </button>
+                <div className="text-dim text-[0.5625rem] font-mono px-3.5 pt-1.5 pb-0.5 tracking-[0.08em] uppercase">
+                  {lang === 'ja' ? '衣装' : 'Outfit'}
+                </div>
                 <button onClick={() => { setMaterialMakerOpen(true); setQuickOpen(false); }}
                   className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5 whitespace-nowrap"
                   style={{ color: 'rgb(var(--c-purple))' }}>
                   🧵 {lang === 'ja' ? (isMobile ? 'マテリアル' : 'マテリアルメーカー') : (isMobile ? 'Material' : 'Material Maker')}
+                </button>
+                <button onClick={() => { setCutoutMakerOpen(true); setQuickOpen(false); }}
+                  className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5 whitespace-nowrap"
+                  style={{ color: 'rgb(var(--c-purple))' }}>
+                  ✂️ {lang === 'ja' ? (isMobile ? 'カット' : 'カットメーカー') : (isMobile ? 'Cutout' : 'Cutout Maker')}
                 </button>
                 {characters.length > 1 && (
                   <button onClick={() => { setSceneOpen(true); setQuickOpen(false); }}
@@ -1830,6 +1845,7 @@ export default function Loom() {
                   onColorPicker={BLOCK_TO_COLOR_TARGET[block.id] ? () => openColorPicker(BLOCK_TO_COLOR_TARGET[block.id], BLOCK_TO_ALLOWED_TARGETS[block.id], block.text) : undefined}
                   onFeatureMaker={['face','body','outfit'].includes(block.id) ? () => { setFeatureMakerFilterBlock(block.id); setFeatureMakerOpen(true); } : undefined}
                   onMaterialMaker={block.id === 'outfit' ? () => setMaterialMakerOpen(true) : undefined}
+                  onCutoutMaker={block.id === 'outfit_detail' ? () => setCutoutMakerOpen(true) : undefined}
                   isLight={theme === 'light'} />
               );
 
@@ -2825,6 +2841,7 @@ export default function Loom() {
       {colorPickerOpen && <ColorPickerModal lang={lang} onApply={applyColorTag} onClose={() => setColorPickerOpen(false)} defaultTarget={colorPickerDefaultTarget} allowedTargets={colorPickerAllowedTargets} blockText={colorPickerBlockText} />}
       {featureMakerOpen && <FeatureMakerModal lang={lang} blocks={blocks} onApply={applyFeatureTag} onClose={() => setFeatureMakerOpen(false)} filterBlockId={featureMakerFilterBlock} />}
       {materialMakerOpen && <MaterialMakerModal lang={lang} blocks={blocks} onApply={applyMaterialTag} onClose={() => setMaterialMakerOpen(false)} />}
+      {cutoutMakerOpen && <CutoutMakerModal lang={lang} blocks={blocks} onApply={(tags) => { applyCutoutTags(tags); setCutoutMakerOpen(false); }} onClose={() => setCutoutMakerOpen(false)} />}
       {sceneOpen && <SceneComposeModal characters={characters} lang={lang} activeTool={activeTool} theme={theme} onClose={() => setSceneOpen(false)} defaultQuality={blocks.find(b => b.id === 'quality')?.text || ''} />}
       {supportOpen && <SupportModal lang={lang} isMobile={isMobile} onClose={() => setSupportOpen(false)} />}
       {settingsOpen && <SettingsModal lang={lang} isMobile={isMobile} defaultTab={settingsTab} onClose={() => { setSettingsOpen(false); setSettingsTab('shortcuts'); }}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { TEMPLATES } from "../../data/templates.js";
 import { BLOCKS_DEF } from "../../data/blocks.js";
+import { EXTRA_TAG_JA } from "../../data/extraTags.js";
 
 // ブロック登録タグの en→ja 逆引きマップ
 const TAG_JA_MAP = new Map();
@@ -12,92 +13,10 @@ for (const block of BLOCKS_DEF) {
   }
 }
 
-// テンプレート専用タグ（ブロック未登録）の日本語マップ
-const TEMPLATE_EXTRA_JA = new Map([
-  // 品質・レンダリング
-  ['smooth shading',           'スムースシェード'],
-  ['intricate details',        '緻密な描写'],
-  // ちびキャラ
-  ['super deformed',           'スーパーデフォルメ'],
-  ['kawaii',                   'かわいい'],
-  ['simple shading',           'シンプルシェード'],
-  // ドット絵
-  ['pixel perfect',            'ピクセルパーフェクト'],
-  ['retro game',               'レトロゲーム'],
-  ['8-bit',                    '8ビット'],
-  // 壁紙
-  ['scenery',                  '情景・風景'],
-  ['cinematic lighting',       'シネマティック照明'],
-  ['volumetric lighting',      'ボリューメトリックライト'],
-  ['dramatic lighting',        'ドラマチック照明'],
-  ['detailed background',      '詳細な背景'],
-  // ライダーキック
-  ['jumping',                  'ジャンプ'],
-  ['kicking',                  '蹴り'],
-  ['midair',                   '空中'],
-  // 風・シネマティック
-  ['clothes fluttering',       '衣装がなびく'],
-  ['cinematic',                'シネマティック'],
-  // 真俯瞰
-  ['hair spread out',          '髪を広げた'],
-  ['hair disheveled',          '髪が乱れた'],
-  ['relaxed pose',             'リラックスポーズ'],
-  ['white floor',              '白いフロア'],
-  ['white sheets',             '白いシーツ'],
-  ['bed sheet',                'ベッドシーツ'],
-  ['soft lighting',            '柔らかい光'],
-  ['fabric',                   '布地'],
-  ['wrinkles',                 'しわ'],
-  ['empty eyes',               'うつろな目'],
-  ['vacant expression',        '虚ろな表情'],
-  // 撮影スタイル
-  ['selfie',                   '自撮り'],
-  // 構図・視点
-  ['foreshortening',           '短縮遠近法'],
-  ['extreme perspective',      '超パース'],
-  ['fisheye lens',             '魚眼レンズ'],
-  ['wide angle view',          '広角'],
-  ['lower body',               '下半身'],
-  ['lower half of face',       '顔の下半分'],
-  ['extreme close-up on eyes', '目の超アップ'],
-  ['macro shot',               'マクロショット'],
-  // ボディ
-  ['armpit focus',             '脇アップ'],
-  ['midriff focus',            'お腹アップ'],
-  ['eye focus',                '目フォーカス'],
-  ['thick thighs',             '太もも太め'],
-  ['plump',                    'ぽっちゃり'],
-  ['wide hips',                '広い腰'],
-  ['voluptuous',               'グラマラス'],
-  // フェイス
-  ['detailed lips',            '詳細な唇'],
-  ['detailed pupils',          '詳細な瞳'],
-  ['smug',                     '得意げ'],
-  ['looking down at viewer',   '見下ろし目線'],
-  // エフェクト
-  ['flying debris',            '飛散する破片'],
-  ['distorted background',     '歪んだ背景'],
-  ['motion blur',              'モーションブラー'],
-  // シチュ構図
-  ['lying on stomach',         'うつ伏せ'],
-  ['on elbows',                '肘をつく'],
-  ['legs up',                  '足を上げる'],
-  ['leg up',                   '足を上げる'],
-  ['foot up',                  '足を上げる'],
-  ['sole facing viewer',       '足裏をカメラへ'],
-  ['hugging own legs',         '膝を抱える'],
-  ['knees up',                 '膝立て'],
-  ['on floor',                 '床の上'],
-  // カットアウト系ディテール
-  ['sideless outfit',          '脇カット/サイドレス'],
-  ['shoulder cutout',          '肩カット'],
-  ['armpit cutout',            '脇くりぬき'],
-]);
-
-// en → ja (ブロック + テンプレート専用の両方を検索)
+// en → ja (ブロック登録 + テンプレ専用辞書 extraTags の両方を検索)
 function toJa(en) {
   const key = en.toLowerCase();
-  return TAG_JA_MAP.get(key) ?? TEMPLATE_EXTRA_JA.get(key) ?? null;
+  return TAG_JA_MAP.get(key) ?? EXTRA_TAG_JA.get(key) ?? null;
 }
 
 const FETI_IDS    = new Set(['nape_lift','bare_back','armpitsleeveless','armpit_closeup','midriff_navel','underboob_lowangle','zettairyouiki','skintight_detail','lowangle_legs','footperspective','split_balance']);

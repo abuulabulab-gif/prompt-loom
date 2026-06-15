@@ -624,10 +624,12 @@ function applyBodyFocusLayer(blockMap, mode) {
 
   const outfitText = blockMap.get('outfit')?.text || '';
   const faceText   = blockMap.get('face')?.text || '';
+  // off shoulder 等の形状モディファイアは outfit_detail に存在するため両方を見る
+  const outfitAllText = outfitText + ', ' + (blockMap.get('outfit_detail')?.text || '');
 
   const hasSkirt           = [...BF_SKIRT_TAGS].some(t => hasTag(outfitText, t));
   const hasLegwear         = [...BF_LEGWEAR_TAGS].some(t => hasTag(outfitText, t));
-  const hasOffShoulder     = [...BF_OFFSHOULDER].some(t => hasTag(outfitText, t));
+  const hasOffShoulder     = [...BF_OFFSHOULDER].some(t => hasTag(outfitAllText, t));
   const hasUpdoHair        = [...BF_UPDO_HAIR].some(t => hasTag(faceText, t));
   const hasCleavageTrigger = [...BF_CLEAVAGE_TRIGGERS].some(t => hasTag(outfitText, t));
   const hasMidriffTrigger  = [...BF_MIDRIFF_TRIGGERS].some(t => hasTag(outfitText, t));

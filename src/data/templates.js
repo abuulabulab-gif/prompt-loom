@@ -41,7 +41,7 @@ export const TEMPLATES = [
     negHintEn: 'realistic, photorealistic, tall, mature body, detailed muscles, long body',
     apply: {
       quality:    'masterpiece, best quality, highres',
-      artstyle:   'chibi, super deformed, cute illustration, simple shading',
+      artstyle:   'chibi, cute illustration, simple shading',
       background: 'simple background, white background',
     },
   },
@@ -236,7 +236,7 @@ export const TEMPLATES = [
     negHintEn: 'pants, long skirt, hidden thighs, full body',
     apply: {
       composition: 'close-up, lower body focus',
-      body:        { mode: 'merge', tags: 'thighs, bare thighs, zettai ryouiki, thigh gap, glossy skin' },
+      body:        { mode: 'merge', tags: 'thighs, bare thighs, zettai ryouiki, thigh gap, shiny skin' },
       outfit:      { mode: 'merge', tags: 'skirt, thighhighs' },
     },
   },
@@ -342,7 +342,7 @@ export const TEMPLATES = [
     negHintEn: "bird's-eye view, standing, hidden legs, curled up, busy background",
     apply: {
       composition: 'lying on back, from above, relaxed pose, full body, one knee bent',
-      body:        { mode: 'merge', tags: 'glossy skin' },
+      body:        { mode: 'merge', tags: 'shiny skin' },
     },
   },
   {

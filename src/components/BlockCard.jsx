@@ -10,6 +10,7 @@ import { TAG_DICT } from "../data/tagDictionary.js";
 import { resolveColorLabel } from "../data/colors.js";
 import { resolveFeatureLabel } from "../data/features.js";
 import { resolveMaterialLabel } from "../data/materials.js";
+import { resolveExtraLabel, resolveCatLabel } from "../data/extraTags.js";
 
 // Category IDs that start collapsed; all others start open.
 // Uses cat.id (stable, defined in blocks.js) — not cat.n (Japanese name).
@@ -21,13 +22,14 @@ const CATS_CLOSED = new Set([
   // 体型
   'body_skin', 'body_detail', 'body_focus', 'body_feet',
   // 衣装
-  'outfit_tops', 'outfit_bottoms', 'outfit_fabric', 'outfit_accessories',
+  'outfit_tops', 'outfit_bottoms', 'outfit_fabric',
+  'outfit_neckwear', 'outfit_armleg', 'outfit_items',
   // 特徴
   'feature_piercing', 'feature_equipment',
   // エフェクト
   'effect_particles', 'effect_weather', 'effect_filter',
   // 構図
-  'comp_hands', 'comp_gaze', 'comp_situation',
+  'comp_hands', 'comp_gaze',
   // 背景
   'bg_indoor', 'bg_time', 'bg_season',
   // ライティング
@@ -42,7 +44,7 @@ const CATS_CLOSED = new Set([
 
 const SCENE_MANAGED_TAGS = new Set(['2girls', '2boys', 'multiple girls', 'multiple boys', '1other']);
 
-export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isFirst, isLast, onSavePreset, onFocus, focused, otherChars, onTransfer, conflictTags, onRemove, onHide, isMobile, isCompact, focusMode, sceneActive, analyzeText, allBlocks, onUndoBackup, isLight, onColorPicker, onFeatureMaker, onMaterialMaker }) {
+export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isFirst, isLast, onSavePreset, onFocus, focused, otherChars, onTransfer, conflictTags, onRemove, onHide, isMobile, isCompact, focusMode, sceneActive, analyzeText, allBlocks, onUndoBackup, isLight, onColorPicker, onFeatureMaker, onMaterialMaker, onCutoutMaker }) {
   const [search, setSearch] = useState('');
   const [saving, setSaving] = useState(false);
   const [pName, setPName] = useState('');
@@ -376,6 +378,15 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
           >🧵</button>
         )}
 
+        {/* Cutout maker shortcut */}
+        {onCutoutMaker && !isLocked && (
+          <button
+            onClick={onCutoutMaker}
+            title={lang === 'ja' ? 'カットメーカーで切り抜き・変形を追加' : 'Add cutouts & silhouette details'}
+            className={`bg-transparent border border-dim rounded-[0.3125rem] text-muted cursor-pointer flex-shrink-0 ${focusMode ? 'px-[0.5625rem] py-1 text-[0.8125rem]' : 'px-1.5 py-0.5 text-[0.625rem]'}`}
+          >✂️</button>
+        )}
+
         {/* Focus mode */}
         {onFocus && (
           <button
@@ -578,9 +589,10 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               const colorInfo    = !isJumpable ? resolveColorLabel(bare)    : null;
               const featureInfo  = !isJumpable ? resolveFeatureLabel(bare)  : null;
               const materialInfo = !isJumpable ? resolveMaterialLabel(bare) : null;
+              const extraInfo    = !isJumpable && !colorInfo && !featureInfo && !materialInfo ? resolveExtraLabel(bare) : null;
               const makerIcon    = colorInfo ? '🎨' : featureInfo ? '🎯' : materialInfo ? '🧵' : null;
               const label        = lang === 'ja'
-                ? (enToJa.get(bareLower) ?? colorInfo?.ja ?? featureInfo?.ja ?? materialInfo?.ja ?? bare)
+                ? (enToJa.get(bareLower) ?? colorInfo?.ja ?? featureInfo?.ja ?? materialInfo?.ja ?? extraInfo?.ja ?? resolveCatLabel(bare)?.ja ?? bare)
                 : bare;
               return (
                 <span

@@ -29,11 +29,11 @@ export const LIMIT_LEN = 750;
 // Categories in this set are "optional" for 🎲 (picked with ~45% chance).
 // Categories NOT in this set are "core" and always get a pick first.
 // Categories picked at reduced probability (~15%) — neither core nor standard optional
-export const RARE_OPT_CAT_NAMES = new Set(['肌質感', '着脱・動作', '状態', '傷・装具']);
+export const RARE_OPT_CAT_NAMES = new Set(['肌質感', '着脱・動作', '状態', '傷・装具', '首・胸アクセ', '手・腕・脚アクセ', '小物・持ち物']);
 
 export const OPTIONAL_CAT_NAMES = new Set([
   // 顔
-  'インナーカラー', '前髪', '目つき・形', '眉', '口・歯', '髪飾り・毛流れ', 'メイク・顔演出',
+  '前髪', '目つき・形', '眉', '口・歯', '髪飾り・毛流れ', 'メイク・顔演出',
   // 属性
   '年齢感', 'ケモ耳・しっぽ・角', '幻想パーツ',
   // 体型（肌色はコア化 → 常に1つ選ばれる）
@@ -41,7 +41,8 @@ export const OPTIONAL_CAT_NAMES = new Set([
   // 衣装（民族・水着・ランジェリーは任意；フォーマル・制服・コスプレはコア扱い）
   '服装スタイル', 'レッグウェア', '民族・伝統衣装', '水着・スポーツ', 'ランジェリー・部屋着',
   // 衣装ディテール（旧 特徴・アクセ）
-  '形状・カット', '素材・生地', '柄・装飾', '着脱・動作', '装飾アクセ',
+  '形状・カット', '素材・生地', '柄・装飾', '着脱・動作',
+  '頭・顔アイテム', '首・胸アクセ', '手・腕・脚アクセ', '小物・持ち物',
   // 体型（追加）
   '傷・装具',
   // 構図（武器・小物は構図ブロックに移動）
@@ -49,9 +50,9 @@ export const OPTIONAL_CAT_NAMES = new Set([
   // エフェクト（全て任意）
   '魔法・オーラ', 'パーティクル', '天候・自然', '演出フィルタ',
   // 構図
-  '手・指', '視線・演出', 'シチュ',
+  '手・指', '視線・演出',
   // 背景
-  '屋内', '時間・天気', '季節・雰囲気', '空気感',
+  '屋内', '時間・天気', '季節・世界観', '雰囲気',
   // 品質
   '仕上がり', '顔の精細化',
   // アートスタイル（スタイルは外す → 常にコア扱い）
@@ -145,7 +146,7 @@ export const RANDOM_EXCLUDE_TAGS = new Set(['2girls', '2boys', 'multiple girls',
 export const BLOCK_RANDOM_RULES = {
   background: {
     exclusiveGroups: [['シンプル', '屋外', '屋内']],
-    skipIfPicked: { 'シンプル': ['時間・天気', '季節・雰囲気'] },
+    skipIfPicked: { 'シンプル': ['時間・天気', '季節・世界観'] },
   },
   outfit: {
     exclusiveGroups: [['フォーマル・ドレス', '制服・ユニフォーム', '民族・伝統衣装', 'コスプレ・ファンタジー', '水着・スポーツ', 'ランジェリー・部屋着']],
@@ -464,25 +465,25 @@ export const RANDOM_COMBO_RULES = [
   { trigger: 'pointy ears',  blockId: 'body',      tag: 'green skin',  },               // 100%確定
   { trigger: 'green skin',   blockId: 'attribute',  tag: 'pointy ears', prob: 0.65 },
   { trigger: 'monster girl', blockId: 'body',       tag: 'green skin',  prob: 0.20 },
-  // シチュ・背景の自然な一致
-  { trigger: 'shrine maiden',   blockId: 'background',  tag: 'shrine',    prob: 0.40 },
-  { trigger: 'school uniform',  blockId: 'composition', tag: 'at school', prob: 0.50 },
-  { trigger: 'blazer uniform',  blockId: 'composition', tag: 'at school', prob: 0.45 },
-  { trigger: 'sailor uniform',  blockId: 'composition', tag: 'at school', prob: 0.45 },
-  { trigger: 'maid outfit',     blockId: 'composition', tag: 'indoors',   prob: 0.55 },
-  { trigger: 'nurse',           blockId: 'composition', tag: 'indoors',   prob: 0.50 },
+  // 衣装・背景の自然な一致（場所は background ブロックに付与）
+  { trigger: 'shrine maiden',   blockId: 'background', tag: 'shrine',    prob: 0.40 },
+  { trigger: 'school uniform',  blockId: 'background', tag: 'classroom', prob: 0.50 },
+  { trigger: 'blazer uniform',  blockId: 'background', tag: 'classroom', prob: 0.45 },
+  { trigger: 'sailor uniform',  blockId: 'background', tag: 'classroom', prob: 0.45 },
+  { trigger: 'maid outfit',     blockId: 'background', tag: 'indoors',   prob: 0.55 },
+  { trigger: 'nurse',           blockId: 'background', tag: 'indoors',   prob: 0.50 },
   // コスプレ → 関連装飾品の自動付与
-  { trigger: 'jiangshi costume', blockId: 'outfit',   tag: 'jiangshi hat',  prob: 0.90 },
-  { trigger: 'mummy costume',    blockId: 'body',     tag: 'bandages',      prob: 0.90 },
-  { trigger: 'ghost costume',    blockId: 'outfit',   tag: 'veil',          prob: 0.60 },
-  { trigger: 'witch outfit',     blockId: 'outfit',   tag: 'hat',           prob: 0.75 },
-  { trigger: 'pirate outfit',    blockId: 'outfit',   tag: 'hat',           prob: 0.65 },
-  { trigger: 'gothic lolita',    blockId: 'outfit',   tag: 'choker',        prob: 0.65 },
-  { trigger: 'magical girl',     blockId: 'composition', tag: 'holding wand', prob: 0.70 },
-  { trigger: 'shrine maiden',    blockId: 'outfit',   tag: 'kanzashi',      prob: 0.65 },
-  { trigger: 'kimono',           blockId: 'outfit',   tag: 'kanzashi',      prob: 0.55 },
-  { trigger: 'furisode',         blockId: 'outfit',   tag: 'kanzashi',      prob: 0.70 },
-  { trigger: 'yukata',           blockId: 'outfit',   tag: 'kanzashi',      prob: 0.50 },
+  { trigger: 'jiangshi costume', blockId: 'outfit_detail', tag: 'jiangshi hat', prob: 0.90 },
+  { trigger: 'mummy costume',    blockId: 'body',          tag: 'bandages',     prob: 0.90 },
+  { trigger: 'ghost costume',    blockId: 'outfit_detail', tag: 'veil',         prob: 0.60 },
+  { trigger: 'witch outfit',     blockId: 'outfit_detail', tag: 'hat',          prob: 0.75 },
+  { trigger: 'pirate outfit',    blockId: 'outfit_detail', tag: 'hat',          prob: 0.65 },
+  { trigger: 'gothic lolita',    blockId: 'outfit_detail', tag: 'choker',       prob: 0.65 },
+  { trigger: 'magical girl',     blockId: 'composition',   tag: 'holding wand', prob: 0.70 },
+  { trigger: 'shrine maiden',    blockId: 'face',          tag: 'kanzashi',     prob: 0.65 },
+  { trigger: 'kimono',           blockId: 'face',          tag: 'kanzashi',     prob: 0.55 },
+  { trigger: 'furisode',         blockId: 'face',          tag: 'kanzashi',     prob: 0.70 },
+  { trigger: 'yukata',           blockId: 'face',          tag: 'kanzashi',     prob: 0.50 },
 ];
 
 // ── キャラデザモード：設定資料特化の厳格ルール ────────────

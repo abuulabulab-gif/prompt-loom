@@ -366,7 +366,7 @@ export const CONFLICT_RULES = [
   // ══════════════════════════════════════════════════════════════════
   ...mk('1boy', ['small breasts','medium breasts','large breasts','huge breasts'],
     '男性キャラと胸サイズが矛盾'),
-  ...mk('1boy', ['cleavage','sideboob','underboob'],
+  ...mk('1boy', ['cleavage','sideboob','underboob','cleavage cutout','underboob cutout'],
     '男性キャラと胸フォーカスが矛盾'),
 
   // ── 男性キャラ×女性向け衣装・アイテム ─────────────────────────────
@@ -405,7 +405,7 @@ export const CONFLICT_RULES = [
   // ③ 視点×ボディフォーカス（前後の同時指定）
   // ══════════════════════════════════════════════════════════════════
   ...mk('back view',
-    ['cleavage','sideboob','underboob','midriff','navel','collarbone','navel cutout','cleavage cutout'],
+    ['cleavage','sideboob','underboob','midriff','navel','collarbone','navel cutout','cleavage cutout','underboob cutout'],
     '後ろ姿と前面ボディフォーカスの同時指定が矛盾'),
 
   // ══════════════════════════════════════════════════════════════════
@@ -443,6 +443,9 @@ export const CONFLICT_RULES = [
     '水中環境と相容れないアイテム・エフェクトが矛盾'),
   // 首元カバー衣装 × 鎖骨フォーカス
   ...mk('collarbone', ['turtleneck','high neck'], '首元が隠れる衣装と鎖骨フォーカスが矛盾'),
+  // 首元を覆うカット × 衿開きカット（閉じた首元と開いた衿が同時指定で矛盾）
+  { tags:['high neck','open collar'], ja:'ハイネックと衿開きが矛盾',     en:'high neck + open collar' },
+  { tags:['turtleneck','open collar'],ja:'タートルネックと衿開きが矛盾', en:'turtleneck + open collar' },
 
   // ══════════════════════════════════════════════════════════════════
   // ⑧ 髪型の物理法則（短い髪×結ぶ・編む系スタイル）

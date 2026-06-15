@@ -136,6 +136,12 @@ const MOBILE_TIPS = (lang) => [
       : '✦ Tools → 🧵 Material Maker auto-applies fabric textures to outfits (e.g. silk skirt, leather jacket, lace stockings). Also activates automatically during random generation',
   },
   {
+    icon: '✂️',
+    text: lang === 'ja'
+      ? '✦ツール → ✂️カットメーカーで胸元・へそ・背中などの切り抜きやハイスリット・シースルー等を選んで衣装ディテールに重ね付け。元の衣装は上書きせず重ねて追記。ブロックの✂️ボタンからも起動できる'
+      : '✦ Tools → ✂️ Cutout Maker layers cutouts (cleavage, navel, back), high slits, see-through and more onto the outfit detail block — without overwriting the base outfit. Also launch from a block\'s ✂️ button',
+  },
+  {
     icon: '💡',
     text: lang === 'ja'
       ? 'テンプレートに「💡 ネガ推奨:」が表示される場合、記載のタグをネガティブブロックに追加すると構図が安定します（例：魚眼レンズ → simple background をネガに追加）'
@@ -159,7 +165,7 @@ const GUIDE = (lang) => [
       { icon: lang === 'ja' ? '1〜6 切替' : '1〜6 Tools', text: lang === 'ja' ? 'AIツールボタンでMJ・NAI・SD・Flux・DALL-Eの出力形式を切替（1〜6キー）。ツールごとに出力が最適化される' : 'AI tool buttons switch output for MJ, NAI, SD, Flux, DALL-E (keys 1–6). Each tool has optimized output' },
       { icon: lang === 'ja' ? 'シンプル' : 'Simple', text: lang === 'ja' ? '⚙️ 設定の「表示モード」でシンプル/ノーマル/エキスパートを切替。シンプルは初心者向けブロックのみ表示。一部の高度な機能はExpertモードでのみ現れる' : '⚙️ Settings → View mode: Simple / Normal / Expert. Simple shows beginner blocks only; some advanced features appear only in Expert mode' },
       { icon: lang === 'ja' ? '⚙️ テーマ設定' : '⚙️ Settings', text: lang === 'ja' ? 'テーマ（ダーク/ライト）・言語（JA/EN）・表示モードは ⚙️ 設定の上部から変更できる' : 'Theme, language, and view mode are changed at the top of the ⚙️ Settings panel' },
-      { icon: lang === 'ja' ? '✦ ツール' : '✦ Tool', text: lang === 'ja' ? 'ヘッダーの「✦ ツール」からテンプレート・🎨カラーメーカー・🎯特徴メーカー・キャラ共演・AIタグ生成へアクセス' : '"✦ Tools" in the header opens Template, 🎨 Color Maker, 🎯 Feature Maker, Collab, and AI tag generation' },
+      { icon: lang === 'ja' ? '✦ ツール' : '✦ Tool', text: lang === 'ja' ? 'ヘッダーの「✦ ツール」からテンプレート・🎨カラーメーカー・🎯特徴メーカー・🧵マテリアルメーカー・✂️カットメーカー・キャラ共演・AIタグ生成へアクセス' : '"✦ Tools" in the header opens Template, 🎨 Color Maker, 🎯 Feature Maker, 🧵 Material Maker, ✂️ Cutout Maker, Collab, and AI tag generation' },
       { icon: lang === 'ja' ? '🗣️ 自然文' : '🗣️ Natural', text: lang === 'ja' ? '自然文タブで選択中のタグを日本語・英語の読みやすい散文で出力。DALL-E選択時は自動で切替' : 'Natural Text tab outputs active tags as readable prose in JA or EN. Auto-activates with DALL-E' },
       { icon: lang === 'ja' ? '🤖 AI機能' : '🤖 AI', text: lang === 'ja' ? 'APIキーを設定（⚙️ 設定 → API）すると4つのAI機能が使えます：①自然文タブでAI散文整形、②✦ツール→「自然文からタグ生成」でテキスト→タグ変換、③✦ツール→「画像からタグ生成」で画像解析、④出力バーの🤖提案でプロンプト改善' : 'Set an API key (⚙️ Settings → API) to unlock 4 AI features: ① AI polish in Natural Text, ② ✦ Tools → "Text to Tags", ③ ✦ Tools → "Image to Tags" (vision), ④ 🤖 Suggest in the output bar' },
     ],
