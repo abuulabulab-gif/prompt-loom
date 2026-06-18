@@ -1108,7 +1108,7 @@ export default function Loom() {
   const tagCount = textToCopy ? countTags(textToCopy) : 0;
 
   // ── Block visibility ──
-  const SIMPLE_BLOCK_IDS = ['quality', 'artstyle', 'attribute', 'face', 'body', 'outfit', 'background', 'negative'];
+  const SIMPLE_BLOCK_IDS = ['quality', 'artstyle', 'attribute', 'face', 'body', 'outfit', 'outfit_detail', 'background', 'negative'];
   const hiddenBlockIds = new Set(activeChar.hiddenBlocks || []);
   const toggleHideBlock = (blockId) => {
     const hidden = activeChar.hiddenBlocks || [];
@@ -1262,7 +1262,7 @@ export default function Loom() {
             if (!quickOpen && quickMenuRef.current) {
               const r = quickMenuRef.current.getBoundingClientRect();
               const qw = Math.min(320, window.innerWidth - 16);
-              setQuickOpenPos({ top: r.bottom + 4, left: Math.max(8, Math.min(r.right - qw, window.innerWidth - qw - 8)), width: qw });
+              setQuickOpenPos({ top: r.bottom + 4, left: Math.max(8, Math.min(r.right - qw, window.innerWidth - qw - 8)), width: qw, maxHeight: `calc(100dvh - ${r.bottom + 20}px)`, overflowY: 'auto' });
             }
             setQuickOpen(p => !p);
           }}
@@ -1843,7 +1843,7 @@ export default function Loom() {
                   allBlocks={blocks}
                   onUndoBackup={templateUndoBuf?.blockTexts[block.id] !== undefined ? () => undoSingleBlock(block.id) : undefined}
                   onColorPicker={BLOCK_TO_COLOR_TARGET[block.id] ? () => openColorPicker(BLOCK_TO_COLOR_TARGET[block.id], BLOCK_TO_ALLOWED_TARGETS[block.id], block.text) : undefined}
-                  onFeatureMaker={['face','body','outfit'].includes(block.id) ? () => { setFeatureMakerFilterBlock(block.id); setFeatureMakerOpen(true); } : undefined}
+                  onFeatureMaker={['face','body','outfit_detail'].includes(block.id) ? () => { setFeatureMakerFilterBlock(block.id === 'outfit_detail' ? 'outfit' : block.id); setFeatureMakerOpen(true); } : undefined}
                   onMaterialMaker={block.id === 'outfit' ? () => setMaterialMakerOpen(true) : undefined}
                   onCutoutMaker={block.id === 'outfit_detail' ? () => setCutoutMakerOpen(true) : undefined}
                   isLight={theme === 'light'} />
