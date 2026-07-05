@@ -694,6 +694,18 @@ export default function Loom() {
     } catch {}
   };
 
+  // ── 素体モード（シーン系ブロック一括mute）──
+  // キャラ情報のみのプロンプトを出すためのトグル。タグは温存し出力だけOFF
+  const SCENE_BLOCK_IDS = ['artstyle', 'effect', 'composition', 'background', 'lighting'];
+  const sceneMuted = blocks.length > 0 && blocks.filter(b => SCENE_BLOCK_IDS.includes(b.id)).every(b => b.enabled === false);
+  const toggleSotaiMode = () => {
+    const mute = !sceneMuted;
+    setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : {
+      ...c,
+      blocks: c.blocks.map(b => SCENE_BLOCK_IDS.includes(b.id) ? { ...b, enabled: !mute } : b),
+    }));
+  };
+
   // ── Templates ──
   // キャラの現在状態（全ブロックの text / enabled）をベースとして記録する
   const snapshotTmplBase = (c) => ({
@@ -1340,6 +1352,17 @@ export default function Loom() {
                 <button onClick={() => { setTemplateOpen(true); setQuickOpen(false); }}
                   className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt text-accent flex items-center gap-2.5 whitespace-nowrap">
                   ✦ {lang === 'ja' ? 'テンプレート' : 'Template'}
+                </button>
+                <button onClick={() => { toggleSotaiMode(); }}
+                  title={lang === 'ja'
+                    ? 'シーン系5ブロック（作風・効果・構図・背景・照明）を一括で一時OFF/ON。タグは保持されます — キャラ情報のみのプロンプトをワンタッチで'
+                    : 'Mute/unmute the 5 scene blocks (artstyle, effect, composition, background, lighting) at once. Tags are kept — character-only prompt in one tap'}
+                  className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5 whitespace-nowrap"
+                  style={{ color: sceneMuted ? 'rgb(76 175 80)' : 'rgb(var(--c-orange, 251 146 60))' }}>
+                  🧍 {lang === 'ja'
+                    ? (sceneMuted ? '素体モード中（シーン復帰）' : '素体モード（シーンOFF）')
+                    : (sceneMuted ? 'Base-body ON (restore scene)' : 'Base-body mode (mute scene)')}
+                  {sceneMuted && <span className="ml-auto text-[0.5625rem]">✓</span>}
                 </button>
                 {apiConfig.apiKey && (
                   <button onClick={() => { setNaturalToTagsTab('text'); setNaturalToTagsOpen(true); setQuickOpen(false); }}
