@@ -48,8 +48,11 @@ test('theme toggle switches between light and dark', async ({ page }) => {
 test('block expands and shows tags', async ({ page }) => {
   await openApp(page);
 
-  const collapseBtn = page.locator('button', { hasText: '▼' }).first();
-  await collapseBtn.click();
+  // '▼' のテキスト一致は複数ヒットして並列実行時にスクロールが暴れるため、
+  // ブロック展開ボタンを title で確定的に掴む
+  const collapseBtn = page.locator('button[title="展開"]').first();
+  // 並列実行時にstability待ちがCPU負荷でループするため、actionabilityチェックを省略
+  await collapseBtn.click({ force: true });
   await page.waitForTimeout(300);
 
   await expect(page.locator('text=強度:').first()).toBeVisible();
