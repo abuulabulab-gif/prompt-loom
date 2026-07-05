@@ -48,6 +48,12 @@ const HYBRID_CHANCE_ILLUST     = 0.08; // 8%
 const NON_BIOLOGICAL_SPECIES = new Set(['android', 'doll']);
 const ANDROID_ORGANIC_PARTS  = new Set(['oni horns', 'small horns', 'deer antlers', 'paw pads', 'scale skin']);
 
+// 性別比（需要重視・女7〜8:男2〜3）: 女の子78% / 男の子14% / 男の娘5% / 中性3%
+const pickRandomGenderEn = () => {
+  const r = Math.random();
+  return r < 0.78 ? '1girl' : r < 0.92 ? '1boy' : r < 0.97 ? 'femboy' : 'androgynous';
+};
+
 const COLOR_CAT_IDS = new Set(['face_haircolor', 'face_eyecolor']);
 const COLOR_CAT_TARGET = { face_haircolor: 'hair', face_eyecolor: 'eyes' };
 
@@ -225,8 +231,7 @@ function pickBlockTags(block, globalExcluded, hist = [], mode = 'illust') {
 
     // Weighted gender pick — solo is force-added as post-step in generateRandomChar
     if (cat.id === 'attr_gender') {
-      const r = Math.random();
-      const genderEn = r < 0.70 ? '1girl' : r < 0.90 ? '1boy' : r < 0.98 ? 'femboy' : 'androgynous';
+      const genderEn = pickRandomGenderEn();
       const pick = cat.t.find(t => t.en === genderEn);
       if (pick && !globalExcluded.has(pick.en.toLowerCase())) {
         picks.push(pick);
@@ -310,8 +315,7 @@ function pickBlockTagsBoosted(block, globalExcluded, boostTags, hist = [], mode 
     if (picks.length >= maxPicks || skippedCats.has(cat.n)) return;
     // Weighted gender pick — solo is force-added as post-step in generateRandomChar
     if (cat.id === 'attr_gender') {
-      const r = Math.random();
-      const genderEn = r < 0.70 ? '1girl' : r < 0.90 ? '1boy' : r < 0.98 ? 'femboy' : 'androgynous';
+      const genderEn = pickRandomGenderEn();
       const pick = cat.t.find(t => t.en === genderEn);
       if (pick && !globalExcluded.has(pick.en.toLowerCase())) {
         picks.push(pick);

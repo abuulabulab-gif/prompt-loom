@@ -695,11 +695,21 @@ export default function Loom() {
   };
 
   // ── Templates ──
+  // キャラの現在状態（全ブロックの text / enabled）をベースとして記録する
+  const snapshotTmplBase = (c) => ({
+    texts:   Object.fromEntries(c.blocks.map(b => [b.id, b.text])),
+    enabled: Object.fromEntries(c.blocks.map(b => [b.id, b.enabled !== false])),
+    savedAt: Date.now(),
+  });
+
   const applyTemplate = (tmpl, clearMode = false) => {
-    // Save undo snapshot of blocks that will be overwritten
+    const muteIds = new Set(tmpl.mute || []);
+    // Save undo snapshot of blocks that will be overwritten / muted
     const snapshot = {};
+    const enabledSnapshot = {};
     for (const b of activeChar.blocks) {
       if (tmpl.apply[b.id] !== undefined) snapshot[b.id] = b.text;
+      if (muteIds.has(b.id)) enabledSnapshot[b.id] = b.enabled !== false;
     }
     // negHint がある場合、undo 対象に negative ブロックも含める
     if (tmpl.negHintEn) {
@@ -707,14 +717,18 @@ export default function Loom() {
       if (negB) snapshot['negative'] = negB.text;
     }
     if (templateUndoTimerRef.current) clearTimeout(templateUndoTimerRef.current);
-    setTemplateUndoBuf({ blockTexts: snapshot, negHintJa: tmpl.negHintJa, negHintEn: tmpl.negHintEn });
+    setTemplateUndoBuf({ blockTexts: snapshot, blockEnabled: enabledSnapshot, mutedCount: muteIds.size, negHintJa: tmpl.negHintJa, negHintEn: tmpl.negHintEn });
     templateUndoTimerRef.current = setTimeout(() => setTemplateUndoBuf(null), 12000);
 
     setCharacters(prev => prev.map(c => {
       if (c.id !== activeCharId) return c;
+      // 初回テンプレ適用時にベース（派生前の姿）を永続記録。以降は明示更新まで維持
+      const tmplBase = c.tmplBase ?? snapshotTmplBase(c);
       return {
         ...c,
+        tmplBase,
         blocks: c.blocks.map(b => {
+          let nb = b;
           // テンプレート指定ブロックを適用
           const v = tmpl.apply[b.id];
           if (v !== undefined) {
@@ -724,20 +738,22 @@ export default function Loom() {
                 const tag = bareTag(seg);
                 if (tag && !hasTag(text, tag)) text = appendTag(text, tag, b.strength);
               }
-              return { ...b, text };
+              nb = { ...b, text };
+            } else {
+              nb = { ...b, text: v };
             }
-            return { ...b, text: v };
-          }
-          // negHint をネガティブブロックに追記（重複スキップ）
-          if (b.id === 'negative' && tmpl.negHintEn) {
+          } else if (b.id === 'negative' && tmpl.negHintEn) {
+            // negHint をネガティブブロックに追記（重複スキップ）
             let text = b.text || '';
             for (const seg of splitTags(tmpl.negHintEn)) {
               const tag = bareTag(seg);
               if (tag && !hasTag(text, tag)) text = appendTag(text, tag, '1.0');
             }
-            return text !== b.text ? { ...b, text } : b;
+            if (text !== b.text) nb = { ...b, text };
           }
-          return b;
+          // mute: このテンプレでノイズになるブロックを、タグ温存のまま出力OFF
+          if (muteIds.has(nb.id) && nb.enabled !== false) nb = { ...nb, enabled: false };
+          return nb;
         }),
       };
     }));
@@ -748,10 +764,56 @@ export default function Loom() {
     if (!templateUndoBuf) return;
     setCharacters(prev => prev.map(c => {
       if (c.id !== activeCharId) return c;
-      return { ...c, blocks: c.blocks.map(b => templateUndoBuf.blockTexts[b.id] !== undefined ? { ...b, text: templateUndoBuf.blockTexts[b.id] } : b) };
+      return { ...c, blocks: c.blocks.map(b => {
+        const t  = templateUndoBuf.blockTexts[b.id];
+        const en = templateUndoBuf.blockEnabled?.[b.id];
+        if (t === undefined && en === undefined) return b;
+        return { ...b, ...(t !== undefined ? { text: t } : {}), ...(en !== undefined ? { enabled: en } : {}) };
+      }) };
     }));
     clearTimeout(templateUndoTimerRef.current);
     setTemplateUndoBuf(null);
+  };
+
+  // ベース（テンプレ派生前の姿）へ全ブロックを復帰。ベース自体は保持する
+  const restoreTemplateBase = () => {
+    setCharacters(prev => prev.map(c => {
+      if (c.id !== activeCharId || !c.tmplBase) return c;
+      return { ...c, blocks: c.blocks.map(b => {
+        const t  = c.tmplBase.texts[b.id];
+        const en = c.tmplBase.enabled[b.id];
+        if (t === undefined && en === undefined) return b;
+        return { ...b, ...(t !== undefined ? { text: t } : {}), ...(en !== undefined ? { enabled: en } : {}) };
+      }) };
+    }));
+    clearTimeout(templateUndoTimerRef.current);
+    setTemplateUndoBuf(null);
+  };
+
+  // 現在の状態を新しいベースとして記録し直す
+  const saveTemplateBase = () => {
+    setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : { ...c, tmplBase: snapshotTmplBase(c) }));
+  };
+
+  // 1ブロックだけベースへ復帰（text＋enabled）
+  const restoreBlockFromBase = (blockId) => {
+    setCharacters(prev => prev.map(c => {
+      if (c.id !== activeCharId || !c.tmplBase) return c;
+      return { ...c, blocks: c.blocks.map(b => b.id === blockId
+        ? { ...b,
+            ...(c.tmplBase.texts[blockId]   !== undefined ? { text: c.tmplBase.texts[blockId] } : {}),
+            ...(c.tmplBase.enabled[blockId] !== undefined ? { enabled: c.tmplBase.enabled[blockId] } : {}) }
+        : b) };
+    }));
+  };
+
+  // ブロックがベースから乖離しているか（⟲チップの表示判定）
+  const blockDiffersFromBase = (b) => {
+    const base = activeChar?.tmplBase;
+    if (!base) return false;
+    const t  = base.texts[b.id];
+    const en = base.enabled[b.id];
+    return (t !== undefined && t !== b.text) || (en !== undefined && en !== (b.enabled !== false));
   };
 
   const undoSingleBlock = (blockId) => {
@@ -1841,7 +1903,8 @@ export default function Loom() {
                   sceneActive={sceneOpen}
                   analyzeText={analyzeText}
                   allBlocks={blocks}
-                  onUndoBackup={templateUndoBuf?.blockTexts[block.id] !== undefined ? () => undoSingleBlock(block.id) : undefined}
+                  onUndoBackup={templateUndoBuf?.blockTexts[block.id] !== undefined ? () => undoSingleBlock(block.id)
+                    : blockDiffersFromBase(block) ? () => restoreBlockFromBase(block.id) : undefined}
                   onColorPicker={BLOCK_TO_COLOR_TARGET[block.id] ? () => openColorPicker(BLOCK_TO_COLOR_TARGET[block.id], BLOCK_TO_ALLOWED_TARGETS[block.id], block.text) : undefined}
                   onFeatureMaker={['face','body','outfit_detail'].includes(block.id) ? () => { setFeatureMakerFilterBlock(block.id === 'outfit_detail' ? 'outfit' : block.id); setFeatureMakerOpen(true); } : undefined}
                   onMaterialMaker={block.id === 'outfit' ? () => setMaterialMakerOpen(true) : undefined}
@@ -2837,7 +2900,9 @@ export default function Loom() {
         onSetFolder={setCharFolder} />}
       {historyOpen && <HistoryModal history={history} lang={lang} onClose={() => setHistoryOpen(false)} onRestore={restoreFromHistory} onDelete={id => setHistory(prev => prev.filter(h => h.id !== id))} />}
       {naturalToTagsOpen && <NaturalToTagsModal lang={lang} apiConfig={apiConfig} blocks={blocks} onAddTags={handleAddTagsFromNatural} onClose={() => setNaturalToTagsOpen(false)} initialTab={naturalToTagsTab} />}
-      {templateOpen && <TemplateModal lang={lang} isMobile={isMobile} onApply={applyTemplate} onClose={() => setTemplateOpen(false)} />}
+      {templateOpen && <TemplateModal lang={lang} isMobile={isMobile} onApply={applyTemplate} onClose={() => setTemplateOpen(false)}
+        hasBase={!!activeChar?.tmplBase} baseSavedAt={activeChar?.tmplBase?.savedAt}
+        onRestoreBase={restoreTemplateBase} onSaveBase={saveTemplateBase} />}
       {colorPickerOpen && <ColorPickerModal lang={lang} onApply={applyColorTag} onClose={() => setColorPickerOpen(false)} defaultTarget={colorPickerDefaultTarget} allowedTargets={colorPickerAllowedTargets} blockText={colorPickerBlockText} />}
       {featureMakerOpen && <FeatureMakerModal lang={lang} blocks={blocks} onApply={applyFeatureTag} onClose={() => setFeatureMakerOpen(false)} filterBlockId={featureMakerFilterBlock} />}
       {materialMakerOpen && <MaterialMakerModal lang={lang} blocks={blocks} onApply={applyMaterialTag} onClose={() => setMaterialMakerOpen(false)} />}
@@ -2909,6 +2974,13 @@ export default function Loom() {
               </button>
               <button onClick={() => { clearTimeout(templateUndoTimerRef.current); setTemplateUndoBuf(null); }} className="text-muted cursor-pointer bg-transparent border-none text-[0.6875rem] leading-none p-0">×</button>
             </div>
+            {templateUndoBuf.mutedCount > 0 && (
+              <div className="mt-1 text-[0.5625rem] font-mono text-muted">
+                {lang === 'ja'
+                  ? `🔇 ${templateUndoBuf.mutedCount}ブロックを一時OFF（タグは保持・スイッチかベース復帰で戻せます）`
+                  : `🔇 ${templateUndoBuf.mutedCount} block(s) muted (tags kept — re-enable via toggle or base restore)`}
+              </div>
+            )}
             {(lang === 'ja' ? templateUndoBuf.negHintJa : templateUndoBuf.negHintEn) && (
               <div className="mt-1.5 text-[0.5625rem] font-mono leading-[1.5] px-1.5 py-[0.1875rem] rounded"
                 style={{ background: 'rgb(var(--c-blue) / 0.08)', color: 'rgb(var(--c-blue))', border: '1px solid rgb(var(--c-blue) / 0.25)' }}>

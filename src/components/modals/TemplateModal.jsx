@@ -148,7 +148,7 @@ function TemplateCard({ tmpl, lang, clearMode, onApply, onShowDetail }) {
   );
 }
 
-export default function TemplateModal({ lang, isMobile, onApply, onClose }) {
+export default function TemplateModal({ lang, isMobile, onApply, onClose, hasBase, baseSavedAt, onRestoreBase, onSaveBase }) {
   const [detailTmpl, setDetailTmpl] = useState(null);
   const [clearMode, setClearMode] = useState(false);
   const gridCls = isMobile ? 'grid grid-cols-2 gap-2' : 'grid gap-2';
@@ -164,6 +164,30 @@ export default function TemplateModal({ lang, isMobile, onApply, onClose }) {
         <div className="px-[1.125rem] py-3.5 border-b border-line flex items-center justify-between gap-3 flex-wrap">
           <span className="text-fg text-sm font-bold">✦ {lang === 'ja' ? 'ブロックテンプレート' : 'Block Templates'}</span>
           <div className="flex items-center gap-2 flex-wrap">
+            {/* ベース（テンプレ派生前の姿）操作 */}
+            <div className="flex items-center gap-1.5">
+              {hasBase && (
+                <button
+                  onClick={onRestoreBase}
+                  className="rounded-full px-3 py-[0.1875rem] text-[0.625rem] font-mono font-bold cursor-pointer border transition-all duration-150"
+                  style={{ background: 'rgb(var(--c-green, 76 175 80) / 0.1)', borderColor: 'rgb(var(--c-green, 76 175 80) / 0.45)', color: 'rgb(76 175 80)' }}
+                  title={lang === 'ja'
+                    ? `テンプレ派生前の状態（${baseSavedAt ? new Date(baseSavedAt).toLocaleTimeString() : ''}記録）へ全ブロックを戻す。ベース自体は残ります`
+                    : `Restore all blocks to the pre-template base${baseSavedAt ? ` (saved ${new Date(baseSavedAt).toLocaleTimeString()})` : ''}. The base itself is kept`}
+                >
+                  ⟲ {lang === 'ja' ? 'ベースに戻す' : 'Restore base'}
+                </button>
+              )}
+              <button
+                onClick={onSaveBase}
+                className="rounded-full px-3 py-[0.1875rem] text-[0.625rem] font-mono font-bold cursor-pointer border border-dim text-muted bg-transparent transition-all duration-150"
+                title={lang === 'ja'
+                  ? '今の全ブロック状態を「ベース」として記録。以降のテンプレ適用からいつでもここへ戻れます（初回適用時は自動記録）'
+                  : 'Record the current state as the base to return to. Auto-recorded on first template apply'}
+              >
+                📌 {lang === 'ja' ? (hasBase ? 'ベース更新' : '現在をベースに記録') : (hasBase ? 'Update base' : 'Save as base')}
+              </button>
+            </div>
             {/* 適用モードトグル */}
             <div className="flex items-center gap-1.5">
               <span className="text-muted text-[0.625rem] font-mono">{lang === 'ja' ? '適用モード:' : 'Apply:'}</span>
@@ -204,8 +228,8 @@ export default function TemplateModal({ lang, isMobile, onApply, onClose }) {
           </p>
           <p className="text-[0.5625rem] font-mono mb-4" style={{ color: 'rgb(var(--c-blue))' }}>
             {lang === 'ja'
-              ? '💡 ネガ推奨タグ（💡）はネガティブブロックに自動追記。適用直後は「元に戻す」が12秒間使えます。'
-              : '💡 Negative hints (💡) are auto-appended to the Negative block. An Undo button appears for 12 seconds after applying.'}
+              ? '💡 ネガ推奨タグ（💡）はネガティブブロックに自動追記。適用直後は「元に戻す」が12秒間使えます。初回適用時に派生前の姿を「ベース」として自動記録——連続でテンプレを重ねても「⟲ ベースに戻す」やブロックの⟲でいつでも復帰できます。フォーカス系テンプレはノイズになるブロックを削除せず一時OFFにします（タグ保持）。'
+              : '💡 Negative hints (💡) are auto-appended to the Negative block. Undo is available for 12s after applying. On first apply, the pre-template state is auto-saved as a base — chain templates freely and return anytime via "Restore base" or per-block ⟲. Focus templates mute noisy blocks instead of deleting (tags kept).'}
           </p>
 
           <div className="text-muted text-[0.625rem] font-mono tracking-widest mb-2 uppercase">{lang === 'ja' ? 'スタイル' : 'Style'}</div>

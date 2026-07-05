@@ -16,7 +16,9 @@ src/
 │   ├── blocks.js             ← BLOCKS_DEF：全ブロック定義（タグ含む）
 │   ├── constants.js          ← uid, toggleTag, countTags 等ユーティリティ
 │   ├── tools.js              ← AIツール定義（MJ/NAI/SD/Flux/DALL-E）
-│   ├── templates.js          ← プリセットテンプレート
+│   ├── templates.js          ← プリセットテンプレート（apply=上書き/merge、mute=一時OFF指定）
+│   ├── cutouts.js            ← カットメーカー用データ（CUTOUT_GROUPS、対象=outfit_detail）
+│   ├── extraTags.js          ← 追加タグ定義
 │   ├── conflicts.js          ← タグ競合チェックルール
 │   ├── colors.js             ← カラーピッカー用データ
 │   ├── expressions.js        ← 表情プリセット
@@ -33,6 +35,7 @@ src/
 │       ├── HistoryModal.jsx  ← スナップショット履歴
 │       ├── TemplateModal.jsx ← テンプレート適用
 │       ├── ColorPickerModal.jsx
+│       ├── CutoutMakerModal.jsx  ← ✂️カットメーカー（衣装ディテールに切り抜き系タグ追記）
 │       ├── SceneComposeModal.jsx
 │       └── ComparePanel.jsx
 ├── CharacterNote/
@@ -196,6 +199,13 @@ src/
 - **次フェーズ候補**: スマホARチップ、タグ補足tooltip（ENモード）、クイックプリセット
 
 ---
+
+## テンプレートのベース機構（v2.5）
+
+- テンプレ初適用時、全ブロックの `text`＋`enabled` を `character.tmplBase` に自動記録（IndexedDB永続）。
+- 復帰：`restoreTemplateBase()`（全体）／ブロック⟲（12秒バッファ優先→ベースにフォールバック）／`saveTemplateBase()`（📌再記録）。
+- テンプレ定義の `mute: ['blockId']` は該当ブロックを**削除せず** `enabled:false` に（タグ温存・出力のみ除外）。フォーカス系＝body/outfit/outfit_detail、シート系＝effect/lighting に設定済み。
+- ランダム生成の性別比は `useRandomGen.js` の `pickRandomGenderEn()`（女78/男14/男の娘5/中性3）。変更はここ一箇所。
 
 ## 注意点
 

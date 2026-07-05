@@ -382,10 +382,12 @@ export const CONFLICT_RULES = [
   ], '男性キャラと女性向け衣装・アイテムが矛盾'),
 
   // ── 幼い体型×極端な描写 ─────────────────────────────────────────
-  ...mk('loli',  ['huge breasts','large breasts'],                '幼い体型と大きな胸が矛盾'),
+  ...mk('loli',  ['huge breasts','large breasts','medium breasts'], '幼い体型と大きな胸が矛盾'),
   ...mk('loli',  ['cleavage','sideboob','underboob',
                   'lingerie','micro bikini','string bikini','monokini'], '幼い体型と過激な描写が矛盾'),
-  ...mk('child', ['huge breasts','large breasts'],               '子どもと大きな胸サイズが矛盾'),
+  ...mk('child', ['huge breasts','large breasts','medium breasts'], '子どもと大きな胸サイズが矛盾'),
+  ...mk('child', ['cleavage','sideboob','underboob',
+                  'lingerie','micro bikini','string bikini','monokini'], '子どもと過激な描写が矛盾'),
 
   // ══════════════════════════════════════════════════════════════════
   // ② 衣装の重ね着パニック（全身服×ボトムス）

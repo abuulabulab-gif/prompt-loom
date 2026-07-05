@@ -1,3 +1,8 @@
+// テンプレート定義フィールド：
+// - apply: { blockId: 'text' } = 全上書き ／ { blockId: { mode:'merge', tags } } = 追記マージ
+// - mute:  ['blockId', ...] = このテンプレでノイズになるブロックを「削除せず出力OFF」にする
+//          （タグは温存。ブロックのスイッチ or ベース復帰でワンタッチ復活）
+// - negHintJa/En: ネガティブブロックへの自動追記
 export const TEMPLATES = [
   // ── スタイル ──────────────────────────────────────────────────────────
   {
@@ -71,6 +76,8 @@ export const TEMPLATES = [
       composition: 'full body, simple pose',
       background:  'white background, simple background',
     },
+    // 素材化ではエフェクト・シーン照明はノイズ → 削除せず一時OFF
+    mute: ['effect', 'lighting'],
   },
   {
     id:'sanmenzu', name:'三面図', nameEn:'3-View Sheet', icon:'📐',
@@ -86,6 +93,8 @@ export const TEMPLATES = [
       composition: 'character turnaround, front view, side view, back view, full body, neutral pose',
       background:  'white background, simple background',
     },
+    // 三面図ではエフェクト・シーン照明はノイズ → 削除せず一時OFF
+    mute: ['effect', 'lighting'],
   },
   {
     id:'chardesign', name:'キャラ設定シート', nameEn:'Design Sheet', icon:'🎭',
@@ -101,6 +110,8 @@ export const TEMPLATES = [
       composition: 'character sheet, full body, reference sheet',
       background:  'white background, simple background',
     },
+    // 設定シートではエフェクト・シーン照明はノイズ → 削除せず一時OFF
+    mute: ['effect', 'lighting'],
   },
   {
     id: 'selfie',
@@ -439,6 +450,8 @@ export const TEMPLATES = [
       composition: { mode: 'merge', tags: 'extreme close-up, lower half of face, lips focus, finger to lower lip' },
       face:        { mode: 'merge', tags: 'parted lips' },
     },
+    // 口元の超クローズアップでは体型・衣装・足元はノイズ → 削除せず一時OFF
+    mute: ['body', 'outfit', 'outfit_detail'],
   },
   {
     id: 'eye_focus',
@@ -453,6 +466,8 @@ export const TEMPLATES = [
       composition: { mode: 'merge', tags: 'extreme close-up on eyes, eye focus' },
       face:        { mode: 'merge', tags: 'detailed eyes' },
     },
+    // 瞳の超クローズアップでは体型・衣装・足元はノイズ → 削除せず一時OFF
+    mute: ['body', 'outfit', 'outfit_detail'],
   },
   {
     id: 'fisheye',
