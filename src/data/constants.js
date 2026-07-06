@@ -582,6 +582,7 @@ export const ttr = (en, ja) => ({ en, ja, rareInRandom: true }); // rare in rand
 
 export const fmtTag    = (en, str) => str === '1.0' ? en : `(${en}:${str})`;
 export const appendTag = (cur, en, str) => {
+  if (hasTag(cur, en)) return cur; // 同一タグの2重追加を防止（メーカー経由・手動共通）
   const f = fmtTag(en, str);
   const b = cur.trimEnd();
   return b ? (b.endsWith(',') ? b + ' ' + f : b + ', ' + f) : f;

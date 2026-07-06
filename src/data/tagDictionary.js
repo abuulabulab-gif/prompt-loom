@@ -344,6 +344,25 @@ export const TAG_DICT = {
   'frilled socks':         { ja: 'フリル（ひらひら）付きのソックス。ロリータ・お嬢様・ドレス系の衣装との相性が良く、可愛らしさを一気に引き上げる', en: 'Socks with frilled edges — pairs beautifully with lolita, princess, or dress styles; strongly elevates cuteness' },
   'single thighhigh':      { ja: '片方の脚だけニーハイを履いた非対称スタイル。キャラクターの個性・こだわり・ちぐはぐな魅力を演出する定番タグ', en: 'Thigh-high worn on only one leg — asymmetric look that gives characters a quirky, distinctive personality' },
   'mismatched legwear':    { ja: '左右で異なる靴下やレッグウェア。ちぐはぐさがキャラクターの個性・子供っぽさ・独自スタイルを演出する', en: 'Different legwear on each leg — the asymmetry conveys a quirky, playful, or uniquely styled character' },
+  'uneven legwear':        { ja: '左右で靴下の丈が違う状態。片方だけニーハイ＋片方だけ短い靴下のような非対称の着こなしを作る', en: 'Legwear of different lengths on each leg — e.g., one thigh-high and one ankle sock' },
+
+  // ── 袖 ────────────────────────────────────────────────────────
+  'detached sleeves':      { ja: '胴体とつながっていない独立した袖。肩が出るのが特徴で、和風衣装やアイドル衣装の定番パーツ', en: 'Sleeves not attached to the top — bare shoulders; common in idol and Japanese-style outfits' },
+  'wide sleeves':          { ja: '振袖のように大きく広がる袖。和風・ファンタジー衣装で優雅な印象を作る', en: 'Broad, flowing sleeves like a furisode kimono — elegant, traditional look' },
+  'sleeves past wrists':   { ja: '手首より長い袖＝いわゆる萌え袖。手が半分隠れて可愛らしさ・あどけなさを演出する', en: 'Sleeves covering the hands — the "moe sleeves" look that reads cute and endearing' },
+  'layered sleeves':       { ja: '布が二層以上に重なった袖。網×透け素材の重ねなど、作り込まれた衣装のディテールを出す', en: 'Sleeves made of two or more stacked fabric layers — e.g., fishnet over sheer' },
+  'puffy sleeves':         { ja: '肩や袖口がふくらんだ袖。お姫様・ロリータ・レトロワンピース系の可愛い印象になる', en: 'Ballooned sleeves — princess, lolita, or retro-dress vibes' },
+  'single sleeve':         { ja: '片腕だけに袖がある非対称デザイン。ステージ衣装・近未来系の個性を出す', en: 'Sleeve on one arm only — asymmetric, stage-costume flair' },
+
+  // ── トップス・ボトムス補足 ───────────────────────────────────
+  'cropped sweater':       { ja: '丈が短くお腹が見えるニット。カジュアル・ストリート系の定番で、へそ出しコーデと相性がいい', en: 'Short-hem knit that bares the midriff — casual streetwear staple' },
+  'cutoffs':               { ja: '裾を切りっぱなしにしたデニム。ほつれた糸のラフさがストリート感を演出する', en: 'Denim with raw cut hems — frayed threads give a rough street look' },
+  'back bow':              { ja: '背中側に付く大きなリボン。ドレス・メイド服・和装の帯結びなど、後ろ姿を華やかにする定番装飾', en: 'Large decorative bow at the back — dresses, maid outfits, or obi-style knots' },
+  'scar across eye':       { ja: '目の上を縦に横切る傷跡。歴戦の戦士・ワケあり キャラの定番演出で、目そのものは無事に描かれる', en: 'Vertical scar crossing over one eye — battle-worn character trope; the eye itself stays intact' },
+  'bandage over one eye':  { ja: '片目を包帯で覆った状態。眼帯より生々しく、ミステリアス・療養中の演出になる', en: 'One eye covered with bandages — more raw than an eyepatch; mysterious or recovering look' },
+  'facial mark':           { ja: '頬や顔に入る紋様・しるし。タトゥーより軽い印で、部族風・ファンタジー種族の顔の記号として使う', en: 'Symbolic marking on the face — lighter than a tattoo; tribal or fantasy-race identifier' },
+  'whisker markings':      { ja: '頬に入るひげ状の線マーク。猫・狐など動物系キャラの顔の定番記号', en: 'Whisker-like lines on the cheeks — classic for cat/fox-type characters' },
+  'tribal tattoo':         { ja: '部族文様風の曲線タトゥー。民族的・戦士系キャラの演出に効く', en: 'Curved tribal-pattern tattoo — ethnic or warrior character flavor' },
 
   // ── 持ち物・武器 ─────────────────────────────────────────────
   'holding fan':           { ja: '扇子（または団扇）を手に持つポーズ。和風・中華風・貴族系に映える', en: 'Holding a folding or flat fan — Japanese, Chinese, or aristocratic aesthetic' },

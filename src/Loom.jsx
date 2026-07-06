@@ -460,11 +460,35 @@ export default function Loom() {
       return { ...c, blocks: sorted };
     }));
   };
+  // プリセット束：衣装＝ディテール込み、構図＝背景・照明・効果込みで保存/適用する
+  // （タグの並び順・隣接はブロックtextにそのまま残るため、束ごと再現される）
+  const PRESET_BUNDLE = {
+    costumePresets: ['outfit', 'outfit_detail'],
+    shotPresets: ['composition', 'background', 'lighting', 'effect'],
+  };
   const savePreset = (blockId, presetKey, name, text) => {
     if ((activeChar[presetKey] || []).length >= 50) { alert(lang === 'ja' ? 'プリセットは最大50件まで保存できます' : 'Preset limit: 50'); return; }
-    setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, [presetKey]: [...(c[presetKey] || []), { id: uid(), name, text }] } : c));
+    const bundle = {};
+    for (const id of (PRESET_BUNDLE[presetKey] || [])) {
+      if (id === blockId) continue;
+      const b = blocks.find(x => x.id === id);
+      if (b?.enabled !== false && b?.text?.trim()) bundle[id] = b.text.trim();
+    }
+    const preset = { id: uid(), name, text, ...(Object.keys(bundle).length ? { bundle } : {}) };
+    setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, [presetKey]: [...(c[presetKey] || []), preset] } : c));
   };
-  const loadPreset = (blockId, text) => updateBlock(blockId, { text });
+  const loadPreset = (blockId, preset) => {
+    const p = typeof preset === 'string' ? { text: preset } : preset; // 旧形式（文字列text）互換
+    updateBlock(blockId, { text: p.text ?? '', enabled: true });
+    for (const [bid, btext] of Object.entries(p.bundle || {})) updateBlock(bid, { text: btext, enabled: true });
+    if (p.negAdd?.trim()) {
+      const negBlock = blocks.find(b => b.id === 'negative');
+      let t = negBlock?.text || '';
+      for (const seg of splitTags(p.negAdd)) t = appendTag(t, seg, '1.0');
+      updateBlock('negative', { text: t, enabled: true });
+    }
+  };
+  const updatePreset = (presetKey, presetId, upd) => setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, [presetKey]: (c[presetKey] || []).map(p => p.id === presetId ? { ...p, ...upd } : p) } : c));
   const deletePreset = (presetKey, presetId) => setCharacters(prev => prev.map(c => c.id === activeCharId ? { ...c, [presetKey]: (c[presetKey] || []).filter(p => p.id !== presetId) } : c));
   const copyPresetToChar = (presetKey, preset, targetCharId) => setCharacters(prev => prev.map(c => c.id === targetCharId ? { ...c, [presetKey]: [...(c[presetKey] || []), { ...preset, id: uid() }] } : c));
 
@@ -1335,7 +1359,7 @@ export default function Loom() {
           <button onClick={() => {
             if (!quickOpen && quickMenuRef.current) {
               const r = quickMenuRef.current.getBoundingClientRect();
-              const qw = Math.min(320, window.innerWidth - 16);
+              const qw = Math.min(380, window.innerWidth - 16);
               setQuickOpenPos({ top: r.bottom + 4, left: Math.max(8, Math.min(r.right - qw, window.innerWidth - qw - 8)), width: qw, maxHeight: `calc(100dvh - ${r.bottom + 20}px)`, overflowY: 'auto' });
             }
             setQuickOpen(p => !p);
@@ -1641,7 +1665,9 @@ export default function Loom() {
                       : (activeChar[key] || []).map(p => (
                           <PresetChip key={p.id} preset={p} color={activeChar.color} lang={lang}
                             otherChars={characters.filter(c => c.id !== activeCharId)}
-                            onLoad={() => loadPreset(blockId, p.text)} onDelete={() => deletePreset(key, p.id)}
+                            onLoad={() => loadPreset(blockId, p)} onDelete={() => deletePreset(key, p.id)}
+                            onEditMemo={() => { const v = window.prompt(lang === 'ja' ? 'プリセットメモ（構造ノート等）:' : 'Preset memo:', p.memo || ''); if (v !== null) updatePreset(key, p.id, { memo: v }); }}
+                            onEditNeg={() => { const v = window.prompt(lang === 'ja' ? '適用時に追加するネガタグ（カンマ区切り）:' : 'Negative tags added on load (comma-separated):', p.negAdd || ''); if (v !== null) updatePreset(key, p.id, { negAdd: v }); }}
                             onCopyTo={(tid) => copyPresetToChar(key, p, tid)} />
                         ))}
                   </div>
@@ -1799,7 +1825,9 @@ export default function Loom() {
                           : (activeChar[key] || []).map(p => (
                               <PresetChip key={p.id} preset={p} color={activeChar.color} lang={lang}
                                 otherChars={characters.filter(c => c.id !== activeCharId)}
-                                onLoad={() => loadPreset(blockId, p.text)} onDelete={() => deletePreset(key, p.id)}
+                                onLoad={() => loadPreset(blockId, p)} onDelete={() => deletePreset(key, p.id)}
+                                onEditMemo={() => { const v = window.prompt(lang === 'ja' ? 'プリセットメモ（構造ノート等）:' : 'Preset memo:', p.memo || ''); if (v !== null) updatePreset(key, p.id, { memo: v }); }}
+                                onEditNeg={() => { const v = window.prompt(lang === 'ja' ? '適用時に追加するネガタグ（カンマ区切り）:' : 'Negative tags added on load (comma-separated):', p.negAdd || ''); if (v !== null) updatePreset(key, p.id, { negAdd: v }); }}
                                 onCopyTo={(tid) => copyPresetToChar(key, p, tid)} />
                             ))}
                       </div>
@@ -1930,7 +1958,7 @@ export default function Loom() {
                     : blockDiffersFromBase(block) ? () => restoreBlockFromBase(block.id) : undefined}
                   onColorPicker={BLOCK_TO_COLOR_TARGET[block.id] ? () => openColorPicker(BLOCK_TO_COLOR_TARGET[block.id], BLOCK_TO_ALLOWED_TARGETS[block.id], block.text) : undefined}
                   onFeatureMaker={['face','body','outfit_detail'].includes(block.id) ? () => { setFeatureMakerFilterBlock(block.id === 'outfit_detail' ? 'outfit' : block.id); setFeatureMakerOpen(true); } : undefined}
-                  onMaterialMaker={block.id === 'outfit' ? () => setMaterialMakerOpen(true) : undefined}
+                  onMaterialMaker={['outfit', 'outfit_detail'].includes(block.id) ? () => setMaterialMakerOpen(true) : undefined}
                   onCutoutMaker={block.id === 'outfit_detail' ? () => setCutoutMakerOpen(true) : undefined}
                   isLight={theme === 'light'} />
               );

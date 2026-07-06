@@ -8,6 +8,7 @@ import { NEG_PRESETS } from "../data/negSuggestions.js";
 import TagBtn from "./TagBtn.jsx";
 import { TAG_DICT } from "../data/tagDictionary.js";
 import { resolveColorLabel } from "../data/colors.js";
+import { isTagActive, isCoveredTag, removeCoveringTags } from "../data/makerCover.js";
 import { resolveFeatureLabel } from "../data/features.js";
 import { resolveMaterialLabel } from "../data/materials.js";
 import { resolveExtraLabel, resolveCatLabel } from "../data/extraTags.js";
@@ -168,8 +169,13 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
       setSelectedTags(prev => prev.includes(en) ? prev.filter(x => x !== en) : [...prev, en]);
       return;
     }
-    const willBeOn = !hasTag(block.text, en);
-    let newText = toggleTag(block.text, en, block.strength);
+    // メーカータグ（black blazer uniform 等）にカバーされている素タグ（blazer uniform）は
+    // 選択表示が維持される。その状態でクリック＝OFF扱いとし、カバー元ごと除去する。
+    const covered = !hasTag(block.text, en) && isCoveredTag(block.text, en);
+    const willBeOn = !covered && !hasTag(block.text, en);
+    let newText = covered
+      ? removeCoveringTags(block.text, en)
+      : toggleTag(block.text, en, block.strength);
 
     if (block.id === 'attribute') {
       const enLower = en.toLowerCase();
@@ -591,16 +597,18 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
               const materialInfo = !isJumpable ? resolveMaterialLabel(bare) : null;
               const extraInfo    = !isJumpable && !colorInfo && !featureInfo && !materialInfo ? resolveExtraLabel(bare) : null;
               const makerIcon    = colorInfo ? '🎨' : featureInfo ? '🎯' : materialInfo ? '🧵' : null;
+              // メーカー製タグはクリックで「そのブロックに配置されたメーカー」を開く（出自への往復導線）
+              const openMaker    = !isLocked ? (colorInfo ? onColorPicker : featureInfo ? onFeatureMaker : materialInfo ? onMaterialMaker : null) : null;
               const label        = lang === 'ja'
                 ? (enToJa.get(bareLower) ?? colorInfo?.ja ?? featureInfo?.ja ?? materialInfo?.ja ?? extraInfo?.ja ?? resolveCatLabel(bare)?.ja ?? bare)
                 : bare;
               return (
                 <span
                   key={idx}
-                  onClick={isJumpable ? () => handleChipJump(bare) : undefined}
-                  title={isJumpable ? (lang === 'ja' ? 'クリックでジャンプ' : 'Click to jump') : (makerIcon ? (lang === 'ja' ? 'メーカーで追加' : 'Added via maker') : undefined)}
+                  onClick={isJumpable ? () => handleChipJump(bare) : (openMaker || undefined)}
+                  title={isJumpable ? (lang === 'ja' ? 'クリックでジャンプ' : 'Click to jump') : (makerIcon ? (openMaker ? (lang === 'ja' ? 'クリックでメーカーを開く' : 'Click to open maker') : (lang === 'ja' ? 'メーカーで追加' : 'Added via maker')) : undefined)}
                   style={{ background: blockColor + '15', border: `1px solid ${blockColor}50`, color: blockColor }}
-                  className={`inline-flex items-center gap-[0.1875rem] rounded font-mono ${focusMode ? 'px-2 py-[0.1875rem] text-xs' : 'px-1.5 py-0.5 text-[0.6875rem]'}${isJumpable ? ' cursor-pointer underline underline-offset-2 decoration-1' : ''}`}
+                  className={`inline-flex items-center gap-[0.1875rem] rounded font-mono ${focusMode ? 'px-2 py-[0.1875rem] text-xs' : 'px-1.5 py-0.5 text-[0.6875rem]'}${isJumpable ? ' cursor-pointer underline underline-offset-2 decoration-1' : openMaker ? ' cursor-pointer underline underline-offset-2 decoration-dashed decoration-1' : ''}`}
                 >
                   {makerIcon && <span className="opacity-70 text-[0.5625rem] leading-none">{makerIcon}</span>}
                   {label}
@@ -835,7 +843,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   if (!tag) return null;
                   return (
                     <TagBtn key={en} tag={tag} color={blockColor} lang={lang} isFav disabled={isLocked}
-                      active={hasTag(block.text, en)} selectMode={selectMode} selected={selectedTags.includes(en)}
+                      active={isTagActive(block.text, en)} selectMode={selectMode} selected={selectedTags.includes(en)}
                       conflict={conflictTags?.has(en.toLowerCase()) && hasTag(block.text, en) ? conflictTags.get(en.toLowerCase()) : false}
                       desc={TAG_DICT[en]} large={focusMode}
                       onInsert={() => onTagClick(en)} onToggleFav={() => toggleFav(en)} />
@@ -856,7 +864,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                   {searchResults.map(tag => (
                     <TagBtn key={tag.en} tag={tag} color={blockColor} lang={lang}
                       isFav={block.favTags?.includes(tag.en)} disabled={isLocked}
-                      active={hasTag(block.text, tag.en)}
+                      active={isTagActive(block.text, tag.en)}
                       analyzed={!!analyzeText && hasTag(analyzeText, tag.en) && !hasTag(block.text, tag.en)}
                       selectMode={selectMode} selected={selectedTags.includes(tag.en)}
                       conflict={conflictTags?.has(tag.en.toLowerCase()) && hasTag(block.text, tag.en) ? conflictTags.get(tag.en.toLowerCase()) : false}
@@ -987,7 +995,7 @@ export default function BlockCard({ block, lang, orderNum, onUpdate, onMove, isF
                       ) : (
                         <TagBtn key={tag.en} tag={tag} color={blockColor} lang={lang}
                           isFav={block.favTags?.includes(tag.en)} disabled={isLocked}
-                          active={hasTag(block.text, tag.en)}
+                          active={isTagActive(block.text, tag.en)}
                           analyzed={!!analyzeText && hasTag(analyzeText, tag.en) && !hasTag(block.text, tag.en)}
                           selectMode={selectMode} selected={selectedTags.includes(tag.en)}
                           conflict={conflictTags?.has(tag.en.toLowerCase()) && hasTag(block.text, tag.en) ? conflictTags.get(tag.en.toLowerCase()) : false}

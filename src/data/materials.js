@@ -21,9 +21,11 @@ export const MATERIAL_PALETTE = [
   { en: 'leather',     ja: 'レザー',           weight: 0.9 },
   { en: 'fur',         ja: 'ファー',           weight: 0.7 },
   { en: 'knit',        ja: 'ニット',           weight: 0.9 },
+  { en: 'ribbed',      ja: 'リブ編み',         weight: 0.9 },
   { en: 'mesh',        ja: 'メッシュ',         weight: 0.8 },
   // 条件付き・成人寄り
   { en: 'sheer',       ja: 'シアー',           weight: 0.7, adult: true },
+  { en: 'see-through', ja: 'シースルー',       weight: 0.7, adult: true },
   { en: 'fishnet',     ja: 'フィッシュネット', weight: 0.6, adult: true },
   { en: 'latex',       ja: 'ラテックス',       weight: 0.4, adult: true, rare: true },
 ];
@@ -61,11 +63,18 @@ export const MATERIAL_TARGETS = [
     combinable: new Set(['leather','velvet','knit','fur','mesh']),
   },
   {
+    id: 'sweater',
+    ja: 'セーター',
+    en: 'sweater',
+    triggers: new Set(['sweater','turtleneck','sweater dress','sweater vest','cardigan','open-chest sweater','virgin killer sweater','cropped sweater']),
+    combinable: new Set(['ribbed','knit','velvet','fur','mesh']),
+  },
+  {
     id: 'sleeves',
     ja: '袖',
     en: 'sleeves',
-    triggers: new Set(['blouse','dress shirt','dress','blazer uniform','school uniform','cardigan','witch outfit','gothic lolita']),
-    combinable: new Set(['lace','sheer','lace-trimmed','silk','velvet','embroidered','mesh']),
+    triggers: new Set(['blouse','dress shirt','dress','blazer uniform','school uniform','cardigan','witch outfit','gothic lolita','turtleneck','sweater','crop top','kimono']),
+    combinable: new Set(['lace','sheer','see-through','lace-trimmed','silk','velvet','embroidered','mesh','fishnet']),
   },
   {
     id: 'collar',

@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { appendTag, removeTag, hasTag } from "../data/constants.js";
+import { removeTag, hasTag } from "../data/constants.js";
 import { TARGET_TO_BLOCK, COLOR_BASE_REMOVE,
   CM_ANIMAL_EAR_TAGS, CM_HORN_TAGS, CM_WING_TAGS, CM_TAIL_TAGS,
 } from "../data/colors.js";
+import { applyMakerTags } from "../data/makerCover.js";
+import { getFeatureReplaces } from "../data/features.js";
 
 export function useColorPicker({ activeCharId, blocks, setCharacters, pushHistory, makeHistoryEntry, lang }) {
   const [colorPickerOpen, setColorPickerOpen]                   = useState(false);
@@ -21,11 +23,8 @@ export function useColorPicker({ activeCharId, blocks, setCharacters, pushHistor
       ...c,
       blocks: c.blocks.map(b => b.id !== blockId ? b : ({
         ...b,
-        text: (() => {
-          let t = tagArray.reduce((acc, tag) => appendTag(acc, tag, '1.0'), b.text);
-          if (baseToRemove) t = removeTag(t, baseToRemove);
-          return t;
-        })(),
+        // 置き換え式：同ベースの旧タグ（素タグ・旧カラー）を除去してから追記
+        text: applyMakerTags(b.text, tagArray, baseToRemove ? [baseToRemove] : []),
         enabled: true, collapsed: false,
       })),
     })));
@@ -43,11 +42,17 @@ export function useColorPicker({ activeCharId, blocks, setCharacters, pushHistor
 
   const applyFeatureTag = (tag, blockId) => {
     const resolvedId = blockId || 'outfit_detail';
+    const removals = getFeatureReplaces(tag); // 素タグとの2重防止（クロスブロック対応）
     pushHistory(makeHistoryEntry(false));
     setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : {
       ...c,
-      blocks: c.blocks.map(b => b.id !== resolvedId ? b : {
-        ...b, text: appendTag(b.text, tag, '1.0'), enabled: true, collapsed: false,
+      blocks: c.blocks.map(b => {
+        let text = b.text;
+        for (const r of removals) if (r.block === b.id && hasTag(text, r.tag)) text = removeTag(text, r.tag);
+        if (b.id === resolvedId) {
+          return { ...b, text: applyMakerTags(text, tag), enabled: true, collapsed: false };
+        }
+        return text === b.text ? b : { ...b, text };
       }),
     }));
     const blockName = blocks.find(b => b.id === resolvedId)?.[lang === 'ja' ? 'name' : 'nameEn'] ?? resolvedId;
@@ -62,7 +67,7 @@ export function useColorPicker({ activeCharId, blocks, setCharacters, pushHistor
     setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : {
       ...c,
       blocks: c.blocks.map(b => b.id !== resolvedId ? b : {
-        ...b, text: appendTag(b.text, tag, '1.0'), enabled: true, collapsed: false,
+        ...b, text: applyMakerTags(b.text, tag), enabled: true, collapsed: false,
       }),
     }));
     const blockName = blocks.find(b => b.id === resolvedId)?.[lang === 'ja' ? 'name' : 'nameEn'] ?? resolvedId;
@@ -80,7 +85,7 @@ export function useColorPicker({ activeCharId, blocks, setCharacters, pushHistor
       ...c,
       blocks: c.blocks.map(b => b.id !== resolvedId ? b : {
         ...b,
-        text: tagArray.reduce((acc, tag) => appendTag(acc, tag, '1.0'), b.text),
+        text: applyMakerTags(b.text, tagArray),
         enabled: true, collapsed: false,
       }),
     }));

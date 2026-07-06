@@ -41,6 +41,8 @@ export const COLOR_TARGETS = [
   { id:'heterochromia', ja:'オッドアイ',    en:'heterochromia'    },
   // ── キャラパーツ ──────────────────────────────────────────────
   { id:'nails',         ja:'爪',            en:'nails'       },
+  { id:'tattoo',        ja:'タトゥー',      en:'tattoo'      },
+  { id:'facial_mark',   ja:'フェイスマーク', en:'facial mark' },
   { id:'tail_color',    ja:'しっぽ',        en:'tail',       gradientable: true },
   // ── ケモ系・幻想パーツ（動的検出）─────────────────────────────────
   { id:'animal_ears',  ja:'ケモ耳',        en:'animal ears' },
@@ -50,14 +52,20 @@ export const COLOR_TARGETS = [
   { id:'glasses_frame', ja:'眼鏡',       en:'glasses'  },
   { id:'earrings',      ja:'イヤリング', en:'earrings' },
   { id:'necklace',      ja:'ネックレス', en:'necklace' },
+  { id:'neck_ribbon',   ja:'首リボン',   en:'neck ribbon' },
+  { id:'choker',        ja:'チョーカー', en:'choker' },
+  { id:'belt',          ja:'ベルト',     en:'belt' },
+  { id:'hairband',      ja:'カチューシャ', en:'hairband' },
   // ── 衣装（動的検出：実際の衣装タグをそのまま色ターゲットにする）──
   { id:'outfit_main',   ja:'衣装メイン',     en:'outfit'      },
   { id:'top',           ja:'トップス',       en:'top'         },
   { id:'bottom',        ja:'ボトムス',       en:'skirt'       },
   { id:'outer',         ja:'アウター',       en:'jacket'      },
   { id:'footwear',      ja:'フットウェア',   en:'shoes'       },
+  { id:'shoelaces',     ja:'靴ひも',         en:'shoelaces'   },
   { id:'legwear',       ja:'レッグウェア',   en:'stockings'   },
   { id:'ribbon',        ja:'リボン',         en:'ribbon'      },
+  { id:'obi',           ja:'帯',             en:'obi'         },
   { id:'accents',       ja:'アクセント色',   en:'accents'     },
   { id:'trim',          ja:'縁取り',         en:'trim'        },
   { id:'embroidery',    ja:'刺繍',           en:'embroidery'  },
@@ -296,29 +304,33 @@ export const TARGET_TO_BLOCK = {
   hair: 'face', inner_hair: 'face', bangs: 'face', bang_streak: 'face',
   forelock: 'face', hair_tips: 'face', sidelocks: 'face',
   eyes: 'face', heterochromia: 'face',
-  nails: 'body',
+  nails: 'body', tattoo: 'body', facial_mark: 'face',
   outfit_main: 'outfit', top: 'outfit', bottom: 'outfit', outer: 'outfit',
-  footwear: 'outfit', legwear: 'outfit', ribbon: 'outfit', accents: 'outfit',
+  footwear: 'outfit', shoelaces: 'outfit', legwear: 'outfit', ribbon: 'outfit', obi: 'outfit', accents: 'outfit',
   trim: 'outfit', embroidery: 'outfit', lace: 'outfit',
   eyeshadow: 'face', lipstick: 'face',
   bg_color: 'background',
   animal_ears: 'attribute', horns: 'attribute', wings: 'attribute', tail_color: 'attribute',
   glasses_frame: 'outfit_detail', earrings: 'outfit_detail', necklace: 'outfit_detail',
+  neck_ribbon: 'outfit_detail', choker: 'outfit_detail', belt: 'outfit_detail',
+  hairband: 'face',
 };
 
 export const BLOCK_TO_COLOR_TARGET = {
   face: 'hair', outfit: 'outfit_main', background: 'bg_color',
-  attribute: 'animal_ears', outfit_detail: 'glasses_frame',
+  attribute: 'animal_ears', outfit_detail: 'glasses_frame', body: 'nails',
 };
 
 export const BLOCK_TO_ALLOWED_TARGETS = {
-  face:         ['hair','inner_hair','bangs','bang_streak','forelock','hair_tips','sidelocks','eyes','heterochromia','eyeshadow','lipstick'],
-  outfit:       ['outfit_main','top','bottom','outer','footwear','legwear','ribbon','accents','trim','embroidery','lace'],
+  face:         ['hair','inner_hair','bangs','bang_streak','forelock','hair_tips','sidelocks','eyes','heterochromia','eyeshadow','lipstick','facial_mark','hairband'],
+  body:         ['nails','tattoo'],
+  outfit:       ['outfit_main','top','bottom','outer','footwear','shoelaces','legwear','ribbon','obi','accents','trim','embroidery','lace'],
   background:   ['bg_color'],
   attribute:    ['animal_ears','horns','wings','tail_color'],
-  outfit_detail:['glasses_frame','earrings','necklace'],
+  outfit_detail:['glasses_frame','earrings','necklace','neck_ribbon','choker','belt'],
 };
 
 export const COLOR_BASE_REMOVE = {
   glasses_frame: 'glasses', earrings: 'earrings', necklace: 'necklace',
+  neck_ribbon: 'neck ribbon', choker: 'choker', belt: 'belt', hairband: 'hairband', obi: 'obi',
 };

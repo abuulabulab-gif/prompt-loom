@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { MATERIAL_PALETTE, MATERIAL_TARGETS, buildMaterialTag } from "../../data/materials.js";
 import { hasTag } from "../../data/constants.js";
+import { isTagActive } from "../../data/makerCover.js";
 
 const ACCENT    = 'rgb(var(--c-blue))';
 const ACCENT_BG = 'rgb(var(--c-blue) / 0.13)';
@@ -8,8 +9,8 @@ const ACCENT_BG = 'rgb(var(--c-blue) / 0.13)';
 const MAT_GROUPS = [
   { label: { ja: '光沢・高級',    en: 'Luxury'        }, acc: '#f59e0b', ids: ['silk','satin','velvet'] },
   { label: { ja: 'レース・装飾',  en: 'Lace & Trim'   }, acc: '#ec4899', ids: ['lace','lace-trimmed','embroidered','sequined'] },
-  { label: { ja: '特殊素材',      en: 'Special'       }, acc: '#78716c', ids: ['leather','fur','knit','mesh'] },
-  { label: { ja: '透け・条件付き', en: 'Sheer & Adult' }, acc: '#64748b', ids: ['sheer','fishnet','latex'] },
+  { label: { ja: '特殊素材',      en: 'Special'       }, acc: '#78716c', ids: ['leather','fur','knit','ribbed','mesh'] },
+  { label: { ja: '透け・条件付き', en: 'Sheer & Adult' }, acc: '#64748b', ids: ['sheer','see-through','fishnet','latex'] },
 ];
 
 const chipCls = (active) =>
@@ -17,9 +18,10 @@ const chipCls = (active) =>
 
 function getBlockText(blocks, id) { return blocks?.find(b => b.id === id)?.text || ''; }
 
+// isTagActive: 色付き等のメーカータグ（black turtleneck）でも素タグ（turtleneck）としてトリガーに掛ける
 function resolveBlockId(target, outfitText, featureText) {
-  if ([...target.triggers].some(k => hasTag(outfitText,  k))) return 'outfit';
-  if ([...target.triggers].some(k => hasTag(featureText, k))) return 'outfit_detail';
+  if ([...target.triggers].some(k => isTagActive(outfitText,  k))) return 'outfit';
+  if ([...target.triggers].some(k => isTagActive(featureText, k))) return 'outfit_detail';
   return null;
 }
 
