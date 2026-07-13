@@ -19,6 +19,7 @@ export const CUTOUT_GROUPS = [
       { en: 'armpit cutout',    ja: '脇くりぬき' },
       { en: 'back cutout',      ja: '背中カット' },
       { en: 'side cutout',      ja: 'サイドカット' },
+      { en: 'heart cutout',     ja: 'ハートくり抜き' },
     ],
   },
   {
@@ -33,8 +34,24 @@ export const CUTOUT_GROUPS = [
       { en: 'high slit',       ja: 'ハイスリット' },
       { en: 'side slit',       ja: 'サイドスリット' },
       { en: 'low-rise',        ja: 'ローライズ' },
+      { en: 'highleg',         ja: 'ハイレグ' },
       { en: 'high neck',       ja: 'ハイネック' },
       { en: 'open collar',     ja: '開けた衿' },
+      { en: 'halterneck',      ja: 'ホルターネック' },
+      { en: 'criss-cross halter', ja: 'クロスホルター' },
+      { en: 'plunging neckline',  ja: '深Vネック' },
+      { en: 'single bare shoulder', ja: '片肩出し' },
+      { en: 'asymmetrical clothes', ja: 'アシンメトリー衣装' },
+    ],
+  },
+  {
+    id: 'fastening',
+    label: { ja: '留め・編み上げ', en: 'Fastening' },
+    acc: '#a78bfa',
+    items: [
+      { en: 'zipper',              ja: 'ジッパー' },
+      { en: 'o-ring',              ja: 'Oリング' },
+      { en: 'cross-laced clothes', ja: '編み上げ' },
     ],
   },
   {
@@ -43,6 +60,7 @@ export const CUTOUT_GROUPS = [
     acc: '#64748b',
     items: [
       { en: 'see-through', ja: 'シースルー' },
+      { en: 'translucent', ja: '半透明' },
       { en: 'skintight',   ja: 'ぴったり' },
       { en: 'torn clothes', ja: '破れた服' },
     ],
