@@ -15,6 +15,7 @@ import {
   deep, downloadJSON, stripWeights, toNaiWeights, SPECIES_PARTS_MAP,
 } from "./data/constants.js";
 import { detectConflicts } from "./data/conflicts.js";
+import { findHinoko, sendToHinoko, openHinoko } from "./hinoko.js";
 import { TOOLS } from "./data/tools.js";
 import { makeCharacter, makeCustomBlock, BLOCKS_DEF } from "./data/blocks.js";
 import PresetChip from "./components/PresetChip.jsx";
@@ -129,6 +130,11 @@ export default function Loom() {
   const [outputEditMode, setOutputEditMode] = useState(false);
   const [outputEditText, setOutputEditText] = useState('');
   const [copied, setCopied] = useState(false);
+  /* ★HINOKO（このPCで動くAI制作工房）連携。
+     繋がっている時だけボタンが出る＝公開版（prompt-loom.com）には現れない。
+     コードを分岐させず、実行時に確かめる（RIN-OS DESIGN §3t）。 */
+  const [hinoko, setHinoko] = useState(null);
+  const [sentToHinoko, setSentToHinoko] = useState(false);
   const [snapped, setSnapped] = useState(false);
   const [shared, setShared] = useState(false);
   const [outputExpanded, setOutputExpanded] = useState(true);
@@ -161,6 +167,16 @@ export default function Loom() {
   const cycleViewMode = () => setViewMode(m => m === 'normal' ? 'simple' : m === 'simple' ? 'expert' : 'normal');
   const [mainTab, setMainTab] = useState(() => localStorage.getItem('loom_mainTab') || 'editor');
   useEffect(() => { localStorage.setItem('loom_mainTab', mainTab); }, [mainTab]);
+
+  /* HINOKOが居るか確かめる。居なければ何も起きない（公開版はいつもこちら）。
+     起動し忘れて後から立ち上げる事もあるので、たまに見直す。 */
+  useEffect(() => {
+    let alive = true;
+    const look = () => { findHinoko().then(h => { if (alive) setHinoko(h); }); };
+    look();
+    const t = setInterval(look, 20000);
+    return () => { alive = false; clearInterval(t); };
+  }, []);
   const [thumbs, setThumbs] = useState({});
   const [thumbPreview, setThumbPreview] = useState(null);
   const [thumbDragOver, setThumbDragOver] = useState(false);
@@ -2511,6 +2527,26 @@ export default function Loom() {
                   className="rounded-md px-[0.5625rem] py-[0.3125rem] text-[0.6875rem] cursor-pointer font-mono border border-dim text-muted"
                   onMouseOver={e => { e.currentTarget.style.borderColor = dangerColor + '80'; e.currentTarget.style.color = dangerColor; }}
                   onMouseOut={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.color = ''; }}>🗑</button>
+                {/* ★HINOKOが動いている時だけ出る。公開版では findHinoko が失敗するので現れない。
+                       押しても描き始めず、向こうの作業台に置くだけ（主導権は人に残す）。 */}
+                {/* ★渡すのは currentText ではなく finalPosText。
+                       currentText は「いま見ているタブの中身」なので、
+                       否定タブを開いていると同じ文が指示と避けたい物の両方に入る。 */}
+                {hinoko && finalPosText && (
+                  <button
+                    onClick={() => {
+                      sendToHinoko(finalPosText, negText || '')
+                        .then(() => { setSentToHinoko(true); openHinoko(); setTimeout(() => setSentToHinoko(false), 2600); })
+                        .catch(err => alert(err.message));
+                    }}
+                    title={lang === 'ja' ? 'この指示をHINOKOの作業台に置く（描き始めません）' : 'Send to HINOKO'}
+                    style={{ background: sentToHinoko ? 'rgb(var(--c-green) / 0.13)' : 'none',
+                             border: `1px solid ${sentToHinoko ? 'rgb(var(--c-green) / 0.5)' : 'rgb(var(--dim))'}`,
+                             color: sentToHinoko ? 'rgb(var(--c-green))' : 'rgb(var(--muted))' }}
+                    className="rounded-md px-[0.5625rem] py-1 text-[0.6875rem] cursor-pointer font-mono transition-all duration-200 flex-shrink-0">
+                    {sentToHinoko ? '✓' : '🔥'}
+                  </button>
+                )}
                 {/* Mobile MJ AR chips */}
                 {activeTool === 'mj' && outputTab !== 'natural' && (() => {
                   const sfxVal = toolSuffixes[activeTool] || '';
@@ -2642,6 +2678,26 @@ export default function Loom() {
                   className="rounded-md px-[0.5625rem] py-1 text-[0.6875rem] cursor-pointer font-mono border border-dim text-muted transition-all duration-200 flex-shrink-0"
                   onMouseOver={e => { e.currentTarget.style.borderColor = dangerColor + '80'; e.currentTarget.style.color = dangerColor; }}
                   onMouseOut={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.color = ''; }}>🗑</button>
+                {/* ★HINOKOが動いている時だけ出る。公開版では findHinoko が失敗するので現れない。
+                       押しても描き始めず、向こうの作業台に置くだけ（主導権は人に残す）。 */}
+                {/* ★渡すのは currentText ではなく finalPosText。
+                       currentText は「いま見ているタブの中身」なので、
+                       否定タブを開いていると同じ文が指示と避けたい物の両方に入る。 */}
+                {hinoko && finalPosText && (
+                  <button
+                    onClick={() => {
+                      sendToHinoko(finalPosText, negText || '')
+                        .then(() => { setSentToHinoko(true); openHinoko(); setTimeout(() => setSentToHinoko(false), 2600); })
+                        .catch(err => alert(err.message));
+                    }}
+                    title={lang === 'ja' ? 'この指示をHINOKOの作業台に置く（描き始めません）' : 'Send to HINOKO'}
+                    style={{ background: sentToHinoko ? 'rgb(var(--c-green) / 0.13)' : 'none',
+                             border: `1px solid ${sentToHinoko ? 'rgb(var(--c-green) / 0.5)' : 'rgb(var(--dim))'}`,
+                             color: sentToHinoko ? 'rgb(var(--c-green))' : 'rgb(var(--muted))' }}
+                    className="rounded-md px-[0.5625rem] py-1 text-[0.6875rem] cursor-pointer font-mono transition-all duration-200 flex-shrink-0">
+                    {sentToHinoko ? '✓' : '🔥'}
+                  </button>
+                )}
                 {apiConfig.apiKey && outputTab === 'positive' && (
                   <button onClick={() => { if (tagSuggestOpen) { setTagSuggestOpen(false); } else { handleTagSuggest(); setOutputExpanded(true); } }}
                     disabled={tagSuggestBusy || !posText}
