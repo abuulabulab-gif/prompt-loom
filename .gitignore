@@ -7,3 +7,9 @@ dist-ssr
 .idea
 
 .vercel
+
+# 検証で撮った画面写真・ビルドの出力物（また作れるので同期しない）
+audit-shots/
+audit2-shots/
+prod-check.png
+loom-app.zip
