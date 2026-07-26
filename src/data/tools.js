@@ -5,5 +5,9 @@ export const TOOLS = [
   { id:'sd',      name:'SD/WebUI',       nameEn:'SD/WebUI',       icon:'🖼️', suffix:'',               note:'Forge/ComfyUI対応',        noteEn:'Forge/ComfyUI',            sep:', ' },
   { id:'pixai',   name:'PixAI',          nameEn:'PixAI',          icon:'🎨', suffix:'',               note:'Danbooruタグ・()重み対応', noteEn:'Danbooru tags, () weights', sep:', ' },
   { id:'flux',    name:'Flux2',          nameEn:'Flux2',          icon:'⚡', suffix:'',               note:'重み構文を自動除去',       noteEn:'Auto-strips weights',      sep:', ', stripWeights:true },
+  // ★HINOKOのAnimaは**強さ指定 (tag:1.2) が効かない**（2026-07-27実測・工房のnote）。
+  //   タグの羅列と自然な英文はそのまま通り、512トークンまで分割不要で読む。
+  //   なので重み構文だけ落とせば素通しでよい＝Flux2と同じ扱い。
+  { id:'anima',   name:'Anima（HINOKO）', nameEn:'Anima (HINOKO)', icon:'🔥', suffix:'',      note:'重み構文が効かないため自動除去', noteEn:'Weights unsupported — auto-stripped', sep:', ', stripWeights:true },
   { id:'dalle',   name:'DALL-E/Copilot', nameEn:'DALL-E/Copilot', icon:'🪄', suffix:'',               note:'自然文タブへ自動切替',    noteEn:'Auto-switches to natural', sep:', ' },
 ];
