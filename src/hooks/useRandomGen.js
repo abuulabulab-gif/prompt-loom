@@ -71,36 +71,11 @@ const pickRandomGenderEn = () => {
 const COLOR_CAT_IDS = new Set(['face_haircolor', 'face_eyecolor']);
 const COLOR_CAT_TARGET = { face_haircolor: 'hair', face_eyecolor: 'eyes' };
 
-// ── フェーズ4: 多様性クールダウン ────────────────────────────────────
-// 直近の生成で使ったタグを記憶し、しばらく出にくくする
-const COOLDOWN_CAT_IDS = new Set([
-  'attr_species', 'face_haircolor', 'face_hairstyle', 'face_eyecolor',
-  'body_shape', 'body_structure', 'body_bust', 'outfit_formal', 'outfit_uniform', 'outfit_ethnic', 'outfit_cosplay', 'outfit_swim', 'outfit_lingerie',
-  'comp_distance', 'comp_angle', 'face_expression',
-  'bg_simple', 'bg_outdoor', 'bg_indoor',
-]);
-const COOLDOWN_KEY  = 'loom_random_cooldown_v1';
-const COOLDOWN_SIZE = 5; // 直近5回分を記憶
-// 使ってからの回数ごとの重み (0=直前, 1=1回前, 2=2回前, 3=3回前)
-const COOLDOWN_DECAY = [0.15, 0.45, 0.70, 0.85];
-
-function loadCooldown() {
-  try { return JSON.parse(localStorage.getItem(COOLDOWN_KEY) || '[]'); }
-  catch { return []; }
-}
-function saveCooldown(hist) {
-  // ブラウザ外（分布を測るシミュレータ）でも動くように、保存は失敗しても進む
-  try { localStorage.setItem(COOLDOWN_KEY, JSON.stringify(hist.slice(-COOLDOWN_SIZE))); }
-  catch { /* localStorage が無い環境＝記憶しないだけ */ }
-}
-function cdWeight(key, catId, hist) {
-  if (!key || !COOLDOWN_CAT_IDS.has(catId) || !hist.length) return 1.0;
-  const k = key.toLowerCase();
-  for (let i = hist.length - 1; i >= 0; i--) {
-    if (hist[i]?.[catId] === k) return COOLDOWN_DECAY[hist.length - 1 - i] ?? 1.0;
-  }
-  return 1.0;
-}
+// ★多様性クールダウンは撤去した（ABUU裁定 2026-07-27）：
+//   「クールダウンは別になくてもいいか、ロジックがちゃんと働いて、
+//     いろんなキャラを生み出せればいいだけなので」。
+//   直近の履歴を持つと**状態が増える＝事故る面が増える**わりに、
+//   タグ数が十分あれば素の抽選で散る。見切りをつけた側。
 // 重みつきランダムでインデックスを返す
 function wIdx(weights) {
   const total = weights.reduce((s, w) => s + w, 0);
@@ -165,8 +140,7 @@ function pickSimilarColor(baseColorEn) {
 }
 
 function pickHairColorExpression(hist, mode) {
-  const baseWeights = COLOR_PALETTE.map(c => cdWeight(c.en, 'face_haircolor', hist));
-  const baseColor   = COLOR_PALETTE[wIdx(baseWeights)];
+  const baseColor = COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
   const baseShade   = pickWeightedShade();
   const baseEn      = buildColorName(baseShade.en, baseColor.en) + ' hair';
   const baseJa      = baseShade.id !== 'normal' ? `${baseShade.ja}${baseColor.ja}` : baseColor.ja;
@@ -211,8 +185,7 @@ function pickColorCatTag(catId, hist = [], mode = 'illust') {
   if (catId === 'face_eyecolor' && Math.random() < 0.10) return pickHeterochromiaPair();
   const targetId  = COLOR_CAT_TARGET[catId];
   const targetObj = COLOR_TARGETS.find(t => t.id === targetId);
-  const weights   = COLOR_PALETTE.map(c => cdWeight(c.en, catId, hist));
-  const color     = COLOR_PALETTE[wIdx(weights)];
+  const color = COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
   const shade     = pickWeightedShade();
   const en        = buildColorTag(shade.en, color.en, targetObj.en);
   const ja        = shade.id !== 'normal'
@@ -281,17 +254,7 @@ function pickBlockTags(block, globalExcluded, hist = [], mode = 'illust') {
     const normalT = validT.filter(t => !t.rareInRandom);
     const rareT   = validT.filter(t =>  t.rareInRandom);
     let pick;
-    if (COOLDOWN_CAT_IDS.has(cat.id)) {
-      // クールダウン重みつきランダム（直近と同じタグが出にくい）
-      // ★レアの扱いは1本に統一（2026-07-27）：以前はここだけ相対重みで、
-      //   レアがカテゴリ内で多数派だと**レアの方が出やすい**穴があった。
-      //   まずレア枠に入るか決め、その中でだけクールダウン重みを効かせる。
-      const useRare = rareT.length > 0 && normalT.length > 0
-        && Math.random() < RARITY.rareTag;
-      const poolT   = useRare ? rareT : (normalT.length ? normalT : rareT);
-      const ws      = poolT.map(t => cdWeight(t.en, cat.id, hist));
-      pick = poolT[wIdx(ws)];
-    } else if (normalT.length === 0) {
+    if (normalT.length === 0) {
       pick = rareT[Math.floor(Math.random() * rareT.length)];
     } else if (rareT.length > 0 && Math.random() < RARITY.rareTag) {
       pick = rareT[Math.floor(Math.random() * rareT.length)];
@@ -372,17 +335,7 @@ function pickBlockTagsBoosted(block, globalExcluded, boostTags, hist = [], mode 
     let pick;
     if (boostedT.length > 0 && Math.random() < 0.70) {
       // ブーストタグでもクールダウンを適用
-      const bws = boostedT.map(t => cdWeight(t.en, cat.id, hist));
-      pick = boostedT[wIdx(bws)];
-    } else if (COOLDOWN_CAT_IDS.has(cat.id)) {
-      // ★レアの扱いは1本に統一（2026-07-27）：以前はここだけ相対重みで、
-      //   レアがカテゴリ内で多数派だと**レアの方が出やすい**穴があった。
-      //   まずレア枠に入るか決め、その中でだけクールダウン重みを効かせる。
-      const useRare = rareT.length > 0 && normalT.length > 0
-        && Math.random() < RARITY.rareTag;
-      const poolT   = useRare ? rareT : (normalT.length ? normalT : rareT);
-      const ws      = poolT.map(t => cdWeight(t.en, cat.id, hist));
-      pick = poolT[wIdx(ws)];
+      pick = boostedT[Math.floor(Math.random() * boostedT.length)];
     } else if (normalT.length === 0) {
       pick = rareT[Math.floor(Math.random() * rareT.length)];
     } else if (rareT.length > 0 && Math.random() < RARITY.rareTag) {
@@ -766,10 +719,8 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
         : 'Reset current prompt and generate a random character?'
     )) return;
 
-    const hist = loadCooldown(); // 直近の生成履歴を読み込み
-
     setCharacters(prev => prev.map(c =>
-      c.id === activeCharId ? weaveRandomCharacter(c, mode, hist) : c
+      c.id === activeCharId ? weaveRandomCharacter(c, mode) : c
     ));
   };
 
@@ -780,7 +731,8 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
 //   確率を見直すには**実際に何千体も生成して分布を見る**しかないが、
 //   フックの中にあると測れなかった。画面側の挙動は変えていない（呼び方が変わっただけ）。
 //   測る道具＝`tools/sim-random.mjs`。
-export function weaveRandomCharacter(c, mode, hist = []) {
+export function weaveRandomCharacter(c, mode) {
+  const hist = [];
     {
       const globalExcluded = new Set();
       // Illust mode: pre-exclude design/reference/simple-background tags
@@ -1018,23 +970,6 @@ export function weaveRandomCharacter(c, mode, hist = []) {
       // ★一線の関所＝**全レイヤーの後ろ**（ここより後ろにタグを足す処理を置かないこと）
       enforceHardLine(blockMap);
 
-      // 生成履歴を保存（シンプル背景クリア後に実行 → 実際の最終状態を記録）
-      const histEntry = {};
-      for (const [, b] of blockMap) {
-        if (!b.cats || !b.text) continue;
-        for (const cat of b.cats) {
-          if (!COOLDOWN_CAT_IDS.has(cat.id)) continue;
-          if (COLOR_CAT_IDS.has(cat.id)) {
-            const cp = (b.lastRandomPicks || []).find(p => p._ci === cat.id);
-            if (cp?._tk) histEntry[cat.id] = cp._tk.toLowerCase();
-          } else {
-            for (const t of cat.t) {
-              if (hasTag(b.text, t.en)) { histEntry[cat.id] = t.en.toLowerCase(); break; }
-            }
-          }
-        }
-      }
-      saveCooldown([...hist, histEntry]);
 
       return {
         ...c,
