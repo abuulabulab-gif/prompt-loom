@@ -761,6 +761,8 @@ export default function Loom() {
     const enabledSnapshot = {};
     for (const b of activeChar.blocks) {
       if (tmpl.apply[b.id] !== undefined) snapshot[b.id] = b.text;
+      // removeCats で削るブロックも「元に戻す」の対象に入れる（消しっぱなしにしない）
+      if (tmpl.removeCats?.[b.id] && snapshot[b.id] === undefined) snapshot[b.id] = b.text;
       if (muteIds.has(b.id)) enabledSnapshot[b.id] = b.enabled !== false;
     }
     // negHint がある場合、undo 対象に negative ブロックも含める
@@ -781,18 +783,39 @@ export default function Loom() {
         tmplBase,
         blocks: c.blocks.map(b => {
           let nb = b;
+          // removeCats: そのテンプレと両立しないカテゴリのタグを**先に落とす**。
+          //   ブロックごと上書きすると同居している他の指定（髪色・目色など）まで
+          //   消えてしまうので、カテゴリ単位で狙って外す。merge より前に実行する
+          //   ＝このテンプレが足したタグは消さない。
+          //   タグ名ではなくカテゴリで指定する＝タグが増えても追従する。
+          const rmCats = tmpl.removeCats?.[b.id];
+          if (rmCats?.length && nb.text) {
+            const doomed = new Set();
+            for (const cat of (nb.cats || [])) {
+              if (!rmCats.includes(cat.n)) continue;
+              for (const t of (cat.t || [])) doomed.add(t.en.toLowerCase());
+            }
+            if (doomed.size) {
+              let text = nb.text;
+              for (const seg of splitTags(text)) {
+                const tag = bareTag(seg);
+                if (tag && doomed.has(tag.toLowerCase())) text = removeTag(text, tag);
+              }
+              if (text !== nb.text) nb = { ...nb, text };
+            }
+          }
           // テンプレート指定ブロックを適用
           const v = tmpl.apply[b.id];
           if (v !== undefined) {
             if (typeof v === 'object' && v.mode === 'merge') {
-              let text = clearMode ? '' : (b.text || '');
+              let text = clearMode ? '' : (nb.text || '');
               for (const seg of splitTags(v.tags || '')) {
                 const tag = bareTag(seg);
-                if (tag && !hasTag(text, tag)) text = appendTag(text, tag, b.strength);
+                if (tag && !hasTag(text, tag)) text = appendTag(text, tag, nb.strength);
               }
-              nb = { ...b, text };
+              nb = { ...nb, text };
             } else {
-              nb = { ...b, text: v };
+              nb = { ...nb, text: v };
             }
           } else if (b.id === 'negative' && tmpl.negHintEn) {
             // negHint をネガティブブロックに追記（重複スキップ）

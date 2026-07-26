@@ -114,6 +114,32 @@ export const TEMPLATES = [
     mute: ['effect', 'lighting'],
   },
   {
+    id: 'vtuber_base',
+    name: 'Vtuber素材（上半身・白背景）',
+    nameEn: 'VTuber Base',
+    icon: '🎙️',
+    desc: '動かす前提の素材づくり用。白背景・無表情・棒立ちの上半身だけを描かせ、パーツ分解とリグに素直な一枚にする。キャラを決めたあと（ランダム生成のあと）に重ねて使う',
+    descEn: 'Rigging-ready source art — upper body only, white background, neutral face and pose, so layers separate cleanly for decomposition. Apply after the character design is set',
+    sizeHintJa: '【推奨サイズ】正方形（Square）。顔が画面の高さの2割以上に写る寄りで生成すること（小さいと口や目の層が取れず、口パク・まばたきが効かない）',
+    sizeHintEn: '[Recommended] Square. Keep the face at least 20% of the frame height — smaller faces lose the mouth/eye layers, which disables lip sync and blinking',
+    negHintJa: 'full body, lower body, legs, feet, cowboy shot, from below, from above, dutch angle, dynamic pose, leaning forward, turning head, open mouth, teeth, smile, wink, closed eyes, blush, tears, hands up, hand on face, holding, cropped head, out of frame, busy background, gradient background, shadow, dark lighting',
+    negHintEn: 'full body, lower body, legs, feet, cowboy shot, from below, from above, dutch angle, dynamic pose, leaning forward, turning head, open mouth, teeth, smile, wink, closed eyes, blush, tears, hands up, hand on face, holding, cropped head, out of frame, busy background, gradient background, shadow, dark lighting',
+    apply: {
+      quality:     'masterpiece, best quality, ultra-detailed, highres, sharp focus',
+      composition: 'upper body, front view, straight-on, looking at viewer, standing, symmetrical, arms at sides',
+      background:  'white background, simple background',
+      // 顔は上書きせず**足すだけ**（髪色・目の色などキャラの芯を消さないため）。
+      // 抽選で入った表情・口は下の removeCats で先に外してある
+      face:        { mode: 'merge', tags: 'expressionless, closed mouth' },
+    },
+    // ★動かす素材で表情・口が付いていると詰む：
+    //   ウインクした目は瞬きできず、笑った口は口パクの差分と噛み合わない。
+    //   カテゴリごと外す＝タグが増えても追従する（タグ名の直書きにしない）
+    removeCats: { face: ['表情', '口・歯'] },
+    // 素材づくりではエフェクト・シーン照明はノイズ → 削除せず一時OFF
+    mute: ['effect', 'lighting'],
+  },
+  {
     id: 'selfie',
     name: '自撮り',
     nameEn: 'Selfie',
