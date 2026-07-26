@@ -137,22 +137,22 @@ loom/
 ├─ audit.mjs / audit2.mjs … 画面を撮って点検する使い捨てスクリプト
 ├─ check.mjs / check.cjs  … 軽い自己点検
 │
-└─ ★仕様メモ（機能ごと・実装の経緯と決めごと）
-   ├─ random-gen-spec.md      … ランダム生成
-   ├─ template-spec.md        … テンプレート
-   ├─ color-maker-spec.md     … カラーメーカー
-   ├─ cutout-maker-spec.md    … カットメーカー
-   ├─ conflicts-system-spec.md … タグ競合
-   ├─ natural-analyze-spec.md … 自然文・解析
-   ├─ character-note-spec.md  … キャラノート
-   ├─ cloud-sync-spec.md      … クラウド同期
-   └─ data-migration-spec.md  … データ移行
+└─ docs/specs/  … ★仕様メモ（機能ごと・実装の経緯と決めごと）
+   ├─ docs/specs/random-gen-spec.md      … ランダム生成
+   ├─ docs/specs/template-spec.md        … テンプレート
+   ├─ docs/specs/color-maker-spec.md     … カラーメーカー
+   ├─ docs/specs/cutout-maker-spec.md    … カットメーカー
+   ├─ docs/specs/conflicts-system-spec.md … タグ競合
+   ├─ docs/specs/natural-analyze-spec.md … 自然文・解析
+   ├─ docs/specs/character-note-spec.md  … キャラノート
+   ├─ docs/specs/cloud-sync-spec.md      … クラウド同期
+   └─ docs/specs/data-migration-spec.md  … データ移行
 ```
 
-### 散らかりについて（正直な現状・2026-07-27の点検）
-**直下に仕様メモが9枚ある。** どれも中身は生きているが、**根に並んでいると
-「まず何を読むか」が見えにくい**。`docs/specs/` へ寄せる案があるが、
-参照している箇所が動くので**まだやっていない**（ABUUの裁定待ち）。
+### 片付いた（2026-07-27・ABUU裁定「LOOMの仕様メモは寄せよう」）
+直下に並んでいた仕様メモ9枚を **`docs/specs/` へ移した**。根に並んでいると
+「まず何を読むか」が見えにくかったため。参照は README と docs/phase2-review.md
+だけだったので張り替え済み。**直下の .md は案内役と台帳だけになった。**
 
 ★この地図を実物に合わせ続ける。ファイル・フォルダを足したらここに1行。
 　ズレは `tools/check-map.py`（RIN-OS共用）が毎回見る。
