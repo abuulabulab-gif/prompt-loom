@@ -7,7 +7,20 @@ import {
   FEMALE_ONLY_SPECIES,
 } from "../data/constants.js";
 
-const RARE_OPT_CAT_PROB = 0.10; // rare optional cats: 10% vs standard 40%
+// ── 確率のつまみ（2026-07-27・ABUU「確率などは全体的に見直してOK」）──────────
+// ★散らばっていた確率をここに集めた。**数えて決める**こと＝`node tools/sim-random.mjs`。
+//   以前は同じ「レア」に**2つの式**があり（20%固定／重み0.2の相対）、後者は
+//   レアがカテゴリ内で多数派だとレアの方が出やすくなる穴があった → 20%固定に統一。
+const RARITY = {
+  // 「珍しいタグ（ttr）」の枠に入る確率。カテゴリ内のレア全部で分け合う
+  rareTag: 0.10,
+  // 任意カテゴリを引く確率（通常／珍しい枠）
+  optCat: 0.40,
+  rareOptCat: 0.10,
+  // 武器を持つ確率
+  weapon: 0.30,
+};
+const RARE_OPT_CAT_PROB = RARITY.rareOptCat;
 import { CONFLICT_MAP } from "../data/conflicts.js";
 import { COLOR_PALETTE, COLOR_TARGETS, buildColorTag, buildColorName, HUE_GROUPS,
 } from "../data/colors.js";
@@ -76,7 +89,9 @@ function loadCooldown() {
   catch { return []; }
 }
 function saveCooldown(hist) {
-  localStorage.setItem(COOLDOWN_KEY, JSON.stringify(hist.slice(-COOLDOWN_SIZE)));
+  // ブラウザ外（分布を測るシミュレータ）でも動くように、保存は失敗しても進む
+  try { localStorage.setItem(COOLDOWN_KEY, JSON.stringify(hist.slice(-COOLDOWN_SIZE))); }
+  catch { /* localStorage が無い環境＝記憶しないだけ */ }
 }
 function cdWeight(key, catId, hist) {
   if (!key || !COOLDOWN_CAT_IDS.has(catId) || !hist.length) return 1.0;
@@ -128,7 +143,8 @@ function picksToText(picks, strength) {
 // ── 髪色表現タイプ ─────────────────────────────────────────────────────────
 // [単色, グラデ, ツートン, スプリット, 部分カラー, 前髪カラー]
 const HAIR_EXPR_WEIGHTS = {
-  chardesign: [55, 10,  8,  7, 13,  7],
+  // [単色, グラデ, ツートン, スプリット, 部分, 前髪]。キャラデザは設定資料＝素の姿が主役
+  chardesign: [72,  6,  5,  4,  9,  4],
   illust:     [40, 15, 12, 10, 13, 10],
 };
 const HAIR_EXPR_TYPES    = ['solid','gradient','twotone','split','partial','bangs'];
@@ -267,12 +283,17 @@ function pickBlockTags(block, globalExcluded, hist = [], mode = 'illust') {
     let pick;
     if (COOLDOWN_CAT_IDS.has(cat.id)) {
       // クールダウン重みつきランダム（直近と同じタグが出にくい）
-      const allT = [...normalT, ...rareT];
-      const ws   = allT.map(t => (t.rareInRandom ? 0.20 : 1.0) * cdWeight(t.en, cat.id, hist));
-      pick = allT[wIdx(ws)];
+      // ★レアの扱いは1本に統一（2026-07-27）：以前はここだけ相対重みで、
+      //   レアがカテゴリ内で多数派だと**レアの方が出やすい**穴があった。
+      //   まずレア枠に入るか決め、その中でだけクールダウン重みを効かせる。
+      const useRare = rareT.length > 0 && normalT.length > 0
+        && Math.random() < RARITY.rareTag;
+      const poolT   = useRare ? rareT : (normalT.length ? normalT : rareT);
+      const ws      = poolT.map(t => cdWeight(t.en, cat.id, hist));
+      pick = poolT[wIdx(ws)];
     } else if (normalT.length === 0) {
       pick = rareT[Math.floor(Math.random() * rareT.length)];
-    } else if (rareT.length > 0 && Math.random() < 0.20) {
+    } else if (rareT.length > 0 && Math.random() < RARITY.rareTag) {
       pick = rareT[Math.floor(Math.random() * rareT.length)];
     } else {
       pick = normalT[Math.floor(Math.random() * normalT.length)];
@@ -291,7 +312,7 @@ function pickBlockTags(block, globalExcluded, hist = [], mode = 'illust') {
   const shuffledOpt = [...optCats].sort(() => Math.random() - 0.5);
   for (const cat of shuffledOpt) {
     if (picks.length >= maxPicks) break;
-    const prob = RARE_OPT_CAT_NAMES.has(cat.n) ? RARE_OPT_CAT_PROB : 0.4;
+    const prob = RARE_OPT_CAT_NAMES.has(cat.n) ? RARE_OPT_CAT_PROB : RARITY.optCat;
     if (!skippedCats.has(cat.n) && Math.random() < prob) doPick(cat);
   }
   return picks;
@@ -354,12 +375,17 @@ function pickBlockTagsBoosted(block, globalExcluded, boostTags, hist = [], mode 
       const bws = boostedT.map(t => cdWeight(t.en, cat.id, hist));
       pick = boostedT[wIdx(bws)];
     } else if (COOLDOWN_CAT_IDS.has(cat.id)) {
-      const allT = [...normalT, ...rareT];
-      const ws   = allT.map(t => (t.rareInRandom ? 0.20 : 1.0) * cdWeight(t.en, cat.id, hist));
-      pick = allT[wIdx(ws)];
+      // ★レアの扱いは1本に統一（2026-07-27）：以前はここだけ相対重みで、
+      //   レアがカテゴリ内で多数派だと**レアの方が出やすい**穴があった。
+      //   まずレア枠に入るか決め、その中でだけクールダウン重みを効かせる。
+      const useRare = rareT.length > 0 && normalT.length > 0
+        && Math.random() < RARITY.rareTag;
+      const poolT   = useRare ? rareT : (normalT.length ? normalT : rareT);
+      const ws      = poolT.map(t => cdWeight(t.en, cat.id, hist));
+      pick = poolT[wIdx(ws)];
     } else if (normalT.length === 0) {
       pick = rareT[Math.floor(Math.random() * rareT.length)];
-    } else if (rareT.length > 0 && Math.random() < 0.20) {
+    } else if (rareT.length > 0 && Math.random() < RARITY.rareTag) {
       pick = rareT[Math.floor(Math.random() * rareT.length)];
     } else {
       pick = normalT[Math.floor(Math.random() * normalT.length)];
@@ -378,7 +404,7 @@ function pickBlockTagsBoosted(block, globalExcluded, boostTags, hist = [], mode 
   const shuffledOpt = [...optCats].sort(() => Math.random() - 0.5);
   for (const cat of shuffledOpt) {
     if (picks.length >= maxPicks) break;
-    const prob = RARE_OPT_CAT_NAMES.has(cat.n) ? RARE_OPT_CAT_PROB : 0.4;
+    const prob = RARE_OPT_CAT_NAMES.has(cat.n) ? RARE_OPT_CAT_PROB : RARITY.optCat;
     if (!skippedCats.has(cat.n) && Math.random() < prob) doPick(cat);
   }
   return picks;
@@ -635,9 +661,46 @@ const BF_THIGH_TRIGGERS = new Set([
   'micro bikini','string bikini','monokini','bikini','mini skirt','micro skirt','sarashi',
 ]);
 
+// ★一線の最終検算（2026-07-27）：幼い見た目 × 性的強調を最後に必ず外す。
+//   除外ルールは「タグを選ぶ時」と「選び終えた掃除」で効くが、**その後ろで走る
+//   メーカー系レイヤーが足し直せてしまう**（実測：3000体中3件、bare thighs / sideboob が
+//   applyBodyFocusLayer 経由で復活）。だから**全レイヤーの後ろに関所を置く**。
+//   外すのは性的強調の側＝年齢の指定は本人のデザイン、乗せた演出だけ降ろす。
+const HARD_LINE_SEXUAL = new Set([
+  'succubus',
+  'lingerie', 'bra', 'babydoll', 'bunny suit', 'reverse bunny suit', 'corset',
+  'virgin killer sweater', 'naked hoodie', 'micro bikini', 'string bikini',
+  'monokini', 'bikini armor',
+  'cleavage', 'sideboob', 'underboob', 'zettai ryouiki', 'bare thighs',
+  'sultry look', 'seductive gaze', 'teasing smile', 'bedroom eyes',
+  'licking lips', 'biting lip',
+]);
+const HARD_LINE_YOUNG = ['child'];
+
+function enforceHardLine(blockMap) {
+  let young = false;
+  for (const [, b] of blockMap) {
+    if (b.text && HARD_LINE_YOUNG.some(t => hasTag(b.text, t))) { young = true; break; }
+  }
+  if (!young) return;
+  for (const [id, b] of blockMap) {
+    if (!b.text || b.locked) continue;
+    let text = b.text;
+    for (const seg of splitTags(text)) {
+      const tag = bareTag(seg);
+      if (HARD_LINE_SEXUAL.has(tag.toLowerCase())) text = removeTag(text, tag);
+    }
+    if (text !== b.text) blockMap.set(id, { ...b, text });
+  }
+}
+
 function applyBodyFocusLayer(blockMap, mode) {
   const bodyBlock = blockMap.get('body');
   if (!bodyBlock || bodyBlock.locked) return;
+  // 足す前にも見る（関所は最後にもあるが、そもそも足さないのが本筋）
+  for (const [, b] of blockMap) {
+    if (b.text && HARD_LINE_YOUNG.some(t => hasTag(b.text, t))) return;
+  }
   const bodyFocusCat = bodyBlock.cats?.find(c => c.n === 'ボディフォーカス');
   if (!bodyFocusCat) return;
 
@@ -705,9 +768,20 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
 
     const hist = loadCooldown(); // 直近の生成履歴を読み込み
 
-    setCharacters(prev => prev.map(c => {
-      if (c.id !== activeCharId) return c;
+    setCharacters(prev => prev.map(c =>
+      c.id === activeCharId ? weaveRandomCharacter(c, mode, hist) : c
+    ));
+  };
 
+  return { randomMode, setRandomMode, generateRandomChar };
+}
+
+// ★キャラ1体を織る処理をReactの外に出した純関数（2026-07-27）。
+//   確率を見直すには**実際に何千体も生成して分布を見る**しかないが、
+//   フックの中にあると測れなかった。画面側の挙動は変えていない（呼び方が変わっただけ）。
+//   測る道具＝`tools/sim-random.mjs`。
+export function weaveRandomCharacter(c, mode, hist = []) {
+    {
       const globalExcluded = new Set();
       // Illust mode: pre-exclude design/reference/simple-background tags
       if (mode === 'illust') {
@@ -941,6 +1015,9 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
       // Illust mode: close-up Soft Penalty + 顔隠しペナルティ
       if (mode === 'illust') applyIllustSoftPenalties(blockMap);
 
+      // ★一線の関所＝**全レイヤーの後ろ**（ここより後ろにタグを足す処理を置かないこと）
+      enforceHardLine(blockMap);
+
       // 生成履歴を保存（シンプル背景クリア後に実行 → 実際の最終状態を記録）
       const histEntry = {};
       for (const [, b] of blockMap) {
@@ -964,8 +1041,5 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
         blocks: newBlocks.map(b => blockMap.has(b.id) ? blockMap.get(b.id) : b),
         lastModified: Date.now(), // Pull競合対策: ランダム生成結果を必ずローカル優先に
       };
-    }));
-  };
-
-  return { randomMode, setRandomMode, generateRandomChar };
+    }
 }
