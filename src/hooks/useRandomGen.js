@@ -591,6 +591,28 @@ function cleanupAnimalParts(text, picks, speciesCat, strength, hybridChance) {
 }
 
 
+// ── 性別と種族の食い違いを直す ───────────────────────────────────────────
+// 「〜girl」系の種族タグは**女性であることまで含んだ**実在タグ。性別抽選が
+// 独立に 1boy / femboy を引くと矛盾した指示になり、絵が破綻する
+// （2026-07-27 実測：`1boy, dragon girl, dragon horns, dragon tail` が出た）。
+// 種族はデザインの芯なので残し、**性別側を寄せて**辻褄を合わせる。
+// ※ androgynous（中性的）は人数を主張しない見た目の指定なので、矛盾扱いにしない。
+const FEMALE_CODED_SPECIES = new Set([
+  'catgirl', 'dragon girl', 'fox girl', 'goblin girl', 'magical girl',
+  'slime girl', 'monster girl', 'kemonomimi girl', 'mermaid', 'lamia', 'succubus',
+]);
+const MALE_CODED_GENDERS = ['1boy', 'femboy', '2boys', 'multiple boys'];
+
+function reconcileGenderSpecies(text, strength) {
+  if (![...FEMALE_CODED_SPECIES].some(s => hasTag(text, s))) return text;
+  let changed = false;
+  for (const g of MALE_CODED_GENDERS) {
+    if (hasTag(text, g)) { text = removeTag(text, g); changed = true; }
+  }
+  if (changed && !hasTag(text, '1girl')) text = appendTag(text, '1girl', strength);
+  return text;
+}
+
 // ── ボディフォーカス自動付与レイヤー ─────────────────────────────────────
 // OPTIONAL_CAT_NAMESから除外したbody_focusを衣装・髪型条件つきで後処理付与する。
 // chardesign: skipBodyCatsで既にスキップ済みのため低確率のみ。
@@ -773,6 +795,7 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
                 const textBefore = text;
                 text = buildSpeciesText(picks, block, speciesCat, text);
                 text = cleanupAnimalParts(text, picks, speciesCat, block.strength, HYBRID_CHANCE_CHARDESIGN);
+                text = reconcileGenderSpecies(text, block.strength);
                 if (!hasTag(text, 'solo')) text = appendTag(text, 'solo', block.strength);
                 const added = splitTags(text).map(bareTag).filter(en => en && !hasTag(textBefore, en) && !picks.some(p => p.en.toLowerCase() === en.toLowerCase()));
                 const allPicks = added.length ? [...picks, ...added.map(en => ({ en, ja: en }))] : picks;
@@ -804,6 +827,7 @@ export function useRandomGen({ blocks, lang, activeCharId, setCharacters }) {
             const textBefore = text;
             text = buildSpeciesText(picks, block, speciesCat, text);
             text = cleanupAnimalParts(text, picks, speciesCat, block.strength, HYBRID_CHANCE_ILLUST);
+            text = reconcileGenderSpecies(text, block.strength);
             if (!hasTag(text, 'solo')) text = appendTag(text, 'solo', block.strength);
             const added = splitTags(text).map(bareTag).filter(en => en && !hasTag(textBefore, en) && !picks.some(p => p.en.toLowerCase() === en.toLowerCase()));
             picks = added.length ? [...picks, ...added.map(en => ({ en, ja: en }))] : picks;

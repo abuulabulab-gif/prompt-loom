@@ -122,11 +122,14 @@ export const TEMPLATES = [
     descEn: 'Rigging-ready source art — upper body only, white background, neutral face and pose, so layers separate cleanly for decomposition. Apply after the character design is set',
     sizeHintJa: '【推奨サイズ】正方形（Square）。顔が画面の高さの2割以上に写る寄りで生成すること（小さいと口や目の層が取れず、口パク・まばたきが効かない）',
     sizeHintEn: '[Recommended] Square. Keep the face at least 20% of the frame height — smaller faces lose the mouth/eye layers, which disables lip sync and blinking',
-    negHintJa: 'full body, lower body, legs, feet, cowboy shot, from below, from above, dutch angle, dynamic pose, leaning forward, turning head, open mouth, teeth, smile, wink, closed eyes, blush, tears, hands up, hand on face, holding, cropped head, out of frame, busy background, gradient background, shadow, dark lighting',
-    negHintEn: 'full body, lower body, legs, feet, cowboy shot, from below, from above, dutch angle, dynamic pose, leaning forward, turning head, open mouth, teeth, smile, wink, closed eyes, blush, tears, hands up, hand on face, holding, cropped head, out of frame, busy background, gradient background, shadow, dark lighting',
+    negHintJa: 'full body, lower body, legs, feet, cowboy shot, waist, hips, from below, from above, dutch angle, dynamic pose, leaning forward, turning head, open mouth, teeth, smile, wink, closed eyes, blush, tears, hands up, hand on face, holding, cropped head, out of frame, busy background, gradient background, shadow, dark lighting',
+    negHintEn: 'full body, lower body, legs, feet, cowboy shot, waist, hips, from below, from above, dutch angle, dynamic pose, leaning forward, turning head, open mouth, teeth, smile, wink, closed eyes, blush, tears, hands up, hand on face, holding, cropped head, out of frame, busy background, gradient background, shadow, dark lighting',
     apply: {
       quality:     'masterpiece, best quality, ultra-detailed, highres, sharp focus',
-      composition: 'upper body, front view, straight-on, looking at viewer, standing, symmetrical, arms at sides',
+      // ★`upper body` だけだと腰まで写って顔が小さくなり、リグの「顔が画面の2割以上」
+      //   （バストアップ判定）に届かなかった＝2026-07-27の通しチェックで実測。
+      //   `portrait` を足して胸から上へ寄せる。
+      composition: 'portrait, upper body, front view, straight-on, looking at viewer, symmetrical, arms at sides',
       background:  'white background, simple background',
       // 顔は上書きせず**足すだけ**（髪色・目の色などキャラの芯を消さないため）。
       // 抽選で入った表情・口は下の removeCats で先に外してある

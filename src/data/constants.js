@@ -487,6 +487,35 @@ export const RANDOM_COMBO_RULES = [
 ];
 
 // ── キャラデザモード：設定資料特化の厳格ルール ────────────
+// ── 一線：幼い見た目 × 性的強調は組み合わせない ─────────────────────────
+// 2026-07-27、ランダム生成が実際に `succubus, child, flat chest` を出した。
+// 年齢感と種族・衣装・露出が別々に抽選され、突き合わせが無かったため。
+// 生成プラットフォームは**プロンプトの文字列も見る**ので、この組み合わせは
+// 利用者の不利益に直結する。どちらが先に引かれても効くよう**両方向**に張る。
+const CHILDLIKE_TAGS = ['child'];
+const SEXUALIZED_TAGS = [
+  // 種族・属性
+  'succubus',
+  // 露出の強い衣装
+  'lingerie', 'bra', 'babydoll', 'bunny suit', 'reverse bunny suit', 'corset',
+  'virgin killer sweater', 'naked hoodie', 'micro bikini', 'string bikini',
+  'monokini', 'bikini armor',
+  // ボディフォーカス（性的強調）
+  'cleavage', 'sideboob', 'underboob', 'zettai ryouiki', 'bare thighs',
+  // 色気の表情・仕草
+  'sultry look', 'seductive gaze', 'teasing smile', 'bedroom eyes',
+  'licking lips', 'biting lip',
+];
+// ★既存の Set を直接いじらない：LOWER_BODY_FRAME_OUT のように**同じ Set が複数キーで
+//   共有**されているため、破壊的に足すと無関係なルールまで汚染する。必ず複製してから入れる。
+for (const [from, to] of [[CHILDLIKE_TAGS, SEXUALIZED_TAGS], [SEXUALIZED_TAGS, CHILDLIKE_TAGS]]) {
+  for (const key of from) {
+    const merged = new Set(RANDOM_EXCLUSION_RULES.get(key) ?? []);
+    for (const t of to) merged.add(t);
+    RANDOM_EXCLUSION_RULES.set(key, merged);
+  }
+}
+
 export const CHARDESIGN_MODE_CONFIG = {
   // ブロック単位の固定テキスト（ランダム抽選を行わず強制上書き）
   qualityText:     'masterpiece, best quality, ultra-detailed, highres, sharp focus',
