@@ -516,6 +516,25 @@ for (const [from, to] of [[CHILDLIKE_TAGS, SEXUALIZED_TAGS], [SEXUALIZED_TAGS, C
   }
 }
 
+// ── 性別と種族の噛み合わせ（ABUU裁定 2026-07-27）─────────────────────────
+// 「**ドラゴンガールは選ばれたらガールのみ**。ドラゴンの少年を作るなら、
+//   亜人＋ボーイ＋ドラゴンの角＋竜の尻尾などパーツが選ばれる仕様に」
+//
+// ＝性別を後から書き換えて辻褄を合わせるのではなく、**男性を引いた時点で
+//   女性込みの種族タグを候補から外す**。男の竜人は「性別が中立な種族 ＋ 幻想パーツ
+//   （ドラゴン角・竜の尻尾）」で組み上がる＝ABUUの「ベース＋パーツ」の考え方と同じ。
+//   性別は種族より先に抽選されるので、この向きなら一度で決まる（後始末が要らない）。
+export const FEMALE_ONLY_SPECIES = [
+  'catgirl', 'dragon girl', 'fox girl', 'goblin girl', 'magical girl',
+  'slime girl', 'monster girl', 'kemonomimi girl', 'mermaid', 'lamia', 'succubus',
+];
+const MALE_GENDER_TAGS = ['1boy', 'femboy', '2boys', 'multiple boys'];
+for (const g of MALE_GENDER_TAGS) {
+  const merged = new Set(RANDOM_EXCLUSION_RULES.get(g) ?? []);
+  for (const s of FEMALE_ONLY_SPECIES) merged.add(s);
+  RANDOM_EXCLUSION_RULES.set(g, merged);
+}
+
 export const CHARDESIGN_MODE_CONFIG = {
   // ブロック単位の固定テキスト（ランダム抽選を行わず強制上書き）
   qualityText:     'masterpiece, best quality, ultra-detailed, highres, sharp focus',

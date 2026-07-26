@@ -4,6 +4,7 @@ import {
   OPTIONAL_CAT_NAMES, RARE_OPT_CAT_NAMES, BLOCK_RANDOM_RULES, SPECIES_PARTS_MAP, RANDOM_EXCLUDE_TAGS,
   TIER3_TAGS, TIER2_BLOCK_IDS, RANDOM_EXCLUSION_RULES, RANDOM_COMBO_RULES,
   CHARDESIGN_MODE_CONFIG, ILLUST_MODE_CONFIG, WEAPON_TAGS, WEAPON_PICK_PROB, HAND_POSE_TAGS, KEMONOMIMI_PAIRS,
+  FEMALE_ONLY_SPECIES,
 } from "../data/constants.js";
 
 const RARE_OPT_CAT_PROB = 0.10; // rare optional cats: 10% vs standard 40%
@@ -597,10 +598,10 @@ function cleanupAnimalParts(text, picks, speciesCat, strength, hybridChance) {
 // （2026-07-27 実測：`1boy, dragon girl, dragon horns, dragon tail` が出た）。
 // 種族はデザインの芯なので残し、**性別側を寄せて**辻褄を合わせる。
 // ※ androgynous（中性的）は人数を主張しない見た目の指定なので、矛盾扱いにしない。
-const FEMALE_CODED_SPECIES = new Set([
-  'catgirl', 'dragon girl', 'fox girl', 'goblin girl', 'magical girl',
-  'slime girl', 'monster girl', 'kemonomimi girl', 'mermaid', 'lamia', 'succubus',
-]);
+// ★一覧は constants.js の FEMALE_ONLY_SPECIES が唯一の正（2ヶ所に持たない）。
+//   あちらは「男性を引いたら候補から外す」側、ここは**取りこぼしの最後の砦**。
+//   性別より先に種族が決まる経路（コンボルール等）が将来できても矛盾を残さない。
+const FEMALE_CODED_SPECIES = new Set(FEMALE_ONLY_SPECIES);
 const MALE_CODED_GENDERS = ['1boy', 'femboy', '2boys', 'multiple boys'];
 
 function reconcileGenderSpecies(text, strength) {
