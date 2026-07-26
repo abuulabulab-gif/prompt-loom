@@ -1687,7 +1687,7 @@ export default function Loom() {
                 onFocus={e => e.target.style.borderColor = activeChar.color + '80'}
                 onBlur={e => e.target.style.borderColor = activeChar.color + '40'} />
               <div className="text-right text-[0.5625rem] font-mono mt-[0.1875rem]"
-                style={{ color: (activeChar.memo?.length ?? 0) >= 480 ? 'rgb(var(--c-orange))' : 'rgb(var(--dim))' }}>
+                style={{ color: (activeChar.memo?.length ?? 0) >= 480 ? 'rgb(var(--c-orange))' : 'rgb(var(--muted))' }}>
                 {activeChar.memo?.length ?? 0}/500
               </div>
             </div>
@@ -1846,7 +1846,7 @@ export default function Loom() {
                     onFocus={e => e.target.style.borderColor = activeChar.color + '80'}
                     onBlur={e => e.target.style.borderColor = activeChar.color + '40'} />
                   <div className="text-right text-[0.5625rem] font-mono mt-[0.1875rem]"
-                    style={{ color: (activeChar.memo?.length ?? 0) >= 480 ? 'rgb(var(--c-orange))' : 'rgb(var(--dim))' }}>
+                    style={{ color: (activeChar.memo?.length ?? 0) >= 480 ? 'rgb(var(--c-orange))' : 'rgb(var(--muted))' }}>
                     {activeChar.memo?.length ?? 0}/500
                   </div>
                 </div>
