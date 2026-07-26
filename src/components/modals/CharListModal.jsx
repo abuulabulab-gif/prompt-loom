@@ -21,7 +21,7 @@ function CharRow({ c, isActive, isDraggable, onSelect }) {
         {...(isDraggable ? { ...attributes, ...listeners } : {})}
         onClick={isDraggable ? e => e.stopPropagation() : undefined}
         className={`text-sm leading-none select-none flex-shrink-0 ${isDraggable ? 'text-dim cursor-grab active:cursor-grabbing' : 'opacity-20 cursor-default'}`}
-        style={{ color: isDraggable ? undefined : 'rgb(var(--dim))' }}
+        style={{ color: isDraggable ? undefined : 'rgb(var(--muted))' }}
       >⠿</span>
       <span style={{ background: c.color }} className="w-2.5 h-2.5 rounded-full flex-shrink-0" />
       <span className="text-sm leading-none pointer-events-none">{c.emoji}</span>

@@ -2427,7 +2427,7 @@ export default function Loom() {
                         </div>
                         {/* row2 右: 統計テキスト */}
                         <span className="text-[0.5rem] font-mono text-center self-center"
-                          style={{ color: theme === 'light' ? 'rgba(0,0,0,0.38)' : 'rgb(var(--dim))' }}>
+                          style={{ color: theme === 'light' ? 'rgba(0,0,0,0.55)' : 'rgb(var(--muted))' }}>
                           <span style={{ color: tags > 0 ? cc : undefined, fontWeight: tags > 0 ? 700 : 400 }}>{tags}t</span>
                           {' · '}{active}/{total}b
                         </span>
