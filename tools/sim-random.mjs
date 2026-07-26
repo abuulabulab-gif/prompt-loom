@@ -8,7 +8,7 @@
 // （一線・性別矛盾）だけは NG として数え、1件でもあれば終了コード1を返す。
 import { BLOCKS_DEF } from '../src/data/blocks.js';
 import { weaveRandomCharacter } from '../src/hooks/useRandomGen.js';
-import { FEMALE_ONLY_SPECIES } from '../src/data/constants.js';
+import { FEMALE_ONLY_SPECIES, ILLUST_MODE_CONFIG } from '../src/data/constants.js';
 
 const N = Number(process.argv[2] || 2000);
 const MODE = process.argv[3] || 'chardesign';
@@ -39,7 +39,7 @@ const pct = (n) => ((n / N) * 100).toFixed(1) + '%';
 const gender = new Map(), species = new Map(), skin = new Map();
 const hairExpr = new Map(), age = new Map();
 let tagTotal = 0;
-const violations = { genderSpecies: 0, childSexual: 0, samples: [] };
+const violations = { genderSpecies: 0, childSexual: 0, modeBoost: 0, samples: [] };
 
 const GENDERS = ['1girl', '1boy', 'femboy', 'androgynous', '2girls', '2boys', 'multiple girls', 'multiple boys', '1other', 'tomboy'];
 const SKINS = ['fair skin', 'pale skin', 'tan skin', 'dark skin', 'olive skin', 'red skin', 'blue skin', 'grey skin', 'green skin'];
@@ -94,10 +94,33 @@ console.log('  → レア肌（赤青灰緑）合計: ' +
 show('髪の色数', hairExpr);
 show('年齢感', age);
 
+// ★モードの効き（2026-07-27の統合で一番壊れやすい所）：
+//   抽選の芯を1本にしたので、イラストの演出ブーストが死んでいないかを毎回見る。
+{
+  const boost = ILLUST_MODE_CONFIG.boostCompositionTags;
+  let hit = 0;
+  const M = Math.min(N, 1000);
+  for (let i = 0; i < M; i++) {
+    const ch = weaveRandomCharacter(freshChar(), MODE);
+    const comp = (ch.blocks.find(b => b.id === 'composition')?.text || '').toLowerCase();
+    if ([...boost].some(t => comp.includes(t))) hit++;
+  }
+  const rate = hit / M;
+  console.log('\n【モードの効き】演出構図タグの出現: ' + (rate * 100).toFixed(1) + '%');
+  if (MODE === 'illust' && rate < 0.5) {
+    console.log('  NG イラストモードなのに演出が乗っていない（ブーストが死んでいる）');
+    violations.modeBoost = 1;
+  }
+  if (MODE === 'chardesign' && rate > 0.05) {
+    console.log('  NG キャラ特化なのに演出が混ざっている（固定構図が効いていない）');
+    violations.modeBoost = 1;
+  }
+}
+
 console.log('\n【起きてはいけない組み合わせ】');
 console.log('  性別 × 女性込み種族 : ' + violations.genderSpecies);
 console.log('  幼い見た目 × 性的強調: ' + violations.childSexual);
 if (violations.samples.length) console.log('  例: ' + violations.samples.join(' / '));
-const ng = violations.genderSpecies + violations.childSexual;
+const ng = violations.genderSpecies + violations.childSexual + violations.modeBoost;
 console.log(ng === 0 ? '\nOK  禁止の組み合わせは出ませんでした' : `\nNG  ${ng} 件`);
 process.exit(ng === 0 ? 0 : 1);
