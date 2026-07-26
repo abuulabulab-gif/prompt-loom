@@ -29,7 +29,7 @@ function CharRow({ c, isActive, isDraggable, onSelect }) {
         className="text-xs font-medium truncate flex-1 pointer-events-none"
         style={{ color: isActive ? c.color : 'rgb(var(--text))' }}
       >{c.name}</span>
-      {isActive && <span className="text-[0.5rem] flex-shrink-0" style={{ color: 'rgb(var(--dim))' }}>▶</span>}
+      {isActive && <span className="text-[0.7rem] flex-shrink-0" style={{ color: 'rgb(var(--muted))' }}>▶</span>}
     </div>
   );
 }

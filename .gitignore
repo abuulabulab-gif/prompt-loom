@@ -13,3 +13,6 @@ audit-shots/
 audit2-shots/
 prod-check.png
 loom-app.zip
+
+test-results/
+playwright-report/

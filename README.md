@@ -109,3 +109,50 @@ loom-app/
   ブロック定義（`BLOCKS_DEF`）、タグデータ、各モーダルコンポーネントを別ファイルに分割すると保守しやすくなります。
 - アイコン画像（`pwa-192.png` `pwa-512.png` `apple-touch-icon.png`）は未同梱です。
   LOOMロゴから書き出して `public/` に置いてください。
+
+---
+
+## 置き場（フォルダの地図）
+
+```
+loom/
+├─ README.md          … いま読んでいるもの（地図）
+├─ CLAUDE.md          … ★実装の憲法（構成・命名・タグ棚の決めごと）。迷ったらここ
+├─ AGENTS.md          … AIエージェント向けの申し送り
+├─ BACKLOG.md         … ★積み残し・要望・改善の棚（次に何をやるか）
+├─ ROADMAP.md         … リリース済みの履歴
+├─ loom-manual.md     … 利用者向けの使い方
+├─ loom-promo-v2.md   … 紹介文の原稿
+├─ tags-list.md       … タグ棚の一覧（棚卸し用）
+├─ SCREENSHOT_GUIDE.md … 画面写真の撮り方（審査・紹介用）
+│
+├─ index.html         … 入口（Viteが読む）
+│
+├─ src/               … ★本体。構成の説明は CLAUDE.md の「ディレクトリ構成」
+├─ public/            … そのまま配られる静的ファイル
+├─ docs/              … 設計メモ・レビュー記録
+├─ tools/             … 道具（sim-random.mjs＝ランダム生成の分布を測る）
+├─ tests/             … Playwrightの試験
+│
+├─ audit.mjs / audit2.mjs … 画面を撮って点検する使い捨てスクリプト
+├─ check.mjs / check.cjs  … 軽い自己点検
+│
+└─ ★仕様メモ（機能ごと・実装の経緯と決めごと）
+   ├─ random-gen-spec.md      … ランダム生成
+   ├─ template-spec.md        … テンプレート
+   ├─ color-maker-spec.md     … カラーメーカー
+   ├─ cutout-maker-spec.md    … カットメーカー
+   ├─ conflicts-system-spec.md … タグ競合
+   ├─ natural-analyze-spec.md … 自然文・解析
+   ├─ character-note-spec.md  … キャラノート
+   ├─ cloud-sync-spec.md      … クラウド同期
+   └─ data-migration-spec.md  … データ移行
+```
+
+### 散らかりについて（正直な現状・2026-07-27の点検）
+**直下に仕様メモが9枚ある。** どれも中身は生きているが、**根に並んでいると
+「まず何を読むか」が見えにくい**。`docs/specs/` へ寄せる案があるが、
+参照している箇所が動くので**まだやっていない**（ABUUの裁定待ち）。
+
+★この地図を実物に合わせ続ける。ファイル・フォルダを足したらここに1行。
+　ズレは `tools/check-map.py`（RIN-OS共用）が毎回見る。
