@@ -120,6 +120,7 @@ loom/
 ├─ CLAUDE.md          … ★実装の憲法（構成・命名・タグ棚の決めごと）。迷ったらここ
 ├─ AGENTS.md          … AIエージェント向けの申し送り
 ├─ BACKLOG.md         … ★積み残し・要望・改善の棚（次に何をやるか）
+├─ TASKS.md           … 残タスクの入口（実体はBACKLOG.mdへのポインタ・全プロジェクト統一）
 ├─ ROADMAP.md         … リリース済みの履歴
 ├─ loom-manual.md     … 利用者向けの使い方
 ├─ loom-promo-v2.md   … 紹介文の原稿
