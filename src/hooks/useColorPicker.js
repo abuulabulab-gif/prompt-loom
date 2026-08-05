@@ -97,6 +97,27 @@ export function useColorPicker({ activeCharId, blocks, setCharacters, pushHistor
     setTimeout(() => setColorToast(null), 3000);
   };
 
+  // 左右メーカー：入れ先ブロックごとの [{blockId, tags}] を1回のhistoryで適用
+  const applyAsymmetryTags = (pairs) => {
+    const list = (pairs || []).filter(p => p?.tags?.length);
+    if (!list.length) return;
+    pushHistory(makeHistoryEntry(false));
+    const byId = new Map(list.map(p => [p.blockId, p.tags]));
+    setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : {
+      ...c,
+      blocks: c.blocks.map(b => byId.has(b.id) ? {
+        ...b, text: applyMakerTags(b.text, byId.get(b.id)), enabled: true, collapsed: false,
+      } : b),
+    }));
+    const total = list.reduce((n, p) => n + p.tags.length, 0);
+    const names = list.map(p => blocks.find(b => b.id === p.blockId)?.[lang === 'ja' ? 'name' : 'nameEn'] ?? p.blockId);
+    const msg = lang === 'ja'
+      ? `🌓 ${names.join('・')}に${total}件追加`
+      : `🌓 ${total} tag${total > 1 ? 's' : ''} added to ${names.join(', ')}`;
+    setColorToast({ msg });
+    setTimeout(() => setColorToast(null), 3000);
+  };
+
   const _pickColorDefault = (allowedTargets, blockText, fallback) => {
     if (!allowedTargets || typeof blockText !== 'string') return fallback;
     const checks = {
@@ -129,6 +150,6 @@ export function useColorPicker({ activeCharId, blocks, setCharacters, pushHistor
     colorPickerDefaultTarget,
     colorPickerBlockText,
     colorToast, setColorToast,
-    applyColorTag, applyFeatureTag, applyMaterialTag, applyCutoutTags, openColorPicker,
+    applyColorTag, applyFeatureTag, applyMaterialTag, applyCutoutTags, applyAsymmetryTags, openColorPicker,
   };
 }

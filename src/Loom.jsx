@@ -27,6 +27,7 @@ import ColorPickerModal from "./components/modals/ColorPickerModal.jsx";
 import FeatureMakerModal from "./components/modals/FeatureMakerModal.jsx";
 import MaterialMakerModal from "./components/modals/MaterialMakerModal.jsx";
 import CutoutMakerModal from "./components/modals/CutoutMakerModal.jsx";
+import AsymmetryMakerModal from "./components/modals/AsymmetryMakerModal.jsx";
 import SceneComposeModal from "./components/modals/SceneComposeModal.jsx";
 import SettingsModal from "./components/modals/SettingsModal.jsx";
 import CharListModal from "./components/modals/CharListModal.jsx";
@@ -152,6 +153,7 @@ export default function Loom() {
   const [featureMakerFilterBlock, setFeatureMakerFilterBlock] = useState(null);
   const [materialMakerOpen, setMaterialMakerOpen] = useState(false);
   const [cutoutMakerOpen, setCutoutMakerOpen] = useState(false);
+  const [asymMakerOpen, setAsymMakerOpen] = useState(false);
   const [sceneOpen, setSceneOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
@@ -978,7 +980,7 @@ export default function Loom() {
     colorPickerOpen, setColorPickerOpen,
     colorPickerAllowedTargets, colorPickerDefaultTarget, colorPickerBlockText,
     colorToast,
-    applyColorTag, applyFeatureTag, applyMaterialTag, applyCutoutTags, openColorPicker,
+    applyColorTag, applyFeatureTag, applyMaterialTag, applyCutoutTags, applyAsymmetryTags, openColorPicker,
   } = useColorPicker({ activeCharId, blocks, setCharacters, pushHistory, makeHistoryEntry, lang });
 
   // ── Keyboard shortcuts ──
@@ -1027,6 +1029,7 @@ export default function Loom() {
         if (featureMakerOpen)    { setFeatureMakerOpen(false);    return; }
         if (materialMakerOpen)   { setMaterialMakerOpen(false);   return; }
         if (cutoutMakerOpen)     { setCutoutMakerOpen(false);     return; }
+        if (asymMakerOpen)       { setAsymMakerOpen(false);       return; }
         if (sceneOpen)        { setSceneOpen(false);        return; }
         if (analyzeOpen)      { setAnalyzeOpen(false); setAnalyzeText(''); return; }
         if (quickOpen)        { setQuickOpen(false);        return; }
@@ -1332,6 +1335,7 @@ export default function Loom() {
     { id: 'open-feature',  group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎯', label: 'Open feature maker',   labelJa: '特徴メーカーを開く',     action: () => setFeatureMakerOpen(true) },
     { id: 'open-material', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🧵', label: 'Open material maker', labelJa: 'マテリアルメーカーを開く', action: () => setMaterialMakerOpen(true) },
     { id: 'open-cutout',   group: lang === 'ja' ? 'パネル' : 'Panels', icon: '✂️', label: 'Open cutout maker',   labelJa: 'カットメーカーを開く',     action: () => setCutoutMakerOpen(true) },
+    { id: 'open-asym',     group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🌓', label: 'Open asymmetry maker', labelJa: '左右メーカーを開く',       action: () => setAsymMakerOpen(true) },
     ...(characters.length > 1 ? [{ id: 'open-scene', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '🎬', label: 'Open Collab', labelJa: 'キャラ共演を開く', action: () => setSceneOpen(true) }] : []),
     { id: 'open-settings', group: lang === 'ja' ? 'パネル' : 'Panels', icon: '⚙️', label: 'Open settings / shortcuts', labelJa: '設定・ショートカット', shortcut: '?', action: () => setSettingsOpen(true) },
     // AI Tools
@@ -1466,6 +1470,11 @@ export default function Loom() {
                   className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5 whitespace-nowrap"
                   style={{ color: 'rgb(var(--c-purple))' }}>
                   ✂️ {lang === 'ja' ? (isMobile ? 'カット' : 'カットメーカー') : (isMobile ? 'Cutout' : 'Cutout Maker')}
+                </button>
+                <button onClick={() => { setAsymMakerOpen(true); setQuickOpen(false); }}
+                  className="w-full text-left px-3.5 py-2 text-xs font-mono cursor-pointer hover:bg-surfalt flex items-center gap-2.5 whitespace-nowrap"
+                  style={{ color: 'rgb(var(--c-purple))' }}>
+                  🌓 {lang === 'ja' ? (isMobile ? '左右' : '左右メーカー') : (isMobile ? 'Asym' : 'Asymmetry Maker')}
                 </button>
                 {characters.length > 1 && (
                   <button onClick={() => { setSceneOpen(true); setQuickOpen(false); }}
@@ -1999,6 +2008,7 @@ export default function Loom() {
                   onFeatureMaker={['face','body','outfit_detail'].includes(block.id) ? () => { setFeatureMakerFilterBlock(block.id === 'outfit_detail' ? 'outfit' : block.id); setFeatureMakerOpen(true); } : undefined}
                   onMaterialMaker={['outfit', 'outfit_detail'].includes(block.id) ? () => setMaterialMakerOpen(true) : undefined}
                   onCutoutMaker={block.id === 'outfit_detail' ? () => setCutoutMakerOpen(true) : undefined}
+                  onAsymmetryMaker={(block.id === 'outfit' || block.id === 'outfit_detail') ? () => setAsymMakerOpen(true) : undefined}
                   isLight={theme === 'light'} />
               );
 
@@ -3037,6 +3047,7 @@ export default function Loom() {
       {featureMakerOpen && <FeatureMakerModal lang={lang} blocks={blocks} onApply={applyFeatureTag} onClose={() => setFeatureMakerOpen(false)} filterBlockId={featureMakerFilterBlock} />}
       {materialMakerOpen && <MaterialMakerModal lang={lang} blocks={blocks} onApply={applyMaterialTag} onClose={() => setMaterialMakerOpen(false)} />}
       {cutoutMakerOpen && <CutoutMakerModal lang={lang} blocks={blocks} onApply={(tags) => { applyCutoutTags(tags); setCutoutMakerOpen(false); }} onClose={() => setCutoutMakerOpen(false)} />}
+      {asymMakerOpen && <AsymmetryMakerModal lang={lang} blocks={blocks} onApply={(pairs) => { applyAsymmetryTags(pairs); setAsymMakerOpen(false); }} onClose={() => setAsymMakerOpen(false)} />}
       {sceneOpen && <SceneComposeModal characters={characters} lang={lang} activeTool={activeTool} theme={theme} onClose={() => setSceneOpen(false)} defaultQuality={blocks.find(b => b.id === 'quality')?.text || ''} />}
       {supportOpen && <SupportModal lang={lang} isMobile={isMobile} onClose={() => setSupportOpen(false)} />}
       {settingsOpen && <SettingsModal lang={lang} isMobile={isMobile} defaultTab={settingsTab} onClose={() => { setSettingsOpen(false); setSettingsTab('shortcuts'); }}
