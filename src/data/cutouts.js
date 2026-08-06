@@ -68,6 +68,16 @@ export const CUTOUT_GROUPS = [
   },
 ];
 
+// 汎用グループメーカーの設定（GroupMakerModal用・2026-08-06共通化）
+export const CUTOUT_MAKER = {
+  icon: '✂️', ja: 'カットメーカー', en: 'Cutout Maker',
+  introJa: '元の衣装の上に重ねるカット・変形ディテールを選択（複数可）。',
+  introEn: 'Pick cut & silhouette details to layer over the base outfit (multi-select).',
+  gradient: 'linear-gradient(135deg,#fb7185,#e11d48)',
+  defaultBlock: CUTOUT_TARGET_BLOCK,
+  groups: CUTOUT_GROUPS,
+};
+
 // 全カットタグの en→ja 逆引き（必要に応じて利用）
 export const CUTOUT_LABEL_MAP = new Map(
   CUTOUT_GROUPS.flatMap(g => g.items.map(it => [it.en.toLowerCase(), it.ja]))

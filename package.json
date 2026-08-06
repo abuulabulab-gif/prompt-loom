@@ -11,7 +11,8 @@
     "lint": "eslint src",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
-    "precheck": "eslint src && vite build"
+    "precheck": "eslint src && vite build",
+    "roadmap": "node scripts/gen-roadmap.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

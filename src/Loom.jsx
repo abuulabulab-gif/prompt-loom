@@ -26,8 +26,9 @@ import TemplateModal from "./components/modals/TemplateModal.jsx";
 import ColorPickerModal from "./components/modals/ColorPickerModal.jsx";
 import FeatureMakerModal from "./components/modals/FeatureMakerModal.jsx";
 import MaterialMakerModal from "./components/modals/MaterialMakerModal.jsx";
-import CutoutMakerModal from "./components/modals/CutoutMakerModal.jsx";
-import AsymmetryMakerModal from "./components/modals/AsymmetryMakerModal.jsx";
+import GroupMakerModal from "./components/modals/GroupMakerModal.jsx";
+import { CUTOUT_MAKER } from "./data/cutouts.js";
+import { ASYM_MAKER } from "./data/asymmetry.js";
 import SceneComposeModal from "./components/modals/SceneComposeModal.jsx";
 import SettingsModal from "./components/modals/SettingsModal.jsx";
 import CharListModal from "./components/modals/CharListModal.jsx";
@@ -1044,7 +1045,7 @@ export default function Loom() {
     colorPickerOpen, setColorPickerOpen,
     colorPickerAllowedTargets, colorPickerDefaultTarget, colorPickerBlockText,
     colorToast,
-    applyColorTag, applyFeatureTag, applyMaterialTag, applyCutoutTags, applyAsymmetryTags, openColorPicker,
+    applyColorTag, applyFeatureTag, applyMaterialTag, applyMakerTagPairs, openColorPicker,
   } = useColorPicker({ activeCharId, blocks, setCharacters, pushHistory, makeHistoryEntry, lang });
 
   // ── Keyboard shortcuts ──
@@ -3137,8 +3138,8 @@ export default function Loom() {
       {colorPickerOpen && <ColorPickerModal lang={lang} onApply={applyColorTag} onClose={() => setColorPickerOpen(false)} defaultTarget={colorPickerDefaultTarget} allowedTargets={colorPickerAllowedTargets} blockText={colorPickerBlockText} />}
       {featureMakerOpen && <FeatureMakerModal lang={lang} blocks={blocks} onApply={applyFeatureTag} onClose={() => setFeatureMakerOpen(false)} filterBlockId={featureMakerFilterBlock} />}
       {materialMakerOpen && <MaterialMakerModal lang={lang} blocks={blocks} onApply={applyMaterialTag} onClose={() => setMaterialMakerOpen(false)} />}
-      {cutoutMakerOpen && <CutoutMakerModal lang={lang} blocks={blocks} onApply={(tags) => { applyCutoutTags(tags); setCutoutMakerOpen(false); }} onClose={() => setCutoutMakerOpen(false)} />}
-      {asymMakerOpen && <AsymmetryMakerModal lang={lang} blocks={blocks} onApply={(pairs) => { applyAsymmetryTags(pairs); setAsymMakerOpen(false); }} onClose={() => setAsymMakerOpen(false)} />}
+      {cutoutMakerOpen && <GroupMakerModal lang={lang} blocks={blocks} config={CUTOUT_MAKER} onApply={(pairs) => { applyMakerTagPairs(pairs, '✂️'); setCutoutMakerOpen(false); }} onClose={() => setCutoutMakerOpen(false)} />}
+      {asymMakerOpen && <GroupMakerModal lang={lang} blocks={blocks} config={ASYM_MAKER} onApply={(pairs) => { applyMakerTagPairs(pairs, '🌓'); setAsymMakerOpen(false); }} onClose={() => setAsymMakerOpen(false)} />}
       {sceneOpen && <SceneComposeModal characters={characters} lang={lang} activeTool={activeTool} theme={theme} onClose={() => setSceneOpen(false)} defaultQuality={blocks.find(b => b.id === 'quality')?.text || ''} />}
       {supportOpen && <SupportModal lang={lang} isMobile={isMobile} onClose={() => setSupportOpen(false)} />}
       {settingsOpen && <SettingsModal lang={lang} isMobile={isMobile} defaultTab={settingsTab} onClose={() => { setSettingsOpen(false); setSettingsTab('shortcuts'); }}

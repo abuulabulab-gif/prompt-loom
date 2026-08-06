@@ -96,16 +96,12 @@ export const ASYM_GROUPS = [
   },
 ];
 
-// 選択タグを「入れ先ブロックごと」にまとめる（Modal と apply の共通ロジック）
-export function groupAsymByBlock(selectedEns) {
-  const map = new Map(); // blockId → en[]
-  for (const g of ASYM_GROUPS) {
-    for (const it of g.items) {
-      if (!selectedEns.has(it.en)) continue;
-      const blockId = it.block || g.block;
-      if (!map.has(blockId)) map.set(blockId, []);
-      map.get(blockId).push(it.en);
-    }
-  }
-  return map;
-}
+// 汎用グループメーカーの設定（GroupMakerModal用・2026-08-06共通化。
+// 入れ先ごとの振り分けはGroupMakerModalが持つ＝旧groupAsymByBlockは吸収・撤去）
+export const ASYM_MAKER = {
+  icon: '🌓', ja: '左右メーカー', en: 'Asymmetry Maker',
+  introJa: '「片方だけ・左右で丈違い・左右別デザイン」を部位ごとに選択（複数可）。それぞれの持ち場のブロックに入ります。',
+  introEn: 'Pick single / uneven-length / mismatched asymmetry per body zone (multi-select). Tags go to their home blocks.',
+  gradient: 'linear-gradient(135deg,#60a5fa,#7c3aed)',
+  groups: ASYM_GROUPS,
+};

@@ -19,6 +19,7 @@ src/
 │   ├── templates.js          ← プリセットテンプレート（apply=上書き/merge、mute=一時OFF指定）
 │   ├── cutouts.js            ← カットメーカー用データ（CUTOUT_GROUPS、対象=outfit_detail）
 │   ├── asymmetry.js          ← 左右メーカー用データ（ASYM_GROUPS・部位7グループ・入れ先ブロック別）
+│   ├── changelog.js          ← ★更新履歴の一次ソース（設定画面表示＋npm run roadmapでROADMAP転記）
 │   ├── extraTags.js          ← 追加タグ定義
 │   ├── conflicts.js          ← タグ競合チェックルール
 │   ├── makerCover.js         ← メーカー置き換え（stripMakerBase/applyMakerTags/isTagActive）
@@ -37,8 +38,7 @@ src/
 │       ├── HistoryModal.jsx  ← スナップショット履歴
 │       ├── TemplateModal.jsx ← テンプレート適用
 │       ├── ColorPickerModal.jsx
-│       ├── CutoutMakerModal.jsx  ← ✂️カットメーカー（衣装ディテールに切り抜き系タグ追記）
-│       ├── AsymmetryMakerModal.jsx ← 🌓左右メーカー（片方だけ・丈違い・左右別を持ち場のブロックへ）
+│       ├── GroupMakerModal.jsx   ← ✂️🌓共通のグループメーカー（configで変身＝cutouts.js/asymmetry.jsのCUTOUT_MAKER/ASYM_MAKER。2026-08-06に2枚を一本化）
 │       ├── SceneComposeModal.jsx
 │       └── ComparePanel.jsx
 ├── CharacterNote/

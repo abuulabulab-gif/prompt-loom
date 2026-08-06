@@ -76,29 +76,9 @@ export function useColorPicker({ activeCharId, blocks, setCharacters, pushHistor
     setTimeout(() => setColorToast(null), 3000);
   };
 
-  const applyCutoutTags = (tags) => {
-    const resolvedId = 'outfit_detail';
-    const tagArray = Array.isArray(tags) ? tags : [tags];
-    if (!tagArray.length) return;
-    pushHistory(makeHistoryEntry(false));
-    setCharacters(prev => prev.map(c => c.id !== activeCharId ? c : {
-      ...c,
-      blocks: c.blocks.map(b => b.id !== resolvedId ? b : {
-        ...b,
-        text: applyMakerTags(b.text, tagArray),
-        enabled: true, collapsed: false,
-      }),
-    }));
-    const blockName = blocks.find(b => b.id === resolvedId)?.[lang === 'ja' ? 'name' : 'nameEn'] ?? resolvedId;
-    const msg = lang === 'ja'
-      ? `✂️ ${blockName}に「${tagArray[0]}」${tagArray.length > 1 ? `他${tagArray.length - 1}件` : ''}を追加`
-      : `✂️ "${tagArray[0]}"${tagArray.length > 1 ? ` +${tagArray.length - 1}` : ''} added to ${blockName}`;
-    setColorToast({ msg });
-    setTimeout(() => setColorToast(null), 3000);
-  };
-
-  // 左右メーカー：入れ先ブロックごとの [{blockId, tags}] を1回のhistoryで適用
-  const applyAsymmetryTags = (pairs) => {
+  // グループメーカー共通：入れ先ブロックごとの [{blockId, tags}] を1回のhistoryで適用
+  // （カット・左右の適用を1本化＝旧applyCutoutTagsを吸収 2026-08-06）
+  const applyMakerTagPairs = (pairs, icon = '✨') => {
     const list = (pairs || []).filter(p => p?.tags?.length);
     if (!list.length) return;
     pushHistory(makeHistoryEntry(false));
@@ -112,8 +92,8 @@ export function useColorPicker({ activeCharId, blocks, setCharacters, pushHistor
     const total = list.reduce((n, p) => n + p.tags.length, 0);
     const names = list.map(p => blocks.find(b => b.id === p.blockId)?.[lang === 'ja' ? 'name' : 'nameEn'] ?? p.blockId);
     const msg = lang === 'ja'
-      ? `🌓 ${names.join('・')}に${total}件追加`
-      : `🌓 ${total} tag${total > 1 ? 's' : ''} added to ${names.join(', ')}`;
+      ? `${icon} ${names.join('・')}に${total}件追加`
+      : `${icon} ${total} tag${total > 1 ? 's' : ''} added to ${names.join(', ')}`;
     setColorToast({ msg });
     setTimeout(() => setColorToast(null), 3000);
   };
@@ -150,6 +130,6 @@ export function useColorPicker({ activeCharId, blocks, setCharacters, pushHistor
     colorPickerDefaultTarget,
     colorPickerBlockText,
     colorToast, setColorToast,
-    applyColorTag, applyFeatureTag, applyMaterialTag, applyCutoutTags, applyAsymmetryTags, openColorPicker,
+    applyColorTag, applyFeatureTag, applyMaterialTag, applyMakerTagPairs, openColorPicker,
   };
 }

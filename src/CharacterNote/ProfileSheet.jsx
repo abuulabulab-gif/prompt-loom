@@ -230,6 +230,23 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
     return s;
   });
   const [copied, setCopied] = useState(false); // false | 'text' | 'tsv'
+  // ★一覧モード（2026-08-06・ABUU「スプレッドシートやドキュメントみたいにサクッとまとめられるよう」）
+  //   ＝全節・全項目をアコーディオン無しで1画面に並べ、Enterで次の欄へ飛ぶ書き込み特化ビュー
+  const [view, setView] = useState(() => {
+    try { return localStorage.getItem('loom_profile_view') === 'table' ? 'table' : 'form'; } catch {} return 'form';
+  });
+  const toggleView = () => {
+    const next = view === 'table' ? 'form' : 'table';
+    setView(next);
+    try { localStorage.setItem('loom_profile_view', next); } catch {}
+  };
+  const gridNext = e => {
+    if (e.key !== 'Enter' || e.shiftKey) return;
+    e.preventDefault();
+    const all = [...document.querySelectorAll('[data-psgrid]')];
+    const i = all.indexOf(e.target);
+    if (all[i + 1]) all[i + 1].focus();
+  };
   const [showTagFields, setShowTagFields] = useState(() => {
     try { return localStorage.getItem('loom_profile_tagfields') === 'true'; } catch {} return false;
   });
@@ -445,6 +462,21 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
           🔄 {lang === 'ja' ? 'エディタから取り込む' : 'Import from editor'}
         </button>
 
+        <button
+          onClick={toggleView}
+          style={view === 'table'
+            ? { background: char.color + '18', borderColor: char.color + '60', color: char.color }
+            : undefined}
+          className={`rounded-md px-[0.5625rem] py-1 text-[0.625rem] font-mono cursor-pointer border transition-all ${view === 'table' ? 'font-bold' : 'border-dim text-muted'}`}
+          title={lang === 'ja'
+            ? '全項目を1画面に並べて、Enterで次の欄へ進みながら一気に書き込む（タグ欄・項目管理はフォーム表示で）'
+            : 'All fields on one screen — Enter jumps to the next field (tag rows live in form view)'}
+        >
+          {view === 'table'
+            ? `⊞ ${lang === 'ja' ? '一覧で編集中' : 'Grid ON'}`
+            : `⊞ ${lang === 'ja' ? '一覧で編集' : 'Grid'}`}
+        </button>
+
         <div className="flex-1" />
 
         <button
@@ -469,8 +501,79 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
         </button>
       </div>
 
+      {/* ── 一覧モード：全節・全項目を1画面に（Enterで次の欄へ） ── */}
+      {view === 'table' && (
+        <div>
+          {SECTIONS.map(sec => {
+            const data = getSection(sec.id);
+            return (
+              <div key={sec.id}>
+                <div className="text-[0.6875rem] font-bold font-mono mt-3 mb-1" style={{ color: char.color }}>
+                  {sec.icon} {lang === 'ja' ? sec.ja : sec.en}
+                </div>
+                {sec.fields.map(f => (
+                  <div key={f.key} className="flex gap-2 mb-[0.1875rem] items-start">
+                    <span className="text-muted text-[0.625rem] font-mono w-[7.5rem] flex-shrink-0 pt-[0.3125rem] leading-tight break-keep">
+                      {lang === 'ja' ? f.ja : f.en}
+                    </span>
+                    {f.multi ? (
+                      <textarea
+                        data-psgrid="1"
+                        value={data[f.key] || ''}
+                        onChange={e => setField(sec.id, f.key, e.target.value)}
+                        placeholder="—"
+                        rows={2}
+                        className="flex-1 bg-bg border border-line rounded-[0.3125rem] text-xs px-2 py-1 font-mono text-fg outline-none resize-y leading-[1.5]"
+                        onFocus={e => { e.target.style.borderColor = char.color + '80'; }}
+                        onBlur={e => { e.target.style.borderColor = ''; }}
+                      />
+                    ) : (
+                      <input
+                        data-psgrid="1"
+                        value={data[f.key] || ''}
+                        onChange={e => setField(sec.id, f.key, e.target.value)}
+                        placeholder="—"
+                        className="flex-1 bg-bg border border-line rounded-[0.3125rem] text-xs px-2 py-1 font-mono text-fg outline-none"
+                        onFocus={e => { e.target.style.borderColor = char.color + '80'; }}
+                        onBlur={e => { e.target.style.borderColor = ''; }}
+                        onKeyDown={gridNext}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+          {customFields.length > 0 && (
+            <div>
+              <div className="text-[0.6875rem] font-bold font-mono mt-3 mb-1" style={{ color: char.color }}>
+                ✏️ {lang === 'ja' ? 'カスタム項目' : 'Custom Fields'}
+              </div>
+              {customFields.map(f => (
+                <div key={f.id} className="flex gap-2 mb-[0.1875rem] items-start">
+                  <span className="text-muted text-[0.625rem] font-mono w-[7.5rem] flex-shrink-0 pt-[0.3125rem] leading-tight break-all">{f.label}</span>
+                  <input
+                    data-psgrid="1"
+                    value={f.value}
+                    onChange={e => updateCustomField(f.id, 'value', e.target.value)}
+                    placeholder="—"
+                    className="flex-1 bg-bg border border-line rounded-[0.3125rem] text-xs px-2 py-1 font-mono text-fg outline-none"
+                    onFocus={e => { e.target.style.borderColor = char.color + '80'; }}
+                    onBlur={e => { e.target.style.borderColor = ''; }}
+                    onKeyDown={gridNext}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="text-dim text-[0.625rem] font-mono mt-2">
+            {lang === 'ja' ? '※ Enterで次の欄へ。AIタグ欄・項目の追加/削除はフォーム表示（もう一度ボタンを押す）で' : '※ Enter jumps to the next field. Tag rows & custom field management live in form view'}
+          </div>
+        </div>
+      )}
+
       {/* ── Standard sections ── */}
-      {SECTIONS.map(sec => {
+      {view === 'form' && SECTIONS.map(sec => {
         const data = getSection(sec.id);
         return (
           <div key={sec.id}>
@@ -507,6 +610,7 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
       })}
 
       {/* ── Custom fields ── */}
+      {view === 'form' && (<>
       <button
         onClick={() => setOpenSecs(prev => ({ ...prev, _custom: !prev._custom }))}
         className="w-full flex items-center gap-1.5 text-[0.6875rem] font-bold font-mono mb-[0.4375rem] mt-3.5 cursor-pointer bg-transparent border-none p-0 text-left group"
@@ -566,6 +670,7 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
           </button>
         </>
       )}
+      </>)}
     </div>
   );
 }
