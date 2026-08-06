@@ -58,6 +58,8 @@ src/
     └── naturalLanguage.js    ← 自然文生成（JA/EN）
 ```
 
+`scripts/` … リポジトリ運用の道具（`gen-roadmap.mjs`＝changelog.js→ROADMAP転記。`npm run roadmap`）
+
 ### `data/conflicts.js` エクスポート
 - `CONFLICT_RULES` — 競合ルール配列（detectConflicts が使用）
 - `detectConflicts(text)` — テキスト内の競合タグ検出

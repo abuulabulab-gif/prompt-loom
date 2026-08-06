@@ -96,7 +96,7 @@ const chipCls = (sel) => sel
 ---
 
 ## TODO（実装時）
-- [ ] `CutoutMakerModal.jsx` を `src/components/modals/` に作成
+- [ ] `GroupMakerModal.jsx（※2026-08-06に左右メーカーと共通化＝旧CutoutMakerModal.jsxは撤去。configは cutouts.js の CUTOUT_MAKER）` を `src/components/modals/` に作成
 - [ ] `Loom.jsx` に `cutoutMakerOpen` state + ツールバーボタン追加
 - [ ] タグ追加時は `precheck` でブロック定義との整合確認
 - [ ] カラーメーカーと同様に CommandPalette からも呼び出せるとベスト
