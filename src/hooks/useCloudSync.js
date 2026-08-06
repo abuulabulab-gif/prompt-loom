@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { pushToCloud, pullFromCloud, deleteFromCloud, mergeCharacters } from "../sync/firestore.js";
+import { pushToCloud, pullFromCloud, deleteFromCloud, mergeCharacters, mergeTombs } from "../sync/firestore.js";
 
 export function useCloudSync({
   user, signInWithGoogle, loaded,
   characters, orderUpdatedAt, settingsUpdatedAt,
+  deletedChars, setDeletedChars,
   setCharacters, setOrderUpdatedAt, setSettingsUpdatedAt,
   theme, lang, viewMode, activeTool, toolSuffixes, history,
   setTheme, setLang, setViewMode, setActiveTool, setToolSuffixes, setHistory,
@@ -23,7 +24,7 @@ export function useCloudSync({
   const liveRef = useRef(null);
   liveRef.current = { // eslint-disable-line react-hooks/refs
     user, orderUpdatedAt, settingsUpdatedAt,
-    characters, theme, lang, viewMode, activeTool, toolSuffixes, history,
+    characters, deletedChars, theme, lang, viewMode, activeTool, toolSuffixes, history,
   };
 
   useEffect(() => {
@@ -44,7 +45,7 @@ export function useCloudSync({
   // ── Pull logic ──────────────────────────────────────────────────────────────
   // force=true bypasses the 30s throttle (for the manual "sync now" button).
   const execPull = async (force = false) => {
-    const { user: u, orderUpdatedAt: oAt, settingsUpdatedAt: sAt } = liveRef.current;
+    const { user: u, orderUpdatedAt: oAt, settingsUpdatedAt: sAt, deletedChars: dl } = liveRef.current;
     if (!u || isSyncingFromCloud.current) return;
     if (!force && Date.now() - lastCloudPullAt.current < 30_000) return;
     isSyncingFromCloud.current = true;
@@ -53,7 +54,10 @@ export function useCloudSync({
       const remote = await pullFromCloud(u.uid);
       lastCloudPullAt.current = Date.now();
       if (remote) {
-        setCharacters(prev => mergeCharacters(prev, remote.characters, remote.characterOrder, oAt, remote.orderUpdatedAt));
+        // 墓標を先に合流させ、そのうえでキャラをマージ（削除の復活防止）
+        const tombs = mergeTombs(dl, remote.deletedChars);
+        setDeletedChars(tombs);
+        setCharacters(prev => mergeCharacters(prev, remote.characters, remote.characterOrder, oAt, remote.orderUpdatedAt, tombs));
         if ((remote.orderUpdatedAt ?? 0) > oAt) setOrderUpdatedAt(remote.orderUpdatedAt);
         if (remote.settings && (remote.settingsUpdatedAt ?? 0) > sAt) {
           isApplyingRemoteSettings.current = true;
@@ -95,11 +99,11 @@ export function useCloudSync({
 
   // ── Push logic ──────────────────────────────────────────────────────────────
   const execPush = async () => {
-    const { user: u, characters: chars, orderUpdatedAt: oAt, settingsUpdatedAt: sAt,
+    const { user: u, characters: chars, orderUpdatedAt: oAt, settingsUpdatedAt: sAt, deletedChars: dl,
             theme: t, lang: l, viewMode: vm, activeTool: at, toolSuffixes: ts, history: h } = liveRef.current;
     if (!u) return;
     setSyncStatus('syncing');
-    const result = await pushToCloud(u.uid, chars, oAt, { theme: t, lang: l, viewMode: vm, activeTool: at, toolSuffixes: ts, history: h }, sAt);
+    const result = await pushToCloud(u.uid, chars, oAt, { theme: t, lang: l, viewMode: vm, activeTool: at, toolSuffixes: ts, history: h }, sAt, dl);
     setSyncStatus(result.ok ? 'synced' : 'error');
     hasPendingPush.current = !result.ok;
     if (!result.ok) setSyncErrCode(result.code ?? '');
@@ -114,7 +118,7 @@ export function useCloudSync({
       if (isSyncingFromCloud.current) return;
       await execPush();
     }, 3000);
-  }, [characters, orderUpdatedAt, settingsUpdatedAt, user, loaded]);
+  }, [characters, orderUpdatedAt, settingsUpdatedAt, deletedChars, user, loaded]);
 
   // Online recovery: retry failed push when connection is restored
   useEffect(() => {

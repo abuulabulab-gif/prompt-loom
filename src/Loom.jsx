@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
 import { DndContext, closestCenter, MouseSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
 import CharVersions from "./components/CharVersions.jsx";
@@ -86,6 +86,22 @@ function migrateAliasesInText(text) {
 // ブロックIDのリネーム履歴。旧IDで保存されたデータを新IDに移行する。
 const LEGACY_BLOCK_IDS = { feature: 'outfit_detail' };
 
+// ★保存のスリム化（2026-08-06全体見直し）：cats は BLOCKS_DEF の複製（1キャラ約40KB・
+//   997タグ）で、読み込み側の mergeCharacterBlocks が毎回 BLOCKS_DEF から作り直す
+//   ＝ディスクに保存する意味がない。クラウドpush（firestore.js toCloudChars）は
+//   最初から剥がしていた＝ローカル保存だけ取り残されていた（30キャラ＋版履歴で
+//   1回の自動保存が数MB級になり得た）。カスタムブロックは cats を持たないので素通し。
+const slimBlockForSave = (b) => {
+  if (b.isCustomBlock) return b;
+  const { cats: _cats, ...rest } = b;
+  return rest;
+};
+const slimCharForSave = (c) => ({
+  ...c,
+  blocks:   (c.blocks   || []).map(slimBlockForSave),
+  versions: (c.versions || []).map(v => ({ ...v, blocks: (v.blocks || []).map(slimBlockForSave) })),
+});
+
 function mergeCharacterBlocks(savedBlocks) {
   const defById = Object.fromEntries(BLOCKS_DEF.map(def => [def.id, def]));
   const processedIds = new Set();
@@ -118,7 +134,23 @@ function mergeCharacterBlocks(savedBlocks) {
 }
 
 export default function Loom() {
-  const [characters, setCharacters] = useState([makeCharacter('キャラ 1', CHAR_COLORS[0], CHAR_EMOJIS[0])]);
+  const [characters, setCharactersRaw] = useState([makeCharacter('キャラ 1', CHAR_COLORS[0], CHAR_EMOJIS[0])]);
+  // ★同期の時計（2026-08-06全体見直しで根治）：中身が変わったキャラだけ lastModified を自動で進める。
+  //   mergeCharacters（sync/firestore.js）はこの時計で勝敗を決めるのに、時計が動くのは
+  //   updateChar とランダム生成だけだった＝タグ操作・メーカー・テンプレ等の編集が
+  //   別端末の pull で丸ごと巻き戻り得た（ランダム生成の「Pull競合対策」コメントの一般化）。
+  //   仕組み＝全書き込みが map で「触っていないキャラは同一参照」を返す前提を使い、
+  //   参照が変わった要素にだけ now を打つ。クラウドのマージと初期ロードは
+  //   setCharactersRaw（素のsetter）を使う＝リモート由来の中身を「いま編集した」ことにしない。
+  const setCharacters = useCallback((updater) => {
+    setCharactersRaw(prev => {
+      const next = typeof updater === 'function' ? updater(prev) : updater;
+      if (next === prev) return prev;
+      const prevSet = new Set(prev);
+      const now = Date.now();
+      return next.map(c => prevSet.has(c) ? c : { ...c, lastModified: now });
+    });
+  }, []);
   const [activeCharId, setActiveCharId] = useState(() => characters[0]?.id);
   const [charPanelOpen, setCharPanelOpen] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth >= 600 : true
@@ -244,6 +276,8 @@ export default function Loom() {
   const [importToast, setImportToast] = useState(null); // null | { name: string }
   const [autoLogToast, setAutoLogToast] = useState(false);
   const [orderUpdatedAt, setOrderUpdatedAt] = useState(0);
+  // 墓標＝消したキャラ {id: 削除時刻}。同期の「削除の復活」防止（sync/firestore.js参照）
+  const [deletedChars, setDeletedChars] = useState({});
   const [settingsUpdatedAt, setSettingsUpdatedAt] = useState(0);
   const [blockStatusOpen, setBlockStatusOpen] = useState(false);
   const [blockStatusPos, setBlockStatusPos] = useState(null);
@@ -266,7 +300,8 @@ export default function Loom() {
   const { syncStatus, syncErrToast, setSyncErrToast, syncErrCode, dataSizeToast, handleSignIn, handleForcePull, handleDeleteCloud, markRemoteApply } = useCloudSync({
     user, signInWithGoogle, loaded,
     characters, orderUpdatedAt, settingsUpdatedAt,
-    setCharacters, setOrderUpdatedAt, setSettingsUpdatedAt,
+    deletedChars, setDeletedChars,
+    setCharacters: setCharactersRaw, setOrderUpdatedAt, setSettingsUpdatedAt,
     theme, lang, viewMode, activeTool, toolSuffixes, history,
     setTheme, setLang, setViewMode, setActiveTool, setToolSuffixes, setHistory,
   });
@@ -284,7 +319,7 @@ export default function Loom() {
               ...c,
               blocks: mergeCharacterBlocks(c.blocks),
             }));
-            setCharacters(migrated); setActiveCharId(migrated[0].id);
+            setCharactersRaw(migrated); setActiveCharId(migrated[0].id);
             // load thumbnails
             const tmap = {};
             for (const c of d.characters) {
@@ -303,6 +338,7 @@ export default function Loom() {
           if (d.outputHeight) setOutputHeight(d.outputHeight);
           if (d.orderUpdatedAt) setOrderUpdatedAt(d.orderUpdatedAt);
           if (d.settingsUpdatedAt) setSettingsUpdatedAt(d.settingsUpdatedAt);
+          if (d.deletedChars) setDeletedChars(d.deletedChars);
         }
       } catch {}
       // First-visit welcome hint
@@ -340,18 +376,42 @@ export default function Loom() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Storage: auto-save on change ──
+  // 最新の保存内容を作る関数を毎renderでrefに置く＝閉じ際フラッシュが古い状態を書かないため
+  const persistRef = useRef(null);
+  persistRef.current = () => saveState({
+    characters: characters.map(slimCharForSave),
+    history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight,
+    orderUpdatedAt, settingsUpdatedAt, deletedChars,
+  });
   useEffect(() => {
     if (!loaded) return;
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(async () => {
       try {
-        await saveState({ characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight, orderUpdatedAt, settingsUpdatedAt });
+        await persistRef.current();
         setSaveStatus('saved');
         if (statusTimer.current) clearTimeout(statusTimer.current);
         statusTimer.current = setTimeout(() => setSaveStatus(''), 2600);
       } catch { setSaveStatus('err'); }
     }, 800);
-  }, [characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight, orderUpdatedAt, settingsUpdatedAt, loaded]);
+  }, [characters, history, lang, activeTool, toolSuffixes, theme, viewMode, outputHeight, orderUpdatedAt, settingsUpdatedAt, deletedChars, loaded]);
+
+  // ★閉じ際フラッシュ（2026-08-06）：800msデバウンスの最中にタブを閉じると最後の編集が
+  //   消えていた。pagehide／裏に回った瞬間に即保存（IndexedDBはbest-effort）。
+  useEffect(() => {
+    if (!loaded) return;
+    const flush = () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+      try { persistRef.current?.(); } catch {}
+    };
+    const onVis = () => { if (document.visibilityState === 'hidden') flush(); };
+    window.addEventListener('pagehide', flush);
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      window.removeEventListener('pagehide', flush);
+      document.removeEventListener('visibilitychange', onVis);
+    };
+  }, [loaded]);
 
   // ── Drag-and-drop ──
   const sensors = useSensors(
@@ -599,7 +659,7 @@ export default function Loom() {
     if (characters.length >= 30) { alert(lang === 'ja' ? 'キャラクターは最大30体まで登録できます' : 'Character limit: 30'); return; }
     const ci = characters.length % CHAR_COLORS.length; const ei = characters.length % CHAR_EMOJIS.length; const c = makeCharacter(`${lang === 'ja' ? 'キャラ' : 'Character'} ${characters.length + 1}`, CHAR_COLORS[ci], CHAR_EMOJIS[ei]); setCharacters(prev => [...prev, c]); setActiveCharId(c.id); setCharPanelOpen(true); setOrderUpdatedAt(Date.now());
   };
-  const duplicateCharacter = (id) => { const src = characters.find(c => c.id === id); if (!src) return; const copy = { ...deep(src), id: uid(), name: src.name + ' (コピー)' }; setCharacters(prev => { const i = prev.findIndex(c => c.id === id); const next = [...prev]; next.splice(i + 1, 0, copy); return next; }); setActiveCharId(copy.id); setOrderUpdatedAt(Date.now()); };
+  const duplicateCharacter = (id) => { const src = characters.find(c => c.id === id); if (!src) return; const copy = { ...deep(src), id: uid(), name: src.name + (lang === 'ja' ? ' (コピー)' : ' (copy)') }; setCharacters(prev => { const i = prev.findIndex(c => c.id === id); const next = [...prev]; next.splice(i + 1, 0, copy); return next; }); setActiveCharId(copy.id); setOrderUpdatedAt(Date.now()); };
   const deleteCharacter = async (id) => {
     if (characters.length <= 1) return;
     const charName = characters.find(c => c.id === id)?.name ?? '';
@@ -608,6 +668,7 @@ export default function Loom() {
       : `Delete "${charName}"? This cannot be undone.`)) return;
     await deleteCharImages(id);
     setThumbs(prev => { const n = { ...prev }; delete n[id]; return n; });
+    setDeletedChars(prev => ({ ...prev, [id]: Date.now() }));
     const r = characters.filter(c => c.id !== id);
     setCharacters(r);
     setOrderUpdatedAt(Date.now());
@@ -640,7 +701,7 @@ export default function Loom() {
   // ── Character version helpers ──
   const saveVersion = (name) => {
     if (!name?.trim()) return;
-    const ver = { id: uid(), name: name.trim(), ts: Date.now(), blocks: deep(activeChar.blocks), memo: activeChar.memo };
+    const ver = { id: uid(), name: name.trim(), ts: Date.now(), blocks: deep(activeChar.blocks.map(slimBlockForSave)), memo: activeChar.memo };
     updateChar(activeCharId, { versions: [ver, ...(activeChar.versions || [])].slice(0, 10) });
   };
   const restoreVersion = (ver) => {
@@ -926,7 +987,7 @@ export default function Loom() {
   if (loraStr) finalPosText = finalPosText + (finalPosText ? ', ' : '') + loraStr;
   if (suffix) finalPosText = finalPosText + (finalPosText ? (tool.sep || ', ') : '') + suffix;
 
-  const naturalText = naturalLang === 'ja' ? toNaturalJa(blocks) : toNaturalEn(blocks);
+  const naturalText = useMemo(() => naturalLang === 'ja' ? toNaturalJa(blocks) : toNaturalEn(blocks), [blocks, naturalLang]);
   // Reset AI result when source text or language changes
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setAiResult(''); setAiError(''); }, [naturalText, naturalLang]);
@@ -951,16 +1012,19 @@ export default function Loom() {
   };
   const blockTextColor = (b) => theme === 'light' ? (b.colorLight ?? b.color) : b.color;
   const tokenColor = textToCopy.length > LIMIT_LEN ? dangerColor : textToCopy.length > WARN_LEN ? warnColor : goodColor;
-  const conflicts = detectConflicts(posText);
+  const conflicts = useMemo(() => detectConflicts(posText), [posText]);
   // Map<tagLower, 'error'|'warn'> — 'error' wins if a tag appears in both levels
-  const conflictTagMap = new Map();
-  for (const c of conflicts) {
-    const lvl = c.level ?? 'error';
-    for (const t of c.tags) {
-      const key = t.toLowerCase();
-      if (!conflictTagMap.has(key) || lvl === 'error') conflictTagMap.set(key, lvl);
+  const conflictTagMap = useMemo(() => {
+    const m = new Map();
+    for (const c of conflicts) {
+      const lvl = c.level ?? 'error';
+      for (const t of c.tags) {
+        const key = t.toLowerCase();
+        if (!m.has(key) || lvl === 'error') m.set(key, lvl);
+      }
     }
-  }
+    return m;
+  }, [conflicts]);
 
   // ── History ──
   const makeHistoryEntry = (isSnapshot = false) => {
@@ -1185,7 +1249,7 @@ export default function Loom() {
 
   // ── Export/Import (1 character) ──
   const handleExport = () => downloadJSON(
-    { version: 'loom-v4', character: activeChar },
+    { version: 'loom-v4', character: slimCharForSave(activeChar) },
     `loom-${activeChar.name}-${Date.now()}.loom`
   );
   const handleImport = (e) => {
