@@ -40,8 +40,9 @@ export const CUTOUT_GROUPS = [
       { en: 'halterneck',      ja: 'ホルターネック' },
       { en: 'criss-cross halter', ja: 'クロスホルター' },
       { en: 'plunging neckline',  ja: '深Vネック' },
-      { en: 'single bare shoulder', ja: '片肩出し' },
-      { en: 'asymmetrical clothes', ja: 'アシンメトリー衣装' },
+      // ★片肩出し・アシンメトリー衣装は左右メーカー（asymmetry.js）へ引っ越し（2026-08-06・
+      //   ABUU「カットメーカーにアシンメトリーがあるから最悪消してOK」＝左右系の家は1つにする。
+      //   タグ自体は blocks.js に残る＝棚からは今までどおり選べる）
     ],
   },
   {

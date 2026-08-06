@@ -18,6 +18,7 @@ src/
 │   ├── tools.js              ← AIツール定義（MJ/NAI/SD/Flux/DALL-E）
 │   ├── templates.js          ← プリセットテンプレート（apply=上書き/merge、mute=一時OFF指定）
 │   ├── cutouts.js            ← カットメーカー用データ（CUTOUT_GROUPS、対象=outfit_detail）
+│   ├── asymmetry.js          ← 左右メーカー用データ（ASYM_GROUPS・部位7グループ・入れ先ブロック別）
 │   ├── extraTags.js          ← 追加タグ定義
 │   ├── conflicts.js          ← タグ競合チェックルール
 │   ├── makerCover.js         ← メーカー置き換え（stripMakerBase/applyMakerTags/isTagActive）
@@ -37,6 +38,7 @@ src/
 │       ├── TemplateModal.jsx ← テンプレート適用
 │       ├── ColorPickerModal.jsx
 │       ├── CutoutMakerModal.jsx  ← ✂️カットメーカー（衣装ディテールに切り抜き系タグ追記）
+│       ├── AsymmetryMakerModal.jsx ← 🌓左右メーカー（片方だけ・丈違い・左右別を持ち場のブロックへ）
 │       ├── SceneComposeModal.jsx
 │       └── ComparePanel.jsx
 ├── CharacterNote/
@@ -47,6 +49,7 @@ src/
 │   ├── PromptLogEntry.jsx
 │   └── RecordModal.jsx
 ├── hooks/
+│   ├── useColorPicker.js     ← メーカー適用の共通口（applyColorTag/Feature/Material/Cutout/Asymmetry）
 │   ├── useVariations.js      ← バリエーション生成（3種類）
 │   ├── useOutputDrag.js      ← 出力エリアのリサイズドラッグ
 │   ├── useCloudSync.js       ← クラウド同期（pull/push/visibility）・設定変更検知
@@ -197,12 +200,12 @@ src/
 ## フェーズ管理
 
 - **フェーズ2完了**: 基本UI・スマホ/PC出力バー・ブロック非表示・キャラノート・バリエーション・ARチップ
-- **v2.7作業中（2026-07-06）**: ①プリセット束化（上記セクション参照）②メーカー製タグチップのクリック→そのブロックに配置されたメーカーを起動（BlockCard renderChip・破線下線が目印。素材メーカーは outfit_detail にも配線）③特徴メーカーに「リボン」位置アイテム（首/腕/脚/足首/背中。**選定基準＝多位置アイテムだけメーカー行き、単一位置の装飾はタグのまま**）④素材メーカーに ribbed/see-through＋セーター/袖ターゲット拡張 ⑤カラーメーカーに靴ひもターゲット ⑥PixAIツールプロファイル ⑦衣装ディテールに袖カテゴリ ⑧✦ツールDD幅320→380px
+- **v2.7〜v2.9＝リリース済み**（2026-08-06現在。内容の一次ソース＝`ROADMAP.md`。v2.9＝🌓左右メーカー・破綻チェック左右系・健康診断強化）。旧「v2.7作業中」の細目はROADMAP v2.7の項へ畳んだ（2ヶ所に持たない）
 - **タグ棚の憲法（ABUU 2026-07-06）**: むやみに静的タグを追加しない。色×部位/素材×衣服のような組み合わせタグはメーカー（既存・改修・新設）で合成する。静的タグを追加する場合はタグ辞書（tagDictionary.js）への登録必須。メーカー生成タグの日本語は各resolver（FEATURE_TAG_JA / resolveMaterialLabel / resolveColorLabel）に必ず対応させる（チップ表示と自然文の両方が参照）
 - **ブロック＝基礎、メーカー＝制御（ABUU 2026-07-06・レイヤー設計の原則）**: 基礎タグ（リボン・タトゥー・包帯・眼鏡…「何を付けるか」）はブロックに置く。それを**どうするか**（位置・左右・掛け方・素材・色）の制御はメーカーが担う＝「こだわるならの設計」。体の複数箇所に付けられるもの（多位置アイテム）は特徴メーカーの品揃えに追加していく。単一位置の装飾（チョーカー等）はタグのままでよい。メーカーのoptionsに使う英語はDanbooruに実在するタグを優先（造語は票が入らない）
 - **次フェーズ候補**: スマホARチップ、タグ補足tooltip（ENモード）、クイックプリセット
-- **キャラ一貫性の後日枠（2026-07-06合意・v2.7候補）**:
-  1. 一貫性監査の拡張 — 健康診断に「素体の抜け」検出（髪色・目色・肌・身長感・シグネチャ特徴[ほくろ等]が未指定なら警告）
+- **キャラ一貫性の後日枠（2026-07-06合意）**:
+  1. ~~一貫性監査の拡張~~ **✅ v2.9で実装（2026-08-06）**＝健康診断に素体の抜け（肌色・身長感＝まとめて1件の注意。シグネチャ特徴は狼少年化するので見送り）・ブロック間の同タグ重複・全体タグ過密（46以上）を追加
   2. 素体コピー — ベース（tmplBase）の内容だけをワンクリックでクリップボードへ（他AIへの持ち出し用）
 
 ---

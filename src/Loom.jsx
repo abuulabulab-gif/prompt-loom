@@ -2343,8 +2343,32 @@ export default function Loom() {
                 const isFemaleChar = allText && /\b(?:1girl|2girls|girl|female|woman|wife|sister|mother)\b/i.test(allText);
                 const hasBustSize  = allText && /\b(?:flat chest|small breasts|medium breasts|large breasts|huge breasts)\b/i.test(allText);
                 const missingBust  = isFemaleChar && !hasBustSize;
-                const consistIssues = [!hasHairColor, !hasEyeColor, !hasEnoughTags, missingBust].filter(Boolean).length;
-                const totalWarn = warnCount + (maxBlock >= 14 ? 1 : 0) + consistIssues;
+                // ── 素体の抜け（肌色・身長感）＝v2.7後日枠「一貫性監査の拡張」。
+                //    まとめて1件の注意（1項目ずつ数えると大半のキャラが「中」になり、狼少年化する）
+                //    判定はタグ単位（部分一致だと short hair の short を身長と誤読する）
+                const tagsPerBlock = nonNeg.filter(b => b.enabled !== false && b.text)
+                  .map(b => ({ name: b[lang === 'ja' ? 'name' : 'nameEn'], set: new Set(splitTags(b.text).map(s => bareTag(s).toLowerCase())) }));
+                const tagSet = new Set(tagsPerBlock.flatMap(x => [...x.set]));
+                const SKIN_TAGS   = ['fair skin','pale skin','tan skin','dark skin','olive skin','red skin','blue skin','grey skin','green skin'];
+                const HEIGHT_TAGS = ['tall','petite','short stature','tall female','tall male'];
+                const bodyGaps = allText ? [
+                  !SKIN_TAGS.some(x => tagSet.has(x))   && (lang === 'ja' ? '肌色' : 'skin tone'),
+                  !HEIGHT_TAGS.some(x => tagSet.has(x)) && (lang === 'ja' ? '身長感' : 'height'),
+                ].filter(Boolean) : [];
+                // ── 同じタグが複数ブロックに重複（票の無駄・強度が割れる）──
+                const dupTags = (() => {
+                  const seen = new Map(); // tag → 初出ブロック名
+                  const dups = new Set();
+                  for (const x of tagsPerBlock) for (const tag of x.set) {
+                    if (seen.has(tag) && seen.get(tag) !== x.name) dups.add(tag);
+                    else if (!seen.has(tag)) seen.set(tag, x.name);
+                  }
+                  return [...dups];
+                })();
+                // ── 全体のタグ過密（1ブロック14の全体版。多すぎると1タグあたりの票が薄まる）──
+                const overloaded = tags > 45;
+                const consistIssues = [!hasHairColor, !hasEyeColor, !hasEnoughTags, missingBust, bodyGaps.length > 0].filter(Boolean).length;
+                const totalWarn = warnCount + (maxBlock >= 14 ? 1 : 0) + consistIssues + (dupTags.length ? 1 : 0) + (overloaded ? 1 : 0);
                 const risk = !allText            ? null
                            : errCount >= 2       ? { label: '大', color: '#f87171' }
                            : errCount === 1      ? { label: '中', color: '#fb923c' }
@@ -2413,6 +2437,9 @@ export default function Loom() {
                                 if (!hasEyeColor)  parts.push(lang === 'ja' ? '目の色未設定' : 'Eye color missing');
                                 if (!hasEnoughTags) parts.push(lang === 'ja' ? 'タグ不足' : 'Too few tags');
                                 if (missingBust)   parts.push(lang === 'ja' ? '胸サイズ未設定' : 'Bust size missing');
+                                if (bodyGaps.length) parts.push((lang === 'ja' ? '素体の抜け: ' : 'Base gaps: ') + bodyGaps.join('・'));
+                                if (dupTags.length)  parts.push((lang === 'ja' ? 'ブロック間の重複: ' : 'Cross-block dup: ') + dupTags.slice(0, 3).join(', ') + (dupTags.length > 3 ? ` +${dupTags.length - 3}` : ''));
+                                if (overloaded)      parts.push(lang === 'ja' ? `タグ過密（全体${tags}）` : `Overloaded (${tags} tags)`);
                                 return parts.length ? parts.join(' / ') : (lang === 'ja' ? '問題なし' : 'No issues');
                               })()}
                               style={{

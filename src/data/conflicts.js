@@ -6,6 +6,20 @@ function mk(a, bs, ja, level) {
   return bs.map(b => ({ tags: [a, b], ja, en: `${a} + ${b}`, ...(level ? { level } : {}) }));
 }
 
+// 脚の無い種族（人魚・ラミア）と矛盾する「脚まわりの衣装・靴」の共有リスト。
+// ★1本にしてある理由＝2列に手書きしていた時代、片方にだけ足して片方を忘れる抜けが7種出た（2026-08-06実測）。
+const NO_LEGS_WEAR = [
+  'thighhighs','shorts','skirt','pants','barefoot','leggings',
+  'high heels','pumps','platform shoes','boots','knee-high boots','thigh-high boots',
+  'ankle boots','sneakers','loafers','mary janes','sandals','slippers',
+  'socks','ankle socks','knee-high socks','platform boots','leg warmers','frilled socks',
+  'single thighhigh','mismatched legwear','fishnet legwear','geta','zettai ryouiki','tights',
+  'fishnet tights','flared skirt','mini skirt','micro skirt','slit skirt','pencil skirt',
+  'single sock','single leg pantyhose','asymmetrical legwear','uneven legwear','over-kneehighs','striped thighhighs',
+  'single shoe','single boot','mismatched footwear','oxford shoes','ballet flats','mules',
+  'heels','bare thighs','thighs','thigh gap','thick thighs','long legs',
+];
+
 export const CONFLICT_RULES = [
   // ── 年齢・体型 ────────────────────────────────────────────────
   { tags:['loli','mature female'],      ja:'幼い体型と成熟体型が矛盾',        en:'loli + mature female' },
@@ -252,77 +266,12 @@ export const CONFLICT_RULES = [
     'thighhighs','tights','pantyhose','knee-high socks','frilled socks','single thighhigh',
   ], 'ハーピーの鳥足と靴/ニーハイ類が不自然（アニメ設定では多様なため警告のみ）', 'warn'),
 
-  // ── 種族×衣装（人魚） ─────────────────────────────────────────
-  { tags:['mermaid','thighhighs'],        ja:'人魚とニーハイが矛盾（脚がない）',            en:'mermaid + thighhighs' },
-  { tags:['mermaid','shorts'],            ja:'人魚とショーツが矛盾（脚がない）',            en:'mermaid + shorts' },
-  { tags:['mermaid','skirt'],             ja:'人魚とスカートが矛盾（脚がない）',            en:'mermaid + skirt' },
-  { tags:['mermaid','pants'],             ja:'人魚とパンツが矛盾（脚がない）',              en:'mermaid + pants' },
-  { tags:['mermaid','barefoot'],          ja:'人魚と裸足が矛盾（脚がない）',               en:'mermaid + barefoot' },
-  { tags:['mermaid','leggings'],          ja:'人魚とレギンスが矛盾（脚がない）',            en:'mermaid + leggings' },
-  { tags:['mermaid','high heels'],        ja:'人魚とハイヒールが矛盾（脚がない）',          en:'mermaid + high heels' },
-  { tags:['mermaid','pumps'],             ja:'人魚とパンプスが矛盾（脚がない）',            en:'mermaid + pumps' },
-  { tags:['mermaid','platform shoes'],    ja:'人魚と厚底が矛盾（脚がない）',               en:'mermaid + platform shoes' },
-  { tags:['mermaid','boots'],             ja:'人魚とブーツが矛盾（脚がない）',              en:'mermaid + boots' },
-  { tags:['mermaid','knee-high boots'],   ja:'人魚とニーハイブーツが矛盾（脚がない）',      en:'mermaid + knee-high boots' },
-  { tags:['mermaid','thigh-high boots'],  ja:'人魚とサイハイブーツが矛盾（脚がない）',      en:'mermaid + thigh-high boots' },
-  { tags:['mermaid','ankle boots'],       ja:'人魚とアンクルブーツが矛盾（脚がない）',      en:'mermaid + ankle boots' },
-  { tags:['mermaid','sneakers'],          ja:'人魚とスニーカーが矛盾（脚がない）',          en:'mermaid + sneakers' },
-  { tags:['mermaid','loafers'],           ja:'人魚とローファーが矛盾（脚がない）',          en:'mermaid + loafers' },
-  { tags:['mermaid','mary janes'],        ja:'人魚とメアリージェーンが矛盾（脚がない）',    en:'mermaid + mary janes' },
-  { tags:['mermaid','sandals'],           ja:'人魚とサンダルが矛盾（脚がない）',            en:'mermaid + sandals' },
-  { tags:['mermaid','slippers'],          ja:'人魚とスリッパが矛盾（脚がない）',            en:'mermaid + slippers' },
-  { tags:['mermaid','socks'],             ja:'人魚と靴下が矛盾（脚がない）',               en:'mermaid + socks' },
-  { tags:['mermaid','ankle socks'],       ja:'人魚とアンクルソックスが矛盾（脚がない）',    en:'mermaid + ankle socks' },
-  { tags:['mermaid','knee-high socks'],   ja:'人魚とニーハイソックスが矛盾（脚がない）',    en:'mermaid + knee-high socks' },
-  { tags:['mermaid','platform boots'],    ja:'人魚と厚底ブーツが矛盾（脚がない）',           en:'mermaid + platform boots' },
-  { tags:['mermaid','leg warmers'],       ja:'人魚とレッグウォーマーが矛盾（脚がない）',      en:'mermaid + leg warmers' },
-  { tags:['mermaid','frilled socks'],    ja:'人魚とフリルソックスが矛盾（脚がない）',        en:'mermaid + frilled socks' },
-  { tags:['mermaid','single thighhigh'],ja:'人魚と片方ニーハイが矛盾（脚がない）',          en:'mermaid + single thighhigh' },
-  { tags:['mermaid','mismatched legwear'],ja:'人魚と左右違い靴下が矛盾（脚がない）',        en:'mermaid + mismatched legwear' },
-  { tags:['mermaid','fishnet legwear'],  ja:'人魚と網レッグウェアが矛盾（脚がない）',      en:'mermaid + fishnet legwear' },
-  // 追加: geta・zettai ryouiki・スカート系・ボディフォーカス脚系
-  { tags:['mermaid','geta'],            ja:'人魚と下駄が矛盾（脚がない）',                en:'mermaid + geta' },
-  { tags:['mermaid','zettai ryouiki'],  ja:'人魚と絶対領域が矛盾（脚がない）',             en:'mermaid + zettai ryouiki' },
-  { tags:['mermaid','tights'],          ja:'人魚とタイツが矛盾（脚がない）',               en:'mermaid + tights' },
-  { tags:['mermaid','fishnet tights'],  ja:'人魚とフィッシュネットタイツが矛盾（脚がない）', en:'mermaid + fishnet tights' },
-  ...mk('mermaid', ['flared skirt','mini skirt','micro skirt','slit skirt','pencil skirt'], '人魚とスカート類が矛盾（脚がない）'),
-  ...mk('mermaid', ['bare thighs','thighs','thigh gap','thick thighs','long legs'], '人魚と脚部ボディフォーカスが矛盾（脚がない）'),
-
-  // ── 種族×衣装（ラミア）─────────────────────────────────────────
-  { tags:['lamia','thighhighs'],          ja:'ラミアとニーハイが矛盾（蛇の下半身）',        en:'lamia + thighhighs' },
-  { tags:['lamia','shorts'],              ja:'ラミアとショーツが矛盾（蛇の下半身）',        en:'lamia + shorts' },
-  { tags:['lamia','skirt'],               ja:'ラミアとスカートが矛盾（蛇の下半身）',        en:'lamia + skirt' },
-  { tags:['lamia','pants'],               ja:'ラミアとパンツが矛盾（蛇の下半身）',          en:'lamia + pants' },
-  { tags:['lamia','leggings'],            ja:'ラミアとレギンスが矛盾（蛇の下半身）',        en:'lamia + leggings' },
-  { tags:['lamia','barefoot'],            ja:'ラミアと裸足が矛盾（蛇の下半身）',            en:'lamia + barefoot' },
-  { tags:['lamia','high heels'],          ja:'ラミアとハイヒールが矛盾（蛇の下半身）',      en:'lamia + high heels' },
-  { tags:['lamia','pumps'],               ja:'ラミアとパンプスが矛盾（蛇の下半身）',        en:'lamia + pumps' },
-  { tags:['lamia','platform shoes'],      ja:'ラミアと厚底が矛盾（蛇の下半身）',            en:'lamia + platform shoes' },
-  { tags:['lamia','boots'],               ja:'ラミアとブーツが矛盾（蛇の下半身）',          en:'lamia + boots' },
-  { tags:['lamia','knee-high boots'],     ja:'ラミアとニーハイブーツが矛盾（蛇の下半身）',  en:'lamia + knee-high boots' },
-  { tags:['lamia','thigh-high boots'],    ja:'ラミアとサイハイブーツが矛盾（蛇の下半身）',  en:'lamia + thigh-high boots' },
-  { tags:['lamia','ankle boots'],         ja:'ラミアとアンクルブーツが矛盾（蛇の下半身）',  en:'lamia + ankle boots' },
-  { tags:['lamia','sneakers'],            ja:'ラミアとスニーカーが矛盾（蛇の下半身）',      en:'lamia + sneakers' },
-  { tags:['lamia','loafers'],             ja:'ラミアとローファーが矛盾（蛇の下半身）',      en:'lamia + loafers' },
-  { tags:['lamia','mary janes'],          ja:'ラミアとメアリージェーンが矛盾（蛇の下半身）',en:'lamia + mary janes' },
-  { tags:['lamia','sandals'],             ja:'ラミアとサンダルが矛盾（蛇の下半身）',        en:'lamia + sandals' },
-  { tags:['lamia','socks'],               ja:'ラミアと靴下が矛盾（蛇の下半身）',            en:'lamia + socks' },
-  { tags:['lamia','knee-high socks'],     ja:'ラミアとニーハイソックスが矛盾（蛇の下半身）',en:'lamia + knee-high socks' },
-  { tags:['lamia','ankle socks'],         ja:'ラミアとアンクルソックスが矛盾（蛇の下半身）',en:'lamia + ankle socks' },
-  { tags:['lamia','platform boots'],      ja:'ラミアと厚底ブーツが矛盾（蛇の下半身）',       en:'lamia + platform boots' },
-  { tags:['lamia','leg warmers'],         ja:'ラミアとレッグウォーマーが矛盾（蛇の下半身）',  en:'lamia + leg warmers' },
-  { tags:['lamia','frilled socks'],      ja:'ラミアとフリルソックスが矛盾（蛇の下半身）',    en:'lamia + frilled socks' },
-  { tags:['lamia','single thighhigh'],  ja:'ラミアと片方ニーハイが矛盾（蛇の下半身）',      en:'lamia + single thighhigh' },
-  { tags:['lamia','mismatched legwear'],ja:'ラミアと左右違い靴下が矛盾（蛇の下半身）',      en:'lamia + mismatched legwear' },
-  { tags:['lamia','fishnet legwear'],  ja:'ラミアと網レッグウェアが矛盾（蛇の下半身）',    en:'lamia + fishnet legwear' },
-  // 追加
-  { tags:['lamia','geta'],            ja:'ラミアと下駄が矛盾（蛇の下半身）',              en:'lamia + geta' },
-  { tags:['lamia','slippers'],        ja:'ラミアとスリッパが矛盾（蛇の下半身）',           en:'lamia + slippers' },
-  { tags:['lamia','zettai ryouiki'],  ja:'ラミアと絶対領域が矛盾（蛇の下半身）',           en:'lamia + zettai ryouiki' },
-  { tags:['lamia','tights'],          ja:'ラミアとタイツが矛盾（蛇の下半身）',             en:'lamia + tights' },
-  { tags:['lamia','fishnet tights'],  ja:'ラミアとフィッシュネットタイツが矛盾（蛇の下半身）', en:'lamia + fishnet tights' },
-  ...mk('lamia', ['flared skirt','mini skirt','micro skirt','slit skirt','pencil skirt'], 'ラミアとスカート類が矛盾（蛇の下半身）'),
-  ...mk('lamia', ['bare thighs','thighs','thigh gap','thick thighs','long legs'], 'ラミアと脚部ボディフォーカスが矛盾（蛇の下半身）'),
+  // ── 種族×衣装（人魚・ラミア＝脚が無い種族） ─────────────────────
+  // ★対象タグは共有リスト1本（NO_LEGS_WEAR）。2026-08-06に手書き2列を畳んだ＝
+  //   2列時代は「片方にだけ足す」抜けが実際に7種出ていた（oxford shoes等）。
+  //   レッグ・靴系のタグを増やしたら、ここに1行足せば人魚もラミアも同時に効く。
+  ...mk('mermaid', NO_LEGS_WEAR, '人魚と脚まわりの衣装・靴が矛盾（脚がない）'),
+  ...mk('lamia',   NO_LEGS_WEAR, 'ラミアと脚まわりの衣装・靴が矛盾（蛇の下半身）'),
 
   // ── 男性 × 胸サイズ ──────────────────────────────────────────
   { tags:['1boy','large breasts'],   ja:'男性と大きめ胸サイズが矛盾',  en:'1boy + large breasts' },
@@ -479,6 +428,23 @@ export const CONFLICT_RULES = [
   ...mk('crescent mark on forehead', ['rune mark on forehead','magic seal on forehead','occult mark on forehead'], '額のマークが重複'),
   ...mk('rune mark on forehead',     ['magic seal on forehead','occult mark on forehead'], '額のマークが重複'),
   ...mk('magic seal on forehead',    ['occult mark on forehead'], '額のマークが重複'),
+
+  // ── 左右系の重ね掛け（左右メーカー新設に伴い 2026-08-06）─────────
+  // single〜（片方だけ）と両方系タグの同居は矛盾。error は CONFLICT_MAP 経由で
+  // ランダム生成からも自動で除外される。
+  { tags:['single thighhigh','thighhighs'],        ja:'片方ニーハイと両脚ニーハイが矛盾',        en:'single thighhigh + thighhighs' },
+  { tags:['single sock','socks'],                  ja:'片ソックスと両脚ソックスが矛盾',          en:'single sock + socks' },
+  { tags:['single leg pantyhose','pantyhose'],     ja:'片脚ストッキングとパンストが矛盾',        en:'single leg pantyhose + pantyhose' },
+  { tags:['single glove','gloves'],                ja:'片手袋と両手手袋が矛盾',                  en:'single glove + gloves' },
+  { tags:['single elbow glove','elbow gloves'],    ja:'片ロンググローブと両手ロンググローブが矛盾', en:'single elbow glove + elbow gloves' },
+  { tags:['single hair bun','double bun'],         ja:'片側お団子とお団子×2が矛盾',              en:'single hair bun + double bun' },
+  { tags:['single sleeve','sleeveless'],           ja:'片袖とノースリーブが矛盾',                en:'single sleeve + sleeveless' },
+  { tags:['single detached sleeve','detached sleeves'], level:'warn', ja:'片分離袖と両腕分離袖はどちらかに', en:'single detached sleeve + detached sleeves' },
+  { tags:['single glove','mismatched gloves'],     level:'warn', ja:'片手袋と左右違い手袋はどちらかに',  en:'single glove + mismatched gloves' },
+  { tags:['single shoe','mismatched footwear'],    level:'warn', ja:'片靴と左右違い靴はどちらかに',      en:'single shoe + mismatched footwear' },
+  { tags:['single boot','mismatched footwear'],    level:'warn', ja:'片ブーツと左右違い靴はどちらかに',  en:'single boot + mismatched footwear' },
+  { tags:['single earring','earrings'],            level:'warn', ja:'片耳イヤリングと（両耳）イヤリングはどちらかに', en:'single earring + earrings' },
+  { tags:['asymmetrical bangs','blunt bangs'],     level:'warn', ja:'アシメ前髪とパッツン（左右対称）は喧嘩しやすい', en:'asymmetrical bangs + blunt bangs' },
 ];
 
 export const detectConflicts = text => {
