@@ -3,7 +3,6 @@
 import { CHANGELOG } from '../../data/changelog.js';
 
 const APP_VERSION = 'v2.9';
-const APP_YEAR = '2026';
 
 const SHORTCUTS = (lang) => [
   {
@@ -880,7 +879,7 @@ export default function SettingsModal({ onClose, lang, isMobile, hiddenBlockIds 
               {/* Copyright */}
               <div className="border-t border-line pt-3.5 text-center space-y-1">
                 <div className="text-fg text-[0.6875rem] font-mono font-semibold">
-                  © {APP_YEAR} LOOM Project
+                  © LOM Project
                 </div>
                 <div className="text-muted text-[0.625rem] font-mono">
                   <a href="https://prompt-loom.com" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">prompt-loom.com</a>
