@@ -134,6 +134,16 @@ function mergeCharacterBlocks(savedBlocks) {
   return [...merged, ...newBlocks];
 }
 
+// 覚えておいた「文」と「入切」をブロックへ戻す。無い物は触らない。
+// ★テンプレの取り消しと、ベースへの復帰で同じ7行を書いていた
+//   （2026-08-31 tools/check-dup.py が発見）＝戻し方を直す時に片方だけ古くなる。
+const applyBlockSnapshot = (blocks, texts, enabled) => blocks.map(b => {
+  const t  = texts?.[b.id];
+  const en = enabled?.[b.id];
+  if (t === undefined && en === undefined) return b;
+  return { ...b, ...(t !== undefined ? { text: t } : {}), ...(en !== undefined ? { enabled: en } : {}) };
+});
+
 export default function Loom() {
   const [characters, setCharactersRaw] = useState([makeCharacter('キャラ 1', CHAR_COLORS[0], CHAR_EMOJIS[0])]);
   // ★同期の時計（2026-08-06全体見直しで根治）：中身が変わったキャラだけ lastModified を自動で進める。
@@ -903,12 +913,7 @@ export default function Loom() {
     if (!templateUndoBuf) return;
     setCharacters(prev => prev.map(c => {
       if (c.id !== activeCharId) return c;
-      return { ...c, blocks: c.blocks.map(b => {
-        const t  = templateUndoBuf.blockTexts[b.id];
-        const en = templateUndoBuf.blockEnabled?.[b.id];
-        if (t === undefined && en === undefined) return b;
-        return { ...b, ...(t !== undefined ? { text: t } : {}), ...(en !== undefined ? { enabled: en } : {}) };
-      }) };
+      return { ...c, blocks: applyBlockSnapshot(c.blocks, templateUndoBuf.blockTexts, templateUndoBuf.blockEnabled) };
     }));
     clearTimeout(templateUndoTimerRef.current);
     setTemplateUndoBuf(null);
@@ -918,12 +923,7 @@ export default function Loom() {
   const restoreTemplateBase = () => {
     setCharacters(prev => prev.map(c => {
       if (c.id !== activeCharId || !c.tmplBase) return c;
-      return { ...c, blocks: c.blocks.map(b => {
-        const t  = c.tmplBase.texts[b.id];
-        const en = c.tmplBase.enabled[b.id];
-        if (t === undefined && en === undefined) return b;
-        return { ...b, ...(t !== undefined ? { text: t } : {}), ...(en !== undefined ? { enabled: en } : {}) };
-      }) };
+      return { ...c, blocks: applyBlockSnapshot(c.blocks, c.tmplBase.texts, c.tmplBase.enabled) };
     }));
     clearTimeout(templateUndoTimerRef.current);
     setTemplateUndoBuf(null);
@@ -1424,6 +1424,34 @@ export default function Loom() {
     ...blocks.map(b => ({ id: `block-${b.id}`, group: lang === 'ja' ? 'ブロック' : 'Blocks', icon: b.icon, label: lang === 'ja' ? b.name : b.nameEn, labelJa: b.name, description: b.text ? b.text.slice(0, 50) : (lang === 'ja' ? '空' : 'empty'), action: () => { setFocusBlockId(null); setTimeout(() => { document.getElementById(`block-${b.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); if (b.collapsed) updateBlock(b.id, { collapsed: false }); }, 80); } })),
   ];
 
+  // 衣装・構図のプリセット行。狭い画面と広い画面で**外側の余白だけ**違う。
+  // ★前はこの21行を丸ごと2ヶ所に書いていた（2026-08-31 tools/check-dup.py が発見）＝
+  //   プリセットの扱いを1つ直すと、**片方の画面幅でだけ古い動きが残る**。
+  const presetRow = (marginCls) => (
+    <div className={`flex gap-0 ${marginCls} min-h-7`}>
+      {[
+        { key: 'costumePresets', label: lang === 'ja' ? '🎀 衣装' : '🎀 Costume', blockId: 'outfit' },
+        { key: 'shotPresets',    label: lang === 'ja' ? '📐 構図' : '📐 Shot',    blockId: 'composition' },
+      ].map(({ key, label, blockId }, i) => (
+        <div key={key} className={`flex-1 flex flex-col gap-1 min-w-0 ${i === 0 ? 'pr-2' : 'pl-2 border-l border-dim'}`}>
+          <span className="text-muted text-[0.625rem] font-mono flex-shrink-0">{label}:</span>
+          <div className="flex flex-wrap gap-1">
+            {(activeChar[key] || []).length === 0
+              ? <span className="text-muted text-[0.625rem] font-mono">{lang === 'ja' ? '（💾で保存）' : '(use 💾)'}</span>
+              : (activeChar[key] || []).map(p => (
+                  <PresetChip key={p.id} preset={p} color={activeChar.color} lang={lang}
+                    otherChars={characters.filter(c => c.id !== activeCharId)}
+                    onLoad={() => loadPreset(blockId, p)} onDelete={() => deletePreset(key, p.id)}
+                    onEditMemo={() => { const v = window.prompt(lang === 'ja' ? 'プリセットメモ（構造ノート等）:' : 'Preset memo:', p.memo || ''); if (v !== null) updatePreset(key, p.id, { memo: v }); }}
+                    onEditNeg={() => { const v = window.prompt(lang === 'ja' ? '適用時に追加するネガタグ（カンマ区切り）:' : 'Negative tags added on load (comma-separated):', p.negAdd || ''); if (v !== null) updatePreset(key, p.id, { negAdd: v }); }}
+                    onCopyTo={(tid) => copyPresetToChar(key, p, tid)} />
+                ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div className="bg-bg text-fg min-h-screen font-sans" style={{ paddingBottom: outputExpanded ? outputHeight : 80 }}>
 
@@ -1765,28 +1793,7 @@ export default function Loom() {
                 {activeChar.memo?.length ?? 0}/500
               </div>
             </div>
-            <div className="flex gap-0 mb-[0.3125rem] min-h-7">
-              {[
-                { key: 'costumePresets', label: lang === 'ja' ? '🎀 衣装' : '🎀 Costume', blockId: 'outfit' },
-                { key: 'shotPresets',    label: lang === 'ja' ? '📐 構図' : '📐 Shot',    blockId: 'composition' },
-              ].map(({ key, label, blockId }, i) => (
-                <div key={key} className={`flex-1 flex flex-col gap-1 min-w-0 ${i === 0 ? 'pr-2' : 'pl-2 border-l border-dim'}`}>
-                  <span className="text-muted text-[0.625rem] font-mono flex-shrink-0">{label}:</span>
-                  <div className="flex flex-wrap gap-1">
-                    {(activeChar[key] || []).length === 0
-                      ? <span className="text-muted text-[0.625rem] font-mono">{lang === 'ja' ? '（💾で保存）' : '(use 💾)'}</span>
-                      : (activeChar[key] || []).map(p => (
-                          <PresetChip key={p.id} preset={p} color={activeChar.color} lang={lang}
-                            otherChars={characters.filter(c => c.id !== activeCharId)}
-                            onLoad={() => loadPreset(blockId, p)} onDelete={() => deletePreset(key, p.id)}
-                            onEditMemo={() => { const v = window.prompt(lang === 'ja' ? 'プリセットメモ（構造ノート等）:' : 'Preset memo:', p.memo || ''); if (v !== null) updatePreset(key, p.id, { memo: v }); }}
-                            onEditNeg={() => { const v = window.prompt(lang === 'ja' ? '適用時に追加するネガタグ（カンマ区切り）:' : 'Negative tags added on load (comma-separated):', p.negAdd || ''); if (v !== null) updatePreset(key, p.id, { negAdd: v }); }}
-                            onCopyTo={(tid) => copyPresetToChar(key, p, tid)} />
-                        ))}
-                  </div>
-                </div>
-              ))}
-            </div>
+            {presetRow("mb-[0.3125rem]")}
             <div className="mb-[0.5625rem]">
               <div className="flex items-center gap-2 mb-[0.3125rem]">
                 <span className="text-muted text-[0.625rem] font-mono">🔗 LoRA</span>
@@ -1925,28 +1932,7 @@ export default function Loom() {
                   </div>
                 </div>
                 {/* Preset row */}
-                <div className="flex gap-0 mb-[0.5625rem] min-h-7">
-                  {[
-                    { key: 'costumePresets', label: lang === 'ja' ? '🎀 衣装' : '🎀 Costume', blockId: 'outfit' },
-                    { key: 'shotPresets',    label: lang === 'ja' ? '📐 構図' : '📐 Shot',    blockId: 'composition' },
-                  ].map(({ key, label, blockId }, i) => (
-                    <div key={key} className={`flex-1 flex flex-col gap-1 min-w-0 ${i === 0 ? 'pr-2' : 'pl-2 border-l border-dim'}`}>
-                      <span className="text-muted text-[0.625rem] font-mono flex-shrink-0">{label}:</span>
-                      <div className="flex flex-wrap gap-1">
-                        {(activeChar[key] || []).length === 0
-                          ? <span className="text-muted text-[0.625rem] font-mono">{lang === 'ja' ? '（💾で保存）' : '(use 💾)'}</span>
-                          : (activeChar[key] || []).map(p => (
-                              <PresetChip key={p.id} preset={p} color={activeChar.color} lang={lang}
-                                otherChars={characters.filter(c => c.id !== activeCharId)}
-                                onLoad={() => loadPreset(blockId, p)} onDelete={() => deletePreset(key, p.id)}
-                                onEditMemo={() => { const v = window.prompt(lang === 'ja' ? 'プリセットメモ（構造ノート等）:' : 'Preset memo:', p.memo || ''); if (v !== null) updatePreset(key, p.id, { memo: v }); }}
-                                onEditNeg={() => { const v = window.prompt(lang === 'ja' ? '適用時に追加するネガタグ（カンマ区切り）:' : 'Negative tags added on load (comma-separated):', p.negAdd || ''); if (v !== null) updatePreset(key, p.id, { negAdd: v }); }}
-                                onCopyTo={(tid) => copyPresetToChar(key, p, tid)} />
-                            ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                {presetRow("mb-[0.5625rem]")}
                 {/* LoRA / Versions / Thumbnails in 3-col grid */}
                 <div className="grid grid-cols-3 gap-4">
                   <div>

@@ -51,99 +51,84 @@ Format: [{"tag":"tag name","block":"face","reason":"short reason in English"}]
 block must be one of: face, attribute, body, outfit, artstyle, background, effect, composition, quality`,
 };
 
-async function request({ provider, apiKey, system, userContent, maxTokens = 700 }) {
-  if (provider === 'openai') {
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [{ role: 'system', content: system }, { role: 'user', content: userContent }],
-        max_tokens: maxTokens,
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error?.message || 'OpenAI API error');
-    return data.choices[0].message.content.trim();
-  }
+// 画像を送る時に一緒に渡す一言（出どころが変わっても同じ）
+const IMAGE_PROMPT = 'この画像を分析してタグを抽出してください。';
 
-  if (provider === 'claude') {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-allow-browser': 'true',
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: maxTokens,
-        system,
-        messages: [{ role: 'user', content: userContent }],
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error?.message || 'Claude API error');
-    return data.content[0].text.trim();
-  }
+// ★出どころごとに違うのは、この4つだけ＝**口・鍵の渡し方・体の形・返事の取り出し方**。
+//   前は「文だけ」と「画像つき」の2つの関数に、OpenAIとClaudeを丸ごと書いていた
+//   ＝同じ物が4ヶ所。モデル名を変える・ヘッダーを足す時に拾い忘れが必ず出る形だった
+//   （2026-08-31 tools/check-dup.py が発見）。
+const PROVIDERS = {
+  openai: {
+    name: 'OpenAI',
+    url: 'https://api.openai.com/v1/chat/completions',
+    headers: apiKey => ({ 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` }),
+    body: ({ system, userContent, image, maxTokens }) => ({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: system },
+        {
+          role: 'user',
+          content: image
+            ? [
+                { type: 'image_url', image_url: { url: `data:${image.mediaType};base64,${image.base64}`, detail: 'low' } },
+                { type: 'text', text: IMAGE_PROMPT },
+              ]
+            : userContent,
+        },
+      ],
+      max_tokens: maxTokens,
+    }),
+    pick: data => data.choices[0].message.content.trim(),
+  },
 
-  throw new Error('Unknown provider');
+  claude: {
+    name: 'Claude',
+    url: 'https://api.anthropic.com/v1/messages',
+    headers: apiKey => ({
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-allow-browser': 'true',
+    }),
+    body: ({ system, userContent, image, maxTokens }) => ({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: maxTokens,
+      system,
+      messages: [{
+        role: 'user',
+        content: image
+          ? [
+              { type: 'image', source: { type: 'base64', media_type: image.mediaType, data: image.base64 } },
+              { type: 'text', text: IMAGE_PROMPT },
+            ]
+          : userContent,
+      }],
+    }),
+    pick: data => data.content[0].text.trim(),
+  },
+};
+
+// 画像を送る時だけ少し長めに返してもらう（画像つきの呼び出しの、前からの既定と同じ）
+const MAX_TOKENS_TEXT  = 700;
+const MAX_TOKENS_IMAGE = 800;
+
+async function request({ provider, apiKey, system, userContent = null, image = null, maxTokens = MAX_TOKENS_TEXT }) {
+  const p = PROVIDERS[provider];
+  if (!p) throw new Error('Unknown provider');
+  const res = await fetch(p.url, {
+    method: 'POST',
+    headers: p.headers(apiKey),
+    body: JSON.stringify(p.body({ system, userContent, image, maxTokens })),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error?.message || `${p.name} API error`);
+  return p.pick(data);
 }
 
-async function requestWithImage({ provider, apiKey, system, base64, mediaType, maxTokens = 800 }) {
-  if (provider === 'openai') {
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: system },
-          {
-            role: 'user',
-            content: [
-              { type: 'image_url', image_url: { url: `data:${mediaType};base64,${base64}`, detail: 'low' } },
-              { type: 'text', text: 'この画像を分析してタグを抽出してください。' },
-            ],
-          },
-        ],
-        max_tokens: maxTokens,
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error?.message || 'OpenAI API error');
-    return data.choices[0].message.content.trim();
-  }
-
-  if (provider === 'claude') {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-allow-browser': 'true',
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: maxTokens,
-        system,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
-            { type: 'text', text: 'この画像を分析してタグを抽出してください。' },
-          ],
-        }],
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error?.message || 'Claude API error');
-    return data.content[0].text.trim();
-  }
-
-  throw new Error('Unknown provider');
+// ```json ... ``` の囲いを外して読む（3ヶ所に同じ2行を書いていた）
+function parseJson(raw) {
+  return JSON.parse(raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim());
 }
 
 export async function callAI({ provider, apiKey, text, naturalLang }) {
@@ -152,18 +137,16 @@ export async function callAI({ provider, apiKey, text, naturalLang }) {
 
 export async function callNaturalToTags({ provider, apiKey, text, lang }) {
   const raw = await request({ provider, apiKey, system: SYSTEM_NATURAL_TO_TAGS[lang] ?? SYSTEM_NATURAL_TO_TAGS.en, userContent: text, maxTokens: 800 });
-  const json = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-  return JSON.parse(json);
+  return parseJson(raw);
 }
 
 export async function callImageToTags({ provider, apiKey, base64, mediaType, lang }) {
-  const raw = await requestWithImage({ provider, apiKey, system: SYSTEM_IMAGE_TO_TAGS[lang] ?? SYSTEM_IMAGE_TO_TAGS.en, base64, mediaType });
-  const json = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-  return JSON.parse(json);
+  const raw = await request({ provider, apiKey, system: SYSTEM_IMAGE_TO_TAGS[lang] ?? SYSTEM_IMAGE_TO_TAGS.en,
+                             image: { base64, mediaType }, maxTokens: MAX_TOKENS_IMAGE });
+  return parseJson(raw);
 }
 
 export async function callTagSuggest({ provider, apiKey, currentTags, lang }) {
   const raw = await request({ provider, apiKey, system: SYSTEM_TAG_SUGGEST[lang] ?? SYSTEM_TAG_SUGGEST.en, userContent: `Current tags: ${currentTags}`, maxTokens: 700 });
-  const json = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-  return JSON.parse(json);
+  return parseJson(raw);
 }

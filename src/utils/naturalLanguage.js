@@ -25,6 +25,24 @@ function getBlock(blocks, id) {
   return b?.text?.trim() ? getTagLabels(b.text, b.cats) : [];
 }
 
+// 文にする時に見る10枠を、まとめて取り出す。
+// ★同じ10行を日本語版と英語版の両方に書いていた（2026-08-31 tools/check-dup.py が発見）＝
+//   枠を1つ増やした時に、**片方の言語だけ拾えない**が起きる。枠の一覧はここ1ヶ所。
+function pickBlocks(blocks) {
+  return {
+    style:   getBlock(blocks, 'artstyle'),
+    attr:    getBlock(blocks, 'attribute'),
+    face:    getBlock(blocks, 'face'),
+    body:    getBlock(blocks, 'body'),
+    outfit:  getBlock(blocks, 'outfit'),
+    feature: getBlock(blocks, 'outfit_detail'),
+    comp:    getBlock(blocks, 'composition'),
+    bg:      getBlock(blocks, 'background'),
+    light:   getBlock(blocks, 'lighting'),
+    effect:  getBlock(blocks, 'effect'),
+  };
+}
+
 // Tags that act as the subject (ignore when building appearance list)
 const SUBJECT_TAGS = new Set(['solo','1girl','1boy','2girls','2boys',
   'multiple girls','multiple boys','androgynous','tomboy','1other']);
@@ -49,16 +67,7 @@ const JA_SUBJECT_MAP = {
 };
 
 export function toNaturalJa(blocks) {
-  const style   = getBlock(blocks, 'artstyle');
-  const attr    = getBlock(blocks, 'attribute');
-  const face    = getBlock(blocks, 'face');
-  const body    = getBlock(blocks, 'body');
-  const outfit  = getBlock(blocks, 'outfit');
-  const feature = getBlock(blocks, 'outfit_detail');
-  const comp    = getBlock(blocks, 'composition');
-  const bg      = getBlock(blocks, 'background');
-  const light   = getBlock(blocks, 'lighting');
-  const effect  = getBlock(blocks, 'effect');
+  const { style, attr, face, body, outfit, feature, comp, bg, light, effect } = pickBlocks(blocks);
 
   const parts = [];
 
@@ -143,16 +152,7 @@ const EN_SUBJECT_MAP = {
 };
 
 export function toNaturalEn(blocks) {
-  const style   = getBlock(blocks, 'artstyle');
-  const attr    = getBlock(blocks, 'attribute');
-  const face    = getBlock(blocks, 'face');
-  const body    = getBlock(blocks, 'body');
-  const outfit  = getBlock(blocks, 'outfit');
-  const feature = getBlock(blocks, 'outfit_detail');
-  const comp    = getBlock(blocks, 'composition');
-  const bg      = getBlock(blocks, 'background');
-  const light   = getBlock(blocks, 'lighting');
-  const effect  = getBlock(blocks, 'effect');
+  const { style, attr, face, body, outfit, feature, comp, bg, light, effect } = pickBlocks(blocks);
 
   const sentences = [];
 

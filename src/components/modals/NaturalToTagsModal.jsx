@@ -50,17 +50,22 @@ export default function NaturalToTagsModal({ lang, apiConfig, blocks: _blocks, o
     setSelected(init);
   };
 
-  const handleConvertText = async () => {
-    if (!input.trim()) return;
+  // 待つ・失敗を出す・後始末する、はどの変換でも同じ＝ここ1ヶ所。
+  // ★前は文からと画像からで丸ごと2回書いていた（2026-08-31 tools/check-dup.py が発見）。
+  const runConvert = async (ask) => {
     setBusy(true); setError(''); setResult(null); setSelected({});
     try {
-      const res = await callNaturalToTags({ provider: apiConfig.provider, apiKey: apiConfig.apiKey, text: input.trim(), lang });
-      applyResult(res);
+      applyResult(await ask());
     } catch (e) {
       setError(localizeApiError(e.message, lang));
     } finally {
       setBusy(false);
     }
+  };
+
+  const handleConvertText = async () => {
+    if (!input.trim()) return;
+    await runConvert(() => callNaturalToTags({ provider: apiConfig.provider, apiKey: apiConfig.apiKey, text: input.trim(), lang }));
   };
 
   const handleImageFile = async (file) => {
@@ -77,15 +82,7 @@ export default function NaturalToTagsModal({ lang, apiConfig, blocks: _blocks, o
 
   const handleConvertImage = async () => {
     if (!imageData) return;
-    setBusy(true); setError(''); setResult(null); setSelected({});
-    try {
-      const res = await callImageToTags({ provider: apiConfig.provider, apiKey: apiConfig.apiKey, ...imageData, lang });
-      applyResult(res);
-    } catch (e) {
-      setError(localizeApiError(e.message, lang));
-    } finally {
-      setBusy(false);
-    }
+    await runConvert(() => callImageToTags({ provider: apiConfig.provider, apiKey: apiConfig.apiKey, ...imageData, lang }));
   };
 
   const handleDrop = (e) => {

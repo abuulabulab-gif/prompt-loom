@@ -231,6 +231,19 @@ const SLEEPWEAR_SHOE_EXCL = new Set([
   'ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
 ]);
 
+// 脚が無い種族（人魚・ラミア）から排除する足元・脚タグ
+// ★人魚とラミアで同じ50語を二重に書いていた（2026-08-31 tools/check-dup.py が発見）。
+//   語を足す時に片方だけ直ると、種族によって効いたり効かなかったりする。
+const NO_LEGS_EXCL = new Set([
+    'sneakers','loafers','mary janes','sandals','slippers','geta','heels','pumps','high heels',
+    'platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
+    'ankle socks','socks','knee-high socks','thighhighs','white thighhighs','black thighhighs',
+    'tights','pantyhose','fishnet tights','fishnet stockings','fishnet legwear','stirrup leggings','leg warmers','barefoot',
+    'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','slit skirt','flared skirt','pencil skirt','pants','jeans','leggings',
+    'zettai ryouiki','bare thighs','thighs','thigh gap','thick thighs','long legs','garter belt',
+    'soles','toes','foot focus','toenail polish','pointed toes',
+  ]);
+
 export const RANDOM_EXCLUSION_RULES = new Map([
   // フレーミング → 下半身タグ除外
   ['extreme close-up', LOWER_BODY_FRAME_OUT],
@@ -241,24 +254,8 @@ export const RANDOM_EXCLUSION_RULES = new Map([
   ['upper body',       LOWER_BODY_FRAME_OUT],
   ['cowboy shot',      LOWER_BODY_FRAME_OUT],
   // 種族 × 衣装・足元（下半身がない種族）
-  ['mermaid', new Set([
-    'sneakers','loafers','mary janes','sandals','slippers','geta','heels','pumps','high heels',
-    'platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
-    'ankle socks','socks','knee-high socks','thighhighs','white thighhighs','black thighhighs',
-    'tights','pantyhose','fishnet tights','fishnet stockings','fishnet legwear','stirrup leggings','leg warmers','barefoot',
-    'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','slit skirt','flared skirt','pencil skirt','pants','jeans','leggings',
-    'zettai ryouiki','bare thighs','thighs','thigh gap','thick thighs','long legs','garter belt',
-    'soles','toes','foot focus','toenail polish','pointed toes',
-  ])],
-  ['lamia', new Set([
-    'sneakers','loafers','mary janes','sandals','slippers','geta','heels','pumps','high heels',
-    'platform shoes','ankle boots','boots','knee-high boots','thigh-high boots','platform boots',
-    'ankle socks','socks','knee-high socks','thighhighs','white thighhighs','black thighhighs',
-    'tights','pantyhose','fishnet tights','fishnet stockings','fishnet legwear','stirrup leggings','leg warmers','barefoot',
-    'shorts','hot pants','mini skirt','micro skirt','skirt','pleated skirt','slit skirt','flared skirt','pencil skirt','pants','jeans','leggings',
-    'zettai ryouiki','bare thighs','thighs','thigh gap','thick thighs','long legs','garter belt',
-    'soles','toes','foot focus','toenail polish','pointed toes',
-  ])],
+  ['mermaid', NO_LEGS_EXCL],
+  ['lamia', NO_LEGS_EXCL],
   // 男性 → 胸サイズを flat chest 以外から排除
   ['1boy', new Set(['small breasts','medium breasts','large breasts','huge breasts'])],
   ['androgynous', new Set(['large breasts','huge breasts'])],

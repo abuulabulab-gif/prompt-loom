@@ -439,6 +439,21 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
     </button>
   );
 
+  // タグの行は既定の欄でも自前の欄でも同じ姿＝ここ1ヶ所で作る。
+  // ★前は同じ10行を2ヶ所に書いていた（2026-08-31 tools/check-dup.py が発見）＝
+  //   渡す物を1つ増やす時に、**片方の欄だけ古いまま**になる。
+  const tagRow = (ft, ftKey) => (
+    <TagRow
+      ft={ft}
+      color={char.color}
+      blockOptions={blockOptions}
+      charBlockIds={charBlockIds}
+      lang={lang}
+      onChange={upd => setFieldTag(ftKey, upd)}
+      onInsert={() => insertToBlock(ft?.tags || '', ft?.block || '')}
+    />
+  );
+
   return (
     <div>
       {/* ── Toolbar ── */}
@@ -591,17 +606,7 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
                     color={char.color}
                     multi={f.multi}
                   />
-                  {showTag && (
-                    <TagRow
-                      ft={ft}
-                      color={char.color}
-                      blockOptions={blockOptions}
-                      charBlockIds={charBlockIds}
-                      lang={lang}
-                      onChange={upd => setFieldTag(ftKey, upd)}
-                      onInsert={() => insertToBlock(ft?.tags || '', ft?.block || '')}
-                    />
-                  )}
+                  {showTag && tagRow(ft, ftKey)}
                 </div>
               );
             })}
@@ -649,17 +654,7 @@ export default function ProfileSheet({ char, lang, onUpdate }) {
                     {f.multi ? '1L' : '多L'}
                   </button>
                 </div>
-                {showTag && (
-                  <TagRow
-                    ft={ft}
-                    color={char.color}
-                    blockOptions={blockOptions}
-                    charBlockIds={charBlockIds}
-                    lang={lang}
-                    onChange={upd => setFieldTag(ftKey, upd)}
-                    onInsert={() => insertToBlock(ft?.tags || '', ft?.block || '')}
-                  />
-                )}
+                {showTag && tagRow(ft, ftKey)}
               </div>
             );
           })}
