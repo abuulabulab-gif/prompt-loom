@@ -4,6 +4,11 @@
 
 export const CHANGELOG = [
   {
+    v: 'v2.11',
+    ja: '🩺破綻チェックに「着衣×乳首・乳輪」の注意を追加：服の語（白シャツ・着物・ビキニ等＝色や柄が付いていても拾う）と乳首・乳輪の語が同時にあると「そこを描く指示になり、胸がはだけやすい（見せないなら外す）」と知らせる。はだけ・透け・裸など見せる語がある時は出さない（見せるつもりの時は邪魔しない）。きっかけ＝実測で、着衣の2人に乳首の語が乗ると8枚とも胸がはだけ、外すと0枚になった。おまかせ生成には影響なし（注意だけ）。🎬キャラ共演：BREAKで区切った並びを「左→右」の指定順に揃えた＋ローカルの制作工房（HODO）を起動している時だけ「HODOに送る」ボタンが出る（公開版には出ない）',
+    en: '🩺 Conflict check: new "clothed × nipple/areola" warning — when clothing tags (white shirt, kimono, bikini… colored variants included) appear with nipple/areola tags, LOOM warns that tags are draw orders and the chest may get exposed (remove them if not shown). Suppressed when exposure tags (open shirt, see-through, nude…) are present. Prompted by a measurement: nipple tags on clothed two-character shots exposed the chest in 8/8 images; removing them brought it to 0/8. Random generation unaffected (warning only). 🎬 Collab: BREAK segments now follow the chosen left→right positions, and a "Send to HODO" button appears only when the local HODO studio is running (never on the public site).',
+  },
+  {
     v: 'v2.10',
     ja: '🎨多色髪カテゴリ新設（顔・表情ブロック）：ツートン髪・多色髪・インナーカラー・グラデ髪・左右分け色・メッシュ髪・毛先カラーの7タグ（全てDanbooru実在・タグ辞書の解説つき）。これまで自由入力でしか組めなかった「ベース色＋差し色」の髪（インナーカラー等）が棚から選べるように。衣装まわりに立襟・詰襟（形状・カット）とケープレット・短マント（コスプレ・ファンタジー）を追加。きっかけ＝キャラ立ち絵の量産テストで、多色髪の層が棚に丸ごと無いと判明したため',
     en: '🎨 New Multicolor Hair category (Face block): two-tone, multicolored, colored inner hair, gradient, split-color, streaked, and colored tips — 7 Danbooru-verified tags with dictionary entries. Base-plus-accent hair styles (inner color etc.) no longer require custom input. Also added high collar (Shape/Cut) and capelet (Cosplay) to outfit shelves. Prompted by a character-sheet production test that revealed the multicolor-hair layer was missing from the shelves entirely.',

@@ -20,6 +20,26 @@ const NO_LEGS_WEAR = [
   'heels','bare thighs','thighs','thigh gap','thick thighs','long legs',
 ];
 
+// ★見せない部位の語（2026-09-25・ABUU「タグを入れるということはそこを書いてくださいって指示してる」
+//   「衣服を着てるのに…乳首や乳輪などを入れるとそっちに釣られる」）。服の語があって、見せる語が無い時だけ注意。
+//   HODOの実測＝素体に乳首の語が乗ったまま着衣の2人を出すと8枚とも胸がはだけ、外すと0枚になった。
+const NIPPLE_WORDS = [
+  'nipples','small nipples','large nipples','puffy nipples','inverted nipples','thick nipples',
+  'pink nipples','dark nipples','areolae','large areolae','small areolae','big areolae',
+];
+const CLOTHED_WORDS = [
+  'shirt','t-shirt','blouse','dress','kimono','yukata','school uniform','serafuku','sailor collar','sweater',
+  'hoodie','jacket','coat','cardigan','vest','leotard','bodysuit','swimsuit','one-piece swimsuit','bikini',
+  'maid','apron','crop top','tank top','camisole','uniform','armor','china dress','cheongsam','bra',
+  'sports bra','tube top','turtleneck','sleeveless shirt','collared shirt','gym uniform','track jacket',
+];
+// 見せるつもりの印（これがあれば注意しない）
+const SHOWING_WORDS = [
+  'topless','nude','completely nude','naked','open shirt','open clothes','see-through','see-through clothes',
+  'breasts out','nipple slip','areola slip','bra lift','shirt lift','clothes lift','breastless clothes',
+  'cupless bra','nipple cutout','wet clothes','undressing','flashing','bare breasts','no bra',
+];
+
 export const CONFLICT_RULES = [
   // ── 年齢・体型 ────────────────────────────────────────────────
   { tags:['loli','mature female'],      ja:'幼い体型と成熟体型が矛盾',        en:'loli + mature female' },
@@ -35,6 +55,12 @@ export const CONFLICT_RULES = [
   { tags:['toned','chubby'],            ja:'引き締まりとぽっちゃりが矛盾',    en:'toned + chubby' },
   { tags:['thick thighs','thigh gap'],  ja:'ムチムチ太ももと太もも隙間は反対の体型なので矛盾', en:'thick thighs + thigh gap' },
   { tags:['long legs','petite'],        ja:'長い脚と小柄な体型が矛盾',        en:'long legs + petite', level:'warn' },
+
+  // ── 見せない部位の語（着衣×乳首・乳輪） ─────────────────────────
+  // any＝服の語のどれか1つ／unless＝見せる語があれば出さない（detectConflicts が読む）
+  ...NIPPLE_WORDS.map(n => ({ tags:[n], any:CLOTHED_WORDS, unless:SHOWING_WORDS, level:'warn',
+    ja:`服を着ているのに「${n}」＝そこを描く指示になり、胸がはだけやすい（見せないなら外す）`,
+    en:`${n} while clothed (tags are draw orders — may expose chest)` })),
 
   // ── 胸サイズ ───────────────────────────────────────────────────
   { tags:['flat chest','huge breasts'],   ja:'胸サイズが矛盾',               en:'flat chest + huge breasts' },
@@ -449,7 +475,12 @@ export const CONFLICT_RULES = [
 
 export const detectConflicts = text => {
   const bares = splitTags(text).map(s => bareTag(s).toLowerCase());
-  return CONFLICT_RULES.filter(r => r.tags.every(t => bares.includes(t.toLowerCase())));
+  const has = t => bares.includes(t.toLowerCase());
+  // ★any は「最後の語が一致」でも当たり＝`white shirt`・`black kimono` も服として拾う
+  const hasTail = t => { const w = t.toLowerCase(); return bares.some(x => x === w || x.endsWith(' ' + w)); };
+  // any＝どれか1つあれば当たり／unless＝どれか1つあれば当たらない（2026-09-25）
+  return CONFLICT_RULES.filter(r => r.tags.every(has)
+    && (!r.any || r.any.some(hasTail)) && !(r.unless || []).some(has));
 };
 
 // Pre-built reverse lookup: tag → Set of conflicting tags (lowercase)
