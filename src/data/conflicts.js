@@ -39,6 +39,13 @@ const SHOWING_WORDS = [
   'breasts out','nipple slip','areola slip','bra lift','shirt lift','clothes lift','breastless clothes',
   'cupless bra','nipple cutout','wet clothes','undressing','flashing','bare breasts','no bra',
 ];
+// ★cameltoe＝布が股に張り付いて出る形（2026-09-25・ABUU「そういった衣装のときに入れる感じで
+//   下着やピチピチ衣装など」）。これらの服が1つも無い時だけ注意（色・柄つきも最後の語で拾う）。
+const TIGHT_WEAR = [
+  'panties','underwear','lingerie','thong','g-string','bikini','swimsuit','leotard','bodysuit',
+  'plugsuit','wetsuit','spandex','latex','skin tight','bike shorts','dolphin shorts','short shorts',
+  'buruma','gym shorts','leggings','yoga pants','tights','pantyhose','highleg','bodystocking',
+];
 
 export const CONFLICT_RULES = [
   // ── 年齢・体型 ────────────────────────────────────────────────
@@ -61,6 +68,9 @@ export const CONFLICT_RULES = [
   ...NIPPLE_WORDS.map(n => ({ tags:[n], any:CLOTHED_WORDS, unless:SHOWING_WORDS, level:'warn',
     ja:`服を着ているのに「${n}」＝そこを描く指示になり、胸がはだけやすい（見せないなら外す）`,
     en:`${n} while clothed (tags are draw orders — may expose chest)` })),
+  { tags:['cameltoe'], unless:TIGHT_WEAR, level:'warn',
+    ja:'下着やピチピチの服が無いのに「cameltoe」＝布が張り付いた股を描く指示（そういう衣装の時に入れる語）',
+    en:'cameltoe without underwear/tight wear (it describes fabric clinging to the crotch)' },
 
   // ── 胸サイズ ───────────────────────────────────────────────────
   { tags:['flat chest','huge breasts'],   ja:'胸サイズが矛盾',               en:'flat chest + huge breasts' },
@@ -478,9 +488,9 @@ export const detectConflicts = text => {
   const has = t => bares.includes(t.toLowerCase());
   // ★any は「最後の語が一致」でも当たり＝`white shirt`・`black kimono` も服として拾う
   const hasTail = t => { const w = t.toLowerCase(); return bares.some(x => x === w || x.endsWith(' ' + w)); };
-  // any＝どれか1つあれば当たり／unless＝どれか1つあれば当たらない（2026-09-25）
+  // any＝どれか1つあれば当たり／unless＝どれか1つあれば当たらない（2026-09-25・どちらも最後の語で一致）
   return CONFLICT_RULES.filter(r => r.tags.every(has)
-    && (!r.any || r.any.some(hasTail)) && !(r.unless || []).some(has));
+    && (!r.any || r.any.some(hasTail)) && !(r.unless || []).some(hasTail));
 };
 
 // Pre-built reverse lookup: tag → Set of conflicting tags (lowercase)
