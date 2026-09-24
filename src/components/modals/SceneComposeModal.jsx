@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { sendToHinoko, openHinoko } from "../../hinoko.js";
 
 const SCENE_POSITIONS = [
   { id: 'left',   ja: '左',   en: 'on the left'        },
@@ -38,12 +39,13 @@ const charBodyText = char => {
   }).join(', ');
 };
 
-export default function SceneComposeModal({ characters, lang, theme, onClose, defaultQuality = 'masterpiece, best quality, ultra-detailed' }) {
+export default function SceneComposeModal({ characters, lang, theme, onClose, hinoko = null, defaultQuality = 'masterpiece, best quality, ultra-detailed' }) {
   const [selected, setSelected] = useState([]);
   const [relation, setRelation] = useState(SCENE_RELATIONS[0]);
   const [globalQuality, setGlobalQuality] = useState(defaultQuality || 'masterpiece, best quality, ultra-detailed');
   const [useBreak, setUseBreak] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [sent, setSent] = useState(false);
 
   const toggleChar = charId => {
     setSelected(prev => {
@@ -81,7 +83,10 @@ export default function SceneComposeModal({ characters, lang, theme, onClose, de
   })();
 
   const sep = useBreak ? ' BREAK ' : ', ';
-  const charParts = selected.map(s => {
+  // ★BREAKの並び＝画面の左から（HODOは BREAK の2つ目以降を左から順に領域へ割る・2026-09-24）。
+  //   選んだ順のままだと「左」と指定した子が右の領域に入る。
+  const POS_ORDER = { left: 0, center: 1, right: 2, back: 3 };
+  const charParts = [...selected].sort((a, b) => (POS_ORDER[a.position] ?? 9) - (POS_ORDER[b.position] ?? 9)).map(s => {
     const char = characters.find(c => c.id === s.charId);
     const pos = SCENE_POSITIONS.find(p => p.id === s.position);
     const body = charBodyText(char);
@@ -98,6 +103,14 @@ export default function SceneComposeModal({ characters, lang, theme, onClose, de
   const doCopy = () => {
     if (!built) return;
     navigator.clipboard.writeText(built).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); });
+  };
+  // ★HODO（旧HINOKO）が動いている時だけ出る＝公開版では hinoko が null で現れない（hinoko.js の方針）。
+  //   BREAK付きで渡すと、HODO側が「共通＋1人ずつ」を領域割りに直す（engines/own.py split_break_regions）。
+  const doSend = () => {
+    if (!built) return;
+    sendToHinoko(built, '')
+      .then(() => { setSent(true); openHinoko(); setTimeout(() => setSent(false), 2600); })
+      .catch(err => alert(err.message));
   };
 
   return (
@@ -225,6 +238,13 @@ export default function SceneComposeModal({ characters, lang, theme, onClose, de
         >
           {copied ? '✓ Copied!' : '📋 ' + (lang === 'ja' ? '合成プロンプトをコピー' : 'Copy combined prompt')}
         </button>
+        {hinoko && built && (
+          <button onClick={doSend}
+            title={lang === 'ja' ? 'HODOの作業台に置く（描き始めません）。BREAK付きなら1人ずつ領域に割って描きます' : 'Send to HODO'}
+            className="w-full mt-2 rounded-[0.5625rem] py-[0.5625rem] text-[0.75rem] font-bold cursor-pointer border border-linebright text-fg bg-transparent">
+            {sent ? '✓' : '🔥 ' + (lang === 'ja' ? 'HODOに送る' : 'Send to HODO')}
+          </button>
+        )}
 
         {selected.length > 1 && !useBreak && (
           <div className="text-warn text-[0.625rem] font-mono text-center mt-2">

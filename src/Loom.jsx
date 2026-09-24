@@ -3126,7 +3126,7 @@ export default function Loom() {
       {materialMakerOpen && <MaterialMakerModal lang={lang} blocks={blocks} onApply={applyMaterialTag} onClose={() => setMaterialMakerOpen(false)} />}
       {cutoutMakerOpen && <GroupMakerModal lang={lang} blocks={blocks} config={CUTOUT_MAKER} onApply={(pairs) => { applyMakerTagPairs(pairs, '✂️'); setCutoutMakerOpen(false); }} onClose={() => setCutoutMakerOpen(false)} />}
       {asymMakerOpen && <GroupMakerModal lang={lang} blocks={blocks} config={ASYM_MAKER} onApply={(pairs) => { applyMakerTagPairs(pairs, '🌓'); setAsymMakerOpen(false); }} onClose={() => setAsymMakerOpen(false)} />}
-      {sceneOpen && <SceneComposeModal characters={characters} lang={lang} activeTool={activeTool} theme={theme} onClose={() => setSceneOpen(false)} defaultQuality={blocks.find(b => b.id === 'quality')?.text || ''} />}
+      {sceneOpen && <SceneComposeModal characters={characters} lang={lang} activeTool={activeTool} theme={theme} hinoko={hinoko} onClose={() => setSceneOpen(false)} defaultQuality={blocks.find(b => b.id === 'quality')?.text || ''} />}
       {supportOpen && <SupportModal lang={lang} isMobile={isMobile} onClose={() => setSupportOpen(false)} />}
       {settingsOpen && <SettingsModal lang={lang} isMobile={isMobile} defaultTab={settingsTab} onClose={() => { setSettingsOpen(false); setSettingsTab('shortcuts'); }}
         hiddenBlockIds={hiddenBlockIds} allBlocks={blocks}
